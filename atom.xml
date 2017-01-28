@@ -39,6 +39,42 @@
   </entry>
   
   <entry>
+    <title>Anatomy of an Angular 2 Application</title>
+    <link href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/"/>
+    <id>https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/</id>
+    <published>2017-01-28T08:38:44.000Z</published>
+    <updated>2017-01-28T09:26:01.165Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br><a id="more"></a><br><div class="figure " style="width:;"><a class="fancybox" href="1_Comprised-of-Angular2.jpg" title="Comprised-of-Angular2" data-fancybox-group=""><img class="fig-img" src="1_Comprised-of-Angular2.jpg" alt="Comprised-of-Angular2"></a><span class="caption">Comprised-of-Angular2</span></div></p>
+<h2 id="What-is-Component"><a href="#What-is-Component" class="headerlink" title="What is Component?"></a>What is Component?</h2><p>每一個<strong>Component</strong>是經由 <span class="highlight-text primary">Template</span> + <span class="highlight-text primary">Class</span> + <span class="highlight-text primary">Metadata</span></p>
+<ul>
+<li>Template : User看到的HTML畫面，俗稱的View</li>
+<li>Class : 使View相關的Code</li>
+<li>Metadata : 提供一些Component額外的資訊</li>
+</ul>
+<div class="figure " style="width:;"><a class="fancybox" href="2_Comprised-of-Component.jpg" title="Comprised-of-Component" data-fancybox-group=""><img class="fig-img" src="2_Comprised-of-Component.jpg" alt="Comprised-of-Component"></a><span class="caption">Comprised-of-Component</span></div>
+<h2 id="Angular-Modules"><a href="#Angular-Modules" class="headerlink" title="Angular Modules"></a>Angular Modules</h2><ul>
+<li><strong>Angular Modules</strong>負責管理我們的Application，讓所有的Component之間都有相關聯</li>
+<li>Angular Application最少會有一個Angular Modules叫做 <strong>Application’s root Angular module</strong></li>
+<li>一個Application可以擁有很多個額外的<strong>Angular Modules</strong></li>
+</ul>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>Angular 的組成大概是這樣子，而之後會持續介紹每個元件的說明。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Application&quot;&gt;&lt;a href=&quot;#Application&quot; class=&quot;headerlink&quot; title=&quot;Application&quot;&gt;&lt;/a&gt;Application&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Angular2 Application&lt;/strong&gt; 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Angular2" scheme="https://mileslin.github.io/categories/Angular2/"/>
+    
+    
+      <category term="Angular2" scheme="https://mileslin.github.io/tags/Angular2/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Hello World</title>
     <link href="https://mileslin.github.io/2017/01/hello-world/"/>
     <id>https://mileslin.github.io/2017/01/hello-world/</id>
