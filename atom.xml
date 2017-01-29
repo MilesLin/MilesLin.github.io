@@ -39,6 +39,71 @@
   </entry>
   
   <entry>
+    <title>Angular2 Modules</title>
+    <link href="https://mileslin.github.io/2017/01/Angular2-Modules/"/>
+    <id>https://mileslin.github.io/2017/01/Angular2-Modules/</id>
+    <published>2017-01-29T16:30:10.000Z</published>
+    <updated>2017-01-29T17:20:45.452Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方便javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div>
+<a id="more"></a>
+<h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><ul>
+<li>TypeScript有提供Modules幫助我處理global namespace的問題</li>
+<li>ES 2015 有定義標準來處理Module，ES 2015一個Module就是一個檔案，一個檔案就是一個Module。  所以只要建立一個js檔，使用export或者import的方式，js檔就是一個Module了。</li>
+<li>Angular2有自己的Angular2 Modules，Angular2 Modules跟ES 2015 Modules是不太一樣的東西。</li>
+</ul>
+<h3 id="ES-2015-Modules"><a href="#ES-2015-Modules" class="headerlink" title="ES 2015 Modules"></a>ES 2015 Modules</h3><p>ES 2015 Modules的運作方式。<br>1.首先我們要有一個export的class<br><figure class="codeblock codeblock--tabbed"><figcaption><span>product.ts</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> Product{</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>上面的ts code會Transpile成這樣的js code<br><figure class="codeblock codeblock--tabbed"><figcaption><span>product.js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Product</span>(<span class="params"></span>)</span>{}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>2.我們就可以Import該class<br><figure class="codeblock codeblock--tabbed"><figcaption><span>useProduct.ts</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { Product } from <span class="string">'./product'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<div class="alert info"><p>import { Product } &lt;= 定義我們要import哪一個class</p>
+</div>
+<div class="alert info"><p>from ‘./product’ &lt;= 定義我們要讀取哪一個js檔案</p>
+</div>
+<h3 id="Angular-Modules"><a href="#Angular-Modules" class="headerlink" title="Angular Modules"></a>Angular Modules</h3><ul>
+<li>Angular Modules 幫助我們組織Applicaiton與functionality的區塊結合在一起，每一個Angular application至少有一個Angular Module，預設為app.module。</li>
+<li>當我們的application有越來越多功能的時候，則可以增加Feature Angular module。</li>
+<li>我們甚至可以定義Shared Module。讓各個Angular Modules使用。</li>
+</ul>
+<h3 id="ES-2015-Modules-vs-Angular-Modules"><a href="#ES-2015-Modules-vs-Angular-Modules" class="headerlink" title="ES 2015 Modules vs Angular Modules"></a>ES 2015 Modules vs Angular Modules</h3><table>
+<thead>
+<tr>
+<th>ES Modules</th>
+<th>Angular Modules</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code files用來import 或 export</td>
+<td>Code files幫我們組織application的functionality區塊</td>
+</tr>
+<tr>
+<td>組織code files</td>
+<td>組織application</td>
+</tr>
+</tbody>
+</table>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方便javascript並沒有提供管理javascript code的方式。&lt;/p&gt;
+&lt;!-- classes : info success warning danger no-icon --&gt;
+&lt;div class=&quot;alert info&quot;&gt;&lt;p&gt;Modules 幫我們解決了這個問題&lt;/p&gt;
+&lt;/div&gt;
+    
+    </summary>
+    
+      <category term="C#" scheme="https://mileslin.github.io/categories/C/"/>
+    
+    
+      <category term="Angular2" scheme="https://mileslin.github.io/tags/Angular2/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Anatomy of an Angular 2 Application</title>
     <link href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/"/>
     <id>https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/</id>
