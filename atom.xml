@@ -43,7 +43,7 @@
     <link href="https://mileslin.github.io/2017/01/Angular2-Modules/"/>
     <id>https://mileslin.github.io/2017/01/Angular2-Modules/</id>
     <published>2017-01-29T16:30:10.000Z</published>
-    <updated>2017-01-29T17:20:45.452Z</updated>
+    <updated>2017-01-29T17:25:44.644Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方便javascript並沒有提供管理javascript code的方式。</p>
 <!-- classes : info success warning danger no-icon -->
@@ -96,7 +96,7 @@
     
     </summary>
     
-      <category term="C#" scheme="https://mileslin.github.io/categories/C/"/>
+      <category term="Angular2" scheme="https://mileslin.github.io/categories/Angular2/"/>
     
     
       <category term="Angular2" scheme="https://mileslin.github.io/tags/Angular2/"/>
