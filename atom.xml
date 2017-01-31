@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-01-25T15:33:33.896Z</updated>
+  <updated>2017-01-31T14:55:39.253Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,18 +20,20 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-01-25T15:33:33.896Z</updated>
+    <updated>2017-01-31T14:55:39.253Z</updated>
     
-    <content type="html"><![CDATA[<p>Welecome to my blog. I’m Miles, from Taiwan.<br><a id="more"></a></p>
-<p>My job is web developing, there are some many new technique coming up these year, it’s really need a blog to record what I learned.</p>
-<p>This blog is that share my web development experience, problems in the working,new technique,Angular2,.NET MVC..etc,these all I will share here.</p>
-<p>And I’m enthusiastic about learning languages, like Japanese and English. I’m enthusiastic about jogging, I participated half marathon many times.</p>
-<p>Anyway, if my post could help you solve problem, that’s my pleasure.</p>
+    <content type="html"><![CDATA[<p>Welcome to my blog.</p>
+<a id="more"></a>
+<p>I’m Miles, from Taiwan and I’m a web developer.</p>
+<p>There are many new techniques coming out each year. I really need a blog to record what I learn.</p>
+<p>This blog is exactly that. To share my web development experiences, problems with work, new techniques, Angular2, .NET MVC.. etc,. I will share all of these here.</p>
+<p>I’m enthusiastic about learning languages, like Japanese and English, and jogging. I’ve participated in several half marathons. I’ll sometimes discuss these topics in my blog as well, but my main focus will be web developing.</p>
+<p>Anyway, if my posts can help you solve some problems, that’s my goal.</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;Welecome to my blog. I’m Miles, from Taiwan.&lt;br&gt;
+      &lt;p&gt;Welcome to my blog.&lt;/p&gt;
     
     </summary>
     
