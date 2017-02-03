@@ -41,13 +41,51 @@
   </entry>
   
   <entry>
+    <title>Bootstrapping App Component</title>
+    <link href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/"/>
+    <id>https://mileslin.github.io/2017/02/Bootstrapping-App-Component/</id>
+    <published>2017-02-02T15:42:46.000Z</published>
+    <updated>2017-02-03T15:19:40.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br><a id="more"></a></p>
+<p>要Bootstrapping Component我們需要完成兩件事情</p>
+<ol>
+<li>Load the root component(bootstrapping)</li>
+<li>Host the application</li>
+</ol>
+<h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><figure class="codeblock codeblock--tabbed"><figcaption><span>app.component.ts</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span>({</span><br><span class="line">  selector: <span class="string">'pm-app'</span>,</span><br><span class="line">  template: <span class="string">`</span><br><span class="line">      &lt;h1&gt;Angular2: Getting Started&lt;/h1&gt;</span><br><span class="line">  `</span></span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppComponent { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Index.html</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">head</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- Configure SystemJS --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"systemjs.config.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span><br><span class="line">    System.import('app').catch(function(err){ console.error(err); });</span><br><span class="line">  </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pm-app</span>&gt;</span>Loading App ...<span class="tag">&lt;/<span class="name">pm-app</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>Component的 <strong>selector:’pm-app’</strong> 代表指定directive的名稱，而Index的 <strong><pm-app></pm-app></strong> 我們稱為directive。  directive就是我們自己設計的元素，依上面的例子就是讀取template的Html。</p>
+<p>那現在的問題是，Module是如何知道我們的root application component的呢?</p>
+<ol>
+<li>index.html Import App 資料夾的ES module</li>
+<li>Systemjs.config.js 設定main.js為application的起點，所以main.js就是我們讀取的第一個ES module</li>
+<li>main ts file bootstraps 我們的第一個Angular module，並啟動application</li>
+</ol>
+<p>視覺化流程就是這樣<br><div class="figure " style="width:;"><a class="fancybox" href="flow.jpg" title="啟動流程" data-fancybox-group=""><img class="fig-img" src="flow.jpg" alt="啟動流程"></a><span class="caption">啟動流程</span></div></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 &lt;a href=&quot;https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents&quot; title=&quot;Angular 2: Getting Started&quot;&gt;Angular 2: Getting Started&lt;/a&gt; 提供的 &lt;a href=&quot;https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start&quot; title=&quot;Angular 2: Getting Started&quot;&gt;Github範例&lt;/a&gt; 做說明。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Angular2" scheme="https://mileslin.github.io/categories/Angular2/"/>
+    
+    
+      <category term="Angular2" scheme="https://mileslin.github.io/tags/Angular2/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Angular2 Modules</title>
     <link href="https://mileslin.github.io/2017/01/Angular2-Modules/"/>
     <id>https://mileslin.github.io/2017/01/Angular2-Modules/</id>
     <published>2017-01-29T16:30:10.000Z</published>
-    <updated>2017-01-29T17:25:44.644Z</updated>
+    <updated>2017-02-01T06:26:36.585Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方便javascript並沒有提供管理javascript code的方式。</p>
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
 <!-- classes : info success warning danger no-icon -->
 <div class="alert info"><p>Modules 幫我們解決了這個問題</p>
 </div>
@@ -91,7 +129,7 @@
     
     <summary type="html">
     
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方便javascript並沒有提供管理javascript code的方式。&lt;/p&gt;
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。&lt;/p&gt;
 &lt;!-- classes : info success warning danger no-icon --&gt;
 &lt;div class=&quot;alert info&quot;&gt;&lt;p&gt;Modules 幫我們解決了這個問題&lt;/p&gt;
 &lt;/div&gt;
@@ -138,33 +176,6 @@
     
     
       <category term="Angular2" scheme="https://mileslin.github.io/tags/Angular2/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="https://mileslin.github.io/2017/01/hello-world/"/>
-    <id>https://mileslin.github.io/2017/01/hello-world/</id>
-    <published>2017-01-15T03:24:13.263Z</published>
-    <updated>2017-01-15T03:24:13.264Z</updated>
-    
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.
-    
-    </summary>
-    
     
   </entry>
   
