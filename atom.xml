@@ -45,7 +45,7 @@
     <link href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/"/>
     <id>https://mileslin.github.io/2017/02/Bootstrapping-App-Component/</id>
     <published>2017-02-02T15:42:46.000Z</published>
-    <updated>2017-02-03T15:19:40.000Z</updated>
+    <updated>2017-02-04T15:11:41.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br><a id="more"></a></p>
 <p>要Bootstrapping Component我們需要完成兩件事情</p>
@@ -71,19 +71,19 @@
     
     </summary>
     
-      <category term="Angular2" scheme="https://mileslin.github.io/categories/Angular2/"/>
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular2" scheme="https://mileslin.github.io/tags/Angular2/"/>
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
   <entry>
-    <title>Angular2 Modules</title>
+    <title>Angular Modules</title>
     <link href="https://mileslin.github.io/2017/01/Angular2-Modules/"/>
     <id>https://mileslin.github.io/2017/01/Angular2-Modules/</id>
     <published>2017-01-29T16:30:10.000Z</published>
-    <updated>2017-02-01T06:26:36.585Z</updated>
+    <updated>2017-02-04T15:09:49.398Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
 <!-- classes : info success warning danger no-icon -->
@@ -136,19 +136,19 @@
     
     </summary>
     
-      <category term="Angular2" scheme="https://mileslin.github.io/categories/Angular2/"/>
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular2" scheme="https://mileslin.github.io/tags/Angular2/"/>
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
   <entry>
-    <title>Anatomy of an Angular 2 Application</title>
+    <title>Anatomy of an Angular Application</title>
     <link href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/"/>
     <id>https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/</id>
     <published>2017-01-28T08:38:44.000Z</published>
-    <updated>2017-01-28T09:26:01.165Z</updated>
+    <updated>2017-02-04T15:09:41.098Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br><a id="more"></a><br><div class="figure " style="width:;"><a class="fancybox" href="1_Comprised-of-Angular2.jpg" title="Comprised-of-Angular2" data-fancybox-group=""><img class="fig-img" src="1_Comprised-of-Angular2.jpg" alt="Comprised-of-Angular2"></a><span class="caption">Comprised-of-Angular2</span></div></p>
 <h2 id="What-is-Component"><a href="#What-is-Component" class="headerlink" title="What is Component?"></a>What is Component?</h2><p>每一個<strong>Component</strong>是經由 <span class="highlight-text primary">Template</span> + <span class="highlight-text primary">Class</span> + <span class="highlight-text primary">Metadata</span></p>
@@ -172,10 +172,10 @@
     
     </summary>
     
-      <category term="Angular2" scheme="https://mileslin.github.io/categories/Angular2/"/>
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular2" scheme="https://mileslin.github.io/tags/Angular2/"/>
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
