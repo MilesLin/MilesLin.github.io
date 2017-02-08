@@ -286,7 +286,7 @@
 <li>Host the application</li>
 </ol>
 <h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><figure class="codeblock codeblock--tabbed"><figcaption><span>app.component.ts</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span>({</span><br><span class="line">  selector: <span class="string">'pm-app'</span>,</span><br><span class="line">  template: <span class="string">`</span><br><span class="line">      &lt;h1&gt;Angular2: Getting Started&lt;/h1&gt;</span><br><span class="line">  `</span></span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppComponent { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Index.html</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">head</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- Configure SystemJS --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"systemjs.config.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span><br><span class="line">    System.import('app').catch(function(err){ console.error(err); });</span><br><span class="line">  </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pm-app</span>&gt;</span>Loading App ...<span class="tag">&lt;/<span class="name">pm-app</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Index.html</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">head</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- Configure SystemJS --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"systemjs.config.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span><br><span class="line">    System.import(<span class="string">'app'</span>).catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>)</span>{ <span class="built_in">console</span>.error(err); });</span><br><span class="line">  </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pm-app</span>&gt;</span>Loading App ...<span class="tag">&lt;/<span class="name">pm-app</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
 <p>Component的 <strong>selector:’pm-app’</strong> 代表指定directive的名稱，而Index的 <strong><pm-app></pm-app></strong> 我們稱為directive。  directive就是我們自己設計的元素，依上面的例子就是讀取template的Html。</p>
 <p>那現在的問題是，Module是如何知道我們的root application component的呢?</p>
 <ol>
@@ -652,6 +652,25 @@
                 
                 <div class="media">
                     
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
                     <div class="media-left">
                         <a class="link-unstyled" href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/">
                             <img class="media-image" src="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/Index-View-Introduction-Cover.jpg" width="90" height="90"/>
@@ -682,7 +701,7 @@
                 data-message-zero="no post found"
                 data-message-one="1 post found"
                 data-message-other="{n} posts found">
-                6 posts found
+                7 posts found
             </p>
         </div>
     </div>
