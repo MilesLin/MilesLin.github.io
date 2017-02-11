@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Miles&#39;s Journey">
-    <title>Anatomy of an Angular Application - Miles&#39;s Journey</title>
+    <title>Protecting Routes with Guards - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
         <meta name="keywords" content=".NET,Angular">
@@ -17,19 +17,16 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="ApplicationAngular2 Application 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。">
+    <meta name="description" content="前言預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Anatomy of an Angular Application">
-<meta property="og:url" content="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/index.html">
+<meta property="og:title" content="Protecting Routes with Guards">
+<meta property="og:url" content="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="ApplicationAngular2 Application 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。">
-<meta property="og:image" content="https://mileslin.github.io/1_Comprised-of-Angular2.jpg">
-<meta property="og:image" content="https://mileslin.github.io/2_Comprised-of-Component.jpg">
-<meta property="og:updated_time" content="2017-02-04T15:09:41.098Z">
+<meta property="og:description" content="前言預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。">
+<meta property="og:updated_time" content="2017-02-11T08:15:15.911Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Anatomy of an Angular Application">
-<meta name="twitter:description" content="ApplicationAngular2 Application 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。">
-<meta name="twitter:image" content="https://mileslin.github.io/1_Comprised-of-Angular2.jpg">
+<meta name="twitter:title" content="Protecting Routes with Guards">
+<meta name="twitter:description" content="前言預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -38,9 +35,6 @@
     
         <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
     
-    
-        <meta property="og:image" content="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" />
     
     
     
@@ -258,13 +252,13 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title" itemprop="headline">
-            Anatomy of an Angular Application
+            Protecting Routes with Guards
         </h1>
     
     <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-01-28T16:38:44+08:00">
+    <time itemprop="datePublished" datetime="2017-02-11T13:38:15+08:00">
 	
-		    Jan 28, 2017
+		    Feb 11, 2017
     	
     </time>
     
@@ -280,21 +274,53 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br><a id="more"></a><br><div class="figure " style="width:;"><a class="fancybox" href="1_Comprised-of-Angular2.jpg" title="Comprised-of-Angular2" data-fancybox-group=""><img class="fig-img" src="1_Comprised-of-Angular2.jpg" alt="Comprised-of-Angular2"></a><span class="caption">Comprised-of-Angular2</span></div></p>
-<h2 id="What-is-Component"><a href="#What-is-Component" class="headerlink" title="What is Component?"></a>What is Component?</h2><p>每一個<strong>Component</strong>是經由 <span class="highlight-text primary">Template</span> + <span class="highlight-text primary">Class</span> + <span class="highlight-text primary">Metadata</span></p>
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br><a id="more"></a><br>例如:</p>
 <ul>
-<li>Template : User看到的HTML畫面，俗稱的View</li>
-<li>Class : 使View相關的Code</li>
-<li>Metadata : 提供一些Component額外的資訊</li>
+<li>user是不被允許瀏覽到某個component</li>
+<li>此網址需要先登入才能使用</li>
+<li>先事先取得一些資料再顯示component</li>
+<li>在離開component之前先取得改變的資料</li>
+<li>或者在user離開之前詢問是否要不儲存離開</li>
 </ul>
-<div class="figure " style="width:;"><a class="fancybox" href="2_Comprised-of-Component.jpg" title="Comprised-of-Component" data-fancybox-group=""><img class="fig-img" src="2_Comprised-of-Component.jpg" alt="Comprised-of-Component"></a><span class="caption">Comprised-of-Component</span></div>
-<h2 id="Angular-Modules"><a href="#Angular-Modules" class="headerlink" title="Angular Modules"></a>Angular Modules</h2><ul>
-<li><strong>Angular Modules</strong>負責管理我們的Application，讓所有的Component之間都有相關聯</li>
-<li>Angular Application最少會有一個Angular Modules叫做 <strong>Application’s root Angular module</strong></li>
-<li>一個Application可以擁有很多個額外的<strong>Angular Modules</strong></li>
+<p>以上情況，都可以在route configuration新增<code>guards</code>達成我們要的目的。</p>
+<h3 id="目前共有五種guards可以使用"><a href="#目前共有五種guards可以使用" class="headerlink" title="目前共有五種guards可以使用"></a>目前共有五種guards可以使用</h3><ul>
+<li>CanActivate: to mediate navigation to a route.</li>
+<li>CanActivateChild: to mediate navigation to a child route.</li>
+<li>CanDeactivate: to mediate navigation away from the current route.</li>
+<li>Resolve: to perform route data retrieval before route activation.</li>
+<li>CanLoad: to mediate navigation to a feature module loaded asynchronously.</li>
 </ul>
-<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>Angular 的組成大概是這樣子，而之後會持續介紹每個元件的說明。</p>
-
+<h3 id="Guard的回傳值決定router的行為"><a href="#Guard的回傳值決定router的行為" class="headerlink" title="Guard的回傳值決定router的行為"></a>Guard的回傳值決定router的行為</h3><div class="alert info"><ul>
+<li>回傳 true，則navigation繼續</li>
+<li>回傳 false，則navigation process stops</li>
+</ul>
+</div>
+<p>而今天選擇<strong>CanActivate</strong>來做說明，其他guards的做法都是類似的。</p>
+<p>原文參考:<br><a href="https://angular.io/docs/ts/latest/guide/router.html#!#guards" title="Guards" target="_blank" rel="external">Guards</a></p>
+<h2 id="範例"><a href="#範例" class="headerlink" title="範例"></a>範例</h2><p>今天的範例我們要驗證使用者輸入的網址參數<em>(:id)</em>是不是個數字，如果不是數字，則導向到 <strong>welcome</strong> 頁面。 router設定如下:<br><figure class="codeblock codeblock--tabbed"><figcaption><span>configuration</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{ path: <span class="string">'detail/:id'</span>, component: DetailComponent }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>我們先用 <code>angular cli</code> 新增一個 <span class="highlight-text primary">service component</span></p>
+<div class="alert success no-icon"><p>ng g s product-guard.service</p>
+</div>
+<p><code>angular cli</code> 會幫我們新增好一個service component，而且我們要做的就是</p>
+<ol>
+<li><code>implements CanActivate</code>，實作canActivate方法</li>
+<li>因為要取得網址的資料，所以<code>canActivate傳入ActivatedRouteSnapshot</code></li>
+<li><code>import Router</code>使用router做導向的動作</li>
+<li>驗證是否為數字，是數字回傳true，不是數字導向<strong>welcome</strong>頁面，回傳false</li>
+</ol>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Service Component</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { CanActivate, ActivatedRouteSnapshot, Router } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { Injectable } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Injectable</span>()</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductGuardService <span class="keyword">implements</span> CanActivate {</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params"><span class="keyword">private</span> _router: Router</span>) { }</span><br><span class="line"></span><br><span class="line">  canActivate(route: ActivatedRouteSnapshot): <span class="built_in">boolean</span> {</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> id = +route.url[<span class="number">1</span>].path;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">isNaN</span>(id) || id &lt; <span class="number">1</span>) {</span><br><span class="line"></span><br><span class="line">      <span class="keyword">this</span>._router.navigate([<span class="string">'/welcome'</span>]);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>以上，我們component的程式碼就寫完了。</p>
+<p>接下來開啟app.module</p>
+<ol>
+<li><code>import ProductGuardService</code></li>
+<li><code>provider</code>加入 <span class="highlight-text success">ProductGuardService </span></li>
+<li><code>router</code>設定多傳入 <span class="highlight-text success">canActivate : ProductGuardService</span></li>
+</ol>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>app.module</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">import</span> { ProductGuardService } from <span class="string">'./product-guard.service'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  declarations: [</span><br><span class="line">    ...</span><br><span class="line">  ],</span><br><span class="line">  imports: [</span><br><span class="line">    ...</span><br><span class="line">    RouterModule.forRoot([      </span><br><span class="line">      {</span><br><span class="line">        path: <span class="string">'detail/:id'</span>,</span><br><span class="line">        canActivate: [ProductGuardService],</span><br><span class="line">        component: DetailComponent</span><br><span class="line">      }...</span><br><span class="line">    ])</span><br><span class="line">  ],</span><br><span class="line">  providers: [ProductGuardService],</span><br><span class="line">  ...</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>加入以上程式碼後，就完成了。  這樣當網址像是數字這種非數字的<strong>id</strong>參數，則網址頁就會自動導向到<strong>welcome</strong>。</p>
+<div class="alert success no-icon"><p><a href="http://localhost:4200/#/detail/abc" target="_blank" rel="external">http://localhost:4200/#/detail/abc</a> 導向 =&gt;  <strong><a href="http://localhost:4200/#/welcome" target="_blank" rel="external">http://localhost:4200/#/welcome</a></strong></p>
+</div>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular.io/docs/ts/latest/guide/router.html#!#guards" title="Guards" target="_blank" rel="external">Guards</a>
             
         </div>
     </div>
@@ -312,7 +338,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/01/Angular2-Modules/"  data-tooltip="Angular Modules">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -320,7 +346,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Navigation-and-Routing-Additional-Techniques/" data-tooltip="Navigation and Routing Additional Techniques">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -335,17 +361,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -393,7 +419,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/01/Angular2-Modules/"  data-tooltip="Angular Modules">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -401,7 +427,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Navigation-and-Routing-Additional-Techniques/" data-tooltip="Navigation and Routing Additional Techniques">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -416,17 +442,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -452,17 +478,17 @@
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
     <ul class="share-options">
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
                 <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
                 <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
                 <i class="fa fa-twitter"></i><span>Share on Twitter</span>
             </a>
         </li>
@@ -736,9 +762,9 @@
     
         <script>
              var disqus_config = function () {
-                 this.page.url = 'https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/';
+                 this.page.url = 'https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/';
                  
-                    this.page.identifier = '2017/01/Anatomy-of-an-Angular-2-Application/';
+                    this.page.identifier = '2017/02/Protecting-Routes-with-Guards/';
                  
              };
             (function() {

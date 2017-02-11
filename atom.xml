@@ -41,6 +41,74 @@
   </entry>
   
   <entry>
+    <title>Protecting Routes with Guards</title>
+    <link href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/"/>
+    <id>https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/</id>
+    <published>2017-02-11T05:38:15.000Z</published>
+    <updated>2017-02-11T08:15:15.911Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br><a id="more"></a><br>例如:</p>
+<ul>
+<li>user是不被允許瀏覽到某個component</li>
+<li>此網址需要先登入才能使用</li>
+<li>先事先取得一些資料再顯示component</li>
+<li>在離開component之前先取得改變的資料</li>
+<li>或者在user離開之前詢問是否要不儲存離開</li>
+</ul>
+<p>以上情況，都可以在route configuration新增<code>guards</code>達成我們要的目的。</p>
+<h3 id="目前共有五種guards可以使用"><a href="#目前共有五種guards可以使用" class="headerlink" title="目前共有五種guards可以使用"></a>目前共有五種guards可以使用</h3><ul>
+<li>CanActivate: to mediate navigation to a route.</li>
+<li>CanActivateChild: to mediate navigation to a child route.</li>
+<li>CanDeactivate: to mediate navigation away from the current route.</li>
+<li>Resolve: to perform route data retrieval before route activation.</li>
+<li>CanLoad: to mediate navigation to a feature module loaded asynchronously.</li>
+</ul>
+<h3 id="Guard的回傳值決定router的行為"><a href="#Guard的回傳值決定router的行為" class="headerlink" title="Guard的回傳值決定router的行為"></a>Guard的回傳值決定router的行為</h3><div class="alert info"><ul>
+<li>回傳 true，則navigation繼續</li>
+<li>回傳 false，則navigation process stops</li>
+</ul>
+</div>
+<p>而今天選擇<strong>CanActivate</strong>來做說明，其他guards的做法都是類似的。</p>
+<p>原文參考:<br><a href="https://angular.io/docs/ts/latest/guide/router.html#!#guards" title="Guards" target="_blank" rel="external">Guards</a></p>
+<h2 id="範例"><a href="#範例" class="headerlink" title="範例"></a>範例</h2><p>今天的範例我們要驗證使用者輸入的網址參數<em>(:id)</em>是不是個數字，如果不是數字，則導向到 <strong>welcome</strong> 頁面。 router設定如下:<br><figure class="codeblock codeblock--tabbed"><figcaption><span>configuration</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{ path: <span class="string">'detail/:id'</span>, component: DetailComponent }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>我們先用 <code>angular cli</code> 新增一個 <span class="highlight-text primary">service component</span></p>
+<div class="alert success no-icon"><p>ng g s product-guard.service</p>
+</div>
+<p><code>angular cli</code> 會幫我們新增好一個service component，而且我們要做的就是</p>
+<ol>
+<li><code>implements CanActivate</code>，實作canActivate方法</li>
+<li>因為要取得網址的資料，所以<code>canActivate傳入ActivatedRouteSnapshot</code></li>
+<li><code>import Router</code>使用router做導向的動作</li>
+<li>驗證是否為數字，是數字回傳true，不是數字導向<strong>welcome</strong>頁面，回傳false</li>
+</ol>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Service Component</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { CanActivate, ActivatedRouteSnapshot, Router } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { Injectable } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Injectable</span>()</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductGuardService <span class="keyword">implements</span> CanActivate {</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params"><span class="keyword">private</span> _router: Router</span>) { }</span><br><span class="line"></span><br><span class="line">  canActivate(route: ActivatedRouteSnapshot): <span class="built_in">boolean</span> {</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> id = +route.url[<span class="number">1</span>].path;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">isNaN</span>(id) || id &lt; <span class="number">1</span>) {</span><br><span class="line"></span><br><span class="line">      <span class="keyword">this</span>._router.navigate([<span class="string">'/welcome'</span>]);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>以上，我們component的程式碼就寫完了。</p>
+<p>接下來開啟app.module</p>
+<ol>
+<li><code>import ProductGuardService</code></li>
+<li><code>provider</code>加入 <span class="highlight-text success">ProductGuardService </span></li>
+<li><code>router</code>設定多傳入 <span class="highlight-text success">canActivate : ProductGuardService</span></li>
+</ol>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>app.module</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">import</span> { ProductGuardService } from <span class="string">'./product-guard.service'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  declarations: [</span><br><span class="line">    ...</span><br><span class="line">  ],</span><br><span class="line">  imports: [</span><br><span class="line">    ...</span><br><span class="line">    RouterModule.forRoot([      </span><br><span class="line">      {</span><br><span class="line">        path: <span class="string">'detail/:id'</span>,</span><br><span class="line">        canActivate: [ProductGuardService],</span><br><span class="line">        component: DetailComponent</span><br><span class="line">      }...</span><br><span class="line">    ])</span><br><span class="line">  ],</span><br><span class="line">  providers: [ProductGuardService],</span><br><span class="line">  ...</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>加入以上程式碼後，就完成了。  這樣當網址像是數字這種非數字的<strong>id</strong>參數，則網址頁就會自動導向到<strong>welcome</strong>。</p>
+<div class="alert success no-icon"><p><a href="http://localhost:4200/#/detail/abc" target="_blank" rel="external">http://localhost:4200/#/detail/abc</a> 導向 =&gt;  <strong><a href="http://localhost:4200/#/welcome" target="_blank" rel="external">http://localhost:4200/#/welcome</a></strong></p>
+</div>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular.io/docs/ts/latest/guide/router.html#!#guards" title="Guards" target="_blank" rel="external">Guards</a>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
+    
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Navigation and Routing Additional Techniques</title>
     <link href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/"/>
     <id>https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/</id>
