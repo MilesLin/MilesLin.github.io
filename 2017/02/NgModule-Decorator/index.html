@@ -6,10 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Miles&#39;s Journey">
-    <title>Category: Angular - Miles&#39;s Journey</title>
+    <title>NgModule Decorator - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,">
+        <meta name="keywords" content=".NET,Angular">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,12 +17,19 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta property="og:type" content="blog">
-<meta property="og:title" content="Miles's Journey">
-<meta property="og:url" content="https://mileslin.github.io/categories/Angular/index.html">
+    <meta name="description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="NgModule Decorator">
+<meta property="og:url" content="https://mileslin.github.io/2017/02/NgModule-Decorator/index.html">
 <meta property="og:site_name" content="Miles's Journey">
+<meta property="og:description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
+<meta property="og:image" content="https://mileslin.github.io/1_app_module.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2_ImportTruth.jpg">
+<meta property="og:updated_time" content="2017-02-16T17:06:59.614Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Miles's Journey">
+<meta name="twitter:title" content="NgModule Decorator">
+<meta name="twitter:description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
+<meta name="twitter:image" content="https://mileslin.github.io/1_app_module.jpg">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -31,6 +38,9 @@
     
         <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
     
+    
+        <meta property="og:image" content="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" />
     
     
     
@@ -64,7 +74,7 @@
         
     
 
-<header id="header" data-behavior="1">
+<header id="header" data-behavior="4">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
@@ -86,7 +96,7 @@
 
     
 
-<nav id="sidebar" data-behavior="1">
+<nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -237,76 +247,21 @@
 </nav>
 
             
-            <div id="main" data-behavior="1"
+            <div id="main" data-behavior="4"
                  class="
                         hasCoverMetaIn
                         ">
                 
-    <section class="postShorten-group main-content-wrap">
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
     
     
-    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title" itemprop="headline">
-                    
-                        <a class="link-unstyled" href="/2017/02/Dive-into-Angular-Modules/">
-                            Dive into Angular Modules
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time itemprop="datePublished" datetime="2017-02-14T23:09:20+08:00">
-	
-		    Feb 14, 2017
-    	
-    </time>
+        <div class="post-header main-content-wrap text-left">
     
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Angular/">Angular</a>
-
-
+        <h1 class="post-title" itemprop="headline">
+            NgModule Decorator
+        </h1>
     
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt" itemprop="articleBody">
-                    <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2>
-                    
-                        <a href="/2017/02/Dive-into-Angular-Modules/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-            <a href="/2017/02/Dive-into-Angular-Modules/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" itemprop="image" src="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/NailImage.jpg"/>
-                </div>
-            </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title" itemprop="headline">
-                    
-                        <a class="link-unstyled" href="/2017/02/NgModule-Decorator/">
-                            NgModule Decorator
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
+    <div class="post-meta">
     <time itemprop="datePublished" datetime="2017-02-13T22:57:17+08:00">
 	
 		    Feb 13, 2017
@@ -321,369 +276,145 @@
     
 </div>
 
-            </div>
-            
-                <div class="postShorten-excerpt" itemprop="articleBody">
-                    <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br>
-                    
-                        <a href="/2017/02/NgModule-Decorator/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-            <a href="/2017/02/NgModule-Decorator/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" itemprop="image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg"/>
-                </div>
-            </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title" itemprop="headline">
-                    
-                        <a class="link-unstyled" href="/2017/02/Protecting-Routes-with-Guards/">
-                            Protecting Routes with Guards
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time itemprop="datePublished" datetime="2017-02-11T13:38:15+08:00">
-	
-		    Feb 11, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Angular/">Angular</a>
-
-
-    
 </div>
-
-            </div>
-            
-                <div class="postShorten-excerpt" itemprop="articleBody">
-                    <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br>
-                    
-                        <a href="/2017/02/Protecting-Routes-with-Guards/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-    </article>
     
-    
-    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title" itemprop="headline">
-                    
-                        <a class="link-unstyled" href="/2017/02/Navigation-and-Routing-Additional-Techniques/">
-                            Navigation and Routing Additional Techniques
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time itemprop="datePublished" datetime="2017-02-09T00:06:07+08:00">
-	
-		    Feb 09, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Angular/">Angular</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt" itemprop="articleBody">
-                    <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br>
-                    
-                        <a href="/2017/02/Navigation-and-Routing-Additional-Techniques/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title" itemprop="headline">
-                    
-                        <a class="link-unstyled" href="/2017/02/Routing-Basics/">
-                            Routing Basics
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time itemprop="datePublished" datetime="2017-02-08T01:06:40+08:00">
-	
-		    Feb 08, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Angular/">Angular</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt" itemprop="articleBody">
-                    <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p>
-                    
-                        <a href="/2017/02/Routing-Basics/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-            <a href="/2017/02/Routing-Basics/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" itemprop="image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg"/>
-                </div>
-            </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title" itemprop="headline">
-                    
-                        <a class="link-unstyled" href="/2017/02/Binding-syntax/">
-                            Binding syntax
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time itemprop="datePublished" datetime="2017-02-04T23:25:57+08:00">
-	
-		    Feb 04, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Angular/">Angular</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt" itemprop="articleBody">
-                    <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+    <div class="post-content markdown" itemprop="articleBody">
+        <div class="main-content-wrap">
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br><a id="more"></a><br><div class="figure right" style="width:;"><a class="fancybox" href="1_app_module.jpg" title="app_module" data-fancybox-group=""><img class="fig-img" src="1_app_module.jpg" alt="app_module"></a><span class="caption">app_module</span></div><br>在建立Angular預設專案的時候，會有一個app.module.ts，這是我們的起始module，這Ng Module有寫了很多的Decorator，這些Decorator都有一些使用原則，要在這邊做說明。</p>
+<h2 id="What-Is-an-Angular-Module"><a href="#What-Is-an-Angular-Module" class="headerlink" title="What Is an Angular Module"></a>What Is an Angular Module</h2><p>Angular module 是一個包含有NgModule decorator的class。 主要目的在於</p>
 <ul>
-<li>內嵌繫結 ( Interpolation )</li>
-<li>屬性繫結 ( Property Binding )</li>
-<li>事件繫結 ( Event Binding )</li>
-<li>雙向繫結 ( Two-way Binding )</li>
+<li>管理我們的application</li>
+<li>有既定的pattern管理程式碼</li>
+<li>可載入外部libraries，擴展原本的application</li>
+<li>可整合其他Module的程式碼</li>
 </ul>
-                    
-                        <a href="/2017/02/Binding-syntax/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
+<p>而Angular module 當application start時候，可以loaded eagerly，或者可以經由router做lazy loaded asynchronously。</p>
+<h2 id="Bootstrap-Array-Truth"><a href="#Bootstrap-Array-Truth" class="headerlink" title="Bootstrap Array Truth"></a>Bootstrap Array Truth</h2><p>Bootstrap Array定義哪一個是最初的Component，使用上也有些限制。</p>
+<ul>
+<li>至少要有一個component，我們稱為root application component</li>
+<li>只能用在root application module, <code>AppModule</code></li>
+</ul>
+<h2 id="Declarations-Array-Truth"><a href="#Declarations-Array-Truth" class="headerlink" title="Declarations Array Truth"></a>Declarations Array Truth</h2><p>我們建立的每一個建立的<em>component,directive,pipe</em>，都會在Angular module中宣告，這些宣告就是放在<strong>declarations</strong>，表示這些<em>component,directive,pipe</em>都是屬於這個Angular module。</p>
+<ul>
+<li>每一個<em>component,directive,pipe</em>只能被一個Angular module宣告</li>
+<li><strong>declarations</strong> 只能宣告<em>component,directive,pipe</em>，不能放其他classes或是services</li>
+<li><span class="highlight-text primary">不重覆宣告 component,directive,pipe 在其他的Angular module</span>  </li>
+<li>所有被宣告的<em>component,directive,pipe</em>預設只能在同一個Angular module使用<ul>
+<li>可用export的方式讓其他Angular module使用</li>
+</ul>
+</li>
+</ul>
+<h2 id="Exports-Array-Truth"><a href="#Exports-Array-Truth" class="headerlink" title="Exports Array Truth"></a>Exports Array Truth</h2><p>Exports Array可以讓我們share <em>component,directive,pipe</em> 給其他的modules使用，甚至可以re-export 3rd party modules。</p>
+<ul>
+<li>如果其他component需要，則Export <em>component,directive,pipe</em></li>
+<li>Re-export modules to re-export their <em>component,directive,pipe</em></li>
+<li><span class="highlight-text primary">Never export a service</span>
+<ul>
+<li>因為Services被宣告在root application Provider’s array，讓Services可被inject到其他class，所以不需要export</li>
+</ul>
+</li>
+</ul>
+<p>用法:<br><figure class="codeblock codeblock--tabbed"><figcaption><span>shared.module</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { NgModule }            from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule }        from <span class="string">'@angular/common'</span>;</span><br><span class="line"><span class="keyword">import</span> { FormsModule }         from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { AwesomePipe }         from <span class="string">'./awesome.pipe'</span>;</span><br><span class="line"><span class="keyword">import</span> { HighlightDirective }  from <span class="string">'./highlight.directive'</span>;</span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports:      [ CommonModule ],</span><br><span class="line">  declarations: [ AwesomePipe, HighlightDirective ],</span><br><span class="line">  exports:      [ AwesomePipe, HighlightDirective,</span><br><span class="line">                  CommonModule, FormsModule ]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> SharedModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<a href="https://angular.io/docs/ts/latest/guide/ngmodule.html#!#shared-module" title="shared-module" target="_blank" rel="external">shared-module</a>
+<h2 id="Imports-Array-Truth"><a href="#Imports-Array-Truth" class="headerlink" title="Imports Array Truth"></a>Imports Array Truth</h2><p>Angular module可以藉由importing其他的Angular module來 extend capabilities。</p>
+<ul>
+<li>Importing module取得該module exported的<em>component,directive,pipe</em></li>
+<li>Only import what this module needs</li>
+<li><span class="highlight-text primary">Importing a module does NOT provide access to its imported modules</span> 或者說 <span class="highlight-text primary">Imports are not inherited</span>
+</li>
+</ul>
+<p>以下圖做說明，就是AppModule可以使用<code>StarComponet</code>但是沒有辦法使用<code>ngModel directive</code>，除非SharedModule re-export FormsModule，AppModule再取得SharedModule re-export的FormsModule才可以使用<code>ngModel directive</code>。<br><div class="figure " style="width:;"><a class="fancybox" href="2_ImportTruth.jpg" title="imports Array" data-fancybox-group=""><img class="fig-img" src="2_ImportTruth.jpg" alt="imports Array"></a><span class="caption">imports Array</span></div></p>
+<h2 id="Providers-Array-Truth"><a href="#Providers-Array-Truth" class="headerlink" title="Providers Array Truth"></a>Providers Array Truth</h2><ul>
+<li>Any service provider added to the providers array is registered at the root of the application</li>
+<li>別在shared module 加入services<ul>
+<li>可考慮建立一個CoreModule專門加入services，並只在AppModule importing一次</li>
+</ul>
+</li>
+<li>Routing guards 只能被加在 Angular module 的 providers array</li>
+</ul>
+<a href="https://angular.io/docs/ts/latest/guide/ngmodule.html#!#providers" title="providers" target="_blank" rel="external">providers</a>
+
             
         </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
         
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title" itemprop="headline">
-                    
-                        <a class="link-unstyled" href="/2017/02/Bootstrapping-App-Component/">
-                            Bootstrapping App Component
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time itemprop="datePublished" datetime="2017-02-02T23:42:46+08:00">
-	
-		    Feb 02, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Angular/">Angular</a>
-
-
-    
-</div>
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a>
 
             </div>
-            
-                <div class="postShorten-excerpt" itemprop="articleBody">
-                    <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br>
-                    
-                        <a href="/2017/02/Bootstrapping-App-Component/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
         
-            <a href="/2017/02/Bootstrapping-App-Component/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" itemprop="image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg"/>
-                </div>
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Dive-into-Angular-Modules/"  data-tooltip="Dive into Angular Modules">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Protecting-Routes-with-Guards/" data-tooltip="Protecting Routes with Guards">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
             </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title" itemprop="headline">
-                    
-                        <a class="link-unstyled" href="/2017/01/Angular2-Modules/">
-                            Angular Modules
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time itemprop="datePublished" datetime="2017-01-30T00:30:10+08:00">
-	
-		    Jan 30, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Angular/">Angular</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt" itemprop="articleBody">
-                    <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
-<!-- classes : info success warning danger no-icon -->
-<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
-</div>
-                    
-                        <a href="/2017/01/Angular2-Modules/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title" itemprop="headline">
-                    
-                        <a class="link-unstyled" href="/2017/01/Anatomy-of-an-Angular-2-Application/">
-                            Anatomy of an Angular Application
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time itemprop="datePublished" datetime="2017-01-28T16:38:44+08:00">
-	
-		    Jan 28, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Angular/">Angular</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt" itemprop="articleBody">
-                    <h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br>
-                    
-                        <a href="/2017/01/Anatomy-of-an-Angular-2-Application/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-            <a href="/2017/01/Anatomy-of-an-Angular-2-Application/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" itemprop="image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg"/>
-                </div>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                <i class="fa fa-google-plus"></i>
             </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+        <li class="post-action">
             
-        
-    </article>
-    
-    <div class="pagination-bar">
-    <ul class="pagination">
-        
-        
-        <li class="pagination-number">page 1 of 1</li>
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
     </ul>
 </div>
 
-</section>
+
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
 
 
 
@@ -694,6 +425,90 @@
 </footer>
 
             </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Dive-into-Angular-Modules/"  data-tooltip="Dive into Angular Modules">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Protecting-Routes-with-Guards/" data-tooltip="Protecting Routes with Guards">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+            <li class="post-action">
+                <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                    <i class="fa fa-comment-o"></i>
+                </a>
+            </li>
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <ul class="share-options">
+        <li class="share-option">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
+            </a>
+        </li>
+        <li class="share-option">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+            </a>
+        </li>
+        <li class="share-option">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+            </a>
+        </li>
+    </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
             
         </div>
         
@@ -1006,6 +821,25 @@
 <script src="/assets/js/jquery.fancybox-thumbs.js"></script>
 <script src="/assets/js/tranquilpeak.js"></script>
 <!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2017/02/NgModule-Decorator/';
+                 
+                    this.page.identifier = '2017/02/NgModule-Decorator/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
 
 
 
