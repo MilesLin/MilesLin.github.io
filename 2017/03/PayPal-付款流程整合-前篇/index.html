@@ -6,10 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Miles&#39;s Journey">
-    <title>Anatomy of an Angular Application - Miles&#39;s Journey</title>
+    <title>PayPal 付款流程整合 前篇 - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,Angular">
+        <meta name="keywords" content=".NET,PayPal">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,19 +17,38 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="ApplicationAngular2 Application 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。">
+    <meta name="description" content="現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。
+
+付款流程
+加入 PayPal 付款按鈕
+選擇整合方式
+Client 端整合 或 Server 端整合
+測試整合流程">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Anatomy of an Angular Application">
-<meta property="og:url" content="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/index.html">
+<meta property="og:title" content="PayPal 付款流程整合 前篇">
+<meta property="og:url" content="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="ApplicationAngular2 Application 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。">
-<meta property="og:image" content="https://mileslin.github.io/1_Comprised-of-Angular2.jpg">
-<meta property="og:image" content="https://mileslin.github.io/2_Comprised-of-Component.jpg">
-<meta property="og:updated_time" content="2017-02-13T04:30:02.169Z">
+<meta property="og:description" content="現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。
+
+付款流程
+加入 PayPal 付款按鈕
+選擇整合方式
+Client 端整合 或 Server 端整合
+測試整合流程">
+<meta property="og:image" content="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/in-context-flow.png">
+<meta property="og:image" content="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png">
+<meta property="og:image" content="https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png">
+<meta property="og:updated_time" content="2017-03-19T07:00:02.132Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Anatomy of an Angular Application">
-<meta name="twitter:description" content="ApplicationAngular2 Application 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。">
-<meta name="twitter:image" content="https://mileslin.github.io/1_Comprised-of-Angular2.jpg">
+<meta name="twitter:title" content="PayPal 付款流程整合 前篇">
+<meta name="twitter:description" content="現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。
+
+付款流程
+加入 PayPal 付款按鈕
+選擇整合方式
+Client 端整合 或 Server 端整合
+測試整合流程">
+<meta name="twitter:image" content="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/in-context-flow.png">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -39,8 +58,8 @@
         <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
     
     
-        <meta property="og:image" content="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" />
+        <meta property="og:image" content="http://softstribe.com/wp-content/uploads/2015/11/paypal_2014_logo_detail-290x290.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="http://softstribe.com/wp-content/uploads/2015/11/paypal_2014_logo_detail-290x290.png" />
     
     
     
@@ -258,19 +277,19 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title" itemprop="headline">
-            Anatomy of an Angular Application
+            PayPal 付款流程整合 前篇
         </h1>
     
     <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-01-28T16:38:44+08:00">
+    <time itemprop="datePublished" datetime="2017-03-18T18:33:53+08:00">
 	
-		    Jan 28, 2017
+		    Mar 18, 2017
     	
     </time>
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/Angular/">Angular</a>
+    <a class="category-link" href="/categories/PayPal/">PayPal</a>
 
 
     
@@ -280,21 +299,78 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br><a id="more"></a><br><div class="figure " style="width:;"><a class="fancybox" href="1_Comprised-of-Angular2.jpg" title="Comprised-of-Angular2" data-fancybox-group=""><img class="fig-img" src="1_Comprised-of-Angular2.jpg" alt="Comprised-of-Angular2"></a><span class="caption">Comprised-of-Angular2</span></div></p>
-<h2 id="What-is-Component"><a href="#What-is-Component" class="headerlink" title="What is Component?"></a>What is Component?</h2><p>每一個<strong>Component</strong>是經由 <span class="highlight-text primary">Template</span> + <span class="highlight-text primary">Class</span> + <span class="highlight-text primary">Metadata</span></p>
+            <p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
 <ul>
-<li>Template : User看到的HTML畫面，俗稱的View</li>
-<li>Class : 使View相關的Code</li>
-<li>Metadata : 提供一些Component額外的資訊</li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程" target="_blank" rel="external">付款流程</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕" target="_blank" rel="external">加入 PayPal 付款按鈕</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式" target="_blank" rel="external">選擇整合方式</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合" target="_blank" rel="external">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合" target="_blank" rel="external">Server 端整合</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程" target="_blank" rel="external">測試整合流程</a>
+</li>
 </ul>
-<div class="figure " style="width:;"><a class="fancybox" href="2_Comprised-of-Component.jpg" title="Comprised-of-Component" data-fancybox-group=""><img class="fig-img" src="2_Comprised-of-Component.jpg" alt="Comprised-of-Component"></a><span class="caption">Comprised-of-Component</span></div>
-<h2 id="Angular-Modules"><a href="#Angular-Modules" class="headerlink" title="Angular Modules"></a>Angular Modules</h2><ul>
-<li><strong>Angular Modules</strong>負責管理我們的Application，讓所有的Component之間都有相關聯</li>
-<li>Angular Application最少會有一個Angular Modules叫做 <strong>Application’s root Angular module</strong></li>
-<li>一個Application可以擁有很多個額外的<strong>Angular Modules</strong></li>
+<a id="more"></a>
+<h2 id="付款流程"><a href="#付款流程" class="headerlink" title="付款流程"></a>付款流程</h2><p>付款流程示意圖<br><div class="figure " style="width:;"><a class="fancybox" href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/in-context-flow.png" title="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" data-fancybox-group="" target="_blank" rel="external"><img class="fig-img" src="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/in-context-flow.png" alt="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/"></a><span class="caption">圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/</span></div></p>
+<ol>
+<li>付款人按下付款按鈕<ul>
+<li>會使用 PayPal 提供的 <code>checkout.js</code> 跳出 lightbox window</li>
+<li>接下來就是使用 javascript 或者 server 端呼叫 PayPal API 初始化帳單</li>
+<li>一旦帳單初始化付款流程就會在 lightbox window 正式開始</li>
 </ul>
-<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>Angular 的組成大概是這樣子，而之後會持續介紹每個元件的說明。</p>
-
+</li>
+<li><p>付款人需登入 PayPal</p>
+<div class="figure " style="width:;"><a class="fancybox" href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png" title="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" data-fancybox-group="" target="_blank" rel="external"><img class="fig-img" src="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png" alt="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/"></a><span class="caption">圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/</span></div>
+</li>
+<li><p>付款人會授權 PayPal 帳單</p>
+<div class="figure " style="width:;"><a class="fancybox" href="https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png" title="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" data-fancybox-group="" target="_blank" rel="external"><img class="fig-img" src="https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png" alt="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/"></a><span class="caption">圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/</span></div>
+</li>
+<li><p>付款人同意帳單後，PayPay 會關掉 lightbox window，付款人回到原本的網頁畫面。  此刻，我們可以顯示一個確認頁面，呼叫 PapPal REST API 來顯示帳單明細，內容包含帳單地址跟Email等等….</p>
+</li>
+<li><p>在確認頁面裡面，呼叫付款完成的 PayPal API 來完成付款。</p>
+</li>
+</ol>
+<p>補充 : <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/prerequisites/" title="支援的瀏覽器" target="_blank" rel="external">Express Checkout 支援的瀏覽器</a></p>
+<h2 id="加入-PayPal-付款按鈕"><a href="#加入-PayPal-付款按鈕" class="headerlink" title="加入 PayPal 付款按鈕"></a>加入 PayPal 付款按鈕</h2><p>載入checkout.js<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Include checkout.js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=<span class="string">"https://www.paypalobjects.com/api/checkout.js"</span>&gt;&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<div class="alert danger"><p>請使用官方提供的線上版本，不要下載到local端。</p>
+</div>
+<h4 id="Render-the-PayPal-button"><a href="#Render-the-PayPal-button" class="headerlink" title="Render the PayPal button"></a>Render the PayPal button</h4><figure class="codeblock codeblock--tabbed"><figcaption><span>Render button</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"paypal-button"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span><br><span class="line">    paypal.Button.render({</span><br><span class="line">    </span><br><span class="line">        <span class="attr">env</span>: <span class="string">'production'</span>, <span class="comment">// Specify 'sandbox' for the test environment</span></span><br><span class="line"></span><br><span class="line">        payment: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>{</span><br><span class="line">            <span class="comment">// Set up the payment here, when the buyer clicks on the button</span></span><br><span class="line">        },</span><br><span class="line"></span><br><span class="line">        <span class="attr">onAuthorize</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data, actions</span>) </span>{</span><br><span class="line">            <span class="comment">// Execute the payment here, when the buyer approves the transaction</span></span><br><span class="line">       }</span><br><span class="line">            </span><br><span class="line">    }, <span class="string">'#paypal-button'</span>);</span><br><span class="line"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<div class="alert info"><ul>
+<li>可以開啟瀏覽器開發工具，確認看看載入是否有錯誤</li>
+<li>IE的環境下建議加入 <code>&lt;!DOCTYPE html&gt;</code> 和 <code>&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot; /&gt;</code> 可避免一些兼容性的錯誤</li>
+</ul>
+</div>
+<p>補充 : </p>
+<ul>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/" title="客製化按鈕" target="_blank" rel="external">客製化按鈕</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/" title="checkout.js 更多應用" target="_blank" rel="external">checkout.js 更多應用</a>
+</li>
+</ul>
+<h2 id="選擇整合方式"><a href="#選擇整合方式" class="headerlink" title="選擇整合方式"></a>選擇整合方式</h2><p>Client 整合 :</p>
+<ul>
+<li>只需要使用 HTML 跟 JavaScript 就可以完成付款流程</li>
+</ul>
+<p>Server 整合 :</p>
+<ul>
+<li>更有彈性</li>
+<li>在 server 端呼叫 REST Payments API 建立帳單、付款等動作。</li>
+</ul>
+<h4 id="整合流程說明"><a href="#整合流程說明" class="headerlink" title="整合流程說明 :"></a>整合流程說明 :</h4><ol>
+<li><code>checkout.js</code> render PayPal 按鈕</li>
+<li>付款人點擊按鈕，建立帳單，並且彈出 lightbox window 。<br>建立帳單的方式，有兩種，參考上方的說明 : <ul>
+<li>Client 整合</li>
+<li>Server 整合</li>
+</ul>
+</li>
+<li>初始化付款流程</li>
+<li>付款人登入並且授權帳單</li>
+<li>顯示確認頁面 (選擇性，不一定要執行此步驟)</li>
+<li>付款完成<ul>
+<li>Client 整合 : <code>checkout.js</code> 自動在 client 端執行付款完成手續</li>
+<li>Server 整合 : Server 呼叫 REST API 完成付款</li>
+</ul>
+</li>
+<li>顯示付款完成頁面</li>
+</ol>
+<h3 id=""><a href="#" class="headerlink" title=""></a><a href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%BE%8C%E7%AF%87/" title="後篇">PayPal 付款流程整合 後篇</a></h3><h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="官方文件" target="_blank" rel="external">官方文件</a>
             
         </div>
     </div>
@@ -303,7 +379,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a>
+    <a class="tag tag--primary tag--small t-link" href="/tags/PayPal/">PayPal</a>
 
             </div>
         
@@ -312,7 +388,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/01/Angular2-Modules/"  data-tooltip="Angular Modules">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/03/PayPal-付款流程整合-後篇/"  data-tooltip="PayPal 付款流程整合 後篇">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -320,7 +396,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Dive-into-Angular-Modules/" data-tooltip="Dive into Angular Modules">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -335,17 +411,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -393,7 +469,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/01/Angular2-Modules/"  data-tooltip="Angular Modules">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/03/PayPal-付款流程整合-後篇/"  data-tooltip="PayPal 付款流程整合 後篇">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -401,7 +477,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Dive-into-Angular-Modules/" data-tooltip="Dive into Angular Modules">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -416,17 +492,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -452,17 +528,17 @@
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
     <ul class="share-options">
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
                 <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
                 <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
                 <i class="fa fa-twitter"></i><span>Share on Twitter</span>
             </a>
         </li>
@@ -788,9 +864,9 @@
     
         <script>
              var disqus_config = function () {
-                 this.page.url = 'https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/';
+                 this.page.url = 'https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/';
                  
-                    this.page.identifier = '2017/01/Anatomy-of-an-Angular-2-Application/';
+                    this.page.identifier = '2017/03/PayPal-付款流程整合-前篇/';
                  
              };
             (function() {
