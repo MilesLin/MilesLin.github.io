@@ -6,10 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Miles&#39;s Journey">
-    <title>NgModule Decorator - Miles&#39;s Journey</title>
+    <title>javascript array methods practice IV - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,Angular">
+        <meta name="keywords" content=".NET,javascript">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,19 +17,25 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
+    <meta name="description" content="判斷 Array 是否有包含某一個值 Array.prototype.includes()
+判斷該元素是 Array 哪一個 Index Array.prototype.indexOf()
+將 Array 用指定的值 join 成一個字串 Array.prototype.join()
+判斷該是 Array 哪一個 Index，但是是從右邊開始算起 Array.prototype.lastInde">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="NgModule Decorator">
-<meta property="og:url" content="https://mileslin.github.io/2017/02/NgModule-Decorator/index.html">
+<meta property="og:title" content="javascript array methods practice IV">
+<meta property="og:url" content="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
-<meta property="og:image" content="https://mileslin.github.io/1_app_module.jpg">
-<meta property="og:image" content="https://mileslin.github.io/2_ImportTruth.jpg">
-<meta property="og:updated_time" content="2017-02-16T17:06:59.614Z">
+<meta property="og:description" content="判斷 Array 是否有包含某一個值 Array.prototype.includes()
+判斷該元素是 Array 哪一個 Index Array.prototype.indexOf()
+將 Array 用指定的值 join 成一個字串 Array.prototype.join()
+判斷該是 Array 哪一個 Index，但是是從右邊開始算起 Array.prototype.lastInde">
+<meta property="og:updated_time" content="2017-04-17T17:27:24.202Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="NgModule Decorator">
-<meta name="twitter:description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
-<meta name="twitter:image" content="https://mileslin.github.io/1_app_module.jpg">
+<meta name="twitter:title" content="javascript array methods practice IV">
+<meta name="twitter:description" content="判斷 Array 是否有包含某一個值 Array.prototype.includes()
+判斷該元素是 Array 哪一個 Index Array.prototype.indexOf()
+將 Array 用指定的值 join 成一個字串 Array.prototype.join()
+判斷該是 Array 哪一個 Index，但是是從右邊開始算起 Array.prototype.lastInde">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -38,9 +44,6 @@
     
         <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
     
-    
-        <meta property="og:image" content="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" />
     
     
     
@@ -258,19 +261,19 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title" itemprop="headline">
-            NgModule Decorator
+            javascript array methods practice IV
         </h1>
     
     <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-02-13T22:57:17+08:00">
+    <time itemprop="datePublished" datetime="2017-04-18T00:40:33+08:00">
 	
-		    Feb 13, 2017
+		    Apr 18, 2017
     	
     </time>
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/Angular/">Angular</a>
+    <a class="category-link" href="/categories/javascript/">javascript</a>
 
 
     
@@ -280,59 +283,37 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br><a id="more"></a><br><div class="figure right" style="width:;"><a class="fancybox" href="1_app_module.jpg" title="app_module" data-fancybox-group=""><img class="fig-img" src="1_app_module.jpg" alt="app_module"></a><span class="caption">app_module</span></div><br>在建立Angular預設專案的時候，會有一個app.module.ts，這是我們的起始module，這Ng Module有寫了很多的Decorator，這些Decorator都有一些使用原則，要在這邊做說明。</p>
-<h2 id="What-Is-an-Angular-Module"><a href="#What-Is-an-Angular-Module" class="headerlink" title="What Is an Angular Module"></a>What Is an Angular Module</h2><p>Angular module 是一個包含有NgModule decorator的class。 主要目的在於</p>
-<ul>
-<li>管理我們的application</li>
-<li>有既定的pattern管理程式碼</li>
-<li>可載入外部libraries，擴展原本的application</li>
-<li>可整合其他Module的程式碼</li>
+            <ul>
+<li>判斷 Array 是否有包含某一個值 <code>Array.prototype.includes()</code></li>
+<li>判斷該元素是 Array 哪一個 Index <code>Array.prototype.indexOf()</code></li>
+<li>將 Array 用指定的值 join 成一個字串 <code>Array.prototype.join()</code></li>
+<li>判斷該是 Array 哪一個 Index，但是是從右邊開始算起 <code>Array.prototype.lastIndexOf()</code></li>
 </ul>
-<p>而Angular module 當application start時候，可以loaded eagerly，或者可以經由router做lazy loaded asynchronously。</p>
-<h2 id="Bootstrap-Array-Truth"><a href="#Bootstrap-Array-Truth" class="headerlink" title="Bootstrap Array Truth"></a>Bootstrap Array Truth</h2><p>Bootstrap Array定義哪一個是最初的Component，使用上也有些限制。</p>
-<ul>
-<li>至少要有一個component，我們稱為root application component</li>
-<li>只能用在root application module, <code>AppModule</code></li>
+<a id="more"></a>
+<h2 id="Array-prototype-includes"><a href="#Array-prototype-includes" class="headerlink" title="Array.prototype.includes()"></a>Array.prototype.includes()</h2><p>判斷 Array 是否有包含某一個值</p>
+<h4 id="參數說明-Array-prototype-includes-searchElement-fromIndex"><a href="#參數說明-Array-prototype-includes-searchElement-fromIndex" class="headerlink" title="參數說明 Array.prototype.includes(searchElement, fromIndex)"></a>參數說明 Array.prototype.includes(searchElement, fromIndex)</h4><ul>
+<li>searchElement : 被搜尋的元素</li>
+<li>fromIndex : 從第幾個元素開始找起，預設是0 (optional)</li>
 </ul>
-<h2 id="Declarations-Array-Truth"><a href="#Declarations-Array-Truth" class="headerlink" title="Declarations Array Truth"></a>Declarations Array Truth</h2><p>我們建立的每一個建立的<em>component,directive,pipe</em>，都會在Angular module中宣告，這些宣告就是放在<strong>declarations</strong>，表示這些<em>component,directive,pipe</em>都是屬於這個Angular module。</p>
-<ul>
-<li>每一個<em>component,directive,pipe</em>只能被一個Angular module宣告</li>
-<li><strong>declarations</strong> 只能宣告<em>component,directive,pipe</em>，不能放其他classes或是services</li>
-<li><span class="highlight-text primary">不重覆宣告 component,directive,pipe 在其他的Angular module</span>  </li>
-<li>所有被宣告的<em>component,directive,pipe</em>預設只能在同一個Angular module使用<ul>
-<li>可用export的方式讓其他Angular module使用</li>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>includes</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line">a.includes(<span class="number">2</span>); <span class="comment">// true </span></span><br><span class="line">a.includes(<span class="number">4</span>); <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = [<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>];</span><br><span class="line"></span><br><span class="line">arr.includes(<span class="string">'c'</span>, <span class="number">3</span>);   <span class="comment">//false</span></span><br><span class="line">arr.includes(<span class="string">'c'</span>, <span class="number">100</span>); <span class="comment">// false</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-indexOf"><a href="#Array-prototype-indexOf" class="headerlink" title="Array.prototype.indexOf()"></a>Array.prototype.indexOf()</h2><p>判斷該元素是 Array 哪一個 Index ，從左邊開始算起，找到第一個就回傳，如果找不到就回傳 -1</p>
+<h4 id="參數說明-Array-prototype-indexOf-searchElement-fromIndex"><a href="#參數說明-Array-prototype-indexOf-searchElement-fromIndex" class="headerlink" title="參數說明 Array.prototype.indexOf(searchElement, fromIndex)"></a>參數說明 Array.prototype.indexOf(searchElement, fromIndex)</h4><ul>
+<li>searchElement : 被搜尋的元素</li>
+<li>fromIndex : 從第幾個元素開始找起，預設是0 (optional)</li>
 </ul>
-</li>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>indexOf</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="number">2</span>, <span class="number">9</span>, <span class="number">9</span>]; </span><br><span class="line">a.indexOf(<span class="number">2</span>); <span class="comment">// 0 </span></span><br><span class="line">a.indexOf(<span class="number">7</span>); <span class="comment">// -1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> array = [<span class="number">2</span>, <span class="number">9</span>, <span class="number">9</span>];</span><br><span class="line">array.indexOf(<span class="number">2</span>);     <span class="comment">// 0</span></span><br><span class="line">array.indexOf(<span class="number">7</span>);     <span class="comment">// -1</span></span><br><span class="line">array.indexOf(<span class="number">9</span>, <span class="number">2</span>);  <span class="comment">// 2</span></span><br><span class="line">array.indexOf(<span class="number">2</span>, <span class="number">-1</span>); <span class="comment">// -1</span></span><br><span class="line">array.indexOf(<span class="number">2</span>, <span class="number">-3</span>); <span class="comment">// 0</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-join"><a href="#Array-prototype-join" class="headerlink" title="Array.prototype.join()"></a>Array.prototype.join()</h2><p>將 Array 用指定的值 join 成一個字串，若沒有傳入參數，則預設是 comma<code>,</code>。 若傳入空字串，則不會有任何字串 join。</p>
+<h4 id="參數說明-Array-prototype-join-separator"><a href="#參數說明-Array-prototype-join-separator" class="headerlink" title="參數說明 Array.prototype.join(separator)"></a>參數說明 Array.prototype.join(separator)</h4><ul>
+<li>separator  : 要 join 的字串 (optional)</li>
 </ul>
-<h2 id="Exports-Array-Truth"><a href="#Exports-Array-Truth" class="headerlink" title="Exports Array Truth"></a>Exports Array Truth</h2><p>Exports Array可以讓我們share <em>component,directive,pipe</em> 給其他的modules使用，甚至可以re-export 3rd party modules。</p>
-<ul>
-<li>如果其他component需要，則Export <em>component,directive,pipe</em></li>
-<li>Re-export modules to re-export their <em>component,directive,pipe</em></li>
-<li><span class="highlight-text primary">Never export a service</span>
-<ul>
-<li>因為Services被宣告在root application Provider’s array，讓Services可被inject到其他class，所以不需要export</li>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>join</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="string">'Wind'</span>, <span class="string">'Rain'</span>, <span class="string">'Fire'</span>];</span><br><span class="line">a.join();    <span class="comment">// 'Wind,Rain,Fire'</span></span><br><span class="line">a.join(<span class="string">'-'</span>); <span class="comment">// 'Wind-Rain-Fire'</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-lastIndexOf"><a href="#Array-prototype-lastIndexOf" class="headerlink" title="Array.prototype.lastIndexOf()"></a>Array.prototype.lastIndexOf()</h2><p>判斷該元素是 Array 哪一個 Index ，從右邊開始算起，找到第一個就回傳，如果找不到就回傳 -1</p>
+<h4 id="參數說明-Array-prototype-lastIndexOf-searchElement-fromIndex"><a href="#參數說明-Array-prototype-lastIndexOf-searchElement-fromIndex" class="headerlink" title="參數說明 Array.prototype.lastIndexOf(searchElement, fromIndex)"></a>參數說明 Array.prototype.lastIndexOf(searchElement, fromIndex)</h4><ul>
+<li>searchElement : 被搜尋的元素</li>
+<li>fromIndex : 從第幾個元素開始找起，預設是0 (optional)</li>
 </ul>
-</li>
-</ul>
-<p>用法:<br><figure class="codeblock codeblock--tabbed"><figcaption><span>shared.module</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { NgModule }            from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule }        from <span class="string">'@angular/common'</span>;</span><br><span class="line"><span class="keyword">import</span> { FormsModule }         from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { AwesomePipe }         from <span class="string">'./awesome.pipe'</span>;</span><br><span class="line"><span class="keyword">import</span> { HighlightDirective }  from <span class="string">'./highlight.directive'</span>;</span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports:      [ CommonModule ],</span><br><span class="line">  declarations: [ AwesomePipe, HighlightDirective ],</span><br><span class="line">  exports:      [ AwesomePipe, HighlightDirective,</span><br><span class="line">                  CommonModule, FormsModule ]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> SharedModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<a href="https://angular.io/docs/ts/latest/guide/ngmodule.html#!#shared-module" title="shared-module" target="_blank" rel="external">shared-module</a>
-<h2 id="Imports-Array-Truth"><a href="#Imports-Array-Truth" class="headerlink" title="Imports Array Truth"></a>Imports Array Truth</h2><p>Angular module可以藉由importing其他的Angular module來 extend capabilities。</p>
-<ul>
-<li>Importing module取得該module exported的<em>component,directive,pipe</em></li>
-<li>Only import what this module needs</li>
-<li><span class="highlight-text primary">Importing a module does NOT provide access to its imported modules</span> 或者說 <span class="highlight-text primary">Imports are not inherited</span>
-</li>
-</ul>
-<p>以下圖做說明，就是AppModule可以使用<code>StarComponet</code>但是沒有辦法使用<code>ngModel directive</code>，除非SharedModule re-export FormsModule，AppModule再取得SharedModule re-export的FormsModule才可以使用<code>ngModel directive</code>。<br><div class="figure " style="width:;"><a class="fancybox" href="2_ImportTruth.jpg" title="imports Array" data-fancybox-group=""><img class="fig-img" src="2_ImportTruth.jpg" alt="imports Array"></a><span class="caption">imports Array</span></div></p>
-<h2 id="Providers-Array-Truth"><a href="#Providers-Array-Truth" class="headerlink" title="Providers Array Truth"></a>Providers Array Truth</h2><ul>
-<li>Any service provider added to the providers array is registered at the root of the application</li>
-<li>別在shared module 加入services<ul>
-<li>可考慮建立一個CoreModule專門加入services，並只在AppModule importing一次</li>
-</ul>
-</li>
-<li>Routing guards 只能被加在 Angular module 的 providers array</li>
-</ul>
-<a href="https://angular.io/docs/ts/latest/guide/ngmodule.html#!#providers" title="providers" target="_blank" rel="external">providers</a>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>indexOf</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> numbers = [<span class="number">2</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">2</span>];</span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>); <span class="comment">// 3</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">7</span>); <span class="comment">// -1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> numbers = [<span class="number">2</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">2</span>];</span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>);     <span class="comment">// 3</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">7</span>);     <span class="comment">// -1</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">3</span>);  <span class="comment">// 3</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">2</span>);  <span class="comment">// 0</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">-2</span>); <span class="comment">// 0</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">-1</span>); <span class="comment">// 3</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">參考連結</a>
 
             
         </div>
@@ -342,7 +323,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a>
+    <a class="tag tag--primary tag--small t-link" href="/tags/array/">array</a> <a class="tag tag--primary tag--small t-link" href="/tags/javascript/">javascript</a>
 
             </div>
         
@@ -351,7 +332,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Dive-into-Angular-Modules/"  data-tooltip="Dive into Angular Modules">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -359,7 +340,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Protecting-Routes-with-Guards/" data-tooltip="Protecting Routes with Guards">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-III/" data-tooltip="javascript array methods practice III">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -374,17 +355,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -432,7 +413,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Dive-into-Angular-Modules/"  data-tooltip="Dive into Angular Modules">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -440,7 +421,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Protecting-Routes-with-Guards/" data-tooltip="Protecting Routes with Guards">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-III/" data-tooltip="javascript array methods practice III">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -455,17 +436,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -491,17 +472,17 @@
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
     <ul class="share-options">
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/">
                 <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/">
                 <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/">
                 <i class="fa fa-twitter"></i><span>Share on Twitter</span>
             </a>
         </li>
@@ -827,9 +808,9 @@
     
         <script>
              var disqus_config = function () {
-                 this.page.url = 'https://mileslin.github.io/2017/02/NgModule-Decorator/';
+                 this.page.url = 'https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/';
                  
-                    this.page.identifier = '2017/02/NgModule-Decorator/';
+                    this.page.identifier = '2017/04/javascript-array-methods-practice-IV/';
                  
              };
             (function() {

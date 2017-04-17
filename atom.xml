@@ -41,6 +41,66 @@
   </entry>
   
   <entry>
+    <title>javascript array methods practice IV</title>
+    <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/"/>
+    <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/</id>
+    <published>2017-04-17T16:40:33.000Z</published>
+    <updated>2017-04-17T17:27:24.202Z</updated>
+    
+    <content type="html"><![CDATA[<ul>
+<li>判斷 Array 是否有包含某一個值 <code>Array.prototype.includes()</code></li>
+<li>判斷該元素是 Array 哪一個 Index <code>Array.prototype.indexOf()</code></li>
+<li>將 Array 用指定的值 join 成一個字串 <code>Array.prototype.join()</code></li>
+<li>判斷該是 Array 哪一個 Index，但是是從右邊開始算起 <code>Array.prototype.lastIndexOf()</code></li>
+</ul>
+<a id="more"></a>
+<h2 id="Array-prototype-includes"><a href="#Array-prototype-includes" class="headerlink" title="Array.prototype.includes()"></a>Array.prototype.includes()</h2><p>判斷 Array 是否有包含某一個值</p>
+<h4 id="參數說明-Array-prototype-includes-searchElement-fromIndex"><a href="#參數說明-Array-prototype-includes-searchElement-fromIndex" class="headerlink" title="參數說明 Array.prototype.includes(searchElement, fromIndex)"></a>參數說明 Array.prototype.includes(searchElement, fromIndex)</h4><ul>
+<li>searchElement : 被搜尋的元素</li>
+<li>fromIndex : 從第幾個元素開始找起，預設是0 (optional)</li>
+</ul>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>includes</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line">a.includes(<span class="number">2</span>); <span class="comment">// true </span></span><br><span class="line">a.includes(<span class="number">4</span>); <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = [<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>];</span><br><span class="line"></span><br><span class="line">arr.includes(<span class="string">'c'</span>, <span class="number">3</span>);   <span class="comment">//false</span></span><br><span class="line">arr.includes(<span class="string">'c'</span>, <span class="number">100</span>); <span class="comment">// false</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-indexOf"><a href="#Array-prototype-indexOf" class="headerlink" title="Array.prototype.indexOf()"></a>Array.prototype.indexOf()</h2><p>判斷該元素是 Array 哪一個 Index ，從左邊開始算起，找到第一個就回傳，如果找不到就回傳 -1</p>
+<h4 id="參數說明-Array-prototype-indexOf-searchElement-fromIndex"><a href="#參數說明-Array-prototype-indexOf-searchElement-fromIndex" class="headerlink" title="參數說明 Array.prototype.indexOf(searchElement, fromIndex)"></a>參數說明 Array.prototype.indexOf(searchElement, fromIndex)</h4><ul>
+<li>searchElement : 被搜尋的元素</li>
+<li>fromIndex : 從第幾個元素開始找起，預設是0 (optional)</li>
+</ul>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>indexOf</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="number">2</span>, <span class="number">9</span>, <span class="number">9</span>]; </span><br><span class="line">a.indexOf(<span class="number">2</span>); <span class="comment">// 0 </span></span><br><span class="line">a.indexOf(<span class="number">7</span>); <span class="comment">// -1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> array = [<span class="number">2</span>, <span class="number">9</span>, <span class="number">9</span>];</span><br><span class="line">array.indexOf(<span class="number">2</span>);     <span class="comment">// 0</span></span><br><span class="line">array.indexOf(<span class="number">7</span>);     <span class="comment">// -1</span></span><br><span class="line">array.indexOf(<span class="number">9</span>, <span class="number">2</span>);  <span class="comment">// 2</span></span><br><span class="line">array.indexOf(<span class="number">2</span>, <span class="number">-1</span>); <span class="comment">// -1</span></span><br><span class="line">array.indexOf(<span class="number">2</span>, <span class="number">-3</span>); <span class="comment">// 0</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-join"><a href="#Array-prototype-join" class="headerlink" title="Array.prototype.join()"></a>Array.prototype.join()</h2><p>將 Array 用指定的值 join 成一個字串，若沒有傳入參數，則預設是 comma<code>,</code>。 若傳入空字串，則不會有任何字串 join。</p>
+<h4 id="參數說明-Array-prototype-join-separator"><a href="#參數說明-Array-prototype-join-separator" class="headerlink" title="參數說明 Array.prototype.join(separator)"></a>參數說明 Array.prototype.join(separator)</h4><ul>
+<li>separator  : 要 join 的字串 (optional)</li>
+</ul>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>join</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="string">'Wind'</span>, <span class="string">'Rain'</span>, <span class="string">'Fire'</span>];</span><br><span class="line">a.join();    <span class="comment">// 'Wind,Rain,Fire'</span></span><br><span class="line">a.join(<span class="string">'-'</span>); <span class="comment">// 'Wind-Rain-Fire'</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-lastIndexOf"><a href="#Array-prototype-lastIndexOf" class="headerlink" title="Array.prototype.lastIndexOf()"></a>Array.prototype.lastIndexOf()</h2><p>判斷該元素是 Array 哪一個 Index ，從右邊開始算起，找到第一個就回傳，如果找不到就回傳 -1</p>
+<h4 id="參數說明-Array-prototype-lastIndexOf-searchElement-fromIndex"><a href="#參數說明-Array-prototype-lastIndexOf-searchElement-fromIndex" class="headerlink" title="參數說明 Array.prototype.lastIndexOf(searchElement, fromIndex)"></a>參數說明 Array.prototype.lastIndexOf(searchElement, fromIndex)</h4><ul>
+<li>searchElement : 被搜尋的元素</li>
+<li>fromIndex : 從第幾個元素開始找起，預設是0 (optional)</li>
+</ul>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>indexOf</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> numbers = [<span class="number">2</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">2</span>];</span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>); <span class="comment">// 3</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">7</span>); <span class="comment">// -1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> numbers = [<span class="number">2</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">2</span>];</span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>);     <span class="comment">// 3</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">7</span>);     <span class="comment">// -1</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">3</span>);  <span class="comment">// 3</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">2</span>);  <span class="comment">// 0</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">-2</span>); <span class="comment">// 0</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">-1</span>); <span class="comment">// 3</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">參考連結</a>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;判斷 Array 是否有包含某一個值 &lt;code&gt;Array.prototype.includes()&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;判斷該元素是 Array 哪一個 Index &lt;code&gt;Array.prototype.indexOf()&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;將 Array 用指定的值 join 成一個字串 &lt;code&gt;Array.prototype.join()&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;判斷該是 Array 哪一個 Index，但是是從右邊開始算起 &lt;code&gt;Array.prototype.lastIndexOf()&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="javascript" scheme="https://mileslin.github.io/categories/javascript/"/>
+    
+    
+      <category term="javascript" scheme="https://mileslin.github.io/tags/javascript/"/>
+    
+      <category term="array" scheme="https://mileslin.github.io/tags/array/"/>
+    
+  </entry>
+  
+  <entry>
     <title>javascript array methods practice III</title>
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/</id>
