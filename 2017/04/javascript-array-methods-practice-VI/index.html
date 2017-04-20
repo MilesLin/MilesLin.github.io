@@ -6,10 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Miles&#39;s Journey">
-    <title>Welecome to Miles&#39;s Journey - Miles&#39;s Journey</title>
+    <title>javascript array methods practice VI - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,Miles">
+        <meta name="keywords" content=".NET,javascript">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,16 +17,25 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="Welcome to my blog.">
+    <meta name="description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce()
+與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight()
+反向 Array 本身的值 Array.prototype.reverse()
+移除 Array 的第一個元素 Array.prototype">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Welecome to Miles's Journey">
-<meta property="og:url" content="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/index.html">
+<meta property="og:title" content="javascript array methods practice VI">
+<meta property="og:url" content="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="Welcome to my blog.">
-<meta property="og:updated_time" content="2017-01-31T14:55:39.253Z">
+<meta property="og:description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce()
+與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight()
+反向 Array 本身的值 Array.prototype.reverse()
+移除 Array 的第一個元素 Array.prototype">
+<meta property="og:updated_time" content="2017-04-20T17:21:08.856Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Welecome to Miles's Journey">
-<meta name="twitter:description" content="Welcome to my blog.">
+<meta name="twitter:title" content="javascript array methods practice VI">
+<meta name="twitter:description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce()
+與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight()
+反向 Array 本身的值 Array.prototype.reverse()
+移除 Array 的第一個元素 Array.prototype">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -36,12 +45,6 @@
         <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
     
     
-        <meta property="og:image" content="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/Index-View-Introduction-Cover.jpg"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/Index-View-Introduction-Cover.jpg" />
-    
-    
-        <meta property="og:image" content="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/Introduction-Cover.jpg"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/Introduction-Cover.jpg" />
     
     
     <!--STYLES-->
@@ -247,60 +250,90 @@
 </nav>
 
             
-        <div class="post-header-cover
-                    text-center
-                    post-header-cover--partial"
-             style="background-image:url('/2100/12/Welecome-to-Miles-s-Journey/Introduction-Cover.jpg');"
-             data-behavior="4">
-            
-                <div class="post-header main-content-wrap text-center">
-    
-        <h1 class="post-title" itemprop="headline">
-            Welecome to Miles&#39;s Journey
-        </h1>
-    
-    <div class="post-meta">
-    <time itemprop="datePublished" datetime="2100-12-31T23:59:59+08:00">
-	
-		    Dec 31, 2100
-    	
-    </time>
-    
-</div>
-
-</div>
-            
-        </div>
-
             <div id="main" data-behavior="4"
-                 class="hasCover
+                 class="
                         hasCoverMetaIn
                         ">
                 
 <article class="post" itemscope itemType="http://schema.org/BlogPosting">
     
     
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title" itemprop="headline">
+            javascript array methods practice VI
+        </h1>
+    
+    <div class="post-meta">
+    <time itemprop="datePublished" datetime="2017-04-20T23:55:24+08:00">
+	
+		    Apr 20, 2017
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/javascript/">javascript</a>
+
+
+    
+</div>
+
+</div>
+    
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <p>Welcome to my blog.</p>
+            <ul>
+<li>可累加 Array 的元素，也可以用來操作元素的值然後回傳 <code>Array.prototype.reduce()</code></li>
+<li>與 <code>Array.prototype.reduce()</code> 相似，差別在於是從右邊開始執行 <code>Array.prototype.reduceRight()</code></li>
+<li>反向 Array 本身的值 <code>Array.prototype.reverse()</code></li>
+<li>移除 Array 的第一個元素 <code>Array.prototype.shift()</code></li>
+</ul>
 <a id="more"></a>
-<p>I’m Miles, from Taiwan and I’m a web developer.</p>
-<p>There are many new techniques coming out each year. I really need a blog to record what I learn.</p>
-<p>This blog is exactly that. To share my web development experiences, problems with work, new techniques, Angular2, .NET MVC.. etc,. I will share all of these here.</p>
-<p>I’m enthusiastic about learning languages, like Japanese and English, and jogging. I’ve participated in several half marathons. I’ll sometimes discuss these topics in my blog as well, but my main focus will be web developing.</p>
-<p>Anyway, if my posts can help you solve some problems, that’s my goal.</p>
-
+<h2 id="Array-prototype-reduce"><a href="#Array-prototype-reduce" class="headerlink" title="Array.prototype.reduce()"></a>Array.prototype.reduce()</h2><p>可累加 Array 的元素，累加元素的方式</p>
+<h4 id="參數說明"><a href="#參數說明" class="headerlink" title="參數說明"></a>參數說明</h4><ul>
+<li>initialValue : 給 accumulator 的初始值，如果沒有給此參數的話，accumulator 會取 Array 第一個元素的值，且會少跑 index = 0 的第一個迴圈</li>
+<li>accumulator : 累加過後的值</li>
+<li>currentValue : 現在的 value</li>
+<li>array : 整個 Array 的值</li>
+</ul>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>reduce int</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> initialValue = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">var</span> result = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].reduce(</span><br><span class="line">  <span class="function">(<span class="params">accumulator, currentValue, currentIndex, array</span>) =&gt;</span> {</span><br><span class="line">    <span class="keyword">return</span> accumulator + currentValue;</span><br><span class="line">  },</span><br><span class="line">  initialValue</span><br><span class="line">);</span><br><span class="line">  <span class="comment">// result = 20</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<div class="alert info"><p>用來攤平 Array</p>
+</div>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Flatten an array of arrays</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> flattened = [[<span class="number">0</span>, <span class="number">1</span>], [<span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>]].reduce(</span><br><span class="line">  <span class="function">(<span class="params"> acc, cur </span>) =&gt;</span> acc.concat(cur),</span><br><span class="line">  []</span><br><span class="line">);</span><br><span class="line"><span class="comment">// flattened is [0, 1, 2, 3, 4, 5]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<div class="alert info"><p>用來計算 Array 裡面相同元素有幾個</p>
+</div>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Counting instances of values in an object</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> names = [<span class="string">'Alice'</span>, <span class="string">'Bob'</span>, <span class="string">'Tiff'</span>, <span class="string">'Bruce'</span>, <span class="string">'Alice'</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> countedNames = names.reduce(<span class="function"><span class="keyword">function</span> (<span class="params">allNames, name</span>) </span>{ </span><br><span class="line">  <span class="keyword">if</span> (name <span class="keyword">in</span> allNames) {</span><br><span class="line">    allNames[name]++;</span><br><span class="line">  }</span><br><span class="line">  <span class="keyword">else</span> {</span><br><span class="line">    allNames[name] = <span class="number">1</span>;</span><br><span class="line">  }</span><br><span class="line">  <span class="keyword">return</span> allNames;</span><br><span class="line">}, {});</span><br><span class="line"><span class="comment">// countedNames is:</span></span><br><span class="line"><span class="comment">// { 'Alice': 2, 'Bob': 1, 'Tiff': 1, 'Bruce': 1 }</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<div class="alert info"><p>與 spread operator 混用，取得某一個欄位的所有值</p>
+</div>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Bonding arrays contained in an array</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// friends - an array of objects </span></span><br><span class="line"><span class="comment">// where object field "books" - list of favorite books </span></span><br><span class="line"><span class="keyword">var</span> friends = [{</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Anna'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'Bible'</span>, <span class="string">'Harry Potter'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">21</span></span><br><span class="line">}, {</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Bob'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'War and peace'</span>, <span class="string">'Romeo and Juliet'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">26</span></span><br><span class="line">}, {</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Alice'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'The Lord of the Rings'</span>, <span class="string">'The Shining'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span></span><br><span class="line">}];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果 initialValue 沒有傳會造成 undefined is not a function 的 Exception</span></span><br><span class="line"><span class="comment">// allbooks - list which will contain all friends' books +  </span></span><br><span class="line"><span class="comment">// additional list contained in initialValue</span></span><br><span class="line"><span class="keyword">var</span> allbooks = friends.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">prev, curr</span>) </span>{</span><br><span class="line">  <span class="keyword">return</span> [...prev, ...curr.books];</span><br><span class="line">}, []);</span><br><span class="line"></span><br><span class="line"><span class="comment">// allbooks = [</span></span><br><span class="line"><span class="comment">//   'Bible', 'Harry Potter', 'War and peace', </span></span><br><span class="line"><span class="comment">//   'Romeo and Juliet', 'The Lord of the Rings',</span></span><br><span class="line"><span class="comment">//   'The Shining'</span></span><br><span class="line"><span class="comment">// ]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-reduceRight"><a href="#Array-prototype-reduceRight" class="headerlink" title="Array.prototype.reduceRight()"></a>Array.prototype.reduceRight()</h2><ul>
+<li>與 <code>Array.prototype.reduce()</code> 的差別，是從右邊開始執行。</li>
+</ul>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>reduceRight</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="string">'1'</span>, <span class="string">'2'</span>, <span class="string">'3'</span>, <span class="string">'4'</span>, <span class="string">'5'</span>]; </span><br><span class="line"><span class="keyword">var</span> left  = a.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">prev, cur</span>)      </span>{ <span class="keyword">return</span> prev + cur; }); </span><br><span class="line"><span class="keyword">var</span> right = a.reduceRight(<span class="function"><span class="keyword">function</span>(<span class="params">prev, cur</span>) </span>{ <span class="keyword">return</span> prev + cur; }); </span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(left);  <span class="comment">// "12345"</span></span><br><span class="line"><span class="built_in">console</span>.log(right); <span class="comment">// "54321"</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-reverse"><a href="#Array-prototype-reverse" class="headerlink" title="Array.prototype.reverse()"></a>Array.prototype.reverse()</h2><p>反向 Array 的值</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>reverse</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">var</span> reversed = a.reverse(); </span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a);        <span class="comment">// ['three', 'two', 'one']</span></span><br><span class="line"><span class="built_in">console</span>.log(reversed); <span class="comment">// ['three', 'two', 'one']</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-shift"><a href="#Array-prototype-shift" class="headerlink" title="Array.prototype.shift()"></a>Array.prototype.shift()</h2><p>pop() 是移除 Array 最後一個元素，而 shift 是移除 Array 的第一個元素，</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>shift</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myFish = [<span class="string">'angel'</span>, <span class="string">'clown'</span>, <span class="string">'mandarin'</span>, <span class="string">'surgeon'</span>];</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'myFish before:'</span>, myFish);</span><br><span class="line"><span class="comment">// myFish before: ['angel', 'clown', 'mandarin', 'surgeon']</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> shifted = myFish.shift(); </span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'myFish after:'</span>, myFish); </span><br><span class="line"><span class="comment">// myFish after: ['clown', 'mandarin', 'surgeon']</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'Removed this element:'</span>, shifted); </span><br><span class="line"><span class="comment">// Removed this element: angel</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">參考連結</a>
             
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/array/">array</a> <a class="tag tag--primary tag--small t-link" href="/tags/javascript/">javascript</a>
+
+            </div>
         
         <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -308,7 +341,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-VI/" data-tooltip="javascript array methods practice VI">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-V/" data-tooltip="javascript array methods practice V">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -323,17 +356,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -381,7 +414,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -389,7 +422,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-VI/" data-tooltip="javascript array methods practice VI">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-V/" data-tooltip="javascript array methods practice V">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -404,17 +437,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -440,17 +473,17 @@
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
     <ul class="share-options">
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
                 <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
                 <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
                 <i class="fa fa-twitter"></i><span>Share on Twitter</span>
             </a>
         </li>
@@ -776,9 +809,9 @@
     
         <script>
              var disqus_config = function () {
-                 this.page.url = 'https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/';
+                 this.page.url = 'https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/';
                  
-                    this.page.identifier = '2100/12/Welecome-to-Miles-s-Journey/';
+                    this.page.identifier = '2017/04/javascript-array-methods-practice-VI/';
                  
              };
             (function() {
