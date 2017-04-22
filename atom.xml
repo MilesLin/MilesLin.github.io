@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-01-31T14:55:39.253Z</updated>
+  <updated>2017-02-13T04:30:02.183Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-01-31T14:55:39.253Z</updated>
+    <updated>2017-02-13T04:30:02.183Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -41,11 +41,68 @@
   </entry>
   
   <entry>
+    <title>javascript array methods practice VIII</title>
+    <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/"/>
+    <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/</id>
+    <published>2017-04-22T15:57:37.000Z</published>
+    <updated>2017-04-22T17:34:28.866Z</updated>
+    
+    <content type="html"><![CDATA[<ul>
+<li>移除元素功能跟 insert 元素功能 <code>Array.prototype.splice()</code></li>
+<li>將 Array 元素toString，並且用 <code>,</code> 隔開 <code>Array.prototype.toString()</code></li>
+<li>從 Array 前面增加元素 <code>Array.prototype.unshift()</code></li>
+</ul>
+<a id="more"></a>
+<h2 id="Array-prototype-splice"><a href="#Array-prototype-splice" class="headerlink" title="Array.prototype.splice()"></a>Array.prototype.splice()</h2><p>移除元素功能跟 insert 元素功能。</p>
+<h4 id="參數說明"><a href="#參數說明" class="headerlink" title="參數說明"></a>參數說明</h4><ul>
+<li>start : 第幾個元素開始執行，從 0 開始計算</li>
+<li>deleteCount : 要移除幾個元素，若沒指定，則移除全部 (optional)</li>
+<li>item1, item2, … : 要被 insert 的元素 (optional)</li>
+</ul>
+<p>回傳值 : 回傳被移除的元素，若沒有元素被移除，則回傳空 Array</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>insert 元素</p>
+</div>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>splice</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myFish = [<span class="string">'angel'</span>, <span class="string">'clown'</span>, <span class="string">'mandarin'</span>, <span class="string">'sturgeon'</span>];</span><br><span class="line"><span class="keyword">var</span> removed = myFish.splice(<span class="number">2</span>, <span class="number">0</span>, <span class="string">'drum'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// myFish is ["angel", "clown", "drum", "mandarin", "sturgeon"] </span></span><br><span class="line"><span class="comment">// removed is [], no elements removed</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<div class="alert info"><p>移除元素</p>
+</div>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>splice</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myFish = [<span class="string">'angel'</span>, <span class="string">'clown'</span>, <span class="string">'drum'</span>, <span class="string">'mandarin'</span>, <span class="string">'sturgeon'</span>];</span><br><span class="line"><span class="keyword">var</span> removed = myFish.splice(<span class="number">3</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// removed is ["mandarin"]</span></span><br><span class="line"><span class="comment">// myFish is ["angel", "clown", "drum", "sturgeon"]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<div class="alert info"><p>移除元素與 insert 元素</p>
+</div>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>splice</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myFish = [<span class="string">'angel'</span>, <span class="string">'clown'</span>, <span class="string">'drum'</span>, <span class="string">'sturgeon'</span>];</span><br><span class="line"><span class="keyword">var</span> removed = myFish.splice(<span class="number">2</span>, <span class="number">1</span>, <span class="string">'trumpet'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// myFish is ["angel", "clown", "trumpet", "sturgeon"]</span></span><br><span class="line"><span class="comment">// removed is ["drum"]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-toString"><a href="#Array-prototype-toString" class="headerlink" title="Array.prototype.toString()"></a>Array.prototype.toString()</h2><p>將 Array 元素toString，並且用 <code>,</code> 隔開</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>toString</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="number">3</span>,{<span class="attr">abc</span> : <span class="number">123</span>}]; </span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(arr.toString()); <span class="comment">//a,b,3,[object Object]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-unshift"><a href="#Array-prototype-unshift" class="headerlink" title="Array.prototype.unshift()"></a>Array.prototype.unshift()</h2><p>從 Array 前面增加元素</p>
+<p>回傳值 : 回傳增加元素後 Array 的 length</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>unshift</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>, <span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">arr.unshift(<span class="number">0</span>); <span class="comment">// result of call is 3, the new array length</span></span><br><span class="line"><span class="comment">// arr is [0, 1, 2]</span></span><br><span class="line"></span><br><span class="line">arr.unshift(<span class="number">-2</span>, <span class="number">-1</span>); <span class="comment">// = 5</span></span><br><span class="line"><span class="comment">// arr is [-2, -1, 0, 1, 2]</span></span><br><span class="line"></span><br><span class="line">arr.unshift([<span class="number">-3</span>]);</span><br><span class="line"><span class="comment">// arr is [[-3], -2, -1, 0, 1, 2]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">參考連結</a>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;移除元素功能跟 insert 元素功能 &lt;code&gt;Array.prototype.splice()&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;將 Array 元素toString，並且用 &lt;code&gt;,&lt;/code&gt; 隔開 &lt;code&gt;Array.prototype.toString()&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;從 Array 前面增加元素 &lt;code&gt;Array.prototype.unshift()&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="javascript" scheme="https://mileslin.github.io/categories/javascript/"/>
+    
+    
+      <category term="javascript" scheme="https://mileslin.github.io/tags/javascript/"/>
+    
+      <category term="array" scheme="https://mileslin.github.io/tags/array/"/>
+    
+  </entry>
+  
+  <entry>
     <title>javascript array methods practice VII</title>
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/</id>
     <published>2017-04-21T15:08:58.000Z</published>
-    <updated>2017-04-21T16:06:26.725Z</updated>
+    <updated>2017-04-22T16:50:23.287Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>回傳淺複製的 Array ，<code>Array.prototype.slice()</code></li>
@@ -107,7 +164,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/</id>
     <published>2017-04-20T15:55:24.000Z</published>
-    <updated>2017-04-20T17:21:08.856Z</updated>
+    <updated>2017-04-22T16:50:23.285Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>可累加 Array 的元素，也可以用來操作元素的值然後回傳 <code>Array.prototype.reduce()</code></li>
@@ -168,7 +225,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/</id>
     <published>2017-04-18T16:06:55.000Z</published>
-    <updated>2017-04-20T15:52:47.860Z</updated>
+    <updated>2017-04-18T17:13:36.030Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立一個全新運算過後的 Array，且不會改到原本的 Array <code>Array.prototype.map()</code></li>
@@ -210,7 +267,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/</id>
     <published>2017-04-17T16:40:33.000Z</published>
-    <updated>2017-04-17T17:27:24.202Z</updated>
+    <updated>2017-04-18T16:04:55.012Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>判斷 Array 是否有包含某一個值 <code>Array.prototype.includes()</code></li>
@@ -270,7 +327,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/</id>
     <published>2017-04-16T04:02:43.000Z</published>
-    <updated>2017-04-16T05:12:35.730Z</updated>
+    <updated>2017-04-18T16:04:55.011Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>使 Array 填滿指定的值 <code>Array.prototype.fill()</code></li>
@@ -334,7 +391,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/</id>
     <published>2017-04-15T09:32:54.000Z</published>
-    <updated>2017-04-15T10:19:21.137Z</updated>
+    <updated>2017-04-18T16:04:55.010Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>複製 Array 自己的元素 <code>Array.prototype.copyWithin()</code></li>
@@ -386,7 +443,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/</id>
     <published>2017-04-13T16:33:29.000Z</published>
-    <updated>2017-04-15T10:06:21.232Z</updated>
+    <updated>2017-04-18T16:04:55.008Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>從現有 Array 建立新 Array 物件 <code>Array.from()</code></li>
@@ -428,7 +485,7 @@
     <link href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%BE%8C%E7%AF%87/"/>
     <id>https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/</id>
     <published>2017-03-18T17:29:33.000Z</published>
-    <updated>2017-04-13T16:13:25.090Z</updated>
+    <updated>2017-03-19T07:01:58.731Z</updated>
     
     <content type="html"><![CDATA[<h3 id="延續前篇"><a href="#延續前篇" class="headerlink" title="延續前篇 "></a>延續前篇 <a href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/" title="前篇">PayPal 付款流程整合 前篇</a></h3><a id="more"></a>
 <h2 id="Client-端整合"><a href="#Client-端整合" class="headerlink" title="Client 端整合"></a>Client 端整合</h2><p>單純用 Client 整合的話只需要單純用 HTML 跟 JavaScript 就能完成，不需要寫到 Server 端的程式碼。</p>
@@ -522,7 +579,7 @@
     <link href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%89%8D%E7%AF%87/"/>
     <id>https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/</id>
     <published>2017-03-18T10:33:53.000Z</published>
-    <updated>2017-04-13T16:13:25.089Z</updated>
+    <updated>2017-03-19T07:25:59.191Z</updated>
     
     <content type="html"><![CDATA[<p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
 <ul>
@@ -623,7 +680,7 @@
     <link href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/"/>
     <id>https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/</id>
     <published>2017-02-14T15:09:20.000Z</published>
-    <updated>2017-04-13T16:13:25.078Z</updated>
+    <updated>2017-03-18T10:19:33.667Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br><a id="more"></a></p>
 <h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><p>在剛開始學Angular的時候都是把所有Component放在App Module底下，當這樣程式大的時候會變得難以維護，今天會說明Feature Module、Shared Module和Router Module，如何讓我們的程式碼更為乾淨，更好維護，而這些骨子裡其實都是Angular Module。</p>
@@ -671,7 +728,7 @@
     <link href="https://mileslin.github.io/2017/02/NgModule-Decorator/"/>
     <id>https://mileslin.github.io/2017/02/NgModule-Decorator/</id>
     <published>2017-02-13T14:57:17.000Z</published>
-    <updated>2017-02-16T17:06:59.614Z</updated>
+    <updated>2017-03-07T01:56:15.073Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br><a id="more"></a><br><div class="figure right" style="width:;"><a class="fancybox" href="1_app_module.jpg" title="app_module" data-fancybox-group=""><img class="fig-img" src="1_app_module.jpg" alt="app_module"></a><span class="caption">app_module</span></div><br>在建立Angular預設專案的時候，會有一個app.module.ts，這是我們的起始module，這Ng Module有寫了很多的Decorator，這些Decorator都有一些使用原則，要在這邊做說明。</p>
 <h2 id="What-Is-an-Angular-Module"><a href="#What-Is-an-Angular-Module" class="headerlink" title="What Is an Angular Module"></a>What Is an Angular Module</h2><p>Angular module 是一個包含有NgModule decorator的class。 主要目的在於</p>
@@ -746,7 +803,7 @@
     <link href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/"/>
     <id>https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/</id>
     <published>2017-02-11T05:38:15.000Z</published>
-    <updated>2017-02-11T08:15:15.911Z</updated>
+    <updated>2017-02-13T04:30:02.182Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br><a id="more"></a><br>例如:</p>
 <ul>
@@ -814,7 +871,7 @@
     <link href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/"/>
     <id>https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/</id>
     <published>2017-02-08T16:06:07.000Z</published>
-    <updated>2017-02-08T17:56:37.077Z</updated>
+    <updated>2017-02-13T04:30:02.181Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br><a id="more"></a>
 <h2 id="Passing-Parameters-to-a-Route"><a href="#Passing-Parameters-to-a-Route" class="headerlink" title="Passing Parameters to a Route"></a>Passing Parameters to a Route</h2><p>首先要記得在Route設定傳參數的path<br><figure class="codeblock codeblock--tabbed"><figcaption><span>path</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{ path: <span class="string">'detail/:id'</span>, component: DetailComponent },</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
@@ -844,7 +901,7 @@
     <link href="https://mileslin.github.io/2017/02/Routing-Basics/"/>
     <id>https://mileslin.github.io/2017/02/Routing-Basics/</id>
     <published>2017-02-07T17:06:40.000Z</published>
-    <updated>2017-02-07T18:20:43.915Z</updated>
+    <updated>2017-02-13T04:30:02.182Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p>
 <a id="more"></a>
@@ -881,7 +938,7 @@
     <link href="https://mileslin.github.io/2017/02/Binding-syntax/"/>
     <id>https://mileslin.github.io/2017/02/Binding-syntax/</id>
     <published>2017-02-04T15:25:57.000Z</published>
-    <updated>2017-02-04T16:22:22.026Z</updated>
+    <updated>2017-02-13T04:30:02.171Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
 <ul>
@@ -927,7 +984,7 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
     <link href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/"/>
     <id>https://mileslin.github.io/2017/02/Bootstrapping-App-Component/</id>
     <published>2017-02-02T15:42:46.000Z</published>
-    <updated>2017-02-04T15:11:41.000Z</updated>
+    <updated>2017-02-13T04:30:02.172Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br><a id="more"></a></p>
 <p>要Bootstrapping Component我們需要完成兩件事情</p>
@@ -965,7 +1022,7 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
     <link href="https://mileslin.github.io/2017/01/Angular2-Modules/"/>
     <id>https://mileslin.github.io/2017/01/Angular2-Modules/</id>
     <published>2017-01-29T16:30:10.000Z</published>
-    <updated>2017-02-04T15:09:49.398Z</updated>
+    <updated>2017-02-13T04:30:02.171Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
 <!-- classes : info success warning danger no-icon -->
@@ -1030,7 +1087,7 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
     <link href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/"/>
     <id>https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/</id>
     <published>2017-01-28T08:38:44.000Z</published>
-    <updated>2017-02-04T15:09:41.098Z</updated>
+    <updated>2017-02-13T04:30:02.169Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br><a id="more"></a><br><div class="figure " style="width:;"><a class="fancybox" href="1_Comprised-of-Angular2.jpg" title="Comprised-of-Angular2" data-fancybox-group=""><img class="fig-img" src="1_Comprised-of-Angular2.jpg" alt="Comprised-of-Angular2"></a><span class="caption">Comprised-of-Angular2</span></div></p>
 <h2 id="What-is-Component"><a href="#What-is-Component" class="headerlink" title="What is Component?"></a>What is Component?</h2><p>每一個<strong>Component</strong>是經由 <span class="highlight-text primary">Template</span> + <span class="highlight-text primary">Class</span> + <span class="highlight-text primary">Metadata</span></p>
