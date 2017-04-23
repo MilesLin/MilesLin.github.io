@@ -41,6 +41,62 @@
   </entry>
   
   <entry>
+    <title>javascript array methods practice summary</title>
+    <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/"/>
+    <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/</id>
+    <published>2017-04-23T14:43:07.000Z</published>
+    <updated>2017-04-23T17:17:59.102Z</updated>
+    
+    <content type="html"><![CDATA[<!-- excerpt -->
+<ul>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/#Array-from" title="Array.from">Array.from()</a>
+: 從現有 Array 建立新 Array 物件，也可以對要複製的 Array 做一些操作</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/#Array-isArray" title="Array.isArray">Array.isArray()</a>
+: 判斷物件是不是一個 Array</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/#Array-prototype-concat" title="Array.prototype.concat">Array.prototype.concat()</a> : 串接兩個 Array</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/#Array-prototype-copyWithin" title="Array.prototype.copyWithin">Array.prototype.copyWithin()</a> : 複製 Array 自己的元素，到自己的 Array 裡面</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/#Array-prototype-entries" title="Array.prototype.entries">Array.prototype.entries()</a> : 回傳 Array Iterator object ，iterator object可取得 index 跟 value</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/#Array-prototype-every" title="Array.prototype.every">Array.prototype.every()</a> : 對 Array 的所有元素做驗證，都驗證過了，則回傳 true</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/#Array-prototype-fill" title="Array.prototype.fill">Array.prototype.fill()</a> : 使 Array 填滿指定的值</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/#Array-prototype-filter" title="Array.prototype.filter">Array.prototype.filter()</a> : 過濾 Array 的資料，用起來跟 LINQ 的 <strong>where</strong> 一樣</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/#Array-prototype-find" title="Array.prototype.find">Array.prototype.find()</a> : 找到第一筆相符的資料</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/#Array-prototype-findIndex" title="Array.prototype.findIndex">Array.prototype.findIndex()</a> : 找到第一筆相符資料的 index</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/#Array-prototype-includes" title="Array.prototype.includes">Array.prototype.includes()</a> : 判斷 Array 是否有包含某一個值</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/#Array-prototype-indexOf" title="Array.prototype.indexOf">Array.prototype.indexOf()</a> : 判斷該元素是 Array 哪一個 Index</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/#Array-prototype-join" title="Array.prototype.join">Array.prototype.join()</a> : 將 Array 用指定的值 join 成一個字串</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/#Array-prototype-lastIndexOf" title="Array.prototype.lastIndexOf">Array.prototype.lastIndexOf()</a> : 斷該元素是 Array 哪一個 Index，但是是從右邊開始算起</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/#Array-prototype-map" title="Array.prototype.map">Array.prototype.map()</a> : 建立一個全新運算過後的 Array，且不會改到原本的 Array</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/#Array-prototype-pop" title="Array.prototype.pop">Array.prototype.pop()</a> : 建除 Array 最後一個元素</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/#Array-prototype-push" title="Array.prototype.push">Array.prototype.push()</a> : 從最後面開始新增元素到 Array</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-reduce" title="Array.prototype.reduce">Array.prototype.reduce()</a> : 可累加 Array 的元素，也可以用來操作元素的值然後回傳</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-reduceRight" title="Array.prototype.reduceRight">Array.prototype.reduceRight()</a> : 與 <code>Array.prototype.reduce()</code> 相似，差別在於是從右邊開始執行</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-reverse" title="Array.prototype.reverse">Array.prototype.reverse()</a> : 反向 Array 本身的值</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-shift" title="Array.prototype.shift">Array.prototype.shift()</a> : 移除 Array 的第一個元素</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-slice" title="Array.prototype.slice">Array.prototype.slice()</a> : 回傳淺複製的 Array</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-some" title="Array.prototype.some">Array.prototype.some()</a> : 驗證其中一個元素是否符合規則，若符合則回傳 true</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-sort" title="Array.prototype.sort">Array.prototype.sort()</a> : 排序 Array</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/#Array-prototype-splice" title="Array.prototype.splice">Array.prototype.splice()</a> : 移除元素功能跟 insert 元素功能</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/#Array-prototype-toString" title="Array.prototype.toString">Array.prototype.toString()</a> :將 Array 元素toString，並且用 <code>,</code> 隔開</li>
+<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/#Array-prototype-unshift" title="Array.prototype.unshift">Array.prototype.unshift()</a> : 從 Array 前面增加元素</li>
+</ul>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">官方參考連結</a>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Array 每一個 method 的簡短說明&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="javascript" scheme="https://mileslin.github.io/categories/javascript/"/>
+    
+    
+      <category term="javascript" scheme="https://mileslin.github.io/tags/javascript/"/>
+    
+      <category term="array" scheme="https://mileslin.github.io/tags/array/"/>
+    
+  </entry>
+  
+  <entry>
     <title>javascript array methods practice VIII</title>
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/</id>
@@ -1072,42 +1128,6 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
 &lt;!-- classes : info success warning danger no-icon --&gt;
 &lt;div class=&quot;alert info&quot;&gt;&lt;p&gt;Modules 幫我們解決了這個問題&lt;/p&gt;
 &lt;/div&gt;
-    
-    </summary>
-    
-      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
-    
-    
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Anatomy of an Angular Application</title>
-    <link href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/"/>
-    <id>https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/</id>
-    <published>2017-01-28T08:38:44.000Z</published>
-    <updated>2017-02-13T04:30:02.169Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br><a id="more"></a><br><div class="figure " style="width:;"><a class="fancybox" href="1_Comprised-of-Angular2.jpg" title="Comprised-of-Angular2" data-fancybox-group=""><img class="fig-img" src="1_Comprised-of-Angular2.jpg" alt="Comprised-of-Angular2"></a><span class="caption">Comprised-of-Angular2</span></div></p>
-<h2 id="What-is-Component"><a href="#What-is-Component" class="headerlink" title="What is Component?"></a>What is Component?</h2><p>每一個<strong>Component</strong>是經由 <span class="highlight-text primary">Template</span> + <span class="highlight-text primary">Class</span> + <span class="highlight-text primary">Metadata</span></p>
-<ul>
-<li>Template : User看到的HTML畫面，俗稱的View</li>
-<li>Class : 使View相關的Code</li>
-<li>Metadata : 提供一些Component額外的資訊</li>
-</ul>
-<div class="figure " style="width:;"><a class="fancybox" href="2_Comprised-of-Component.jpg" title="Comprised-of-Component" data-fancybox-group=""><img class="fig-img" src="2_Comprised-of-Component.jpg" alt="Comprised-of-Component"></a><span class="caption">Comprised-of-Component</span></div>
-<h2 id="Angular-Modules"><a href="#Angular-Modules" class="headerlink" title="Angular Modules"></a>Angular Modules</h2><ul>
-<li><strong>Angular Modules</strong>負責管理我們的Application，讓所有的Component之間都有相關聯</li>
-<li>Angular Application最少會有一個Angular Modules叫做 <strong>Application’s root Angular module</strong></li>
-<li>一個Application可以擁有很多個額外的<strong>Angular Modules</strong></li>
-</ul>
-<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>Angular 的組成大概是這樣子，而之後會持續介紹每個元件的說明。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Application&quot;&gt;&lt;a href=&quot;#Application&quot; class=&quot;headerlink&quot; title=&quot;Application&quot;&gt;&lt;/a&gt;Application&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Angular2 Application&lt;/strong&gt; 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。&lt;br&gt;
     
     </summary>
     
