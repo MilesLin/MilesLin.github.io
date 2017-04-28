@@ -17,16 +17,16 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC是註冊方式有點不同)">
+    <meta name="description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Autofac 設定 Web API Register Controller 筆記">
 <meta property="og:url" content="https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC是註冊方式有點不同)">
-<meta property="og:updated_time" content="2017-04-28T13:50:21.313Z">
+<meta property="og:description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
+<meta property="og:updated_time" content="2017-04-28T14:05:24.068Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Autofac 設定 Web API Register Controller 筆記">
-<meta name="twitter:description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC是註冊方式有點不同)">
+<meta name="twitter:description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -274,7 +274,7 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC是註冊方式有點不同)</p>
+            <p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)</p>
 <a id="more"></a>
 <h2 id="使用容器註冊物件"><a href="#使用容器註冊物件" class="headerlink" title="使用容器註冊物件"></a>使用容器註冊物件</h2><p>為了方便整理，我會先新增 <code>AutofacConfig.cs</code> 放在 App_Start 資料夾裡面， <code>AutofacConfig.cs</code> 則負責註冊。</p>
 <ul>

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-02-13T04:30:02.183Z</updated>
+  <updated>2017-01-31T14:55:39.253Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-02-13T04:30:02.183Z</updated>
+    <updated>2017-01-31T14:55:39.253Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -45,9 +45,9 @@
     <link href="https://mileslin.github.io/2017/04/Autofac-%E8%A8%AD%E5%AE%9A-Web-API-Register-Controller-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/</id>
     <published>2017-04-28T12:52:13.000Z</published>
-    <updated>2017-04-28T13:50:21.313Z</updated>
+    <updated>2017-04-28T14:05:24.068Z</updated>
     
-    <content type="html"><![CDATA[<p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC是註冊方式有點不同)</p>
+    <content type="html"><![CDATA[<p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)</p>
 <a id="more"></a>
 <h2 id="使用容器註冊物件"><a href="#使用容器註冊物件" class="headerlink" title="使用容器註冊物件"></a>使用容器註冊物件</h2><p>為了方便整理，我會先新增 <code>AutofacConfig.cs</code> 放在 App_Start 資料夾裡面， <code>AutofacConfig.cs</code> 則負責註冊。</p>
 <ul>
@@ -69,7 +69,7 @@
     
     <summary type="html">
     
-      &lt;p&gt;Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC是註冊方式有點不同)&lt;/p&gt;
+      &lt;p&gt;Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)&lt;/p&gt;
     
     </summary>
     
@@ -89,7 +89,7 @@
     <link href="https://mileslin.github.io/2017/04/NLog-%E5%BB%BA%E7%BD%AE%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/NLog-建置筆記/</id>
     <published>2017-04-26T13:54:29.000Z</published>
-    <updated>2017-04-26T14:58:38.000Z</updated>
+    <updated>2017-04-28T14:04:32.657Z</updated>
     
     <content type="html"><![CDATA[<p>最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。</p>
 <a id="more"></a>
@@ -154,7 +154,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/</id>
     <published>2017-04-23T14:43:07.000Z</published>
-    <updated>2017-04-23T17:17:59.102Z</updated>
+    <updated>2017-04-28T14:04:32.746Z</updated>
     
     <content type="html"><![CDATA[<!-- excerpt -->
 <ul>
@@ -210,7 +210,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/</id>
     <published>2017-04-22T15:57:37.000Z</published>
-    <updated>2017-04-22T17:34:28.866Z</updated>
+    <updated>2017-04-28T14:04:32.743Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>移除元素功能跟 insert 元素功能 <code>Array.prototype.splice()</code></li>
@@ -267,7 +267,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/</id>
     <published>2017-04-21T15:08:58.000Z</published>
-    <updated>2017-04-22T16:50:23.287Z</updated>
+    <updated>2017-04-21T16:06:26.725Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>回傳淺複製的 Array ，<code>Array.prototype.slice()</code></li>
@@ -329,7 +329,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/</id>
     <published>2017-04-20T15:55:24.000Z</published>
-    <updated>2017-04-22T16:50:23.285Z</updated>
+    <updated>2017-04-20T17:21:08.856Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>可累加 Array 的元素，也可以用來操作元素的值然後回傳 <code>Array.prototype.reduce()</code></li>
@@ -390,7 +390,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/</id>
     <published>2017-04-18T16:06:55.000Z</published>
-    <updated>2017-04-18T17:13:36.030Z</updated>
+    <updated>2017-04-20T15:52:47.860Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立一個全新運算過後的 Array，且不會改到原本的 Array <code>Array.prototype.map()</code></li>
@@ -432,7 +432,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/</id>
     <published>2017-04-17T16:40:33.000Z</published>
-    <updated>2017-04-18T16:04:55.012Z</updated>
+    <updated>2017-04-17T17:27:24.202Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>判斷 Array 是否有包含某一個值 <code>Array.prototype.includes()</code></li>
@@ -492,7 +492,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/</id>
     <published>2017-04-16T04:02:43.000Z</published>
-    <updated>2017-04-18T16:04:55.011Z</updated>
+    <updated>2017-04-16T05:12:35.730Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>使 Array 填滿指定的值 <code>Array.prototype.fill()</code></li>
@@ -556,7 +556,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/</id>
     <published>2017-04-15T09:32:54.000Z</published>
-    <updated>2017-04-18T16:04:55.010Z</updated>
+    <updated>2017-04-15T10:19:21.137Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>複製 Array 自己的元素 <code>Array.prototype.copyWithin()</code></li>
@@ -608,7 +608,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/</id>
     <published>2017-04-13T16:33:29.000Z</published>
-    <updated>2017-04-18T16:04:55.008Z</updated>
+    <updated>2017-04-15T10:06:21.232Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>從現有 Array 建立新 Array 物件 <code>Array.from()</code></li>
@@ -650,7 +650,7 @@
     <link href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%BE%8C%E7%AF%87/"/>
     <id>https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/</id>
     <published>2017-03-18T17:29:33.000Z</published>
-    <updated>2017-03-19T07:01:58.731Z</updated>
+    <updated>2017-04-13T16:13:25.090Z</updated>
     
     <content type="html"><![CDATA[<h3 id="延續前篇"><a href="#延續前篇" class="headerlink" title="延續前篇 "></a>延續前篇 <a href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/" title="前篇">PayPal 付款流程整合 前篇</a></h3><a id="more"></a>
 <h2 id="Client-端整合"><a href="#Client-端整合" class="headerlink" title="Client 端整合"></a>Client 端整合</h2><p>單純用 Client 整合的話只需要單純用 HTML 跟 JavaScript 就能完成，不需要寫到 Server 端的程式碼。</p>
@@ -744,7 +744,7 @@
     <link href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%89%8D%E7%AF%87/"/>
     <id>https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/</id>
     <published>2017-03-18T10:33:53.000Z</published>
-    <updated>2017-03-19T07:25:59.191Z</updated>
+    <updated>2017-04-13T16:13:25.089Z</updated>
     
     <content type="html"><![CDATA[<p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
 <ul>
@@ -845,7 +845,7 @@
     <link href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/"/>
     <id>https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/</id>
     <published>2017-02-14T15:09:20.000Z</published>
-    <updated>2017-03-18T10:19:33.667Z</updated>
+    <updated>2017-04-13T16:13:25.078Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br><a id="more"></a></p>
 <h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><p>在剛開始學Angular的時候都是把所有Component放在App Module底下，當這樣程式大的時候會變得難以維護，今天會說明Feature Module、Shared Module和Router Module，如何讓我們的程式碼更為乾淨，更好維護，而這些骨子裡其實都是Angular Module。</p>
@@ -893,7 +893,7 @@
     <link href="https://mileslin.github.io/2017/02/NgModule-Decorator/"/>
     <id>https://mileslin.github.io/2017/02/NgModule-Decorator/</id>
     <published>2017-02-13T14:57:17.000Z</published>
-    <updated>2017-03-07T01:56:15.073Z</updated>
+    <updated>2017-02-16T17:06:59.614Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br><a id="more"></a><br><div class="figure right" style="width:;"><a class="fancybox" href="1_app_module.jpg" title="app_module" data-fancybox-group=""><img class="fig-img" src="1_app_module.jpg" alt="app_module"></a><span class="caption">app_module</span></div><br>在建立Angular預設專案的時候，會有一個app.module.ts，這是我們的起始module，這Ng Module有寫了很多的Decorator，這些Decorator都有一些使用原則，要在這邊做說明。</p>
 <h2 id="What-Is-an-Angular-Module"><a href="#What-Is-an-Angular-Module" class="headerlink" title="What Is an Angular Module"></a>What Is an Angular Module</h2><p>Angular module 是一個包含有NgModule decorator的class。 主要目的在於</p>
@@ -968,7 +968,7 @@
     <link href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/"/>
     <id>https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/</id>
     <published>2017-02-11T05:38:15.000Z</published>
-    <updated>2017-02-13T04:30:02.182Z</updated>
+    <updated>2017-02-11T08:15:15.911Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br><a id="more"></a><br>例如:</p>
 <ul>
@@ -1036,7 +1036,7 @@
     <link href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/"/>
     <id>https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/</id>
     <published>2017-02-08T16:06:07.000Z</published>
-    <updated>2017-02-13T04:30:02.181Z</updated>
+    <updated>2017-02-08T17:56:37.077Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br><a id="more"></a>
 <h2 id="Passing-Parameters-to-a-Route"><a href="#Passing-Parameters-to-a-Route" class="headerlink" title="Passing Parameters to a Route"></a>Passing Parameters to a Route</h2><p>首先要記得在Route設定傳參數的path<br><figure class="codeblock codeblock--tabbed"><figcaption><span>path</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{ path: <span class="string">'detail/:id'</span>, component: DetailComponent },</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
@@ -1066,7 +1066,7 @@
     <link href="https://mileslin.github.io/2017/02/Routing-Basics/"/>
     <id>https://mileslin.github.io/2017/02/Routing-Basics/</id>
     <published>2017-02-07T17:06:40.000Z</published>
-    <updated>2017-02-13T04:30:02.182Z</updated>
+    <updated>2017-02-07T18:20:43.915Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p>
 <a id="more"></a>
@@ -1103,7 +1103,7 @@
     <link href="https://mileslin.github.io/2017/02/Binding-syntax/"/>
     <id>https://mileslin.github.io/2017/02/Binding-syntax/</id>
     <published>2017-02-04T15:25:57.000Z</published>
-    <updated>2017-02-13T04:30:02.171Z</updated>
+    <updated>2017-02-04T16:22:22.026Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
 <ul>
