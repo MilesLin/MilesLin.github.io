@@ -41,6 +41,144 @@
   </entry>
   
   <entry>
+    <title>使用 Angular CLI 建立 Angular 專案架構說明</title>
+    <link href="https://mileslin.github.io/2017/04/%E4%BD%BF%E7%94%A8-Angular-CLI-%E5%BB%BA%E7%AB%8B-Angular-%E5%B0%88%E6%A1%88%E6%9E%B6%E6%A7%8B%E8%AA%AA%E6%98%8E/"/>
+    <id>https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/</id>
+    <published>2017-04-30T09:46:33.000Z</published>
+    <updated>2017-04-30T15:19:26.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 <a href="https://github.com/angular/angular-cli" title="Angular CLI" target="_blank" rel="external">Angular CLI</a> 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。</p>
+<a id="more"></a>
+<h2 id="建立專案"><a href="#建立專案" class="headerlink" title="建立專案"></a>建立專案</h2><p>首先我們要執行 cmd 指令 <code>ng new my-app</code> 建立 Angular 專案，Angular CLI 會幫我們建立這樣專案架構的專案<br><div class="figure " style="width:;"><a class="fancybox" href="Structure.jpg" title="Structure" data-fancybox-group=""><img class="fig-img" src="Structure.jpg" alt="Structure"></a><span class="caption">Structure</span></div></p>
+<h2 id="The-root-folder"><a href="#The-root-folder" class="headerlink" title="The root folder"></a>The root folder</h2><p>負責放支援建置 app 的設定檔</p>
+<table>
+<thead>
+<tr>
+<th>檔案</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>e2e/</td>
+<td>負責放 End-to-End 測試程式碼的資料夾</td>
+</tr>
+<tr>
+<td>node_modules/</td>
+<td><code>Node.js</code> 建立的資料夾，負責放 third party modules 的資料夾，其 thrid party modules 清單則放在 <code>package.json</code>裡面</td>
+</tr>
+<tr>
+<td>.angular-cli.json</td>
+<td>放 Angular CLI 的設定檔 <a href="https://github.com/angular/angular-cli/wiki/angular-cli" title="Angular CLI Config Schema" target="_blank" rel="external">Angular CLI Config Schema</a></td>
+</tr>
+<tr>
+<td>.editorconfig</td>
+<td>幫助開發者使用不同的 IDEs 保持檔案格式一致性的設定檔 <a href="http://editorconfig.org" title="http://editorconfig.org editorconfig" target="_blank" rel="external"></a></td>
+</tr>
+<tr>
+<td>.gitignore</td>
+<td>Git 的設定檔，讓指定檔案不會 commit 到 Source control</td>
+</tr>
+<tr>
+<td>karma.conf.js</td>
+<td>Karma test 的 unit tests 設定 <a href="https://karma-runner.github.io/1.0/index.html" title="Karma" target="_blank" rel="external">Karma</a></td>
+</tr>
+<tr>
+<td>package.json</td>
+<td>npm 設定檔， third party 清單與版本資訊</td>
+</tr>
+<tr>
+<td>protractor.conf.js</td>
+<td>Angular end-to-end test framework <a href="http://www.protractortest.org/#/" title="Protractor" target="_blank" rel="external">Protractor</a> 設定檔</td>
+</tr>
+<tr>
+<td>README.md</td>
+<td>Angular CLI 基本指令文件</td>
+</tr>
+<tr>
+<td>tsconfig.json</td>
+<td>TypeScript 編譯器設定檔案</td>
+</tr>
+<tr>
+<td>tslint.json</td>
+<td>保持 code style 一致性的 <a href="https://palantir.github.io/tslint/" title="TSLint" target="_blank" rel="external">TSLint</a> 設定檔</td>
+</tr>
+</tbody>
+</table>
+<h2 id="The-src-folder"><a href="#The-src-folder" class="headerlink" title="The src folder"></a>The src folder</h2><p>寫程式碼的地方。  所有的 Angular components, templates, styles, images 等等…都放這邊。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="Src.jpg" title="Src" data-fancybox-group=""><img class="fig-img" src="Src.jpg" alt="Src"></a><span class="caption">Src</span></div>
+<table>
+<thead>
+<tr>
+<th>檔案</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>app/app.component.{ts,html,css,spec.ts}</td>
+<td>所有的 Componet、Service、Pipe、Unit test 等等..程式碼都是放在這個資料夾，而 <code>app.component</code> 則是 Angular CLI 預設建立的 root component</td>
+</tr>
+<tr>
+<td>app/app.module.ts</td>
+<td>預設的 <a href="https://angular.io/docs/ts/latest/guide/appmodule.html" title="root module" target="_blank" rel="external">root module</a> ， 告訴 Angular 有哪些 Components 、Modules、 Services，讓 Angular 知道如何 assemble the application</td>
+</tr>
+<tr>
+<td>assets/*</td>
+<td>放圖片或者是建立 application 需要用的到材料</td>
+</tr>
+<tr>
+<td>environments/*</td>
+<td>設定 Angular 程式碼會用到的參數，很像 Web.config 的東西。  預設為 environment.ts ， 要產生不同的 environment 的話，參考命名規則為 environment.xxx.ts，在執行或者 build Angular application 的時候加入 xxx 的參數，則可以指定到該 environmnet ，例如 : <code>ng build -xxx</code>、 <code>ng serve -xxx</code></td>
+</tr>
+<tr>
+<td>favicon.ico</td>
+<td>網頁頁籤的 icon <div class="figure " style="width:;"><a class="fancybox" href="icon.jpg" title="" data-fancybox-group=""><img class="fig-img" src="icon.jpg" alt=""></a></div><div style="clear:both;"></div></td>
+</tr>
+<tr>
+<td>index.html</td>
+<td>網頁進入點，當使用者拜訪網站的時候，是執行到這個頁面。  在大部分的情況，是不需用編輯的， Angular CLI 在 build application 的時候會自動加入 js 和 css</td>
+</tr>
+<tr>
+<td>main.ts</td>
+<td>啟動 application root module(<span class="highlight-text primary">AppModule</span>) 的編譯起始點</td>
+</tr>
+<tr>
+<td>polyfills.ts</td>
+<td>因為不同的瀏覽器會支援不同的 web standards， polyfills 就像補丁的概念，補足些沒有支援的部分。 <a href="https://angular.io/docs/ts/latest/guide/browser-support.html" title="Browser Support" target="_blank" rel="external">Browser Support</a></td>
+</tr>
+<tr>
+<td>styles.css</td>
+<td>放置 global styles 的 CSS</td>
+</tr>
+<tr>
+<td>test.ts</td>
+<td>unit tests 的進入點，有些 unit tests 的設定也寫在這邊</td>
+</tr>
+<tr>
+<td>tsconfig.{app,spec}.json</td>
+<td>TypeScript 編譯設定檔 ，<code>tsconfig.app.json</code> for Angular app、 <code>tsconfig.spec.json</code> for unit tests</td>
+</tr>
+</tbody>
+</table>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular.io/docs/ts/latest/cli-quickstart.html" title="cli-quickstart" target="_blank" rel="external">CLI QUICKSTART</a>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 &lt;a href=&quot;https://github.com/angular/angular-cli&quot; title=&quot;Angular CLI&quot;&gt;Angular CLI&lt;/a&gt; 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
+    
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Autofac 設定 Web API Register Controller 筆記</title>
     <link href="https://mileslin.github.io/2017/04/Autofac-%E8%A8%AD%E5%AE%9A-Web-API-Register-Controller-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/</id>
@@ -1088,52 +1226,6 @@
     <summary type="html">
     
       &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
-    
-    
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Binding syntax</title>
-    <link href="https://mileslin.github.io/2017/02/Binding-syntax/"/>
-    <id>https://mileslin.github.io/2017/02/Binding-syntax/</id>
-    <published>2017-02-04T15:25:57.000Z</published>
-    <updated>2017-02-04T16:22:22.026Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
-<ul>
-<li>內嵌繫結 ( Interpolation )</li>
-<li>屬性繫結 ( Property Binding )</li>
-<li>事件繫結 ( Event Binding )</li>
-<li>雙向繫結 ( Two-way Binding )</li>
-</ul>
-<a id="more"></a>
-<h2 id="Interpolation"><a href="#Interpolation" class="headerlink" title="Interpolation"></a>Interpolation</h2><p>此種資料繫結方式是屬於單向繫結，使用方法如下</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Interpolation</span><ul class="tabs"><li class="tab active">html</li><li class="tab">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span></span><br><span class="line">  {{title}}</span><br><span class="line"><span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure><figure class="highlight ts" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppComponent {</span><br><span class="line">  title = <span class="string">'app works!'</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Property-Binding"><a href="#Property-Binding" class="headerlink" title="Property Binding"></a>Property Binding</h2><p>這也是屬於單向繫結，只要是Html內建的tag都可以使用這種繫結方式。這個功能非常強大，還能用在Component之間的傳值。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Property Binding</span><ul class="tabs"><li class="tab active">html</li><li class="tab">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> [<span class="attr">href</span>]=<span class="string">"googleLink"</span>&gt;</span>Google Link<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure><figure class="highlight ts" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppComponent {</span><br><span class="line">   googleLink = <span class="string">'http://www.google.com'</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="Event-Binding"><a href="#Event-Binding" class="headerlink" title="Event Binding"></a>Event Binding</h2><p>只要是瀏覽器預設的所有事件，都可以用這樣的方式綁定，而且每個一個綁定的事件，都會有特定的型別，例如範例的click事件傳入的是 <span class="highlight-text primary">MouseEvent</span> 型別。
-
-button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)</span> MyClick傳入的一定是 <strong>$event</strong>。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Event Binding</span><ul class="tabs"><li class="tab active">html</li><li class="tab">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> (<span class="attr">click</span>) = <span class="string">"MyClick($event)"</span>&gt;</span>Click<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure><figure class="highlight ts" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppComponent {</span><br><span class="line"></span><br><span class="line">  MyClick(evt:MouseEvent) : <span class="built_in">void</span></span><br><span class="line">  {</span><br><span class="line">    <span class="built_in">console</span>.log(evt);<span class="comment">//如果當下不知道型別，可用這種方式檢查型別</span></span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"Hello"</span>);</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Two-way-Binding"><a href="#Two-way-Binding" class="headerlink" title="Two-way Binding"></a>Two-way Binding</h2><p>此種方式為雙向繫結，通常是用在input或select的原件上，讓使用者輸入的值可以傳回到class的property。  不過此種方式很浪費效能，建議斟酌使用，或者是改用事件的方式來完成類似的功能。</p>
-<p>至於用法就是使用 <span class="highlight-text primary">[(ngModel)]</span> 就可以了。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Two-way Binding</span><ul class="tabs"><li class="tab active">html</li><li class="tab">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> [(<span class="attr">ngModel</span>)]=<span class="string">"filter"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure><figure class="highlight ts" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppComponent {</span><br><span class="line">  filter : <span class="built_in">string</span> = <span class="string">''</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular.io/docs/ts/latest/guide/template-syntax.html" title="Binding syntax" target="_blank" rel="external">Binding syntax</a>]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;要從class將資料繫結到template上面，Angular有四種方式。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;內嵌繫結 ( Interpolation )&lt;/li&gt;
-&lt;li&gt;屬性繫結 ( Property Binding )&lt;/li&gt;
-&lt;li&gt;事件繫結 ( Event Binding )&lt;/li&gt;
-&lt;li&gt;雙向繫結 ( Two-way Binding )&lt;/li&gt;
-&lt;/ul&gt;
     
     </summary>
     
