@@ -17,17 +17,22 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="之前學的 two way binding 的寫法如下 [(ngModel)]html1&amp;lt;input type=&quot;text&quot; name=&quot;firstName&quot; [(ngModel)]=&quot;firstName&quot;&amp;gt; 今天要說明的是，如何把( )與[ ]分開寫，這樣就可以在使用者輸入的時候加入一些邏輯進入">
-<meta name="keywords" content="Angular">
+    <meta name="description" content="之前學的 two way binding 的寫法如下
+[(ngModel)]html1&amp;lt;input type=&quot;text&quot; name=&quot;firstName&quot; [(ngModel)]=&quot;firstName&quot;&amp;gt;
+今天要說明的是，如何把( )與[ ]分開寫，這樣就可以在使用者輸入的時候加入一些邏輯進入">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Two way data binding event 的寫法">
 <meta property="og:url" content="https://mileslin.github.io/2017/05/Two-way-data-binding-event-的寫法/index.html">
-<meta property="og:site_name" content="Miles&#39;s Journey">
-<meta property="og:description" content="之前學的 two way binding 的寫法如下 [(ngModel)]html1&amp;lt;input type=&quot;text&quot; name=&quot;firstName&quot; [(ngModel)]=&quot;firstName&quot;&amp;gt; 今天要說明的是，如何把( )與[ ]分開寫，這樣就可以在使用者輸入的時候加入一些邏輯進入">
-<meta property="og:updated_time" content="2017-05-09T10:37:45.162Z">
+<meta property="og:site_name" content="Miles's Journey">
+<meta property="og:description" content="之前學的 two way binding 的寫法如下
+[(ngModel)]html1&amp;lt;input type=&quot;text&quot; name=&quot;firstName&quot; [(ngModel)]=&quot;firstName&quot;&amp;gt;
+今天要說明的是，如何把( )與[ ]分開寫，這樣就可以在使用者輸入的時候加入一些邏輯進入">
+<meta property="og:updated_time" content="2017-05-09T12:53:24.643Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Two way data binding event 的寫法">
-<meta name="twitter:description" content="之前學的 two way binding 的寫法如下 [(ngModel)]html1&amp;lt;input type=&quot;text&quot; name=&quot;firstName&quot; [(ngModel)]=&quot;firstName&quot;&amp;gt; 今天要說明的是，如何把( )與[ ]分開寫，這樣就可以在使用者輸入的時候加入一些邏輯進入">
+<meta name="twitter:description" content="之前學的 two way binding 的寫法如下
+[(ngModel)]html1&amp;lt;input type=&quot;text&quot; name=&quot;firstName&quot; [(ngModel)]=&quot;firstName&quot;&amp;gt;
+今天要說明的是，如何把( )與[ ]分開寫，這樣就可以在使用者輸入的時候加入一些邏輯進入">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -279,7 +284,7 @@
 <figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"firstName"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
 <p>今天要說明的是，如何把<code>( )</code>與<code>[ ]</code>分開寫，這樣就可以在使用者輸入的時候加入一些邏輯進入</p>
 <a id="more"></a>
-<h2 id="將小括號-另外寫"><a href="#將小括號-另外寫" class="headerlink" title="將小括號()另外寫"></a>將小括號<code>()</code>另外寫</h2><figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [<span class="attr">ngModel</span>]=<span class="string">"firstName"</span>(<span class="attr">ngModelChange</span>)= <span class="string">"firstName=$event"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="將小括號-另外寫"><a href="#將小括號-另外寫" class="headerlink" title="將小括號( )另外寫"></a>將小括號<code>( )</code>另外寫</h2><figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [<span class="attr">ngModel</span>]=<span class="string">"firstName"</span>(<span class="attr">ngModelChange</span>)= <span class="string">"firstName=$event"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
 <p>那這樣寫有什麼好處呢?  就是當我們想要在使用者輸入的時候增加一些邏輯，我們就可以這樣寫。</p>
 <p>例如:強制使用者第一個字輸入大寫，我們就可以改寫成這樣</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>ToUpperCase</span><ul class="tabs"><li class="tab active">html</li><li class="tab">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [<span class="attr">ngModel</span>]=<span class="string">"firstName"</span> (<span class="attr">ngModelChange</span>)= <span class="string">"firstLetterToUpperCase($event)"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure><figure class="highlight ts" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppComponent {</span><br><span class="line"></span><br><span class="line">  firstName = <span class="string">''</span>;</span><br><span class="line">  firstLetterToUpperCase(value: <span class="built_in">string</span>){</span><br><span class="line">    <span class="keyword">if</span> (value.length &gt;<span class="number">0</span>) {</span><br><span class="line">      <span class="keyword">this</span>.firstName = value.charAt(<span class="number">0</span>).toUpperCase() + value.slice(<span class="number">1</span>);</span><br><span class="line">    }<span class="keyword">else</span>{</span><br><span class="line">      <span class="keyword">this</span>.firstName = value;</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -583,7 +588,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -742,11 +747,11 @@
                         </span>
                         <div class="media-content hide-xs font-merryweather"><p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
 <ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程" target="_blank" rel="external">付款流程</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕" target="_blank" rel="external">加入 PayPal 付款按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式" target="_blank" rel="external">選擇整合方式</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合" target="_blank" rel="external">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合" target="_blank" rel="external">Server 端整合</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程" target="_blank" rel="external">測試整合流程</a>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程">付款流程</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕">加入 PayPal 付款按鈕</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式">選擇整合方式</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合">Server 端整合</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程">測試整合流程</a>
 </li>
 </ul></div>
                     </div>
