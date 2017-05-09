@@ -17,37 +17,18 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。
-
-付款流程
-加入 PayPal 付款按鈕
-選擇整合方式
-Client 端整合 或 Server 端整合
-測試整合流程">
+    <meta name="description" content="現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。  付款流程 加入 PayPal 付款按鈕 選擇整合方式 Client 端整合 或 Server 端整合 測試整合流程">
+<meta name="keywords" content="PayPal">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="PayPal 付款流程整合 前篇">
 <meta property="og:url" content="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/index.html">
-<meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。
-
-付款流程
-加入 PayPal 付款按鈕
-選擇整合方式
-Client 端整合 或 Server 端整合
-測試整合流程">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。  付款流程 加入 PayPal 付款按鈕 選擇整合方式 Client 端整合 或 Server 端整合 測試整合流程">
 <meta property="og:image" content="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/in-context-flow.png">
-<meta property="og:image" content="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png">
-<meta property="og:image" content="https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png">
-<meta property="og:updated_time" content="2017-04-13T16:13:25.089Z">
+<meta property="og:updated_time" content="2017-05-09T10:37:45.151Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="PayPal 付款流程整合 前篇">
-<meta name="twitter:description" content="現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。
-
-付款流程
-加入 PayPal 付款按鈕
-選擇整合方式
-Client 端整合 或 Server 端整合
-測試整合流程">
+<meta name="twitter:description" content="現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。  付款流程 加入 PayPal 付款按鈕 選擇整合方式 Client 端整合 或 Server 端整合 測試整合流程">
 <meta name="twitter:image" content="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/in-context-flow.png">
 <meta name="twitter:creator" content="@MilesLin2016">
     
@@ -318,30 +299,58 @@ Client 端整合 或 Server 端整合
 </ul>
 </li>
 <li><p>付款人需登入 PayPal</p>
-<div class="figure " style="width:;"><a class="fancybox" href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png" title="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/" data-fancybox-group="" target="_blank" rel="external"><img class="fig-img" src="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png" alt="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/"></a><span class="caption">圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/</span></div>
+{% image fancybox https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png 圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/ %}
 </li>
 <li><p>付款人會授權 PayPal 帳單</p>
-<div class="figure " style="width:;"><a class="fancybox" href="https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png" title="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/" data-fancybox-group="" target="_blank" rel="external"><img class="fig-img" src="https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png" alt="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/"></a><span class="caption">圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/</span></div>
+{% image fancybox https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png 圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/ %}
 </li>
 <li><p>付款人同意帳單後，PayPay 會關掉 lightbox window，付款人回到原本的網頁畫面。  此刻，我們可以顯示一個確認頁面，呼叫 PapPal REST API 來顯示帳單明細，內容包含帳單地址跟Email等等….</p>
 </li>
 <li><p>在確認頁面裡面，呼叫付款完成的 PayPal API 來完成付款。</p>
 </li>
 </ol>
-<p>補充 : <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/prerequisites/" title="支援的瀏覽器" target="_blank" rel="external">Express Checkout 支援的瀏覽器</a></p>
-<h2 id="加入-PayPal-付款按鈕"><a href="#加入-PayPal-付款按鈕" class="headerlink" title="加入 PayPal 付款按鈕"></a>加入 PayPal 付款按鈕</h2><p>載入checkout.js<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Include checkout.js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=<span class="string">"https://www.paypalobjects.com/api/checkout.js"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<div class="alert danger"><p>請使用官方提供的線上版本，不要下載到local端。</p>
-</div>
-<h4 id="Render-the-PayPal-button"><a href="#Render-the-PayPal-button" class="headerlink" title="Render the PayPal button"></a>Render the PayPal button</h4><figure class="codeblock codeblock--tabbed"><figcaption><span>Render button</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"paypal-button"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span><br><span class="line">    paypal.Button.render({</span><br><span class="line">    </span><br><span class="line">        <span class="attr">env</span>: <span class="string">'production'</span>, <span class="comment">// Specify 'sandbox' for the test environment</span></span><br><span class="line"></span><br><span class="line">        payment: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>{</span><br><span class="line">            <span class="comment">// Set up the payment here, when the buyer clicks on the button</span></span><br><span class="line">        },</span><br><span class="line"></span><br><span class="line">        <span class="attr">onAuthorize</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data, actions</span>) </span>{</span><br><span class="line">            <span class="comment">// Execute the payment here, when the buyer approves the transaction</span></span><br><span class="line">       }</span><br><span class="line">            </span><br><span class="line">    }, <span class="string">'#paypal-button'</span>);</span><br><span class="line"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><ul>
-<li>可以開啟瀏覽器開發工具，確認看看載入是否有錯誤</li>
-<li>IE的環境下建議加入 <code>&lt;!DOCTYPE html&gt;</code> 和 <code>&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot; /&gt;</code> 可避免一些兼容性的錯誤</li>
-</ul>
-</div>
+<p>補充 : {% link Express Checkout 支援的瀏覽器 https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/prerequisites/ 支援的瀏覽器 %}</p>
+<h2 id="加入-PayPal-付款按鈕"><a href="#加入-PayPal-付款按鈕" class="headerlink" title="加入 PayPal 付款按鈕"></a>加入 PayPal 付款按鈕</h2><p>載入checkout.js<br>{% tabbed_codeblock Include checkout.js %}
+
+  <!-- tab js -->
+    <script src="https://www.paypalobjects.com/api/checkout.js"></script>
+  <!-- endtab -->
+  
+{% endtabbed_codeblock %}</p>
+{% alert danger %}
+請使用官方提供的線上版本，不要下載到local端。
+{% endalert %}
+<h4 id="Render-the-PayPal-button"><a href="#Render-the-PayPal-button" class="headerlink" title="Render the PayPal button"></a>Render the PayPal button</h4>{% tabbed_codeblock Render button %}
+
+  <!-- tab html -->
+    <div id="paypal-button"></div>
+    <script>
+    paypal.Button.render({
+    
+        env: 'production', // Specify 'sandbox' for the test environment
+
+        payment: function() {
+            // Set up the payment here, when the buyer clicks on the button
+        },
+
+        onAuthorize: function(data, actions) {
+            // Execute the payment here, when the buyer approves the transaction
+       }
+            
+    }, '#paypal-button');
+</script>
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}
+{% alert info %}
+* 可以開啟瀏覽器開發工具，確認看看載入是否有錯誤
+* IE的環境下建議加入 `<!DOCTYPE html>` 和 `<meta http-equiv="X-UA-Compatible" content="IE=edge">` 可避免一些兼容性的錯誤
+
+{% endalert %}
 <p>補充 : </p>
 <ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/" title="客製化按鈕" target="_blank" rel="external">客製化按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/" title="checkout.js 更多應用" target="_blank" rel="external">checkout.js 更多應用</a>
+<li>{% link 客製化按鈕 https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/ 客製化按鈕  %}</li>
+<li>{% link "checkout.js 更多應用" https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/ checkout.js 更多應用 %}
 </li>
 </ul>
 <h2 id="選擇整合方式"><a href="#選擇整合方式" class="headerlink" title="選擇整合方式"></a>選擇整合方式</h2><p>Client 整合 :</p>
@@ -669,7 +678,7 @@ Client 端整合 或 Server 端整合
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -828,11 +837,11 @@ Client 端整合 或 Server 端整合
                         </span>
                         <div class="media-content hide-xs font-merryweather"><p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
 <ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程">付款流程</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕">加入 PayPal 付款按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式">選擇整合方式</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合">Server 端整合</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程">測試整合流程</a>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程" target="_blank" rel="external">付款流程</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕" target="_blank" rel="external">加入 PayPal 付款按鈕</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式" target="_blank" rel="external">選擇整合方式</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合" target="_blank" rel="external">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合" target="_blank" rel="external">Server 端整合</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程" target="_blank" rel="external">測試整合流程</a>
 </li>
 </ul></div>
                     </div>
@@ -847,7 +856,7 @@ Client 端整合 或 Server 端整合
                 data-message-zero="no post found"
                 data-message-one="1 post found"
                 data-message-other="{n} posts found">
-                26 posts found
+                27 posts found
             </p>
         </div>
     </div>

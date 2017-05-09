@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-01-31T14:55:39.253Z</updated>
+  <updated>2017-05-09T10:37:45.168Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-01-31T14:55:39.253Z</updated>
+    <updated>2017-05-09T10:37:45.168Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -41,11 +41,49 @@
   </entry>
   
   <entry>
+    <title>vscode 設定自動觸發 suggestions</title>
+    <link href="https://mileslin.github.io/2017/05/vscode-%E8%A8%AD%E5%AE%9A%E8%87%AA%E5%8B%95%E8%A7%B8%E7%99%BC-suggestions/"/>
+    <id>https://mileslin.github.io/2017/05/vscode-設定自動觸發-suggestions/</id>
+    <published>2017-05-09T11:07:21.000Z</published>
+    <updated>2017-05-09T11:32:15.206Z</updated>
+    
+    <content type="html"><![CDATA[<p>某一版 vscode 更新後，寫 markdown 文件時不會自動跑出小視窗提醒能輸入的 snippet，需要點 <span class="highlight-text primary">ctrl + space</span>
+才會出現視窗，可是中文輸入法的 <span class="highlight-text primary">ctrl + space</span> 有自己的預設行為啊 !! 。</p>
+<a id="more"></a>
+<p>於是乎，我上 github 上去詢問是否有解決的方案，感謝官方的大神們有回我，結論是只要設定 markdown 的 quickSuggestions 就好了。  <a href="https://github.com/Microsoft/vscode/issues/26108#issuecomment-299738939" title="github回應" target="_blank" rel="external">github回應</a></p>
+<h2 id="解法"><a href="#解法" class="headerlink" title="解法"></a>解法</h2><p>首先開啟 Command Palette (<code>Ctrl+Shift+P</code>)，輸入 <code>Configure language specific settings</code> 後按enter， 然後選擇 <code>markdown</code>。</p>
+<p>再設定檔加入這段就可以了</p>
+<div class="alert info"><p>“[markdown]”: {<br>    “editor.quickSuggestions”: true<br>}</p>
+</div>
+<p>完整片段<br><div class="figure " style="width:;"><a class="fancybox" href="setting.jpg" title="" data-fancybox-group=""><img class="fig-img" src="setting.jpg" alt=""></a></div><div style="clear:both;"></div></p>
+<p>詳細設定說明: <a href="https://code.visualstudio.com/updates/v1_9#_language-specific-settings" title="language-specific-settings" target="_blank" rel="external">language-specific-settings</a></p>
+<p>能解決這問題，太令人感動了&gt;&lt;”</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;某一版 vscode 更新後，寫 markdown 文件時不會自動跑出小視窗提醒能輸入的 snippet，需要點 &lt;span class=&quot;highlight-text primary&quot;&gt;ctrl + space&lt;/span&gt;
+才會出現視窗，可是中文輸入法的 &lt;span class=&quot;highlight-text primary&quot;&gt;ctrl + space&lt;/span&gt; 有自己的預設行為啊 !! 。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="vscode" scheme="https://mileslin.github.io/categories/vscode/"/>
+    
+    
+      <category term="vscode" scheme="https://mileslin.github.io/tags/vscode/"/>
+    
+      <category term="trigger" scheme="https://mileslin.github.io/tags/trigger/"/>
+    
+      <category term="suggestion" scheme="https://mileslin.github.io/tags/suggestion/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Two way data binding event 的寫法</title>
     <link href="https://mileslin.github.io/2017/05/Two-way-data-binding-event-%E7%9A%84%E5%AF%AB%E6%B3%95/"/>
     <id>https://mileslin.github.io/2017/05/Two-way-data-binding-event-的寫法/</id>
     <published>2017-05-06T08:26:25.000Z</published>
-    <updated>2017-05-06T08:44:58.870Z</updated>
+    <updated>2017-05-09T10:37:45.162Z</updated>
     
     <content type="html"><![CDATA[<p>之前學的 two way binding 的寫法如下</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"firstName"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -80,7 +118,7 @@
     <link href="https://mileslin.github.io/2017/05/User-input-%E5%AF%A6%E7%94%A8%E7%9A%84-key-%E4%BA%8B%E4%BB%B6/"/>
     <id>https://mileslin.github.io/2017/05/User-input-實用的-key-事件/</id>
     <published>2017-05-02T16:30:27.000Z</published>
-    <updated>2017-05-02T16:54:44.208Z</updated>
+    <updated>2017-05-09T10:37:45.167Z</updated>
     
     <content type="html"><![CDATA[<p>使用者輸入資料的時候，通常會綁定一些事情，做一些邏輯之類的，例如:使用者點選 Enter 則執行搜尋功能等等….</p>
 <a id="more"></a>
@@ -114,11 +152,11 @@
     <link href="https://mileslin.github.io/2017/04/%E4%BD%BF%E7%94%A8-Angular-CLI-%E5%BB%BA%E7%AB%8B-Angular-%E5%B0%88%E6%A1%88%E6%9E%B6%E6%A7%8B%E8%AA%AA%E6%98%8E/"/>
     <id>https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/</id>
     <published>2017-04-30T09:46:33.000Z</published>
-    <updated>2017-04-30T15:19:26.000Z</updated>
+    <updated>2017-05-09T10:37:45.186Z</updated>
     
     <content type="html"><![CDATA[<p>從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 <a href="https://github.com/angular/angular-cli" title="Angular CLI" target="_blank" rel="external">Angular CLI</a> 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。</p>
 <a id="more"></a>
-<h2 id="建立專案"><a href="#建立專案" class="headerlink" title="建立專案"></a>建立專案</h2><p>首先我們要執行 cmd 指令 <code>ng new my-app</code> 建立 Angular 專案，Angular CLI 會幫我們建立這樣專案架構的專案<br><div class="figure " style="width:;"><a class="fancybox" href="Structure.jpg" title="Structure" data-fancybox-group=""><img class="fig-img" src="Structure.jpg" alt="Structure"></a><span class="caption">Structure</span></div></p>
+<h2 id="建立專案"><a href="#建立專案" class="headerlink" title="建立專案"></a>建立專案</h2><p>首先我們要執行 cmd 指令 <code>ng new my-app</code> 建立 Angular 專案，Angular CLI 會幫我們建立這樣專案架構的專案<br>{% image fancybox Structure.jpg "Structure" %}</p>
 <h2 id="The-root-folder"><a href="#The-root-folder" class="headerlink" title="The root folder"></a>The root folder</h2><p>負責放支援建置 app 的設定檔</p>
 <table>
 <thead>
@@ -138,11 +176,11 @@
 </tr>
 <tr>
 <td>.angular-cli.json</td>
-<td>放 Angular CLI 的設定檔 <a href="https://github.com/angular/angular-cli/wiki/angular-cli" title="Angular CLI Config Schema" target="_blank" rel="external">Angular CLI Config Schema</a></td>
+<td>放 Angular CLI 的設定檔 {% link Angular CLI Config Schema https://github.com/angular/angular-cli/wiki/angular-cli Angular CLI Config Schema %}</td>
 </tr>
 <tr>
 <td>.editorconfig</td>
-<td>幫助開發者使用不同的 IDEs 保持檔案格式一致性的設定檔 <a href="http://editorconfig.org" title="http://editorconfig.org editorconfig" target="_blank" rel="external"></a></td>
+<td>幫助開發者使用不同的 IDEs 保持檔案格式一致性的設定檔 {% link "http://editorconfig.org" http://editorconfig.org editorconfig %}</td>
 </tr>
 <tr>
 <td>.gitignore</td>
@@ -150,7 +188,7 @@
 </tr>
 <tr>
 <td>karma.conf.js</td>
-<td>Karma test 的 unit tests 設定 <a href="https://karma-runner.github.io/1.0/index.html" title="Karma" target="_blank" rel="external">Karma</a></td>
+<td>Karma test 的 unit tests 設定 {% link Karma https://karma-runner.github.io/1.0/index.html Karma %}</td>
 </tr>
 <tr>
 <td>package.json</td>
@@ -158,7 +196,7 @@
 </tr>
 <tr>
 <td>protractor.conf.js</td>
-<td>Angular end-to-end test framework <a href="http://www.protractortest.org/#/" title="Protractor" target="_blank" rel="external">Protractor</a> 設定檔</td>
+<td>Angular end-to-end test framework {% link Protractor http://www.protractortest.org/#/ Protractor %} 設定檔</td>
 </tr>
 <tr>
 <td>README.md</td>
@@ -170,12 +208,12 @@
 </tr>
 <tr>
 <td>tslint.json</td>
-<td>保持 code style 一致性的 <a href="https://palantir.github.io/tslint/" title="TSLint" target="_blank" rel="external">TSLint</a> 設定檔</td>
+<td>保持 code style 一致性的 {% link TSLint https://palantir.github.io/tslint/ TSLint %} 設定檔</td>
 </tr>
 </tbody>
 </table>
 <h2 id="The-src-folder"><a href="#The-src-folder" class="headerlink" title="The src folder"></a>The src folder</h2><p>寫程式碼的地方。  所有的 Angular components, templates, styles, images 等等…都放這邊。</p>
-<div class="figure " style="width:;"><a class="fancybox" href="Src.jpg" title="Src" data-fancybox-group=""><img class="fig-img" src="Src.jpg" alt="Src"></a><span class="caption">Src</span></div>
+{% image fancybox Src.jpg "Src" %}
 <table>
 <thead>
 <tr>
@@ -202,7 +240,7 @@
 </tr>
 <tr>
 <td>favicon.ico</td>
-<td>網頁頁籤的 icon <div class="figure " style="width:;"><a class="fancybox" href="icon.jpg" title="" data-fancybox-group=""><img class="fig-img" src="icon.jpg" alt=""></a></div><div style="clear:both;"></div></td>
+<td>網頁頁籤的 icon {% image fancybox clear icon.jpg %}</td>
 </tr>
 <tr>
 <td>index.html</td>
@@ -210,11 +248,11 @@
 </tr>
 <tr>
 <td>main.ts</td>
-<td>啟動 application root module(<span class="highlight-text primary">AppModule</span>) 的編譯起始點</td>
+<td>啟動 application root module({% hl_text primary %}AppModule{% endhl_text %}) 的編譯起始點</td>
 </tr>
 <tr>
 <td>polyfills.ts</td>
-<td>因為不同的瀏覽器會支援不同的 web standards， polyfills 就像補丁的概念，補足些沒有支援的部分。 <a href="https://angular.io/docs/ts/latest/guide/browser-support.html" title="Browser Support" target="_blank" rel="external">Browser Support</a></td>
+<td>因為不同的瀏覽器會支援不同的 web standards， polyfills 就像補丁的概念，補足些沒有支援的部分。 {% link Browser Support https://angular.io/docs/ts/latest/guide/browser-support.html Browser Support %}</td>
 </tr>
 <tr>
 <td>styles.css</td>
@@ -234,7 +272,7 @@
     
     <summary type="html">
     
-      &lt;p&gt;從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 &lt;a href=&quot;https://github.com/angular/angular-cli&quot; title=&quot;Angular CLI&quot;&gt;Angular CLI&lt;/a&gt; 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。&lt;/p&gt;
+      &lt;p&gt;從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 &lt;a href=&quot;https://github.com/angular/angular-cli&quot; title=&quot;Angular CLI&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Angular CLI&lt;/a&gt; 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。&lt;/p&gt;
     
     </summary>
     
@@ -252,7 +290,7 @@
     <link href="https://mileslin.github.io/2017/04/Autofac-%E8%A8%AD%E5%AE%9A-Web-API-Register-Controller-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/</id>
     <published>2017-04-28T12:52:13.000Z</published>
-    <updated>2017-04-28T14:05:24.068Z</updated>
+    <updated>2017-05-09T10:37:45.095Z</updated>
     
     <content type="html"><![CDATA[<p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)</p>
 <a id="more"></a>
@@ -260,11 +298,77 @@
 <ul>
 <li>先註冊所有 Web API Controller 到 ContainerBuilder</li>
 <li>註冊所有 Controller 要相依的物件，這邊以 IConfiguration 為例子，表示 Controller 建構式注入 IConfiguration 時會取得 Configuration 物件</li>
-<li>開啟 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper()</code><figure class="codeblock codeblock--tabbed"><figcaption><span>AutofacConfig</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AutofacConfig</span></span><br><span class="line">{</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Bootstrapper</span>(<span class="params"></span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Get your HttpConfiguration.</span></span><br><span class="line">        <span class="keyword">var</span> config = GlobalConfiguration.Configuration;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Register your Web API controllers.</span></span><br><span class="line">        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// OPTIONAL: Register the Autofac filter provider.</span></span><br><span class="line">        builder.RegisterWebApiFilterProvider(config);</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> container = builder.Build();</span><br><span class="line"></span><br><span class="line">        config.DependencyResolver = <span class="keyword">new</span> AutofacWebApiDependencyResolver(container);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-</li>
+<li>開啟 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper()</code>{% tabbed_codeblock AutofacConfig %}
+
+  <!-- tab cs -->
+    public class AutofacConfig
+    {
+        public static void Bootstrapper()
+        {
+            var builder = new ContainerBuilder();
+
+            // Get your HttpConfiguration.
+            var config = GlobalConfiguration.Configuration;
+
+            // Register your Web API controllers.
+            builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
+
+            // OPTIONAL: Register the Autofac filter provider.
+            builder.RegisterWebApiFilterProvider(config);
+
+            builder.RegisterType<configuration>()
+               .As<iconfiguration>()
+               .InstancePerLifetimeScope();
+
+            builder.RegisterType<configuration>()
+               .As<iconfiguration>()
+               .InstancePerLifetimeScope();
+
+            var container = builder.Build();
+
+            config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
+        }
+    }
+  <!-- endtab -->
+  
+{% endtabbed_codeblock %}
+</iconfiguration></configuration></iconfiguration></configuration></li>
 </ul>
-<p>打開 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper();</code><br><figure class="codeblock codeblock--tabbed"><figcaption><span>Global.asax.cs</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class WebApiApplication : System.Web.HttpApplication</span><br><span class="line">{</span><br><span class="line">    protected void Application_Start()</span><br><span class="line">    {</span><br><span class="line">        AreaRegistration.RegisterAllAreas();</span><br><span class="line">        GlobalConfiguration.Configure(WebApiConfig.Register);</span><br><span class="line">        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);</span><br><span class="line">        RouteConfig.RegisterRoutes(RouteTable.Routes);</span><br><span class="line">        BundleConfig.RegisterBundles(BundleTable.Bundles);</span><br><span class="line">        </span><br><span class="line">        // 加入這行</span><br><span class="line">        AutofacConfig.Bootstrapper();</span><br><span class="line"></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<p>接下來 Controller 就可以建構式注入 IConfiguration 取得 Configuration 物件<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Controller</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ValuesController</span> : <span class="title">ApiController</span></span><br><span class="line">{</span><br><span class="line">    IConfiguration _configuration;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ValuesController</span>(<span class="params">IConfiguration configuration</span>)</span><br><span class="line">    </span>{</span><br><span class="line">        _configuration = configuration;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>打開 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper();</code><br>{% tabbed_codeblock Global.asax.cs %}
+
+  <!-- tab cs -->
+    public class WebApiApplication : System.Web.HttpApplication
+    {
+        protected void Application_Start()
+        {
+            AreaRegistration.RegisterAllAreas();
+            GlobalConfiguration.Configure(WebApiConfig.Register);
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+            
+            // 加入這行
+            AutofacConfig.Bootstrapper();
+
+        }
+    }
+  <!-- endtab -->
+  
+{% endtabbed_codeblock %}</p>
+<p>接下來 Controller 就可以建構式注入 IConfiguration 取得 Configuration 物件<br>{% tabbed_codeblock Controller %}
+
+  <!-- tab cs -->
+    public class ValuesController : ApiController
+    {
+        IConfiguration _configuration;
+        public ValuesController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+    }
+  <!-- endtab -->
+  
+{% endtabbed_codeblock %}</p>
 <h2 id="建立-Autofac-Module"><a href="#建立-Autofac-Module" class="headerlink" title="建立 Autofac.Module"></a>建立 Autofac.Module</h2><p>當註冊物件一多的時候，我們可以建立 <code>Aufofac.Module</code> 把註冊這件事情分散在各個 Module 處理。</p>
 <p>例如我建立一個 EFModule ，註冊 Entities。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>EFModule</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class EFModule : Autofac.Module</span><br><span class="line">{</span><br><span class="line">    protected override void Load(ContainerBuilder builder)</span><br><span class="line">    {</span><br><span class="line">        builder.RegisterType&lt;WebPaymentEntities&gt;()</span><br><span class="line">           .As&lt;WebPaymentEntities&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
 <p>我的 ContainerBuilder 只要註冊 Module 就好<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Register Module</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Bootstrapper</span>(<span class="params"></span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Get your HttpConfiguration.</span></span><br><span class="line">        <span class="keyword">var</span> config = GlobalConfiguration.Configuration;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Register your Web API controllers.</span></span><br><span class="line">        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// OPTIONAL: Register the Autofac filter provider.</span></span><br><span class="line">        builder.RegisterWebApiFilterProvider(config);</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 註冊 Module</span></span><br><span class="line">        builder.RegisterModule(<span class="keyword">new</span> EFModule());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> container = builder.Build();</span><br><span class="line"></span><br><span class="line">        config.DependencyResolver = <span class="keyword">new</span> AutofacWebApiDependencyResolver(container);</span><br><span class="line">    }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
@@ -296,7 +400,7 @@
     <link href="https://mileslin.github.io/2017/04/NLog-%E5%BB%BA%E7%BD%AE%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/NLog-建置筆記/</id>
     <published>2017-04-26T13:54:29.000Z</published>
-    <updated>2017-04-28T14:04:32.657Z</updated>
+    <updated>2017-05-09T10:37:45.133Z</updated>
     
     <content type="html"><![CDATA[<p>最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。</p>
 <a id="more"></a>
@@ -361,7 +465,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/</id>
     <published>2017-04-23T14:43:07.000Z</published>
-    <updated>2017-04-28T14:04:32.746Z</updated>
+    <updated>2017-05-09T10:37:45.186Z</updated>
     
     <content type="html"><![CDATA[<!-- excerpt -->
 <ul>
@@ -386,13 +490,13 @@
 <li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/#Array-prototype-push" title="Array.prototype.push">Array.prototype.push()</a> : 從最後面開始新增元素到 Array</li>
 <li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-reduce" title="Array.prototype.reduce">Array.prototype.reduce()</a> : 可累加 Array 的元素，也可以用來操作元素的值然後回傳</li>
 <li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-reduceRight" title="Array.prototype.reduceRight">Array.prototype.reduceRight()</a> : 與 <code>Array.prototype.reduce()</code> 相似，差別在於是從右邊開始執行</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-reverse" title="Array.prototype.reverse">Array.prototype.reverse()</a> : 反向 Array 本身的值</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-shift" title="Array.prototype.shift">Array.prototype.shift()</a> : 移除 Array 的第一個元素</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-slice" title="Array.prototype.slice">Array.prototype.slice()</a> : 回傳淺複製的 Array</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-some" title="Array.prototype.some">Array.prototype.some()</a> : 驗證其中一個元素是否符合規則，若符合則回傳 true</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-sort" title="Array.prototype.sort">Array.prototype.sort()</a> : 排序 Array</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/#Array-prototype-splice" title="Array.prototype.splice">Array.prototype.splice()</a> : 移除元素功能跟 insert 元素功能</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/#Array-prototype-toString" title="Array.prototype.toString">Array.prototype.toString()</a> :將 Array 元素toString，並且用 <code>,</code> 隔開</li>
+<li>{% link "Array.prototype.reverse()" https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-reverse Array.prototype.reverse %} : 反向 Array 本身的值</li>
+<li>{% link "Array.prototype.shift()" https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-shift Array.prototype.shift %} : 移除 Array 的第一個元素</li>
+<li>{% link "Array.prototype.slice()" https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-slice Array.prototype.slice %} : 回傳淺複製的 Array</li>
+<li>{% link "Array.prototype.some()" https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-some Array.prototype.some %} : 驗證其中一個元素是否符合規則，若符合則回傳 true</li>
+<li>{% link "Array.prototype.sort()" https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-sort Array.prototype.sort %} : 排序 Array</li>
+<li>{% link "Array.prototype.splice()" https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/#Array-prototype-splice Array.prototype.splice %} : 移除元素功能跟 insert 元素功能</li>
+<li>{% link "Array.prototype.toString()" https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/#Array-prototype-toString Array.prototype.toString %} :將 Array 元素toString，並且用 <code>,</code> 隔開</li>
 <li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/#Array-prototype-unshift" title="Array.prototype.unshift">Array.prototype.unshift()</a> : 從 Array 前面增加元素</li>
 </ul>
 <h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">官方參考連結</a>]]></content>
@@ -417,7 +521,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/</id>
     <published>2017-04-22T15:57:37.000Z</published>
-    <updated>2017-04-28T14:04:32.743Z</updated>
+    <updated>2017-05-09T10:37:45.185Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>移除元素功能跟 insert 元素功能 <code>Array.prototype.splice()</code></li>
@@ -474,7 +578,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/</id>
     <published>2017-04-21T15:08:58.000Z</published>
-    <updated>2017-04-21T16:06:26.725Z</updated>
+    <updated>2017-05-09T10:37:45.179Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>回傳淺複製的 Array ，<code>Array.prototype.slice()</code></li>
@@ -536,7 +640,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/</id>
     <published>2017-04-20T15:55:24.000Z</published>
-    <updated>2017-04-20T17:21:08.856Z</updated>
+    <updated>2017-05-09T10:37:45.179Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>可累加 Array 的元素，也可以用來操作元素的值然後回傳 <code>Array.prototype.reduce()</code></li>
@@ -552,16 +656,92 @@
 <li>currentValue : 現在的 value</li>
 <li>array : 整個 Array 的值</li>
 </ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>reduce int</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> initialValue = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">var</span> result = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].reduce(</span><br><span class="line">  <span class="function">(<span class="params">accumulator, currentValue, currentIndex, array</span>) =&gt;</span> {</span><br><span class="line">    <span class="keyword">return</span> accumulator + currentValue;</span><br><span class="line">  },</span><br><span class="line">  initialValue</span><br><span class="line">);</span><br><span class="line">  <span class="comment">// result = 20</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>用來攤平 Array</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Flatten an array of arrays</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> flattened = [[<span class="number">0</span>, <span class="number">1</span>], [<span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>]].reduce(</span><br><span class="line">  <span class="function">(<span class="params"> acc, cur </span>) =&gt;</span> acc.concat(cur),</span><br><span class="line">  []</span><br><span class="line">);</span><br><span class="line"><span class="comment">// flattened is [0, 1, 2, 3, 4, 5]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>用來計算 Array 裡面相同元素有幾個</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Counting instances of values in an object</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> names = [<span class="string">'Alice'</span>, <span class="string">'Bob'</span>, <span class="string">'Tiff'</span>, <span class="string">'Bruce'</span>, <span class="string">'Alice'</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> countedNames = names.reduce(<span class="function"><span class="keyword">function</span> (<span class="params">allNames, name</span>) </span>{ </span><br><span class="line">  <span class="keyword">if</span> (name <span class="keyword">in</span> allNames) {</span><br><span class="line">    allNames[name]++;</span><br><span class="line">  }</span><br><span class="line">  <span class="keyword">else</span> {</span><br><span class="line">    allNames[name] = <span class="number">1</span>;</span><br><span class="line">  }</span><br><span class="line">  <span class="keyword">return</span> allNames;</span><br><span class="line">}, {});</span><br><span class="line"><span class="comment">// countedNames is:</span></span><br><span class="line"><span class="comment">// { 'Alice': 2, 'Bob': 1, 'Tiff': 1, 'Bruce': 1 }</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>與 spread operator 混用，取得某一個欄位的所有值</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Bonding arrays contained in an array</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// friends - an array of objects </span></span><br><span class="line"><span class="comment">// where object field "books" - list of favorite books </span></span><br><span class="line"><span class="keyword">var</span> friends = [{</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Anna'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'Bible'</span>, <span class="string">'Harry Potter'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">21</span></span><br><span class="line">}, {</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Bob'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'War and peace'</span>, <span class="string">'Romeo and Juliet'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">26</span></span><br><span class="line">}, {</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Alice'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'The Lord of the Rings'</span>, <span class="string">'The Shining'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span></span><br><span class="line">}];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果 initialValue 沒有傳會造成 undefined is not a function 的 Exception</span></span><br><span class="line"><span class="comment">// allbooks - list which will contain all friends' books +  </span></span><br><span class="line"><span class="comment">// additional list contained in initialValue</span></span><br><span class="line"><span class="keyword">var</span> allbooks = friends.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">prev, curr</span>) </span>{</span><br><span class="line">  <span class="keyword">return</span> [...prev, ...curr.books];</span><br><span class="line">}, []);</span><br><span class="line"></span><br><span class="line"><span class="comment">// allbooks = [</span></span><br><span class="line"><span class="comment">//   'Bible', 'Harry Potter', 'War and peace', </span></span><br><span class="line"><span class="comment">//   'Romeo and Juliet', 'The Lord of the Rings',</span></span><br><span class="line"><span class="comment">//   'The Shining'</span></span><br><span class="line"><span class="comment">// ]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+{% tabbed_codeblock "reduce int" %}
+
+  <!-- tab js -->
+  var initialValue = 10;
+    var result = [0, 1, 2, 3, 4].reduce(
+  (accumulator, currentValue, currentIndex, array) => {
+    return accumulator + currentValue;
+  },
+  initialValue
+);
+  // result = 20
+  <!-- endtab -->
+{% endtabbed_codeblock %}
+{% alert info %}
+用來攤平 Array
+{% endalert %}
+{% tabbed_codeblock "Flatten an array of arrays" %}
+
+  <!-- tab js -->
+var flattened = [[0, 1], [2, 3], [4, 5]].reduce(
+  ( acc, cur ) => acc.concat(cur),
+  []
+);
+// flattened is [0, 1, 2, 3, 4, 5]
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}
+{% alert info %}
+用來計算 Array 裡面相同元素有幾個
+{% endalert %}
+{% tabbed_codeblock "Counting instances of values in an object" %}
+
+  <!-- tab js -->
+var names = ['Alice', 'Bob', 'Tiff', 'Bruce', 'Alice'];
+
+var countedNames = names.reduce(function (allNames, name) { 
+  if (name in allNames) {
+    allNames[name]++;
+  }
+  else {
+    allNames[name] = 1;
+  }
+  return allNames;
+}, {});
+// countedNames is:
+// { 'Alice': 2, 'Bob': 1, 'Tiff': 1, 'Bruce': 1 }
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}
+{% alert info %}
+與 spread operator 混用，取得某一個欄位的所有值
+{% endalert %}
+{% tabbed_codeblock "Bonding arrays contained in an array" %}
+
+  <!-- tab js -->
+// friends - an array of objects 
+// where object field "books" - list of favorite books 
+var friends = [{
+  name: 'Anna',
+  books: ['Bible', 'Harry Potter'],
+  age: 21
+}, {
+  name: 'Bob',
+  books: ['War and peace', 'Romeo and Juliet'],
+  age: 26
+}, {
+  name: 'Alice',
+  books: ['The Lord of the Rings', 'The Shining'],
+  age: 18
+}];
+
+// 如果 initialValue 沒有傳會造成 undefined is not a function 的 Exception
+// allbooks - list which will contain all friends' books +  
+// additional list contained in initialValue
+var allbooks = friends.reduce(function(prev, curr) {
+  return [...prev, ...curr.books];
+}, []);
+
+// allbooks = [
+//   'Bible', 'Harry Potter', 'War and peace', 
+//   'Romeo and Juliet', 'The Lord of the Rings',
+//   'The Shining'
+// ]
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}
 <h2 id="Array-prototype-reduceRight"><a href="#Array-prototype-reduceRight" class="headerlink" title="Array.prototype.reduceRight()"></a>Array.prototype.reduceRight()</h2><ul>
 <li>與 <code>Array.prototype.reduce()</code> 的差別，是從右邊開始執行。</li>
 </ul>
@@ -597,7 +777,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/</id>
     <published>2017-04-18T16:06:55.000Z</published>
-    <updated>2017-04-20T15:52:47.860Z</updated>
+    <updated>2017-05-09T10:37:45.178Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立一個全新運算過後的 Array，且不會改到原本的 Array <code>Array.prototype.map()</code></li>
@@ -639,7 +819,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/</id>
     <published>2017-04-17T16:40:33.000Z</published>
-    <updated>2017-04-17T17:27:24.202Z</updated>
+    <updated>2017-05-09T10:37:45.178Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>判斷 Array 是否有包含某一個值 <code>Array.prototype.includes()</code></li>
@@ -699,7 +879,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/</id>
     <published>2017-04-16T04:02:43.000Z</published>
-    <updated>2017-04-16T05:12:35.730Z</updated>
+    <updated>2017-05-09T10:37:45.177Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>使 Array 填滿指定的值 <code>Array.prototype.fill()</code></li>
@@ -715,10 +895,37 @@
 <li>end : 填到哪一個元素，預設是此陣列的長度 (optional)</li>
 </ul>
 <p>Note : start 跟 end 若填負數，則是從右邊開始算</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>fill</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>);               <span class="comment">// [4, 4, 4]</span></span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>, <span class="number">1</span>);            <span class="comment">// [1, 4, 4]</span></span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>, <span class="number">1</span>, <span class="number">2</span>);         <span class="comment">// [1, 4, 3]</span></span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>, <span class="number">1</span>, <span class="number">1</span>);         <span class="comment">// [1, 2, 3]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+{% tabbed_codeblock fill %}
+
+  <!-- tab js -->
+    [1, 2, 3].fill(4);               // [4, 4, 4]
+    [1, 2, 3].fill(4, 1);            // [1, 4, 4]
+    [1, 2, 3].fill(4, 1, 2);         // [1, 4, 3]
+    [1, 2, 3].fill(4, 1, 1);         // [1, 2, 3]
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}
 <h2 id="Array-prototype-filter"><a href="#Array-prototype-filter" class="headerlink" title="Array.prototype.filter()"></a>Array.prototype.filter()</h2><p>過濾 Array 的內容，且回傳的 Array 是一個全新的 Array</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>filter</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isBigEnough</span>(<span class="params">value,index,array</span>) </span>{</span><br><span class="line">	</span><br><span class="line">  <span class="keyword">return</span> value &gt;= <span class="number">10</span>;</span><br><span class="line">}</span><br><span class="line"><span class="keyword">var</span> filtered = [<span class="number">12</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">130</span>, <span class="number">44</span>].filter(isBigEnough);</span><br><span class="line"></span><br><span class="line"><span class="comment">//arrow function</span></span><br><span class="line">[<span class="number">12</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">130</span>, <span class="number">44</span>].filter( <span class="function">(<span class="params">value,index,array</span>) =&gt;</span>{</span><br><span class="line">	  </span><br><span class="line">  <span class="keyword">return</span> value &gt;= <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-find"><a href="#Array-prototype-find" class="headerlink" title="Array.prototype.find()"></a>Array.prototype.find()</h2><p>找到第一筆相符的元素，如果都找不到，則回傳 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined" title="undefiend" target="_blank" rel="external">undefiend</a> </p>
+{% tabbed_codeblock filter %}
+
+  <!-- tab js -->
+    function isBigEnough(value,index,array) {
+	
+  return value >= 10;
+}
+var filtered = [12, 5, 8, 130, 44].filter(isBigEnough);
+
+//arrow function
+[12, 5, 8, 130, 44].filter( (value,index,array) =>{
+	  
+  return value >= 10;
+
+});
+
+  <!-- endtab -->
+{% endtabbed_codeblock %}
+<h2 id="Array-prototype-find"><a href="#Array-prototype-find" class="headerlink" title="Array.prototype.find()"></a>Array.prototype.find()</h2><p>找到第一筆相符的元素，如果都找不到，則回傳 {% link undefiend https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined undefiend 
+%} </p>
 <h4 id="參數說明-arr-find-value-index-array"><a href="#參數說明-arr-find-value-index-array" class="headerlink" title="參數說明 arr.find(value, index, array)"></a>參數說明 <code>arr.find(value, index, array)</code></h4><ul>
 <li>element : 當下元素的 value</li>
 <li>index : 當下元素的 index ，從 0 開始 (optional)</li>
@@ -763,7 +970,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/</id>
     <published>2017-04-15T09:32:54.000Z</published>
-    <updated>2017-04-15T10:19:21.137Z</updated>
+    <updated>2017-05-09T10:37:45.177Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>複製 Array 自己的元素 <code>Array.prototype.copyWithin()</code></li>
@@ -815,7 +1022,7 @@
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/</id>
     <published>2017-04-13T16:33:29.000Z</published>
-    <updated>2017-04-15T10:06:21.232Z</updated>
+    <updated>2017-05-09T10:37:45.176Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>從現有 Array 建立新 Array 物件 <code>Array.from()</code></li>
@@ -857,7 +1064,7 @@
     <link href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%BE%8C%E7%AF%87/"/>
     <id>https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/</id>
     <published>2017-03-18T17:29:33.000Z</published>
-    <updated>2017-04-13T16:13:25.090Z</updated>
+    <updated>2017-05-09T10:37:45.151Z</updated>
     
     <content type="html"><![CDATA[<h3 id="延續前篇"><a href="#延續前篇" class="headerlink" title="延續前篇 "></a>延續前篇 <a href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/" title="前篇">PayPal 付款流程整合 前篇</a></h3><a id="more"></a>
 <h2 id="Client-端整合"><a href="#Client-端整合" class="headerlink" title="Client 端整合"></a>Client 端整合</h2><p>單純用 Client 整合的話只需要單純用 HTML 跟 JavaScript 就能完成，不需要寫到 Server 端的程式碼。</p>
@@ -865,7 +1072,7 @@
 <li><p>建立 <a href="https://developer.paypal.com/docs/integration/direct/make-your-first-call/#create-a-paypal-app" title="PayPal app" target="_blank" rel="external">PayPal app</a> 取得 credentials，傳入 client ID 。</p>
 <div class="figure " style="width:;"><a class="fancybox" href="SetClientID.jpg" title="" data-fancybox-group=""><img class="fig-img" src="SetClientID.jpg" alt=""></a></div>
 </li>
-<li><p>在 <code>payment</code> function 使用 <code>paypal.rest.payment.create()</code> 設定付款選項。參考 : <a href="https://developer.paypal.com/docs/api/payments/#payment_create_request" title="如何建立帳單" target="_blank" rel="external">如何建立帳單</a></p>
+<li><p>在 <code>payment</code> function 使用 <code>paypal.rest.payment.create()</code> 設定付款選項。參考 : {% link 如何建立帳單 https://developer.paypal.com/docs/api/payments/#payment_create_request 如何建立帳單 %}</p>
 </li>
 <li><p>在 <code>onAuthorize</code> call back 顯示成功頁面</p>
 </li>
@@ -891,8 +1098,9 @@
 </tr>
 <tr>
 <td style="text-align:left">付款之前顯示確認頁面</td>
-<td style="text-align:left">在 <code>onAuthorize</code> call back 可使用 <code>actions.payment.get()</code> 取得帳單和付款人資訊 <div class="alert info"><p>必須顯示付款確認頁面，否則 <code>actions.payment.execute()</code> 和 <code>actions.payment.get()</code> 會無法使用。</p>
-</div></td>
+<td style="text-align:left">在 <code>onAuthorize</code> call back 可使用 <code>actions.payment.get()</code> 取得帳單和付款人資訊 {% alert info %}
+必須顯示付款確認頁面，否則 `actions.payment.execute()` 和 `actions.payment.get()` 會無法使用。
+{% endalert %}</td>
 </tr>
 </tbody>
 </table>
@@ -900,19 +1108,58 @@
 <h3 id="設置-Client-環境"><a href="#設置-Client-環境" class="headerlink" title="設置 Client 環境"></a>設置 Client 環境</h3><ol>
 <li>載入 <code>checkout.js</code></li>
 <li>設定 <code>payment</code> function 建立帳單<ul>
-<li>呼叫 Server <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/#set-up-the-payment" title="建立帳單" target="_blank" rel="external">建立帳單</a></li>
+<li>呼叫 Server {% link 建立帳單 https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/#set-up-the-payment 建立帳單 %}</li>
 <li>從建立帳單的 API 取得 <code>paymentID</code>，呼叫<code>resolve(data.paymentID</code>，開始付款人授權流程。</li>
 </ul>
 </li>
 <li>設定 <code>onAuthorize</code> 完成付款<ul>
 <li>之後的 REST Payments API 呼叫，都需要用到 <code>data.paymentID</code> 和 <code>data.payerID</code>，</li>
 <li>可選擇是否顯示帳單明細</li>
-<li>呼叫 Server 端 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/#execute-the-payment" title="執行付款" target="_blank" rel="external">執行付款</a></li>
+<li>呼叫 Server 端 {% link 執行付款 https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/#execute-the-payment 執行付款 %}</li>
 </ul>
 </li>
 </ol>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Sample</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"paypal-button"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://www.paypalobjects.com/api/checkout.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span><br><span class="line">    paypal.Button.render({</span><br><span class="line">    </span><br><span class="line">        <span class="attr">env</span>: <span class="string">'production'</span>, <span class="comment">// Optional: specify 'sandbox' environment</span></span><br><span class="line">    </span><br><span class="line">        payment: <span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>{</span><br><span class="line">               </span><br><span class="line">            <span class="keyword">var</span> CREATE_PAYMENT_URL = <span class="string">'https://my-store.com/paypal/create-payment'</span>;</span><br><span class="line">                </span><br><span class="line">            paypal.request.post(CREATE_PAYMENT_URL)</span><br><span class="line">                .then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>{ resolve(data.paymentID); })</span><br><span class="line">                .catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>{ reject(err); });</span><br><span class="line">        },</span><br><span class="line"></span><br><span class="line">        <span class="attr">onAuthorize</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>{</span><br><span class="line">        </span><br><span class="line">            <span class="comment">// Note: you can display a confirmation page before executing</span></span><br><span class="line">            </span><br><span class="line">            <span class="keyword">var</span> EXECUTE_PAYMENT_URL = <span class="string">'https://my-store.com/paypal/execute-payment'</span>;</span><br><span class="line"></span><br><span class="line">            paypal.request.post(EXECUTE_PAYMENT_URL,</span><br><span class="line">                    { <span class="attr">paymentID</span>: data.paymentID, <span class="attr">payerID</span>: data.payerID })</span><br><span class="line">                    </span><br><span class="line">                .then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>{ <span class="comment">/* Go to a success page */</span> })</span><br><span class="line">                .catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>{ <span class="comment">/* Go to an error page  */</span> });</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">    }, <span class="string">'#paypal-button'</span>);</span><br><span class="line"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>範例來源 :<br><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Advanced server integration" target="_blank" rel="external">Advanced server integration</a></p>
+{% tabbed_codeblock Sample %}
+
+  <!-- tab html -->
+    <div id="paypal-button"></div>
+
+<script src="https://www.paypalobjects.com/api/checkout.js"></script>
+
+<script>
+    paypal.Button.render({
+    
+        env: 'production', // Optional: specify 'sandbox' environment
+    
+        payment: function(resolve, reject) {
+               
+            var CREATE_PAYMENT_URL = 'https://my-store.com/paypal/create-payment';
+                
+            paypal.request.post(CREATE_PAYMENT_URL)
+                .then(function(data) { resolve(data.paymentID); })
+                .catch(function(err) { reject(err); });
+        },
+
+        onAuthorize: function(data) {
+        
+            // Note: you can display a confirmation page before executing
+            
+            var EXECUTE_PAYMENT_URL = 'https://my-store.com/paypal/execute-payment';
+
+            paypal.request.post(EXECUTE_PAYMENT_URL,
+                    { paymentID: data.paymentID, payerID: data.payerID })
+                    
+                .then(function(data) { /* Go to a success page */ })
+                .catch(function(err) { /* Go to an error page  */ });
+        }
+
+    }, '#paypal-button');
+</script>
+
+  <!-- endtab -->
+  
+{% endtabbed_codeblock %}
+<p>範例來源 :<br>{% link Advanced server integration https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/ Advanced server integration %}</p>
 <h3 id="Server-如何整合付款流程說明"><a href="#Server-如何整合付款流程說明" class="headerlink" title="Server 如何整合付款流程說明"></a>Server 如何整合付款流程說明</h3><ol>
 <li>Client 端的 <code>payment</code> method 呼叫 Server</li>
 <li>Server 呼叫 Payments API 建立帳單<!-- classes : info success warning danger no-icon -->
@@ -923,8 +1170,9 @@
 <li>開始初始化付款流程， 在 client 建立的 <code>payment</code> method 從回傳的 JSON 訊息傳 <code>paymentID</code> 到 <code>checkout.js</code> script</li>
 <li>開啟 lightbox 讓付款人同意付款</li>
 </ol>
-<h4 id="執行付款"><a href="#執行付款" class="headerlink" title="執行付款"></a>執行付款</h4><p>使用者同意付款後， <code>checkout.js</code> 會呼叫 <code>onAuthorize</code> call back。<br><!-- classes : info success warning danger no-icon --><br><div class="alert info"><p>執行付款之前，建議可以顯示付款明細</p>
-</div></p>
+<h4 id="執行付款"><a href="#執行付款" class="headerlink" title="執行付款"></a>執行付款</h4><p>使用者同意付款後， <code>checkout.js</code> 會呼叫 <code>onAuthorize</code> call back。<br><!-- classes : info success warning danger no-icon --><br>{% alert info %}
+執行付款之前，建議可以顯示付款明細
+{% endalert %}</p>
 <ol>
 <li><code>onAuthorize</code> call back 呼叫 Server 並傳入 <code>data.paymentID</code> 和 <code>data.payerID</code>，執行付款</li>
 <li>Server 呼叫付款完成 API 完成付款</li>
@@ -951,7 +1199,7 @@
     <link href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%89%8D%E7%AF%87/"/>
     <id>https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/</id>
     <published>2017-03-18T10:33:53.000Z</published>
-    <updated>2017-04-13T16:13:25.089Z</updated>
+    <updated>2017-05-09T10:37:45.151Z</updated>
     
     <content type="html"><![CDATA[<p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
 <ul>
@@ -972,30 +1220,58 @@
 </ul>
 </li>
 <li><p>付款人需登入 PayPal</p>
-<div class="figure " style="width:;"><a class="fancybox" href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png" title="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/" data-fancybox-group="" target="_blank" rel="external"><img class="fig-img" src="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png" alt="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/"></a><span class="caption">圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/</span></div>
+{% image fancybox https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png 圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/ %}
 </li>
 <li><p>付款人會授權 PayPal 帳單</p>
-<div class="figure " style="width:;"><a class="fancybox" href="https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png" title="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/" data-fancybox-group="" target="_blank" rel="external"><img class="fig-img" src="https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png" alt="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/"></a><span class="caption">圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/</span></div>
+{% image fancybox https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png 圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/ %}
 </li>
 <li><p>付款人同意帳單後，PayPay 會關掉 lightbox window，付款人回到原本的網頁畫面。  此刻，我們可以顯示一個確認頁面，呼叫 PapPal REST API 來顯示帳單明細，內容包含帳單地址跟Email等等….</p>
 </li>
 <li><p>在確認頁面裡面，呼叫付款完成的 PayPal API 來完成付款。</p>
 </li>
 </ol>
-<p>補充 : <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/prerequisites/" title="支援的瀏覽器" target="_blank" rel="external">Express Checkout 支援的瀏覽器</a></p>
-<h2 id="加入-PayPal-付款按鈕"><a href="#加入-PayPal-付款按鈕" class="headerlink" title="加入 PayPal 付款按鈕"></a>加入 PayPal 付款按鈕</h2><p>載入checkout.js<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Include checkout.js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=<span class="string">"https://www.paypalobjects.com/api/checkout.js"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<div class="alert danger"><p>請使用官方提供的線上版本，不要下載到local端。</p>
-</div>
-<h4 id="Render-the-PayPal-button"><a href="#Render-the-PayPal-button" class="headerlink" title="Render the PayPal button"></a>Render the PayPal button</h4><figure class="codeblock codeblock--tabbed"><figcaption><span>Render button</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"paypal-button"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span><br><span class="line">    paypal.Button.render({</span><br><span class="line">    </span><br><span class="line">        <span class="attr">env</span>: <span class="string">'production'</span>, <span class="comment">// Specify 'sandbox' for the test environment</span></span><br><span class="line"></span><br><span class="line">        payment: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>{</span><br><span class="line">            <span class="comment">// Set up the payment here, when the buyer clicks on the button</span></span><br><span class="line">        },</span><br><span class="line"></span><br><span class="line">        <span class="attr">onAuthorize</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data, actions</span>) </span>{</span><br><span class="line">            <span class="comment">// Execute the payment here, when the buyer approves the transaction</span></span><br><span class="line">       }</span><br><span class="line">            </span><br><span class="line">    }, <span class="string">'#paypal-button'</span>);</span><br><span class="line"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><ul>
-<li>可以開啟瀏覽器開發工具，確認看看載入是否有錯誤</li>
-<li>IE的環境下建議加入 <code>&lt;!DOCTYPE html&gt;</code> 和 <code>&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot; /&gt;</code> 可避免一些兼容性的錯誤</li>
-</ul>
-</div>
+<p>補充 : {% link Express Checkout 支援的瀏覽器 https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/prerequisites/ 支援的瀏覽器 %}</p>
+<h2 id="加入-PayPal-付款按鈕"><a href="#加入-PayPal-付款按鈕" class="headerlink" title="加入 PayPal 付款按鈕"></a>加入 PayPal 付款按鈕</h2><p>載入checkout.js<br>{% tabbed_codeblock Include checkout.js %}
+
+  <!-- tab js -->
+    <script src="https://www.paypalobjects.com/api/checkout.js"></script>
+  <!-- endtab -->
+  
+{% endtabbed_codeblock %}</p>
+{% alert danger %}
+請使用官方提供的線上版本，不要下載到local端。
+{% endalert %}
+<h4 id="Render-the-PayPal-button"><a href="#Render-the-PayPal-button" class="headerlink" title="Render the PayPal button"></a>Render the PayPal button</h4>{% tabbed_codeblock Render button %}
+
+  <!-- tab html -->
+    <div id="paypal-button"></div>
+    <script>
+    paypal.Button.render({
+    
+        env: 'production', // Specify 'sandbox' for the test environment
+
+        payment: function() {
+            // Set up the payment here, when the buyer clicks on the button
+        },
+
+        onAuthorize: function(data, actions) {
+            // Execute the payment here, when the buyer approves the transaction
+       }
+            
+    }, '#paypal-button');
+</script>
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}
+{% alert info %}
+* 可以開啟瀏覽器開發工具，確認看看載入是否有錯誤
+* IE的環境下建議加入 `<!DOCTYPE html>` 和 `<meta http-equiv="X-UA-Compatible" content="IE=edge">` 可避免一些兼容性的錯誤
+
+{% endalert %}
 <p>補充 : </p>
 <ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/" title="客製化按鈕" target="_blank" rel="external">客製化按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/" title="checkout.js 更多應用" target="_blank" rel="external">checkout.js 更多應用</a>
+<li>{% link 客製化按鈕 https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/ 客製化按鈕  %}</li>
+<li>{% link "checkout.js 更多應用" https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/ checkout.js 更多應用 %}
 </li>
 </ul>
 <h2 id="選擇整合方式"><a href="#選擇整合方式" class="headerlink" title="選擇整合方式"></a>選擇整合方式</h2><p>Client 整合 :</p>
@@ -1030,11 +1306,11 @@
     
       &lt;p&gt;現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/&quot; title=&quot;付款流程&quot;&gt;付款流程&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/&quot; title=&quot;加入 PayPal 付款按鈕&quot;&gt;加入 PayPal 付款按鈕&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/&quot; title=&quot;選擇整合方式&quot;&gt;選擇整合方式&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/&quot; title=&quot;Client 端整合&quot;&gt;Client 端整合&lt;/a&gt; 或 &lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/&quot; title=&quot;Server 端整合&quot;&gt;Server 端整合&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/&quot; title=&quot;測試整合流程&quot;&gt;測試整合流程&lt;/a&gt;
+&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/&quot; title=&quot;付款流程&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;付款流程&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/&quot; title=&quot;加入 PayPal 付款按鈕&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;加入 PayPal 付款按鈕&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/&quot; title=&quot;選擇整合方式&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;選擇整合方式&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/&quot; title=&quot;Client 端整合&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Client 端整合&lt;/a&gt; 或 &lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/&quot; title=&quot;Server 端整合&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Server 端整合&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/&quot; title=&quot;測試整合流程&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;測試整合流程&lt;/a&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
     
@@ -1052,7 +1328,7 @@
     <link href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/"/>
     <id>https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/</id>
     <published>2017-02-14T15:09:20.000Z</published>
-    <updated>2017-04-13T16:13:25.078Z</updated>
+    <updated>2017-05-09T10:37:45.129Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br><a id="more"></a></p>
 <h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><p>在剛開始學Angular的時候都是把所有Component放在App Module底下，當這樣程式大的時候會變得難以維護，今天會說明Feature Module、Shared Module和Router Module，如何讓我們的程式碼更為乾淨，更好維護，而這些骨子裡其實都是Angular Module。</p>
@@ -1066,18 +1342,91 @@
 <li>AppModule移除ProductComponent</li>
 <li>因為FormsModule移到ProductModule裡去了，所以AppModule移除FormsModule</li>
 </ol>
-<p>而我們的ProductModule程式碼會變成這樣<br><figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { FormsModule } from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule } from <span class="string">'@angular/common'</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    CommonModule,</span><br><span class="line">    FormsModule,</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>而我們的ProductModule程式碼會變成這樣<br>{% tabbed_codeblock ProductModule %}
+
+  <!-- tab ts -->
+    import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ProductComponent } from './product.component';
+import { NgModule, Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+
+@NgModule({
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule.forChild(
+      [
+        { path: 'product', component: ProductComponent }
+      ]
+    )
+  ],
+  declarations: [ProductComponent]
+})
+export class ProductModule { }
+
+  <!-- endtab -->  
+{% endtabbed_codeblock %}</p>
 <h4 id="程式碼說明"><a href="#程式碼說明" class="headerlink" title="程式碼說明"></a>程式碼說明</h4><ul>
 <li><strong>CommonModule</strong> 說明可提供ngFor跟ngIf directives的功能</li>
 <li><strong>FormsModule</strong> 提供ngModel 功能</li>
-<li><strong>RouterModule.forChild</strong>跟<strong>RouterModule.forRoot</strong>的差別是 =&gt; <span class="highlight-text primary">不會再註冊一次Router Service。</span></li>
+<li><strong>RouterModule.forChild</strong>跟<strong>RouterModule.forRoot</strong>的差別是 =&gt; {% hl_text primary %}不會再註冊一次Router Service。
+{% endhl_text %}</li>
 </ul>
-<h2 id="Shared-Module"><a href="#Shared-Module" class="headerlink" title="Shared Module"></a>Shared Module</h2><p>Shared Module負責Feature Module共同的部分，只要 <span class="highlight-text primary">Feature Module Import Shared Module</span>  就可以取得這些功能。</p>
+<h2 id="Shared-Module"><a href="#Shared-Module" class="headerlink" title="Shared Module"></a>Shared Module</h2><p>Shared Module負責Feature Module共同的部分，只要 {% hl_text primary %}Feature Module Import Shared Module
+{% endhl_text %}  就可以取得這些功能。</p>
 <p>一樣產生Component跟Module。<code>ng g c shared.component</code>、<code>ng g module shared.module</code> ，然後把AppModule有關shared的程式碼，都移到SharedModule裡面。<br>所以我們要做的就是把Feature Module共同的部分放到Shared Module，然後Shared Module要export這些要共用的部分，例如<strong>SharedComponent、CommonModule、FormsModule</strong>。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>SharedModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { FormsModule } from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { SharedComponent } from <span class="string">'./shared.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule } from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule } from <span class="string">'@angular/common'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    CommonModule</span><br><span class="line">  ],</span><br><span class="line">  declarations: [SharedComponent],</span><br><span class="line">  exports:[</span><br><span class="line">    CommonModule,</span><br><span class="line">    FormsModule,</span><br><span class="line">    SharedComponent</span><br><span class="line">  ]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> SharedModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>所以我們的ProductModule只要import SharedModule 就可以有SharedModule export的功能，例如CommonModule跟FormsModule。  記得import SharedModule後，就要把ProductModule裡面原本的CommonModule跟FormsModule移除。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule refactoring</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { SharedModule } from <span class="string">'./../shared/SharedModule'</span>;</span><br><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    SharedModule,</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="Router-Module"><a href="#Router-Module" class="headerlink" title="Router Module"></a>Router Module</h2><p>現在要做的就是把ProductModule的Router設定移出來，首先先產生Routing Module <code>ng g module product-routing.module</code>，加入Product的Router設定，並且export RouterModule。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Product-RoutingModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./../product/product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  exports: [RouterModule]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductRoutingModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure><br>而我們的productModule把Router設定拿掉，改成 <span class="highlight-text primary">import ProductRoutingModule</span> 就可以了。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule refactoring routing</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductRoutingModule } from <span class="string">'./../product-routing/product-routing.module'</span>;</span><br><span class="line"><span class="keyword">import</span> { SharedModule } from <span class="string">'./../shared/SharedModule'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    SharedModule,</span><br><span class="line">    ProductRoutingModule</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
+{% tabbed_codeblock SharedModule %}
+
+  <!-- tab ts -->
+    import { FormsModule } from '@angular/forms';
+import { SharedComponent } from './shared.component';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@NgModule({
+  imports: [
+    CommonModule
+  ],
+  declarations: [SharedComponent],
+  exports:[
+    CommonModule,
+    FormsModule,
+    SharedComponent
+  ]
+})
+export class SharedModule { }
+
+  <!-- endtab -->
+  
+{% endtabbed_codeblock %}
+<p>所以我們的ProductModule只要import SharedModule 就可以有SharedModule export的功能，例如CommonModule跟FormsModule。  記得import SharedModule後，就要把ProductModule裡面原本的CommonModule跟FormsModule移除。<br>{% tabbed_codeblock ProductModule refactoring %}
+
+  <!-- tab ts -->
+    import { SharedModule } from './../shared/SharedModule';
+import { RouterModule } from '@angular/router';
+import { ProductComponent } from './product.component';
+import { NgModule, Component } from '@angular/core';
+
+@NgModule({
+  imports: [
+    SharedModule,
+    RouterModule.forChild(
+      [
+        { path: 'product', component: ProductComponent }
+      ]
+    )
+  ],
+  declarations: [ProductComponent]
+})
+export class ProductModule { }
+
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}</p>
+<h2 id="Router-Module"><a href="#Router-Module" class="headerlink" title="Router Module"></a>Router Module</h2><p>現在要做的就是把ProductModule的Router設定移出來，首先先產生Routing Module <code>ng g module product-routing.module</code>，加入Product的Router設定，並且export RouterModule。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Product-RoutingModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductComponent } <span class="keyword">from</span> <span class="string">'./../product/product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { RouterModule } <span class="keyword">from</span> <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule } <span class="keyword">from</span> <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  exports: [RouterModule]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductRoutingModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure><br>而我們的productModule把Router設定拿掉，改成 <span class="highlight-text primary">import ProductRoutingModule</span> 就可以了。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule refactoring routing</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductRoutingModule } <span class="keyword">from</span> <span class="string">'./../product-routing/product-routing.module'</span>;</span><br><span class="line"><span class="keyword">import</span> { SharedModule } <span class="keyword">from</span> <span class="string">'./../shared/SharedModule'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } <span class="keyword">from</span> <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } <span class="keyword">from</span> <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    SharedModule,</span><br><span class="line">    ProductRoutingModule</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
 <p>備註: AppModule的Router也是用這種方式refactoring，差別在於因為是root application module要使用的Router 所以要用RouterModule.forRoot。</p>
 <h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>今天終於把Angular Module之間的互動以及一些簡單的Module設計方式說明完了，其中有關import和export的說明可以參考這篇 <a href="https://mileslin.github.io/2017/02/NgModule-Decorator/" title="NgModule Decorator">NgModule Decorator</a></p>
 ]]></content>
@@ -1100,7 +1449,7 @@
     <link href="https://mileslin.github.io/2017/02/NgModule-Decorator/"/>
     <id>https://mileslin.github.io/2017/02/NgModule-Decorator/</id>
     <published>2017-02-13T14:57:17.000Z</published>
-    <updated>2017-02-16T17:06:59.614Z</updated>
+    <updated>2017-05-09T10:37:45.140Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br><a id="more"></a><br><div class="figure right" style="width:;"><a class="fancybox" href="1_app_module.jpg" title="app_module" data-fancybox-group=""><img class="fig-img" src="1_app_module.jpg" alt="app_module"></a><span class="caption">app_module</span></div><br>在建立Angular預設專案的時候，會有一個app.module.ts，這是我們的起始module，這Ng Module有寫了很多的Decorator，這些Decorator都有一些使用原則，要在這邊做說明。</p>
 <h2 id="What-Is-an-Angular-Module"><a href="#What-Is-an-Angular-Module" class="headerlink" title="What Is an Angular Module"></a>What Is an Angular Module</h2><p>Angular module 是一個包含有NgModule decorator的class。 主要目的在於</p>
@@ -1120,7 +1469,9 @@
 <ul>
 <li>每一個<em>component,directive,pipe</em>只能被一個Angular module宣告</li>
 <li><strong>declarations</strong> 只能宣告<em>component,directive,pipe</em>，不能放其他classes或是services</li>
-<li><span class="highlight-text primary">不重覆宣告 component,directive,pipe 在其他的Angular module</span>  </li>
+<li>{% hl_text primary %}
+不重覆宣告 component,directive,pipe 在其他的Angular module
+{% endhl_text %}  </li>
 <li>所有被宣告的<em>component,directive,pipe</em>預設只能在同一個Angular module使用<ul>
 <li>可用export的方式讓其他Angular module使用</li>
 </ul>
@@ -1130,19 +1481,38 @@
 <ul>
 <li>如果其他component需要，則Export <em>component,directive,pipe</em></li>
 <li>Re-export modules to re-export their <em>component,directive,pipe</em></li>
-<li><span class="highlight-text primary">Never export a service</span>
+<li>{% hl_text primary %}Never export a service
+{% endhl_text %}
 <ul>
 <li>因為Services被宣告在root application Provider’s array，讓Services可被inject到其他class，所以不需要export</li>
 </ul>
 </li>
 </ul>
-<p>用法:<br><figure class="codeblock codeblock--tabbed"><figcaption><span>shared.module</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { NgModule }            from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule }        from <span class="string">'@angular/common'</span>;</span><br><span class="line"><span class="keyword">import</span> { FormsModule }         from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { AwesomePipe }         from <span class="string">'./awesome.pipe'</span>;</span><br><span class="line"><span class="keyword">import</span> { HighlightDirective }  from <span class="string">'./highlight.directive'</span>;</span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports:      [ CommonModule ],</span><br><span class="line">  declarations: [ AwesomePipe, HighlightDirective ],</span><br><span class="line">  exports:      [ AwesomePipe, HighlightDirective,</span><br><span class="line">                  CommonModule, FormsModule ]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> SharedModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<a href="https://angular.io/docs/ts/latest/guide/ngmodule.html#!#shared-module" title="shared-module" target="_blank" rel="external">shared-module</a>
+<p>用法:<br>{% tabbed_codeblock shared.module %}
+
+  <!-- tab ts -->
+    import { NgModule }            from '@angular/core';
+import { CommonModule }        from '@angular/common';
+import { FormsModule }         from '@angular/forms';
+import { AwesomePipe }         from './awesome.pipe';
+import { HighlightDirective }  from './highlight.directive';
+@NgModule({
+  imports:      [ CommonModule ],
+  declarations: [ AwesomePipe, HighlightDirective ],
+  exports:      [ AwesomePipe, HighlightDirective,
+                  CommonModule, FormsModule ]
+})
+export class SharedModule { }
+
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}</p>
+{% link shared-module https://angular.io/docs/ts/latest/guide/ngmodule.html#!#shared-module shared-module %}
 <h2 id="Imports-Array-Truth"><a href="#Imports-Array-Truth" class="headerlink" title="Imports Array Truth"></a>Imports Array Truth</h2><p>Angular module可以藉由importing其他的Angular module來 extend capabilities。</p>
 <ul>
 <li>Importing module取得該module exported的<em>component,directive,pipe</em></li>
 <li>Only import what this module needs</li>
-<li><span class="highlight-text primary">Importing a module does NOT provide access to its imported modules</span> 或者說 <span class="highlight-text primary">Imports are not inherited</span>
+<li>{% hl_text primary %}Importing a module does NOT provide access to its imported modules{% endhl_text %} 或者說 {% hl_text primary %}Imports are not inherited{% endhl_text %}
 </li>
 </ul>
 <p>以下圖做說明，就是AppModule可以使用<code>StarComponet</code>但是沒有辦法使用<code>ngModel directive</code>，除非SharedModule re-export FormsModule，AppModule再取得SharedModule re-export的FormsModule才可以使用<code>ngModel directive</code>。<br><div class="figure " style="width:;"><a class="fancybox" href="2_ImportTruth.jpg" title="imports Array" data-fancybox-group=""><img class="fig-img" src="2_ImportTruth.jpg" alt="imports Array"></a><span class="caption">imports Array</span></div></p>
@@ -1160,74 +1530,6 @@
     <summary type="html">
     
       &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
-    
-    
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Protecting Routes with Guards</title>
-    <link href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/"/>
-    <id>https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/</id>
-    <published>2017-02-11T05:38:15.000Z</published>
-    <updated>2017-02-11T08:15:15.911Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br><a id="more"></a><br>例如:</p>
-<ul>
-<li>user是不被允許瀏覽到某個component</li>
-<li>此網址需要先登入才能使用</li>
-<li>先事先取得一些資料再顯示component</li>
-<li>在離開component之前先取得改變的資料</li>
-<li>或者在user離開之前詢問是否要不儲存離開</li>
-</ul>
-<p>以上情況，都可以在route configuration新增<code>guards</code>達成我們要的目的。</p>
-<h3 id="目前共有五種guards可以使用"><a href="#目前共有五種guards可以使用" class="headerlink" title="目前共有五種guards可以使用"></a>目前共有五種guards可以使用</h3><ul>
-<li>CanActivate: to mediate navigation to a route.</li>
-<li>CanActivateChild: to mediate navigation to a child route.</li>
-<li>CanDeactivate: to mediate navigation away from the current route.</li>
-<li>Resolve: to perform route data retrieval before route activation.</li>
-<li>CanLoad: to mediate navigation to a feature module loaded asynchronously.</li>
-</ul>
-<h3 id="Guard的回傳值決定router的行為"><a href="#Guard的回傳值決定router的行為" class="headerlink" title="Guard的回傳值決定router的行為"></a>Guard的回傳值決定router的行為</h3><div class="alert info"><ul>
-<li>回傳 true，則navigation繼續</li>
-<li>回傳 false，則navigation process stops</li>
-</ul>
-</div>
-<p>而今天選擇<strong>CanActivate</strong>來做說明，其他guards的做法都是類似的。</p>
-<p>原文參考:<br><a href="https://angular.io/docs/ts/latest/guide/router.html#!#guards" title="Guards" target="_blank" rel="external">Guards</a></p>
-<h2 id="範例"><a href="#範例" class="headerlink" title="範例"></a>範例</h2><p>今天的範例我們要驗證使用者輸入的網址參數<em>(:id)</em>是不是個數字，如果不是數字，則導向到 <strong>welcome</strong> 頁面。 router設定如下:<br><figure class="codeblock codeblock--tabbed"><figcaption><span>configuration</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{ path: <span class="string">'detail/:id'</span>, component: DetailComponent }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<p>我們先用 <code>angular cli</code> 新增一個 <span class="highlight-text primary">service component</span></p>
-<div class="alert success no-icon"><p>ng g s product-guard.service</p>
-</div>
-<p><code>angular cli</code> 會幫我們新增好一個service component，而且我們要做的就是</p>
-<ol>
-<li><code>implements CanActivate</code>，實作canActivate方法</li>
-<li>因為要取得網址的資料，所以<code>canActivate傳入ActivatedRouteSnapshot</code></li>
-<li><code>import Router</code>使用router做導向的動作</li>
-<li>驗證是否為數字，是數字回傳true，不是數字導向<strong>welcome</strong>頁面，回傳false</li>
-</ol>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Service Component</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { CanActivate, ActivatedRouteSnapshot, Router } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { Injectable } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Injectable</span>()</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductGuardService <span class="keyword">implements</span> CanActivate {</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params"><span class="keyword">private</span> _router: Router</span>) { }</span><br><span class="line"></span><br><span class="line">  canActivate(route: ActivatedRouteSnapshot): <span class="built_in">boolean</span> {</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> id = +route.url[<span class="number">1</span>].path;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">isNaN</span>(id) || id &lt; <span class="number">1</span>) {</span><br><span class="line"></span><br><span class="line">      <span class="keyword">this</span>._router.navigate([<span class="string">'/welcome'</span>]);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>以上，我們component的程式碼就寫完了。</p>
-<p>接下來開啟app.module</p>
-<ol>
-<li><code>import ProductGuardService</code></li>
-<li><code>provider</code>加入 <span class="highlight-text success">ProductGuardService </span></li>
-<li><code>router</code>設定多傳入 <span class="highlight-text success">canActivate : ProductGuardService</span></li>
-</ol>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>app.module</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">import</span> { ProductGuardService } from <span class="string">'./product-guard.service'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  declarations: [</span><br><span class="line">    ...</span><br><span class="line">  ],</span><br><span class="line">  imports: [</span><br><span class="line">    ...</span><br><span class="line">    RouterModule.forRoot([      </span><br><span class="line">      {</span><br><span class="line">        path: <span class="string">'detail/:id'</span>,</span><br><span class="line">        canActivate: [ProductGuardService],</span><br><span class="line">        component: DetailComponent</span><br><span class="line">      }...</span><br><span class="line">    ])</span><br><span class="line">  ],</span><br><span class="line">  providers: [ProductGuardService],</span><br><span class="line">  ...</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>加入以上程式碼後，就完成了。  這樣當網址像是數字這種非數字的<strong>id</strong>參數，則網址頁就會自動導向到<strong>welcome</strong>。</p>
-<div class="alert success no-icon"><p><a href="http://localhost:4200/#/detail/abc" target="_blank" rel="external">http://localhost:4200/#/detail/abc</a> 導向 =&gt;  <strong><a href="http://localhost:4200/#/welcome" target="_blank" rel="external">http://localhost:4200/#/welcome</a></strong></p>
-</div>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular.io/docs/ts/latest/guide/router.html#!#guards" title="Guards" target="_blank" rel="external">Guards</a>]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。&lt;br&gt;
     
     </summary>
     

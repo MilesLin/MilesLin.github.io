@@ -18,18 +18,19 @@
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
     <meta name="description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
+<meta name="keywords" content="Angular">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="NgModule Decorator">
 <meta property="og:url" content="https://mileslin.github.io/2017/02/NgModule-Decorator/index.html">
-<meta property="og:site_name" content="Miles's Journey">
+<meta property="og:site_name" content="Miles&#39;s Journey">
 <meta property="og:description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
-<meta property="og:image" content="https://mileslin.github.io/1_app_module.jpg">
-<meta property="og:image" content="https://mileslin.github.io/2_ImportTruth.jpg">
-<meta property="og:updated_time" content="2017-02-16T17:06:59.614Z">
+<meta property="og:image" content="https://mileslin.github.io/2017/02/NgModule-Decorator/1_app_module.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg">
+<meta property="og:updated_time" content="2017-05-09T10:37:45.140Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="NgModule Decorator">
 <meta name="twitter:description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
-<meta name="twitter:image" content="https://mileslin.github.io/1_app_module.jpg">
+<meta name="twitter:image" content="https://mileslin.github.io/2017/02/NgModule-Decorator/1_app_module.jpg">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -298,7 +299,9 @@
 <ul>
 <li>每一個<em>component,directive,pipe</em>只能被一個Angular module宣告</li>
 <li><strong>declarations</strong> 只能宣告<em>component,directive,pipe</em>，不能放其他classes或是services</li>
-<li><span class="highlight-text primary">不重覆宣告 component,directive,pipe 在其他的Angular module</span>  </li>
+<li>{% hl_text primary %}
+不重覆宣告 component,directive,pipe 在其他的Angular module
+{% endhl_text %}  </li>
 <li>所有被宣告的<em>component,directive,pipe</em>預設只能在同一個Angular module使用<ul>
 <li>可用export的方式讓其他Angular module使用</li>
 </ul>
@@ -308,19 +311,38 @@
 <ul>
 <li>如果其他component需要，則Export <em>component,directive,pipe</em></li>
 <li>Re-export modules to re-export their <em>component,directive,pipe</em></li>
-<li><span class="highlight-text primary">Never export a service</span>
+<li>{% hl_text primary %}Never export a service
+{% endhl_text %}
 <ul>
 <li>因為Services被宣告在root application Provider’s array，讓Services可被inject到其他class，所以不需要export</li>
 </ul>
 </li>
 </ul>
-<p>用法:<br><figure class="codeblock codeblock--tabbed"><figcaption><span>shared.module</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { NgModule }            from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule }        from <span class="string">'@angular/common'</span>;</span><br><span class="line"><span class="keyword">import</span> { FormsModule }         from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { AwesomePipe }         from <span class="string">'./awesome.pipe'</span>;</span><br><span class="line"><span class="keyword">import</span> { HighlightDirective }  from <span class="string">'./highlight.directive'</span>;</span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports:      [ CommonModule ],</span><br><span class="line">  declarations: [ AwesomePipe, HighlightDirective ],</span><br><span class="line">  exports:      [ AwesomePipe, HighlightDirective,</span><br><span class="line">                  CommonModule, FormsModule ]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> SharedModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<a href="https://angular.io/docs/ts/latest/guide/ngmodule.html#!#shared-module" title="shared-module" target="_blank" rel="external">shared-module</a>
+<p>用法:<br>{% tabbed_codeblock shared.module %}
+
+  <!-- tab ts -->
+    import { NgModule }            from '@angular/core';
+import { CommonModule }        from '@angular/common';
+import { FormsModule }         from '@angular/forms';
+import { AwesomePipe }         from './awesome.pipe';
+import { HighlightDirective }  from './highlight.directive';
+@NgModule({
+  imports:      [ CommonModule ],
+  declarations: [ AwesomePipe, HighlightDirective ],
+  exports:      [ AwesomePipe, HighlightDirective,
+                  CommonModule, FormsModule ]
+})
+export class SharedModule { }
+
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}</p>
+{% link shared-module https://angular.io/docs/ts/latest/guide/ngmodule.html#!#shared-module shared-module %}
 <h2 id="Imports-Array-Truth"><a href="#Imports-Array-Truth" class="headerlink" title="Imports Array Truth"></a>Imports Array Truth</h2><p>Angular module可以藉由importing其他的Angular module來 extend capabilities。</p>
 <ul>
 <li>Importing module取得該module exported的<em>component,directive,pipe</em></li>
 <li>Only import what this module needs</li>
-<li><span class="highlight-text primary">Importing a module does NOT provide access to its imported modules</span> 或者說 <span class="highlight-text primary">Imports are not inherited</span>
+<li>{% hl_text primary %}Importing a module does NOT provide access to its imported modules{% endhl_text %} 或者說 {% hl_text primary %}Imports are not inherited{% endhl_text %}
 </li>
 </ul>
 <p>以下圖做說明，就是AppModule可以使用<code>StarComponet</code>但是沒有辦法使用<code>ngModel directive</code>，除非SharedModule re-export FormsModule，AppModule再取得SharedModule re-export的FormsModule才可以使用<code>ngModel directive</code>。<br><div class="figure " style="width:;"><a class="fancybox" href="2_ImportTruth.jpg" title="imports Array" data-fancybox-group=""><img class="fig-img" src="2_ImportTruth.jpg" alt="imports Array"></a><span class="caption">imports Array</span></div></p>
@@ -632,7 +654,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -791,11 +813,11 @@
                         </span>
                         <div class="media-content hide-xs font-merryweather"><p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
 <ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程">付款流程</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕">加入 PayPal 付款按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式">選擇整合方式</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合">Server 端整合</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程">測試整合流程</a>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程" target="_blank" rel="external">付款流程</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕" target="_blank" rel="external">加入 PayPal 付款按鈕</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式" target="_blank" rel="external">選擇整合方式</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合" target="_blank" rel="external">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合" target="_blank" rel="external">Server 端整合</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程" target="_blank" rel="external">測試整合流程</a>
 </li>
 </ul></div>
                     </div>
@@ -810,7 +832,7 @@
                 data-message-zero="no post found"
                 data-message-one="1 post found"
                 data-message-other="{n} posts found">
-                26 posts found
+                27 posts found
             </p>
         </div>
     </div>

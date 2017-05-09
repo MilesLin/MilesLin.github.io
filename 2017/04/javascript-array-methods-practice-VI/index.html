@@ -17,25 +17,17 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce()
-與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight()
-反向 Array 本身的值 Array.prototype.reverse()
-移除 Array 的第一個元素 Array.prototype">
+    <meta name="description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce() 與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight() 反向 Array 本身的值 Array.prototype.reverse() 移除 Array 的第一個元素 Array.prototype">
+<meta name="keywords" content="javascript">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="javascript array methods practice VI">
 <meta property="og:url" content="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/index.html">
-<meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce()
-與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight()
-反向 Array 本身的值 Array.prototype.reverse()
-移除 Array 的第一個元素 Array.prototype">
-<meta property="og:updated_time" content="2017-04-20T17:21:08.856Z">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce() 與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight() 反向 Array 本身的值 Array.prototype.reverse() 移除 Array 的第一個元素 Array.prototype">
+<meta property="og:updated_time" content="2017-05-09T10:37:45.179Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="javascript array methods practice VI">
-<meta name="twitter:description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce()
-與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight()
-反向 Array 本身的值 Array.prototype.reverse()
-移除 Array 的第一個元素 Array.prototype">
+<meta name="twitter:description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce() 與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight() 反向 Array 本身的值 Array.prototype.reverse() 移除 Array 的第一個元素 Array.prototype">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -297,16 +289,92 @@
 <li>currentValue : 現在的 value</li>
 <li>array : 整個 Array 的值</li>
 </ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>reduce int</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> initialValue = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">var</span> result = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].reduce(</span><br><span class="line">  <span class="function">(<span class="params">accumulator, currentValue, currentIndex, array</span>) =&gt;</span> {</span><br><span class="line">    <span class="keyword">return</span> accumulator + currentValue;</span><br><span class="line">  },</span><br><span class="line">  initialValue</span><br><span class="line">);</span><br><span class="line">  <span class="comment">// result = 20</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>用來攤平 Array</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Flatten an array of arrays</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> flattened = [[<span class="number">0</span>, <span class="number">1</span>], [<span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>]].reduce(</span><br><span class="line">  <span class="function">(<span class="params"> acc, cur </span>) =&gt;</span> acc.concat(cur),</span><br><span class="line">  []</span><br><span class="line">);</span><br><span class="line"><span class="comment">// flattened is [0, 1, 2, 3, 4, 5]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>用來計算 Array 裡面相同元素有幾個</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Counting instances of values in an object</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> names = [<span class="string">'Alice'</span>, <span class="string">'Bob'</span>, <span class="string">'Tiff'</span>, <span class="string">'Bruce'</span>, <span class="string">'Alice'</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> countedNames = names.reduce(<span class="function"><span class="keyword">function</span> (<span class="params">allNames, name</span>) </span>{ </span><br><span class="line">  <span class="keyword">if</span> (name <span class="keyword">in</span> allNames) {</span><br><span class="line">    allNames[name]++;</span><br><span class="line">  }</span><br><span class="line">  <span class="keyword">else</span> {</span><br><span class="line">    allNames[name] = <span class="number">1</span>;</span><br><span class="line">  }</span><br><span class="line">  <span class="keyword">return</span> allNames;</span><br><span class="line">}, {});</span><br><span class="line"><span class="comment">// countedNames is:</span></span><br><span class="line"><span class="comment">// { 'Alice': 2, 'Bob': 1, 'Tiff': 1, 'Bruce': 1 }</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>與 spread operator 混用，取得某一個欄位的所有值</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Bonding arrays contained in an array</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// friends - an array of objects </span></span><br><span class="line"><span class="comment">// where object field "books" - list of favorite books </span></span><br><span class="line"><span class="keyword">var</span> friends = [{</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Anna'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'Bible'</span>, <span class="string">'Harry Potter'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">21</span></span><br><span class="line">}, {</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Bob'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'War and peace'</span>, <span class="string">'Romeo and Juliet'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">26</span></span><br><span class="line">}, {</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Alice'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'The Lord of the Rings'</span>, <span class="string">'The Shining'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span></span><br><span class="line">}];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果 initialValue 沒有傳會造成 undefined is not a function 的 Exception</span></span><br><span class="line"><span class="comment">// allbooks - list which will contain all friends' books +  </span></span><br><span class="line"><span class="comment">// additional list contained in initialValue</span></span><br><span class="line"><span class="keyword">var</span> allbooks = friends.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">prev, curr</span>) </span>{</span><br><span class="line">  <span class="keyword">return</span> [...prev, ...curr.books];</span><br><span class="line">}, []);</span><br><span class="line"></span><br><span class="line"><span class="comment">// allbooks = [</span></span><br><span class="line"><span class="comment">//   'Bible', 'Harry Potter', 'War and peace', </span></span><br><span class="line"><span class="comment">//   'Romeo and Juliet', 'The Lord of the Rings',</span></span><br><span class="line"><span class="comment">//   'The Shining'</span></span><br><span class="line"><span class="comment">// ]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+{% tabbed_codeblock "reduce int" %}
+
+  <!-- tab js -->
+  var initialValue = 10;
+    var result = [0, 1, 2, 3, 4].reduce(
+  (accumulator, currentValue, currentIndex, array) => {
+    return accumulator + currentValue;
+  },
+  initialValue
+);
+  // result = 20
+  <!-- endtab -->
+{% endtabbed_codeblock %}
+{% alert info %}
+用來攤平 Array
+{% endalert %}
+{% tabbed_codeblock "Flatten an array of arrays" %}
+
+  <!-- tab js -->
+var flattened = [[0, 1], [2, 3], [4, 5]].reduce(
+  ( acc, cur ) => acc.concat(cur),
+  []
+);
+// flattened is [0, 1, 2, 3, 4, 5]
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}
+{% alert info %}
+用來計算 Array 裡面相同元素有幾個
+{% endalert %}
+{% tabbed_codeblock "Counting instances of values in an object" %}
+
+  <!-- tab js -->
+var names = ['Alice', 'Bob', 'Tiff', 'Bruce', 'Alice'];
+
+var countedNames = names.reduce(function (allNames, name) { 
+  if (name in allNames) {
+    allNames[name]++;
+  }
+  else {
+    allNames[name] = 1;
+  }
+  return allNames;
+}, {});
+// countedNames is:
+// { 'Alice': 2, 'Bob': 1, 'Tiff': 1, 'Bruce': 1 }
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}
+{% alert info %}
+與 spread operator 混用，取得某一個欄位的所有值
+{% endalert %}
+{% tabbed_codeblock "Bonding arrays contained in an array" %}
+
+  <!-- tab js -->
+// friends - an array of objects 
+// where object field "books" - list of favorite books 
+var friends = [{
+  name: 'Anna',
+  books: ['Bible', 'Harry Potter'],
+  age: 21
+}, {
+  name: 'Bob',
+  books: ['War and peace', 'Romeo and Juliet'],
+  age: 26
+}, {
+  name: 'Alice',
+  books: ['The Lord of the Rings', 'The Shining'],
+  age: 18
+}];
+
+// 如果 initialValue 沒有傳會造成 undefined is not a function 的 Exception
+// allbooks - list which will contain all friends' books +  
+// additional list contained in initialValue
+var allbooks = friends.reduce(function(prev, curr) {
+  return [...prev, ...curr.books];
+}, []);
+
+// allbooks = [
+//   'Bible', 'Harry Potter', 'War and peace', 
+//   'Romeo and Juliet', 'The Lord of the Rings',
+//   'The Shining'
+// ]
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}
 <h2 id="Array-prototype-reduceRight"><a href="#Array-prototype-reduceRight" class="headerlink" title="Array.prototype.reduceRight()"></a>Array.prototype.reduceRight()</h2><ul>
 <li>與 <code>Array.prototype.reduce()</code> 的差別，是從右邊開始執行。</li>
 </ul>
@@ -614,7 +682,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -773,11 +841,11 @@
                         </span>
                         <div class="media-content hide-xs font-merryweather"><p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
 <ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程">付款流程</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕">加入 PayPal 付款按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式">選擇整合方式</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合">Server 端整合</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程">測試整合流程</a>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程" target="_blank" rel="external">付款流程</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕" target="_blank" rel="external">加入 PayPal 付款按鈕</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式" target="_blank" rel="external">選擇整合方式</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合" target="_blank" rel="external">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合" target="_blank" rel="external">Server 端整合</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程" target="_blank" rel="external">測試整合流程</a>
 </li>
 </ul></div>
                     </div>
@@ -792,7 +860,7 @@
                 data-message-zero="no post found"
                 data-message-one="1 post found"
                 data-message-other="{n} posts found">
-                26 posts found
+                27 posts found
             </p>
         </div>
     </div>

@@ -18,19 +18,20 @@
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
     <meta name="description" content="延續前篇 PayPal 付款流程整合 前篇">
+<meta name="keywords" content="PayPal">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="PayPal 付款流程整合 後篇">
 <meta property="og:url" content="https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/index.html">
-<meta property="og:site_name" content="Miles's Journey">
+<meta property="og:site_name" content="Miles&#39;s Journey">
 <meta property="og:description" content="延續前篇 PayPal 付款流程整合 前篇">
-<meta property="og:image" content="https://mileslin.github.io/SetClientID.jpg">
-<meta property="og:image" content="https://mileslin.github.io/CreatedPaymentResponse.jpg">
-<meta property="og:image" content="https://mileslin.github.io/PaymentID.jpg">
-<meta property="og:updated_time" content="2017-04-13T16:13:25.090Z">
+<meta property="og:image" content="https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/SetClientID.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/CreatedPaymentResponse.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/PaymentID.jpg">
+<meta property="og:updated_time" content="2017-05-09T10:37:45.151Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="PayPal 付款流程整合 後篇">
 <meta name="twitter:description" content="延續前篇 PayPal 付款流程整合 前篇">
-<meta name="twitter:image" content="https://mileslin.github.io/SetClientID.jpg">
+<meta name="twitter:image" content="https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/SetClientID.jpg">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -287,7 +288,7 @@
 <li><p>建立 <a href="https://developer.paypal.com/docs/integration/direct/make-your-first-call/#create-a-paypal-app" title="PayPal app" target="_blank" rel="external">PayPal app</a> 取得 credentials，傳入 client ID 。</p>
 <div class="figure " style="width:;"><a class="fancybox" href="SetClientID.jpg" title="" data-fancybox-group=""><img class="fig-img" src="SetClientID.jpg" alt=""></a></div>
 </li>
-<li><p>在 <code>payment</code> function 使用 <code>paypal.rest.payment.create()</code> 設定付款選項。參考 : <a href="https://developer.paypal.com/docs/api/payments/#payment_create_request" title="如何建立帳單" target="_blank" rel="external">如何建立帳單</a></p>
+<li><p>在 <code>payment</code> function 使用 <code>paypal.rest.payment.create()</code> 設定付款選項。參考 : {% link 如何建立帳單 https://developer.paypal.com/docs/api/payments/#payment_create_request 如何建立帳單 %}</p>
 </li>
 <li><p>在 <code>onAuthorize</code> call back 顯示成功頁面</p>
 </li>
@@ -313,8 +314,9 @@
 </tr>
 <tr>
 <td style="text-align:left">付款之前顯示確認頁面</td>
-<td style="text-align:left">在 <code>onAuthorize</code> call back 可使用 <code>actions.payment.get()</code> 取得帳單和付款人資訊 <div class="alert info"><p>必須顯示付款確認頁面，否則 <code>actions.payment.execute()</code> 和 <code>actions.payment.get()</code> 會無法使用。</p>
-</div></td>
+<td style="text-align:left">在 <code>onAuthorize</code> call back 可使用 <code>actions.payment.get()</code> 取得帳單和付款人資訊 {% alert info %}
+必須顯示付款確認頁面，否則 `actions.payment.execute()` 和 `actions.payment.get()` 會無法使用。
+{% endalert %}</td>
 </tr>
 </tbody>
 </table>
@@ -322,19 +324,58 @@
 <h3 id="設置-Client-環境"><a href="#設置-Client-環境" class="headerlink" title="設置 Client 環境"></a>設置 Client 環境</h3><ol>
 <li>載入 <code>checkout.js</code></li>
 <li>設定 <code>payment</code> function 建立帳單<ul>
-<li>呼叫 Server <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/#set-up-the-payment" title="建立帳單" target="_blank" rel="external">建立帳單</a></li>
+<li>呼叫 Server {% link 建立帳單 https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/#set-up-the-payment 建立帳單 %}</li>
 <li>從建立帳單的 API 取得 <code>paymentID</code>，呼叫<code>resolve(data.paymentID</code>，開始付款人授權流程。</li>
 </ul>
 </li>
 <li>設定 <code>onAuthorize</code> 完成付款<ul>
 <li>之後的 REST Payments API 呼叫，都需要用到 <code>data.paymentID</code> 和 <code>data.payerID</code>，</li>
 <li>可選擇是否顯示帳單明細</li>
-<li>呼叫 Server 端 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/#execute-the-payment" title="執行付款" target="_blank" rel="external">執行付款</a></li>
+<li>呼叫 Server 端 {% link 執行付款 https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/#execute-the-payment 執行付款 %}</li>
 </ul>
 </li>
 </ol>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Sample</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"paypal-button"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://www.paypalobjects.com/api/checkout.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span><br><span class="line">    paypal.Button.render({</span><br><span class="line">    </span><br><span class="line">        <span class="attr">env</span>: <span class="string">'production'</span>, <span class="comment">// Optional: specify 'sandbox' environment</span></span><br><span class="line">    </span><br><span class="line">        payment: <span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>{</span><br><span class="line">               </span><br><span class="line">            <span class="keyword">var</span> CREATE_PAYMENT_URL = <span class="string">'https://my-store.com/paypal/create-payment'</span>;</span><br><span class="line">                </span><br><span class="line">            paypal.request.post(CREATE_PAYMENT_URL)</span><br><span class="line">                .then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>{ resolve(data.paymentID); })</span><br><span class="line">                .catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>{ reject(err); });</span><br><span class="line">        },</span><br><span class="line"></span><br><span class="line">        <span class="attr">onAuthorize</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>{</span><br><span class="line">        </span><br><span class="line">            <span class="comment">// Note: you can display a confirmation page before executing</span></span><br><span class="line">            </span><br><span class="line">            <span class="keyword">var</span> EXECUTE_PAYMENT_URL = <span class="string">'https://my-store.com/paypal/execute-payment'</span>;</span><br><span class="line"></span><br><span class="line">            paypal.request.post(EXECUTE_PAYMENT_URL,</span><br><span class="line">                    { <span class="attr">paymentID</span>: data.paymentID, <span class="attr">payerID</span>: data.payerID })</span><br><span class="line">                    </span><br><span class="line">                .then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>{ <span class="comment">/* Go to a success page */</span> })</span><br><span class="line">                .catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>{ <span class="comment">/* Go to an error page  */</span> });</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">    }, <span class="string">'#paypal-button'</span>);</span><br><span class="line"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>範例來源 :<br><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Advanced server integration" target="_blank" rel="external">Advanced server integration</a></p>
+{% tabbed_codeblock Sample %}
+
+  <!-- tab html -->
+    <div id="paypal-button"></div>
+
+<script src="https://www.paypalobjects.com/api/checkout.js"></script>
+
+<script>
+    paypal.Button.render({
+    
+        env: 'production', // Optional: specify 'sandbox' environment
+    
+        payment: function(resolve, reject) {
+               
+            var CREATE_PAYMENT_URL = 'https://my-store.com/paypal/create-payment';
+                
+            paypal.request.post(CREATE_PAYMENT_URL)
+                .then(function(data) { resolve(data.paymentID); })
+                .catch(function(err) { reject(err); });
+        },
+
+        onAuthorize: function(data) {
+        
+            // Note: you can display a confirmation page before executing
+            
+            var EXECUTE_PAYMENT_URL = 'https://my-store.com/paypal/execute-payment';
+
+            paypal.request.post(EXECUTE_PAYMENT_URL,
+                    { paymentID: data.paymentID, payerID: data.payerID })
+                    
+                .then(function(data) { /* Go to a success page */ })
+                .catch(function(err) { /* Go to an error page  */ });
+        }
+
+    }, '#paypal-button');
+</script>
+
+  <!-- endtab -->
+  
+{% endtabbed_codeblock %}
+<p>範例來源 :<br>{% link Advanced server integration https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/ Advanced server integration %}</p>
 <h3 id="Server-如何整合付款流程說明"><a href="#Server-如何整合付款流程說明" class="headerlink" title="Server 如何整合付款流程說明"></a>Server 如何整合付款流程說明</h3><ol>
 <li>Client 端的 <code>payment</code> method 呼叫 Server</li>
 <li>Server 呼叫 Payments API 建立帳單<!-- classes : info success warning danger no-icon -->
@@ -345,8 +386,9 @@
 <li>開始初始化付款流程， 在 client 建立的 <code>payment</code> method 從回傳的 JSON 訊息傳 <code>paymentID</code> 到 <code>checkout.js</code> script</li>
 <li>開啟 lightbox 讓付款人同意付款</li>
 </ol>
-<h4 id="執行付款"><a href="#執行付款" class="headerlink" title="執行付款"></a>執行付款</h4><p>使用者同意付款後， <code>checkout.js</code> 會呼叫 <code>onAuthorize</code> call back。<br><!-- classes : info success warning danger no-icon --><br><div class="alert info"><p>執行付款之前，建議可以顯示付款明細</p>
-</div></p>
+<h4 id="執行付款"><a href="#執行付款" class="headerlink" title="執行付款"></a>執行付款</h4><p>使用者同意付款後， <code>checkout.js</code> 會呼叫 <code>onAuthorize</code> call back。<br><!-- classes : info success warning danger no-icon --><br>{% alert info %}
+執行付款之前，建議可以顯示付款明細
+{% endalert %}</p>
 <ol>
 <li><code>onAuthorize</code> call back 呼叫 Server 並傳入 <code>data.paymentID</code> 和 <code>data.payerID</code>，執行付款</li>
 <li>Server 呼叫付款完成 API 完成付款</li>
@@ -652,7 +694,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -811,11 +853,11 @@
                         </span>
                         <div class="media-content hide-xs font-merryweather"><p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
 <ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程">付款流程</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕">加入 PayPal 付款按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式">選擇整合方式</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合">Server 端整合</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程">測試整合流程</a>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程" target="_blank" rel="external">付款流程</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕" target="_blank" rel="external">加入 PayPal 付款按鈕</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式" target="_blank" rel="external">選擇整合方式</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合" target="_blank" rel="external">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合" target="_blank" rel="external">Server 端整合</a></li>
+<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程" target="_blank" rel="external">測試整合流程</a>
 </li>
 </ul></div>
                     </div>
@@ -830,7 +872,7 @@
                 data-message-zero="no post found"
                 data-message-one="1 post found"
                 data-message-other="{n} posts found">
-                26 posts found
+                27 posts found
             </p>
         </div>
     </div>
