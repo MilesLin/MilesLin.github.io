@@ -18,19 +18,16 @@
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
     <meta name="description" content="從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 Angular CLI 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。">
+<meta name="keywords" content="Angular">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="使用 Angular CLI 建立 Angular 專案架構說明">
 <meta property="og:url" content="https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/index.html">
-<meta property="og:site_name" content="Miles's Journey">
+<meta property="og:site_name" content="Miles&#39;s Journey">
 <meta property="og:description" content="從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 Angular CLI 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。">
-<meta property="og:image" content="https://mileslin.github.io/Structure.jpg">
-<meta property="og:image" content="https://mileslin.github.io/Src.jpg">
-<meta property="og:image" content="https://mileslin.github.io/icon.jpg">
-<meta property="og:updated_time" content="2017-05-21T15:19:04.158Z">
+<meta property="og:updated_time" content="2017-05-09T10:37:45.186Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用 Angular CLI 建立 Angular 專案架構說明">
 <meta name="twitter:description" content="從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 Angular CLI 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。">
-<meta name="twitter:image" content="https://mileslin.github.io/Structure.jpg">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -283,7 +280,7 @@
         <div class="main-content-wrap">
             <p>從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 <a href="https://github.com/angular/angular-cli" title="Angular CLI" target="_blank" rel="external">Angular CLI</a> 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。</p>
 <a id="more"></a>
-<h2 id="建立專案"><a href="#建立專案" class="headerlink" title="建立專案"></a>建立專案</h2><p>首先我們要執行 cmd 指令 <code>ng new my-app</code> 建立 Angular 專案，Angular CLI 會幫我們建立這樣專案架構的專案<br><div class="figure " style="width:;"><a class="fancybox" href="Structure.jpg" title="Structure" data-fancybox-group=""><img class="fig-img" src="Structure.jpg" alt="Structure"></a><span class="caption">Structure</span></div></p>
+<h2 id="建立專案"><a href="#建立專案" class="headerlink" title="建立專案"></a>建立專案</h2><p>首先我們要執行 cmd 指令 <code>ng new my-app</code> 建立 Angular 專案，Angular CLI 會幫我們建立這樣專案架構的專案<br>{% image fancybox Structure.jpg "Structure" %}</p>
 <h2 id="The-root-folder"><a href="#The-root-folder" class="headerlink" title="The root folder"></a>The root folder</h2><p>負責放支援建置 app 的設定檔</p>
 <table>
 <thead>
@@ -303,11 +300,11 @@
 </tr>
 <tr>
 <td>.angular-cli.json</td>
-<td>放 Angular CLI 的設定檔 <a href="https://github.com/angular/angular-cli/wiki/angular-cli" title="Angular CLI Config Schema" target="_blank" rel="external">Angular CLI Config Schema</a></td>
+<td>放 Angular CLI 的設定檔 {% link Angular CLI Config Schema https://github.com/angular/angular-cli/wiki/angular-cli Angular CLI Config Schema %}</td>
 </tr>
 <tr>
 <td>.editorconfig</td>
-<td>幫助開發者使用不同的 IDEs 保持檔案格式一致性的設定檔 <a href="http://editorconfig.org" title="http://editorconfig.org editorconfig" target="_blank" rel="external"></a></td>
+<td>幫助開發者使用不同的 IDEs 保持檔案格式一致性的設定檔 {% link "http://editorconfig.org" http://editorconfig.org editorconfig %}</td>
 </tr>
 <tr>
 <td>.gitignore</td>
@@ -315,7 +312,7 @@
 </tr>
 <tr>
 <td>karma.conf.js</td>
-<td>Karma test 的 unit tests 設定 <a href="https://karma-runner.github.io/1.0/index.html" title="Karma" target="_blank" rel="external">Karma</a></td>
+<td>Karma test 的 unit tests 設定 {% link Karma https://karma-runner.github.io/1.0/index.html Karma %}</td>
 </tr>
 <tr>
 <td>package.json</td>
@@ -323,7 +320,7 @@
 </tr>
 <tr>
 <td>protractor.conf.js</td>
-<td>Angular end-to-end test framework <a href="http://www.protractortest.org/#/" title="Protractor" target="_blank" rel="external">Protractor</a> 設定檔</td>
+<td>Angular end-to-end test framework {% link Protractor http://www.protractortest.org/#/ Protractor %} 設定檔</td>
 </tr>
 <tr>
 <td>README.md</td>
@@ -335,12 +332,12 @@
 </tr>
 <tr>
 <td>tslint.json</td>
-<td>保持 code style 一致性的 <a href="https://palantir.github.io/tslint/" title="TSLint" target="_blank" rel="external">TSLint</a> 設定檔</td>
+<td>保持 code style 一致性的 {% link TSLint https://palantir.github.io/tslint/ TSLint %} 設定檔</td>
 </tr>
 </tbody>
 </table>
 <h2 id="The-src-folder"><a href="#The-src-folder" class="headerlink" title="The src folder"></a>The src folder</h2><p>寫程式碼的地方。  所有的 Angular components, templates, styles, images 等等…都放這邊。</p>
-<div class="figure " style="width:;"><a class="fancybox" href="Src.jpg" title="Src" data-fancybox-group=""><img class="fig-img" src="Src.jpg" alt="Src"></a><span class="caption">Src</span></div>
+{% image fancybox Src.jpg "Src" %}
 <table>
 <thead>
 <tr>
@@ -367,7 +364,7 @@
 </tr>
 <tr>
 <td>favicon.ico</td>
-<td>網頁頁籤的 icon <div class="figure " style="width:;"><a class="fancybox" href="icon.jpg" title="" data-fancybox-group=""><img class="fig-img" src="icon.jpg" alt=""></a></div><div style="clear:both;"></div></td>
+<td>網頁頁籤的 icon {% image fancybox clear icon.jpg %}</td>
 </tr>
 <tr>
 <td>index.html</td>
@@ -375,11 +372,11 @@
 </tr>
 <tr>
 <td>main.ts</td>
-<td>啟動 application root module(<span class="highlight-text primary">AppModule</span>) 的編譯起始點</td>
+<td>啟動 application root module({% hl_text primary %}AppModule{% endhl_text %}) 的編譯起始點</td>
 </tr>
 <tr>
 <td>polyfills.ts</td>
-<td>因為不同的瀏覽器會支援不同的 web standards， polyfills 就像補丁的概念，補足些沒有支援的部分。 <a href="https://angular.io/docs/ts/latest/guide/browser-support.html" title="Browser Support" target="_blank" rel="external">Browser Support</a></td>
+<td>因為不同的瀏覽器會支援不同的 web standards， polyfills 就像補丁的概念，補足些沒有支援的部分。 {% link Browser Support https://angular.io/docs/ts/latest/guide/browser-support.html Browser Support %}</td>
 </tr>
 <tr>
 <td>styles.css</td>
@@ -630,6 +627,27 @@
                 
                 <div class="media">
                     
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
                     <div class="media-left">
                         <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
                             <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90"/>
@@ -694,7 +712,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -832,39 +850,6 @@
                     <hr>
                 </div>
                 
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
-                            <img class="media-image" src="http://softstribe.com/wp-content/uploads/2015/11/paypal_2014_logo_detail-290x290.png" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
-                            <h3 class="media-heading">PayPal 付款流程整合 前篇</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Mar 18, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
-<ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程">付款流程</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕">加入 PayPal 付款按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式">選擇整合方式</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合">Server 端整合</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程">測試整合流程</a>
-</li>
-</ul></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
             </div>
         </div>
         <div class="modal-footer">
@@ -872,7 +857,7 @@
                 data-message-zero="no post found"
                 data-message-one="1 post found"
                 data-message-other="{n} posts found">
-                28 posts found
+                29 posts found
             </p>
         </div>
     </div>

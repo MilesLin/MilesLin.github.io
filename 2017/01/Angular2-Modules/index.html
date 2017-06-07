@@ -17,22 +17,17 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。
-
-Modules 幫我們解決了這個問題">
+    <meta name="description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。  Modules 幫我們解決了這個問題">
+<meta name="keywords" content="Angular">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Angular Modules">
 <meta property="og:url" content="https://mileslin.github.io/2017/01/Angular2-Modules/index.html">
-<meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。
-
-Modules 幫我們解決了這個問題">
-<meta property="og:updated_time" content="2017-02-13T04:30:02.171Z">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。  Modules 幫我們解決了這個問題">
+<meta property="og:updated_time" content="2017-05-09T10:37:45.094Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Angular Modules">
-<meta name="twitter:description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。
-
-Modules 幫我們解決了這個問題">
+<meta name="twitter:description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。  Modules 幫我們解決了這個問題">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -292,7 +287,7 @@ Modules 幫我們解決了這個問題">
 </ul>
 <h3 id="ES-2015-Modules"><a href="#ES-2015-Modules" class="headerlink" title="ES 2015 Modules"></a>ES 2015 Modules</h3><p>ES 2015 Modules的運作方式。<br>1.首先我們要有一個export的class<br><figure class="codeblock codeblock--tabbed"><figcaption><span>product.ts</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> Product{</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
 <p>上面的ts code會Transpile成這樣的js code<br><figure class="codeblock codeblock--tabbed"><figcaption><span>product.js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Product</span>(<span class="params"></span>)</span>{}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<p>2.我們就可以Import該class<br><figure class="codeblock codeblock--tabbed"><figcaption><span>useProduct.ts</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { Product } from <span class="string">'./product'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>2.我們就可以Import該class<br><figure class="codeblock codeblock--tabbed"><figcaption><span>useProduct.ts</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { Product } <span class="keyword">from</span> <span class="string">'./product'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
 <div class="alert info"><p>import { Product } &lt;= 定義我們要import哪一個class</p>
 </div>
 <div class="alert info"><p>from ‘./product’ &lt;= 定義我們要讀取哪一個js檔案</p>
@@ -555,6 +550,27 @@ Modules 幫我們解決了這個問題">
                 
                 <div class="media">
                     
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
                     <div class="media-left">
                         <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
                             <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90"/>
@@ -619,7 +635,7 @@ Modules 幫我們解決了這個問題">
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -757,39 +773,6 @@ Modules 幫我們解決了這個問題">
                     <hr>
                 </div>
                 
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
-                            <img class="media-image" src="http://softstribe.com/wp-content/uploads/2015/11/paypal_2014_logo_detail-290x290.png" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
-                            <h3 class="media-heading">PayPal 付款流程整合 前篇</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Mar 18, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
-<ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程">付款流程</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕">加入 PayPal 付款按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式">選擇整合方式</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合">Server 端整合</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程">測試整合流程</a>
-</li>
-</ul></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
             </div>
         </div>
         <div class="modal-footer">
@@ -797,7 +780,7 @@ Modules 幫我們解決了這個問題">
                 data-message-zero="no post found"
                 data-message-one="1 post found"
                 data-message-other="{n} posts found">
-                28 posts found
+                29 posts found
             </p>
         </div>
     </div>

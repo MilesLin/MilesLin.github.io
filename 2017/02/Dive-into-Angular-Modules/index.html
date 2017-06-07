@@ -18,12 +18,13 @@
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
     <meta name="description" content="前言今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。">
+<meta name="keywords" content="Angular">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Dive into Angular Modules">
 <meta property="og:url" content="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/index.html">
-<meta property="og:site_name" content="Miles's Journey">
+<meta property="og:site_name" content="Miles&#39;s Journey">
 <meta property="og:description" content="前言今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。">
-<meta property="og:updated_time" content="2017-03-18T10:19:33.667Z">
+<meta property="og:updated_time" content="2017-05-09T10:37:45.129Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dive into Angular Modules">
 <meta name="twitter:description" content="前言今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。">
@@ -286,18 +287,91 @@
 <li>AppModule移除ProductComponent</li>
 <li>因為FormsModule移到ProductModule裡去了，所以AppModule移除FormsModule</li>
 </ol>
-<p>而我們的ProductModule程式碼會變成這樣<br><figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { FormsModule } from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule } from <span class="string">'@angular/common'</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    CommonModule,</span><br><span class="line">    FormsModule,</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>而我們的ProductModule程式碼會變成這樣<br>{% tabbed_codeblock ProductModule %}
+
+  <!-- tab ts -->
+    import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ProductComponent } from './product.component';
+import { NgModule, Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+
+@NgModule({
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule.forChild(
+      [
+        { path: 'product', component: ProductComponent }
+      ]
+    )
+  ],
+  declarations: [ProductComponent]
+})
+export class ProductModule { }
+
+  <!-- endtab -->  
+{% endtabbed_codeblock %}</p>
 <h4 id="程式碼說明"><a href="#程式碼說明" class="headerlink" title="程式碼說明"></a>程式碼說明</h4><ul>
 <li><strong>CommonModule</strong> 說明可提供ngFor跟ngIf directives的功能</li>
 <li><strong>FormsModule</strong> 提供ngModel 功能</li>
-<li><strong>RouterModule.forChild</strong>跟<strong>RouterModule.forRoot</strong>的差別是 =&gt; <span class="highlight-text primary">不會再註冊一次Router Service。</span></li>
+<li><strong>RouterModule.forChild</strong>跟<strong>RouterModule.forRoot</strong>的差別是 =&gt; {% hl_text primary %}不會再註冊一次Router Service。
+{% endhl_text %}</li>
 </ul>
-<h2 id="Shared-Module"><a href="#Shared-Module" class="headerlink" title="Shared Module"></a>Shared Module</h2><p>Shared Module負責Feature Module共同的部分，只要 <span class="highlight-text primary">Feature Module Import Shared Module</span>  就可以取得這些功能。</p>
+<h2 id="Shared-Module"><a href="#Shared-Module" class="headerlink" title="Shared Module"></a>Shared Module</h2><p>Shared Module負責Feature Module共同的部分，只要 {% hl_text primary %}Feature Module Import Shared Module
+{% endhl_text %}  就可以取得這些功能。</p>
 <p>一樣產生Component跟Module。<code>ng g c shared.component</code>、<code>ng g module shared.module</code> ，然後把AppModule有關shared的程式碼，都移到SharedModule裡面。<br>所以我們要做的就是把Feature Module共同的部分放到Shared Module，然後Shared Module要export這些要共用的部分，例如<strong>SharedComponent、CommonModule、FormsModule</strong>。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>SharedModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { FormsModule } from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { SharedComponent } from <span class="string">'./shared.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule } from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule } from <span class="string">'@angular/common'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    CommonModule</span><br><span class="line">  ],</span><br><span class="line">  declarations: [SharedComponent],</span><br><span class="line">  exports:[</span><br><span class="line">    CommonModule,</span><br><span class="line">    FormsModule,</span><br><span class="line">    SharedComponent</span><br><span class="line">  ]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> SharedModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>所以我們的ProductModule只要import SharedModule 就可以有SharedModule export的功能，例如CommonModule跟FormsModule。  記得import SharedModule後，就要把ProductModule裡面原本的CommonModule跟FormsModule移除。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule refactoring</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { SharedModule } from <span class="string">'./../shared/SharedModule'</span>;</span><br><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    SharedModule,</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="Router-Module"><a href="#Router-Module" class="headerlink" title="Router Module"></a>Router Module</h2><p>現在要做的就是把ProductModule的Router設定移出來，首先先產生Routing Module <code>ng g module product-routing.module</code>，加入Product的Router設定，並且export RouterModule。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Product-RoutingModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./../product/product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  exports: [RouterModule]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductRoutingModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure><br>而我們的productModule把Router設定拿掉，改成 <span class="highlight-text primary">import ProductRoutingModule</span> 就可以了。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule refactoring routing</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductRoutingModule } from <span class="string">'./../product-routing/product-routing.module'</span>;</span><br><span class="line"><span class="keyword">import</span> { SharedModule } from <span class="string">'./../shared/SharedModule'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    SharedModule,</span><br><span class="line">    ProductRoutingModule</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
+{% tabbed_codeblock SharedModule %}
+
+  <!-- tab ts -->
+    import { FormsModule } from '@angular/forms';
+import { SharedComponent } from './shared.component';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@NgModule({
+  imports: [
+    CommonModule
+  ],
+  declarations: [SharedComponent],
+  exports:[
+    CommonModule,
+    FormsModule,
+    SharedComponent
+  ]
+})
+export class SharedModule { }
+
+  <!-- endtab -->
+  
+{% endtabbed_codeblock %}
+<p>所以我們的ProductModule只要import SharedModule 就可以有SharedModule export的功能，例如CommonModule跟FormsModule。  記得import SharedModule後，就要把ProductModule裡面原本的CommonModule跟FormsModule移除。<br>{% tabbed_codeblock ProductModule refactoring %}
+
+  <!-- tab ts -->
+    import { SharedModule } from './../shared/SharedModule';
+import { RouterModule } from '@angular/router';
+import { ProductComponent } from './product.component';
+import { NgModule, Component } from '@angular/core';
+
+@NgModule({
+  imports: [
+    SharedModule,
+    RouterModule.forChild(
+      [
+        { path: 'product', component: ProductComponent }
+      ]
+    )
+  ],
+  declarations: [ProductComponent]
+})
+export class ProductModule { }
+
+  <!-- endtab -->
+
+{% endtabbed_codeblock %}</p>
+<h2 id="Router-Module"><a href="#Router-Module" class="headerlink" title="Router Module"></a>Router Module</h2><p>現在要做的就是把ProductModule的Router設定移出來，首先先產生Routing Module <code>ng g module product-routing.module</code>，加入Product的Router設定，並且export RouterModule。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Product-RoutingModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductComponent } <span class="keyword">from</span> <span class="string">'./../product/product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { RouterModule } <span class="keyword">from</span> <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule } <span class="keyword">from</span> <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  exports: [RouterModule]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductRoutingModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure><br>而我們的productModule把Router設定拿掉，改成 <span class="highlight-text primary">import ProductRoutingModule</span> 就可以了。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule refactoring routing</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductRoutingModule } <span class="keyword">from</span> <span class="string">'./../product-routing/product-routing.module'</span>;</span><br><span class="line"><span class="keyword">import</span> { SharedModule } <span class="keyword">from</span> <span class="string">'./../shared/SharedModule'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } <span class="keyword">from</span> <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } <span class="keyword">from</span> <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    SharedModule,</span><br><span class="line">    ProductRoutingModule</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
 <p>備註: AppModule的Router也是用這種方式refactoring，差別在於因為是root application module要使用的Router 所以要用RouterModule.forRoot。</p>
 <h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>今天終於把Angular Module之間的互動以及一些簡單的Module設計方式說明完了，其中有關import和export的說明可以參考這篇 <a href="https://mileslin.github.io/2017/02/NgModule-Decorator/" title="NgModule Decorator">NgModule Decorator</a></p>
 
@@ -535,6 +609,27 @@
                 
                 <div class="media">
                     
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
                     <div class="media-left">
                         <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
                             <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90"/>
@@ -599,7 +694,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -737,39 +832,6 @@
                     <hr>
                 </div>
                 
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
-                            <img class="media-image" src="http://softstribe.com/wp-content/uploads/2015/11/paypal_2014_logo_detail-290x290.png" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/">
-                            <h3 class="media-heading">PayPal 付款流程整合 前篇</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Mar 18, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
-<ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程">付款流程</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕">加入 PayPal 付款按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式">選擇整合方式</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合">Server 端整合</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程">測試整合流程</a>
-</li>
-</ul></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
             </div>
         </div>
         <div class="modal-footer">
@@ -777,7 +839,7 @@
                 data-message-zero="no post found"
                 data-message-one="1 post found"
                 data-message-other="{n} posts found">
-                28 posts found
+                29 posts found
             </p>
         </div>
     </div>
