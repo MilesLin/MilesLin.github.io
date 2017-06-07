@@ -17,17 +17,22 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。  Modules 幫我們解決了這個問題">
-<meta name="keywords" content="Angular">
+    <meta name="description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。
+
+Modules 幫我們解決了這個問題">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Angular Modules">
 <meta property="og:url" content="https://mileslin.github.io/2017/01/Angular2-Modules/index.html">
-<meta property="og:site_name" content="Miles&#39;s Journey">
-<meta property="og:description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。  Modules 幫我們解決了這個問題">
-<meta property="og:updated_time" content="2017-05-09T10:37:45.094Z">
+<meta property="og:site_name" content="Miles's Journey">
+<meta property="og:description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。
+
+Modules 幫我們解決了這個問題">
+<meta property="og:updated_time" content="2017-02-13T04:30:02.171Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Angular Modules">
-<meta name="twitter:description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。  Modules 幫我們解決了這個問題">
+<meta name="twitter:description" content="前言javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。
+
+Modules 幫我們解決了這個問題">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -287,7 +292,7 @@
 </ul>
 <h3 id="ES-2015-Modules"><a href="#ES-2015-Modules" class="headerlink" title="ES 2015 Modules"></a>ES 2015 Modules</h3><p>ES 2015 Modules的運作方式。<br>1.首先我們要有一個export的class<br><figure class="codeblock codeblock--tabbed"><figcaption><span>product.ts</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> Product{</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
 <p>上面的ts code會Transpile成這樣的js code<br><figure class="codeblock codeblock--tabbed"><figcaption><span>product.js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Product</span>(<span class="params"></span>)</span>{}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<p>2.我們就可以Import該class<br><figure class="codeblock codeblock--tabbed"><figcaption><span>useProduct.ts</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { Product } <span class="keyword">from</span> <span class="string">'./product'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>2.我們就可以Import該class<br><figure class="codeblock codeblock--tabbed"><figcaption><span>useProduct.ts</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { Product } from <span class="string">'./product'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
 <div class="alert info"><p>import { Product } &lt;= 定義我們要import哪一個class</p>
 </div>
 <div class="alert info"><p>from ‘./product’ &lt;= 定義我們要讀取哪一個js檔案</p>
@@ -635,7 +640,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

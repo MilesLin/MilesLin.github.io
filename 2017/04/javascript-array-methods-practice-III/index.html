@@ -17,17 +17,25 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="使 Array 填滿指定的值 Array.prototype.fill() 過濾 Array 的資料，用起來跟 LINQ 的 where 一樣 Array.prototype.filter() 找到第一筆相符的資料 Array.prototype.find() 找到第一筆相符資料的 index Array.prototype.findIndex()">
-<meta name="keywords" content="javascript">
+    <meta name="description" content="使 Array 填滿指定的值 Array.prototype.fill()
+過濾 Array 的資料，用起來跟 LINQ 的 where 一樣 Array.prototype.filter()
+找到第一筆相符的資料 Array.prototype.find()
+找到第一筆相符資料的 index Array.prototype.findIndex()">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="javascript array methods practice III">
 <meta property="og:url" content="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/index.html">
-<meta property="og:site_name" content="Miles&#39;s Journey">
-<meta property="og:description" content="使 Array 填滿指定的值 Array.prototype.fill() 過濾 Array 的資料，用起來跟 LINQ 的 where 一樣 Array.prototype.filter() 找到第一筆相符的資料 Array.prototype.find() 找到第一筆相符資料的 index Array.prototype.findIndex()">
-<meta property="og:updated_time" content="2017-05-09T10:37:45.177Z">
+<meta property="og:site_name" content="Miles's Journey">
+<meta property="og:description" content="使 Array 填滿指定的值 Array.prototype.fill()
+過濾 Array 的資料，用起來跟 LINQ 的 where 一樣 Array.prototype.filter()
+找到第一筆相符的資料 Array.prototype.find()
+找到第一筆相符資料的 index Array.prototype.findIndex()">
+<meta property="og:updated_time" content="2017-04-18T16:04:55.011Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="javascript array methods practice III">
-<meta name="twitter:description" content="使 Array 填滿指定的值 Array.prototype.fill() 過濾 Array 的資料，用起來跟 LINQ 的 where 一樣 Array.prototype.filter() 找到第一筆相符的資料 Array.prototype.find() 找到第一筆相符資料的 index Array.prototype.findIndex()">
+<meta name="twitter:description" content="使 Array 填滿指定的值 Array.prototype.fill()
+過濾 Array 的資料，用起來跟 LINQ 的 where 一樣 Array.prototype.filter()
+找到第一筆相符的資料 Array.prototype.find()
+找到第一筆相符資料的 index Array.prototype.findIndex()">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -289,37 +297,10 @@
 <li>end : 填到哪一個元素，預設是此陣列的長度 (optional)</li>
 </ul>
 <p>Note : start 跟 end 若填負數，則是從右邊開始算</p>
-{% tabbed_codeblock fill %}
-
-  <!-- tab js -->
-    [1, 2, 3].fill(4);               // [4, 4, 4]
-    [1, 2, 3].fill(4, 1);            // [1, 4, 4]
-    [1, 2, 3].fill(4, 1, 2);         // [1, 4, 3]
-    [1, 2, 3].fill(4, 1, 1);         // [1, 2, 3]
-  <!-- endtab -->
-
-{% endtabbed_codeblock %}
+<figure class="codeblock codeblock--tabbed"><figcaption><span>fill</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>);               <span class="comment">// [4, 4, 4]</span></span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>, <span class="number">1</span>);            <span class="comment">// [1, 4, 4]</span></span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>, <span class="number">1</span>, <span class="number">2</span>);         <span class="comment">// [1, 4, 3]</span></span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>, <span class="number">1</span>, <span class="number">1</span>);         <span class="comment">// [1, 2, 3]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
 <h2 id="Array-prototype-filter"><a href="#Array-prototype-filter" class="headerlink" title="Array.prototype.filter()"></a>Array.prototype.filter()</h2><p>過濾 Array 的內容，且回傳的 Array 是一個全新的 Array</p>
-{% tabbed_codeblock filter %}
-
-  <!-- tab js -->
-    function isBigEnough(value,index,array) {
-	
-  return value >= 10;
-}
-var filtered = [12, 5, 8, 130, 44].filter(isBigEnough);
-
-//arrow function
-[12, 5, 8, 130, 44].filter( (value,index,array) =>{
-	  
-  return value >= 10;
-
-});
-
-  <!-- endtab -->
-{% endtabbed_codeblock %}
-<h2 id="Array-prototype-find"><a href="#Array-prototype-find" class="headerlink" title="Array.prototype.find()"></a>Array.prototype.find()</h2><p>找到第一筆相符的元素，如果都找不到，則回傳 {% link undefiend https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined undefiend 
-%} </p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>filter</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isBigEnough</span>(<span class="params">value,index,array</span>) </span>{</span><br><span class="line">	</span><br><span class="line">  <span class="keyword">return</span> value &gt;= <span class="number">10</span>;</span><br><span class="line">}</span><br><span class="line"><span class="keyword">var</span> filtered = [<span class="number">12</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">130</span>, <span class="number">44</span>].filter(isBigEnough);</span><br><span class="line"></span><br><span class="line"><span class="comment">//arrow function</span></span><br><span class="line">[<span class="number">12</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">130</span>, <span class="number">44</span>].filter( <span class="function">(<span class="params">value,index,array</span>) =&gt;</span>{</span><br><span class="line">	  </span><br><span class="line">  <span class="keyword">return</span> value &gt;= <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Array-prototype-find"><a href="#Array-prototype-find" class="headerlink" title="Array.prototype.find()"></a>Array.prototype.find()</h2><p>找到第一筆相符的元素，如果都找不到，則回傳 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined" title="undefiend" target="_blank" rel="external">undefiend</a> </p>
 <h4 id="參數說明-arr-find-value-index-array"><a href="#參數說明-arr-find-value-index-array" class="headerlink" title="參數說明 arr.find(value, index, array)"></a>參數說明 <code>arr.find(value, index, array)</code></h4><ul>
 <li>element : 當下元素的 value</li>
 <li>index : 當下元素的 index ，從 0 開始 (optional)</li>
@@ -657,7 +638,7 @@ var filtered = [12, 5, 8, 130, 44].filter(isBigEnough);
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

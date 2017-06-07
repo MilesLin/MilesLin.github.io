@@ -18,13 +18,12 @@
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
     <meta name="description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
-<meta name="keywords" content="C#,.NET,Autofac">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Autofac 設定 Web API Register Controller 筆記">
 <meta property="og:url" content="https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/index.html">
-<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:site_name" content="Miles's Journey">
 <meta property="og:description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
-<meta property="og:updated_time" content="2017-06-06T09:16:36.583Z">
+<meta property="og:updated_time" content="2017-05-21T15:19:04.154Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Autofac 設定 Web API Register Controller 筆記">
 <meta name="twitter:description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
@@ -281,77 +280,11 @@
 <ul>
 <li>先註冊所有 Web API Controller 到 ContainerBuilder</li>
 <li>註冊所有 Controller 要相依的物件，這邊以 IConfiguration 為例子，表示 Controller 建構式注入 IConfiguration 時會取得 Configuration 物件</li>
-<li>開啟 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper()</code>{% tabbed_codeblock AutofacConfig %}
-
-  <!-- tab cs -->
-    public class AutofacConfig
-    {
-        public static void Bootstrapper()
-        {
-            var builder = new ContainerBuilder();
-
-            // Get your HttpConfiguration.
-            var config = GlobalConfiguration.Configuration;
-
-            // Register your Web API controllers.
-            builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-
-            // OPTIONAL: Register the Autofac filter provider.
-            builder.RegisterWebApiFilterProvider(config);
-
-            builder.RegisterType<configuration>()
-               .As<iconfiguration>()
-               .InstancePerLifetimeScope();
-
-            builder.RegisterType<configuration>()
-               .As<iconfiguration>()
-               .InstancePerLifetimeScope();
-
-            var container = builder.Build();
-
-            config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
-        }
-    }
-  <!-- endtab -->
-  
-{% endtabbed_codeblock %}
-</iconfiguration></configuration></iconfiguration></configuration></li>
+<li>開啟 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper()</code><figure class="codeblock codeblock--tabbed"><figcaption><span>AutofacConfig</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AutofacConfig</span></span><br><span class="line">{</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Bootstrapper</span>(<span class="params"></span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Get your HttpConfiguration.</span></span><br><span class="line">        <span class="keyword">var</span> config = GlobalConfiguration.Configuration;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Register your Web API controllers.</span></span><br><span class="line">        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// OPTIONAL: Register the Autofac filter provider.</span></span><br><span class="line">        builder.RegisterWebApiFilterProvider(config);</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> container = builder.Build();</span><br><span class="line"></span><br><span class="line">        config.DependencyResolver = <span class="keyword">new</span> AutofacWebApiDependencyResolver(container);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
 </ul>
-<p>打開 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper();</code><br>{% tabbed_codeblock Global.asax.cs %}
-
-  <!-- tab cs -->
-    public class WebApiApplication : System.Web.HttpApplication
-    {
-        protected void Application_Start()
-        {
-            AreaRegistration.RegisterAllAreas();
-            GlobalConfiguration.Configure(WebApiConfig.Register);
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
-            
-            // 加入這行
-            AutofacConfig.Bootstrapper();
-
-        }
-    }
-  <!-- endtab -->
-  
-{% endtabbed_codeblock %}</p>
-<p>接下來 Controller 就可以建構式注入 IConfiguration 取得 Configuration 物件<br>{% tabbed_codeblock Controller %}
-
-  <!-- tab cs -->
-    public class ValuesController : ApiController
-    {
-        IConfiguration _configuration;
-        public ValuesController(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-    }
-  <!-- endtab -->
-  
-{% endtabbed_codeblock %}</p>
+<p>打開 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper();</code><br><figure class="codeblock codeblock--tabbed"><figcaption><span>Global.asax.cs</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class WebApiApplication : System.Web.HttpApplication</span><br><span class="line">{</span><br><span class="line">    protected void Application_Start()</span><br><span class="line">    {</span><br><span class="line">        AreaRegistration.RegisterAllAreas();</span><br><span class="line">        GlobalConfiguration.Configure(WebApiConfig.Register);</span><br><span class="line">        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);</span><br><span class="line">        RouteConfig.RegisterRoutes(RouteTable.Routes);</span><br><span class="line">        BundleConfig.RegisterBundles(BundleTable.Bundles);</span><br><span class="line">        </span><br><span class="line">        // 加入這行</span><br><span class="line">        AutofacConfig.Bootstrapper();</span><br><span class="line"></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>接下來 Controller 就可以建構式注入 IConfiguration 取得 Configuration 物件<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Controller</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ValuesController</span> : <span class="title">ApiController</span></span><br><span class="line">{</span><br><span class="line">    IConfiguration _configuration;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ValuesController</span>(<span class="params">IConfiguration configuration</span>)</span><br><span class="line">    </span>{</span><br><span class="line">        _configuration = configuration;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
 <h2 id="建立-Autofac-Module"><a href="#建立-Autofac-Module" class="headerlink" title="建立 Autofac.Module"></a>建立 Autofac.Module</h2><p>當註冊物件一多的時候，我們可以建立 <code>Aufofac.Module</code> 把註冊這件事情分散在各個 Module 處理。</p>
 <p>例如我建立一個 EFModule ，註冊 Entities。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>EFModule</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class EFModule : Autofac.Module</span><br><span class="line">{</span><br><span class="line">    protected override void Load(ContainerBuilder builder)</span><br><span class="line">    {</span><br><span class="line">        builder.RegisterType&lt;WebPaymentEntities&gt;()</span><br><span class="line">           .As&lt;WebPaymentEntities&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
 <p>我的 ContainerBuilder 只要註冊 Module 就好<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Register Module</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Bootstrapper</span>(<span class="params"></span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Get your HttpConfiguration.</span></span><br><span class="line">        <span class="keyword">var</span> config = GlobalConfiguration.Configuration;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Register your Web API controllers.</span></span><br><span class="line">        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// OPTIONAL: Register the Autofac filter provider.</span></span><br><span class="line">        builder.RegisterWebApiFilterProvider(config);</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 註冊 Module</span></span><br><span class="line">        builder.RegisterModule(<span class="keyword">new</span> EFModule());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> container = builder.Build();</span><br><span class="line"></span><br><span class="line">        config.DependencyResolver = <span class="keyword">new</span> AutofacWebApiDependencyResolver(container);</span><br><span class="line">    }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
@@ -679,7 +612,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

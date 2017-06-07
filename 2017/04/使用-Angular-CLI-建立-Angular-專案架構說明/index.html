@@ -18,16 +18,19 @@
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
     <meta name="description" content="從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 Angular CLI 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。">
-<meta name="keywords" content="Angular">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="使用 Angular CLI 建立 Angular 專案架構說明">
 <meta property="og:url" content="https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/index.html">
-<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:site_name" content="Miles's Journey">
 <meta property="og:description" content="從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 Angular CLI 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。">
-<meta property="og:updated_time" content="2017-05-09T10:37:45.186Z">
+<meta property="og:image" content="https://mileslin.github.io/Structure.jpg">
+<meta property="og:image" content="https://mileslin.github.io/Src.jpg">
+<meta property="og:image" content="https://mileslin.github.io/icon.jpg">
+<meta property="og:updated_time" content="2017-05-21T15:19:04.158Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用 Angular CLI 建立 Angular 專案架構說明">
 <meta name="twitter:description" content="從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 Angular CLI 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。">
+<meta name="twitter:image" content="https://mileslin.github.io/Structure.jpg">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -280,7 +283,7 @@
         <div class="main-content-wrap">
             <p>從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 <a href="https://github.com/angular/angular-cli" title="Angular CLI" target="_blank" rel="external">Angular CLI</a> 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。</p>
 <a id="more"></a>
-<h2 id="建立專案"><a href="#建立專案" class="headerlink" title="建立專案"></a>建立專案</h2><p>首先我們要執行 cmd 指令 <code>ng new my-app</code> 建立 Angular 專案，Angular CLI 會幫我們建立這樣專案架構的專案<br>{% image fancybox Structure.jpg "Structure" %}</p>
+<h2 id="建立專案"><a href="#建立專案" class="headerlink" title="建立專案"></a>建立專案</h2><p>首先我們要執行 cmd 指令 <code>ng new my-app</code> 建立 Angular 專案，Angular CLI 會幫我們建立這樣專案架構的專案<br><div class="figure " style="width:;"><a class="fancybox" href="Structure.jpg" title="Structure" data-fancybox-group=""><img class="fig-img" src="Structure.jpg" alt="Structure"></a><span class="caption">Structure</span></div></p>
 <h2 id="The-root-folder"><a href="#The-root-folder" class="headerlink" title="The root folder"></a>The root folder</h2><p>負責放支援建置 app 的設定檔</p>
 <table>
 <thead>
@@ -300,11 +303,11 @@
 </tr>
 <tr>
 <td>.angular-cli.json</td>
-<td>放 Angular CLI 的設定檔 {% link Angular CLI Config Schema https://github.com/angular/angular-cli/wiki/angular-cli Angular CLI Config Schema %}</td>
+<td>放 Angular CLI 的設定檔 <a href="https://github.com/angular/angular-cli/wiki/angular-cli" title="Angular CLI Config Schema" target="_blank" rel="external">Angular CLI Config Schema</a></td>
 </tr>
 <tr>
 <td>.editorconfig</td>
-<td>幫助開發者使用不同的 IDEs 保持檔案格式一致性的設定檔 {% link "http://editorconfig.org" http://editorconfig.org editorconfig %}</td>
+<td>幫助開發者使用不同的 IDEs 保持檔案格式一致性的設定檔 <a href="http://editorconfig.org" title="http://editorconfig.org editorconfig" target="_blank" rel="external"></a></td>
 </tr>
 <tr>
 <td>.gitignore</td>
@@ -312,7 +315,7 @@
 </tr>
 <tr>
 <td>karma.conf.js</td>
-<td>Karma test 的 unit tests 設定 {% link Karma https://karma-runner.github.io/1.0/index.html Karma %}</td>
+<td>Karma test 的 unit tests 設定 <a href="https://karma-runner.github.io/1.0/index.html" title="Karma" target="_blank" rel="external">Karma</a></td>
 </tr>
 <tr>
 <td>package.json</td>
@@ -320,7 +323,7 @@
 </tr>
 <tr>
 <td>protractor.conf.js</td>
-<td>Angular end-to-end test framework {% link Protractor http://www.protractortest.org/#/ Protractor %} 設定檔</td>
+<td>Angular end-to-end test framework <a href="http://www.protractortest.org/#/" title="Protractor" target="_blank" rel="external">Protractor</a> 設定檔</td>
 </tr>
 <tr>
 <td>README.md</td>
@@ -332,12 +335,12 @@
 </tr>
 <tr>
 <td>tslint.json</td>
-<td>保持 code style 一致性的 {% link TSLint https://palantir.github.io/tslint/ TSLint %} 設定檔</td>
+<td>保持 code style 一致性的 <a href="https://palantir.github.io/tslint/" title="TSLint" target="_blank" rel="external">TSLint</a> 設定檔</td>
 </tr>
 </tbody>
 </table>
 <h2 id="The-src-folder"><a href="#The-src-folder" class="headerlink" title="The src folder"></a>The src folder</h2><p>寫程式碼的地方。  所有的 Angular components, templates, styles, images 等等…都放這邊。</p>
-{% image fancybox Src.jpg "Src" %}
+<div class="figure " style="width:;"><a class="fancybox" href="Src.jpg" title="Src" data-fancybox-group=""><img class="fig-img" src="Src.jpg" alt="Src"></a><span class="caption">Src</span></div>
 <table>
 <thead>
 <tr>
@@ -364,7 +367,7 @@
 </tr>
 <tr>
 <td>favicon.ico</td>
-<td>網頁頁籤的 icon {% image fancybox clear icon.jpg %}</td>
+<td>網頁頁籤的 icon <div class="figure " style="width:;"><a class="fancybox" href="icon.jpg" title="" data-fancybox-group=""><img class="fig-img" src="icon.jpg" alt=""></a></div><div style="clear:both;"></div></td>
 </tr>
 <tr>
 <td>index.html</td>
@@ -372,11 +375,11 @@
 </tr>
 <tr>
 <td>main.ts</td>
-<td>啟動 application root module({% hl_text primary %}AppModule{% endhl_text %}) 的編譯起始點</td>
+<td>啟動 application root module(<span class="highlight-text primary">AppModule</span>) 的編譯起始點</td>
 </tr>
 <tr>
 <td>polyfills.ts</td>
-<td>因為不同的瀏覽器會支援不同的 web standards， polyfills 就像補丁的概念，補足些沒有支援的部分。 {% link Browser Support https://angular.io/docs/ts/latest/guide/browser-support.html Browser Support %}</td>
+<td>因為不同的瀏覽器會支援不同的 web standards， polyfills 就像補丁的概念，補足些沒有支援的部分。 <a href="https://angular.io/docs/ts/latest/guide/browser-support.html" title="Browser Support" target="_blank" rel="external">Browser Support</a></td>
 </tr>
 <tr>
 <td>styles.css</td>
@@ -712,7 +715,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="external">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="external">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
