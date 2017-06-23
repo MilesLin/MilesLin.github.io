@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-02-13T04:30:02.183Z</updated>
+  <updated>2017-02-13T04:30:04.000Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-02-13T04:30:02.183Z</updated>
+    <updated>2017-02-13T04:30:04.000Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -41,11 +41,43 @@
   </entry>
   
   <entry>
+    <title>擴充套件屬性，以sweetalert為例</title>
+    <link href="https://mileslin.github.io/2017/06/%E6%93%B4%E5%85%85%E5%A5%97%E4%BB%B6%E5%B1%AC%E6%80%A7%EF%BC%8C%E4%BB%A5sweetalert%E7%82%BA%E4%BE%8B/"/>
+    <id>https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/</id>
+    <published>2017-06-23T06:25:13.000Z</published>
+    <updated>2017-06-23T06:44:34.314Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。<br><div class="figure " style="width:;"><a class="fancybox" href="error_input.jpg" title="error_input" data-fancybox-group=""><img class="fig-img" src="error_input.jpg" alt="error_input"></a><span class="caption">error_input</span></div></p>
+<a id="more"></a>
+<p>要解決這個問題呢，我們首先要先知道 <code>swal({})</code> 是傳入什麼型別，這時候就要找 sweetalert typing 定義檔，就可以看到 <code>swal({})</code> 傳入的型別是什麼。<br><div class="figure " style="width:;"><a class="fancybox" href="sweetalter_typing.jpg" title="sweetalter_typing" data-fancybox-group=""><img class="fig-img" src="sweetalter_typing.jpg" alt="sweetalter_typing"></a><span class="caption">sweetalter_typing</span></div></p>
+<div class="alert info"><p>declare namespace SweetAlert 底下的 interface SettingsBase</p>
+</div>
+<p>型別定義在 namespace SweetAlert 底下的 interface ，知道定義型別的地方後，接下就當然不能直接在這邊新增，因為這是 npm 下載下來的 package。  我們要直接去 typescript 的 typing 新增 SettingsBase 的擴充。</p>
+<p>在 Angular 專案底下的 <code>src\typings.d.ts</code>，新增同樣 namespace 與 interface<br><div class="figure " style="width:;"><a class="fancybox" href="extend_typing.jpg" title="extend_typing" data-fancybox-group=""><img class="fig-img" src="extend_typing.jpg" alt="extend_typing"></a><span class="caption">extend_typing</span></div></p>
+<p>就可以發現，我們使用 <code>swal({})</code> 就可以傳入 input 屬性了。<br><div class="figure " style="width:;"><a class="fancybox" href="success.jpg" title="success" data-fancybox-group=""><img class="fig-img" src="success.jpg" alt="success"></a><span class="caption">success</span></div></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近專案上有使用到 &lt;a href=&quot;https://limonte.github.io/sweetalert2/&quot; title=&quot;Sweetalter2&quot;&gt;Sweetalter2&lt;/a&gt; ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 &lt;span class=&quot;highlight-text danger&quot;&gt;input &lt;/span&gt;  這個屬性。&lt;br&gt;&lt;div class=&quot;figure &quot; style=&quot;width:;&quot;&gt;&lt;a class=&quot;fancybox&quot; href=&quot;error_input.jpg&quot; title=&quot;error_input&quot; data-fancybox-group=&quot;&quot;&gt;&lt;img class=&quot;fig-img&quot; src=&quot;error_input.jpg&quot; alt=&quot;error_input&quot;&gt;&lt;/a&gt;&lt;span class=&quot;caption&quot;&gt;error_input&lt;/span&gt;&lt;/div&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
+    
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="typescript" scheme="https://mileslin.github.io/tags/typescript/"/>
+    
+  </entry>
+  
+  <entry>
     <title>為什麼需要 Domain-Driven Design</title>
     <link href="https://mileslin.github.io/2017/05/%E7%82%BA%E4%BB%80%E9%BA%BC%E9%9C%80%E8%A6%81-Domain-Driven-Design/"/>
     <id>https://mileslin.github.io/2017/05/為什麼需要-Domain-Driven-Design/</id>
     <published>2017-05-21T15:51:09.000Z</published>
-    <updated>2017-05-21T17:01:39.882Z</updated>
+    <updated>2017-06-08T07:43:30.044Z</updated>
     
     <content type="html"><![CDATA[<p>最近開始看 Donmain-Driven Design 的 <a href="https://app.pluralsight.com/library/courses/domain-driven-design-fundamentals/table-of-contents" title="TitleAttribute" target="_blank" rel="external">plurasight 的影片</a> ，其裡面有一句話深深吸引我，而當我開始看 DDD 的教學影片時，發現需要知道的內容，是多麼的廣泛，這句話當之無愧。。<br> <blockquote><p>The more you know, the more you realize you know nothing</p>
 <footer><strong>Socrates</strong></footer></blockquote></p>
@@ -109,7 +141,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/vscode-%E8%A8%AD%E5%AE%9A%E8%87%AA%E5%8B%95%E8%A7%B8%E7%99%BC-suggestions/"/>
     <id>https://mileslin.github.io/2017/05/vscode-設定自動觸發-suggestions/</id>
     <published>2017-05-09T11:07:21.000Z</published>
-    <updated>2017-05-21T15:19:04.156Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>某一版 vscode 更新後，寫 markdown 文件時不會自動跑出小視窗提醒能輸入的 snippet，需要點 <span class="highlight-text primary">ctrl + space</span>
 才會出現視窗，可是中文輸入法的 <span class="highlight-text primary">ctrl + space</span> 有自己的預設行為啊 !! 。</p>
@@ -147,7 +179,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/Two-way-data-binding-event-%E7%9A%84%E5%AF%AB%E6%B3%95/"/>
     <id>https://mileslin.github.io/2017/05/Two-way-data-binding-event-的寫法/</id>
     <published>2017-05-06T08:26:25.000Z</published>
-    <updated>2017-05-21T15:19:04.155Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>之前學的 two way binding 的寫法如下</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"firstName"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -182,7 +214,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/User-input-%E5%AF%A6%E7%94%A8%E7%9A%84-key-%E4%BA%8B%E4%BB%B6/"/>
     <id>https://mileslin.github.io/2017/05/User-input-實用的-key-事件/</id>
     <published>2017-05-02T16:30:27.000Z</published>
-    <updated>2017-05-21T15:19:04.156Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>使用者輸入資料的時候，通常會綁定一些事情，做一些邏輯之類的，例如:使用者點選 Enter 則執行搜尋功能等等….</p>
 <a id="more"></a>
@@ -216,7 +248,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/%E4%BD%BF%E7%94%A8-Angular-CLI-%E5%BB%BA%E7%AB%8B-Angular-%E5%B0%88%E6%A1%88%E6%9E%B6%E6%A7%8B%E8%AA%AA%E6%98%8E/"/>
     <id>https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/</id>
     <published>2017-04-30T09:46:33.000Z</published>
-    <updated>2017-05-21T15:19:04.158Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 <a href="https://github.com/angular/angular-cli" title="Angular CLI" target="_blank" rel="external">Angular CLI</a> 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。</p>
 <a id="more"></a>
@@ -354,7 +386,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/Autofac-%E8%A8%AD%E5%AE%9A-Web-API-Register-Controller-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/</id>
     <published>2017-04-28T12:52:13.000Z</published>
-    <updated>2017-05-21T15:19:04.154Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)</p>
 <a id="more"></a>
@@ -398,7 +430,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/NLog-%E5%BB%BA%E7%BD%AE%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/NLog-建置筆記/</id>
     <published>2017-04-26T13:54:29.000Z</published>
-    <updated>2017-04-26T14:58:38.000Z</updated>
+    <updated>2017-06-08T07:43:30.215Z</updated>
     
     <content type="html"><![CDATA[<p>最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。</p>
 <a id="more"></a>
@@ -463,7 +495,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/</id>
     <published>2017-04-23T14:43:07.000Z</published>
-    <updated>2017-04-23T17:17:59.102Z</updated>
+    <updated>2017-06-08T07:43:30.342Z</updated>
     
     <content type="html"><![CDATA[<!-- excerpt -->
 <ul>
@@ -519,7 +551,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/</id>
     <published>2017-04-22T15:57:37.000Z</published>
-    <updated>2017-04-22T17:34:28.866Z</updated>
+    <updated>2017-06-08T07:43:30.257Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>移除元素功能跟 insert 元素功能 <code>Array.prototype.splice()</code></li>
@@ -576,7 +608,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/</id>
     <published>2017-04-21T15:08:58.000Z</published>
-    <updated>2017-04-22T16:50:23.287Z</updated>
+    <updated>2017-04-22T16:50:24.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>回傳淺複製的 Array ，<code>Array.prototype.slice()</code></li>
@@ -638,7 +670,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/</id>
     <published>2017-04-20T15:55:24.000Z</published>
-    <updated>2017-04-22T16:50:23.285Z</updated>
+    <updated>2017-04-22T16:50:24.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>可累加 Array 的元素，也可以用來操作元素的值然後回傳 <code>Array.prototype.reduce()</code></li>
@@ -699,7 +731,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/</id>
     <published>2017-04-18T16:06:55.000Z</published>
-    <updated>2017-04-18T17:13:36.030Z</updated>
+    <updated>2017-06-08T07:43:30.299Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立一個全新運算過後的 Array，且不會改到原本的 Array <code>Array.prototype.map()</code></li>
@@ -741,7 +773,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/</id>
     <published>2017-04-17T16:40:33.000Z</published>
-    <updated>2017-04-18T16:04:55.012Z</updated>
+    <updated>2017-04-18T16:04:56.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>判斷 Array 是否有包含某一個值 <code>Array.prototype.includes()</code></li>
@@ -801,7 +833,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/</id>
     <published>2017-04-16T04:02:43.000Z</published>
-    <updated>2017-04-18T16:04:55.011Z</updated>
+    <updated>2017-04-18T16:04:56.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>使 Array 填滿指定的值 <code>Array.prototype.fill()</code></li>
@@ -865,7 +897,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/</id>
     <published>2017-04-15T09:32:54.000Z</published>
-    <updated>2017-04-18T16:04:55.010Z</updated>
+    <updated>2017-04-18T16:04:56.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>複製 Array 自己的元素 <code>Array.prototype.copyWithin()</code></li>
@@ -917,7 +949,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/</id>
     <published>2017-04-13T16:33:29.000Z</published>
-    <updated>2017-04-18T16:04:55.008Z</updated>
+    <updated>2017-04-18T16:04:56.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>從現有 Array 建立新 Array 物件 <code>Array.from()</code></li>
@@ -959,7 +991,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%BE%8C%E7%AF%87/"/>
     <id>https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/</id>
     <published>2017-03-18T17:29:33.000Z</published>
-    <updated>2017-03-19T07:01:58.731Z</updated>
+    <updated>2017-06-08T07:43:30.132Z</updated>
     
     <content type="html"><![CDATA[<h3 id="延續前篇"><a href="#延續前篇" class="headerlink" title="延續前篇 "></a>延續前篇 <a href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/" title="前篇">PayPal 付款流程整合 前篇</a></h3><a id="more"></a>
 <h2 id="Client-端整合"><a href="#Client-端整合" class="headerlink" title="Client 端整合"></a>Client 端整合</h2><p>單純用 Client 整合的話只需要單純用 HTML 跟 JavaScript 就能完成，不需要寫到 Server 端的程式碼。</p>
@@ -1053,7 +1085,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%89%8D%E7%AF%87/"/>
     <id>https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/</id>
     <published>2017-03-18T10:33:53.000Z</published>
-    <updated>2017-03-19T07:25:59.191Z</updated>
+    <updated>2017-06-08T07:43:30.173Z</updated>
     
     <content type="html"><![CDATA[<p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
 <ul>
@@ -1146,54 +1178,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     
     
       <category term="PayPal" scheme="https://mileslin.github.io/tags/PayPal/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Dive into Angular Modules</title>
-    <link href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/"/>
-    <id>https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/</id>
-    <published>2017-02-14T15:09:20.000Z</published>
-    <updated>2017-03-18T10:19:33.667Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br><a id="more"></a></p>
-<h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><p>在剛開始學Angular的時候都是把所有Component放在App Module底下，當這樣程式大的時候會變得難以維護，今天會說明Feature Module、Shared Module和Router Module，如何讓我們的程式碼更為乾淨，更好維護，而這些骨子裡其實都是Angular Module。</p>
-<ul>
-<li><strong>Feature Module</strong> 就是產品資訊、基本資料等等…之類的需求</li>
-<li><strong>Shared Module</strong> 就是把共同用到的<em>Pipe、Component、Module</em>等等…放在這邊</li>
-<li><strong>Router Module</strong> 職責在分得更細一點的話，就可以再分出<strong>Router Module</strong>來負責Router設定的工作</li>
-</ul>
-<h2 id="Feature-Module"><a href="#Feature-Module" class="headerlink" title="Feature Module"></a>Feature Module</h2><p>先執行指令，產生Component跟Module。<code>ng g c product.component</code>、<code>ng g module product.module</code>，然後把AppModule有關product的程式碼，都移到ProductModule裡面。</p>
-<h5 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h5><ol>
-<li>AppModule移除ProductComponent</li>
-<li>因為FormsModule移到ProductModule裡去了，所以AppModule移除FormsModule</li>
-</ol>
-<p>而我們的ProductModule程式碼會變成這樣<br><figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { FormsModule } from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule } from <span class="string">'@angular/common'</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    CommonModule,</span><br><span class="line">    FormsModule,</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h4 id="程式碼說明"><a href="#程式碼說明" class="headerlink" title="程式碼說明"></a>程式碼說明</h4><ul>
-<li><strong>CommonModule</strong> 說明可提供ngFor跟ngIf directives的功能</li>
-<li><strong>FormsModule</strong> 提供ngModel 功能</li>
-<li><strong>RouterModule.forChild</strong>跟<strong>RouterModule.forRoot</strong>的差別是 =&gt; <span class="highlight-text primary">不會再註冊一次Router Service。</span></li>
-</ul>
-<h2 id="Shared-Module"><a href="#Shared-Module" class="headerlink" title="Shared Module"></a>Shared Module</h2><p>Shared Module負責Feature Module共同的部分，只要 <span class="highlight-text primary">Feature Module Import Shared Module</span>  就可以取得這些功能。</p>
-<p>一樣產生Component跟Module。<code>ng g c shared.component</code>、<code>ng g module shared.module</code> ，然後把AppModule有關shared的程式碼，都移到SharedModule裡面。<br>所以我們要做的就是把Feature Module共同的部分放到Shared Module，然後Shared Module要export這些要共用的部分，例如<strong>SharedComponent、CommonModule、FormsModule</strong>。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>SharedModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { FormsModule } from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { SharedComponent } from <span class="string">'./shared.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule } from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule } from <span class="string">'@angular/common'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    CommonModule</span><br><span class="line">  ],</span><br><span class="line">  declarations: [SharedComponent],</span><br><span class="line">  exports:[</span><br><span class="line">    CommonModule,</span><br><span class="line">    FormsModule,</span><br><span class="line">    SharedComponent</span><br><span class="line">  ]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> SharedModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>所以我們的ProductModule只要import SharedModule 就可以有SharedModule export的功能，例如CommonModule跟FormsModule。  記得import SharedModule後，就要把ProductModule裡面原本的CommonModule跟FormsModule移除。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule refactoring</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { SharedModule } from <span class="string">'./../shared/SharedModule'</span>;</span><br><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    SharedModule,</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="Router-Module"><a href="#Router-Module" class="headerlink" title="Router Module"></a>Router Module</h2><p>現在要做的就是把ProductModule的Router設定移出來，首先先產生Routing Module <code>ng g module product-routing.module</code>，加入Product的Router設定，並且export RouterModule。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Product-RoutingModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./../product/product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  exports: [RouterModule]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductRoutingModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure><br>而我們的productModule把Router設定拿掉，改成 <span class="highlight-text primary">import ProductRoutingModule</span> 就可以了。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule refactoring routing</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductRoutingModule } from <span class="string">'./../product-routing/product-routing.module'</span>;</span><br><span class="line"><span class="keyword">import</span> { SharedModule } from <span class="string">'./../shared/SharedModule'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    SharedModule,</span><br><span class="line">    ProductRoutingModule</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>備註: AppModule的Router也是用這種方式refactoring，差別在於因為是root application module要使用的Router 所以要用RouterModule.forRoot。</p>
-<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>今天終於把Angular Module之間的互動以及一些簡單的Module設計方式說明完了，其中有關import和export的說明可以參考這篇 <a href="https://mileslin.github.io/2017/02/NgModule-Decorator/" title="NgModule Decorator">NgModule Decorator</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
-    
-    
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
