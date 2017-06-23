@@ -17,21 +17,23 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。error_input">
+    <meta name="description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。
+error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; // &amp;lt;- error});">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="擴充套件屬性，以sweetalert為例">
 <meta property="og:url" content="https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。error_input">
-<meta property="og:image" content="https://mileslin.github.io/error_input.jpg">
+<meta property="og:description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。
+error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; // &amp;lt;- error});">
 <meta property="og:image" content="https://mileslin.github.io/sweetalter_typing.jpg">
 <meta property="og:image" content="https://mileslin.github.io/extend_typing.jpg">
 <meta property="og:image" content="https://mileslin.github.io/success.jpg">
-<meta property="og:updated_time" content="2017-06-23T06:44:34.314Z">
+<meta property="og:updated_time" content="2017-06-23T06:50:42.476Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="擴充套件屬性，以sweetalert為例">
-<meta name="twitter:description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。error_input">
-<meta name="twitter:image" content="https://mileslin.github.io/error_input.jpg">
+<meta name="twitter:description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。
+error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; // &amp;lt;- error});">
+<meta name="twitter:image" content="https://mileslin.github.io/sweetalter_typing.jpg">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -41,8 +43,8 @@
         <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
     
     
-        <meta property="og:image" content="https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/sweetalter_typing.jpg"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/sweetalter_typing.jpg" />
+        <meta property="og:image" content="https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/error_input.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/error_input.jpg" />
     
     
     
@@ -282,7 +284,8 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。<br><div class="figure " style="width:;"><a class="fancybox" href="error_input.jpg" title="error_input" data-fancybox-group=""><img class="fig-img" src="error_input.jpg" alt="error_input"></a><span class="caption">error_input</span></div></p>
+            <p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>error_input</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">swal({</span><br><span class="line">  title: <span class="string">'Oops !!!'</span>,</span><br><span class="line">  input: <span class="string">'email'</span> <span class="comment">// &lt;- error</span></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
 <a id="more"></a>
 <p>要解決這個問題呢，我們首先要先知道 <code>swal({})</code> 是傳入什麼型別，這時候就要找 sweetalert typing 定義檔，就可以看到 <code>swal({})</code> 傳入的型別是什麼。<br><div class="figure " style="width:;"><a class="fancybox" href="sweetalter_typing.jpg" title="sweetalter_typing" data-fancybox-group=""><img class="fig-img" src="sweetalter_typing.jpg" alt="sweetalter_typing"></a><span class="caption">sweetalter_typing</span></div></p>
 <div class="alert info"><p>declare namespace SweetAlert 底下的 interface SettingsBase</p>
