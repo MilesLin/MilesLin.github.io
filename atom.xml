@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-02-13T04:30:04.000Z</updated>
+  <updated>2017-01-31T14:55:39.253Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-02-13T04:30:04.000Z</updated>
+    <updated>2017-01-31T14:55:39.253Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -41,11 +41,40 @@
   </entry>
   
   <entry>
+    <title>Destructuring assignment</title>
+    <link href="https://mileslin.github.io/2017/06/Destructuring-assignment/"/>
+    <id>https://mileslin.github.io/2017/06/Destructuring-assignment/</id>
+    <published>2017-06-28T15:52:51.000Z</published>
+    <updated>2017-06-28T16:22:23.450Z</updated>
+    
+    <content type="html"><![CDATA[<p>解構賦值是一種優雅的方式能夠將<code>{}</code>與<code>[]</code>的值讀出來<br><a id="more"></a></p>
+<h2 id="讀取陣列並-assign-到變數上"><a href="#讀取陣列並-assign-到變數上" class="headerlink" title="讀取陣列並 assign 到變數上"></a>讀取陣列並 assign 到變數上</h2><p><em>陣列的解構賦值用陣列去接</em><br><figure class="codeblock codeblock--tabbed"><figcaption><span>JavaScript</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> foo = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">let</span> [one, two, three] = foo;</span><br><span class="line"><span class="built_in">console</span>.log(one); <span class="comment">// 'one'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="物件的解構賦值"><a href="#物件的解構賦值" class="headerlink" title="物件的解構賦值"></a>物件的解構賦值</h2><p>在ES6有支援物件的解構賦值，這就能用在更多的用途上。  例如這有點像 import module 的用法。<br><em>物件的解構賦值用物件去接</em><br><figure class="codeblock codeblock--tabbed"><figcaption><span>js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> myModule = {</span><br><span class="line">  <span class="attr">drawSquare</span>: <span class="function"><span class="keyword">function</span> <span class="title">drawSquare</span>(<span class="params">length</span>) </span>{ <span class="comment">/* implementation */</span> },</span><br><span class="line">  <span class="attr">drawCircle</span>: <span class="function"><span class="keyword">function</span> <span class="title">drawCircle</span>(<span class="params">radius</span>) </span>{ <span class="comment">/* implementation */</span> },</span><br><span class="line">  <span class="attr">drawText</span>: <span class="function"><span class="keyword">function</span> <span class="title">drawText</span>(<span class="params">text</span>) </span>{ <span class="comment">/* implementation */</span> },</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> {drawSquare, drawText} = myModule;</span><br><span class="line"></span><br><span class="line">drawSquare(<span class="number">5</span>);</span><br><span class="line">drawText(<span class="string">'hello'</span>);</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="傳入-function-的解構賦值"><a href="#傳入-function-的解構賦值" class="headerlink" title="傳入 function 的解構賦值"></a>傳入 function 的解構賦值</h2><p>解構賦值也允許你傳入 function ，並且 function’s parameter 指定要讀取哪一個 properties。<br><!-- classes : info success warning danger no-icon --><br><div class="alert info no-icon"><p>function 參數的 property 名稱要與傳入物件的 property 名稱一致，否額會 undefined</p>
+</div><br><figure class="codeblock codeblock--tabbed"><figcaption><span>js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> jane = { <span class="attr">firstName</span>: <span class="string">'Jane'</span>, <span class="attr">lastName</span>: <span class="string">'Doe'</span>};</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sayName</span>(<span class="params">{firstName, lastName, middleName = <span class="string">'N/A'</span>}</span>) </span>{</span><br><span class="line">  <span class="built_in">console</span>.log(firstName);  <span class="comment">// Jane</span></span><br><span class="line">  <span class="built_in">console</span>.log(lastName);   <span class="comment">// Doe</span></span><br><span class="line">  <span class="built_in">console</span>.log(middleName); <span class="comment">// N/A</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">sayName(jane)</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="陣列變數交換的用法"><a href="#陣列變數交換的用法" class="headerlink" title="陣列變數交換的用法"></a>陣列變數交換的用法</h2><p>陣列可以用解構賦值的方式，交換陣列的值<br><figure class="codeblock codeblock--tabbed"><figcaption><span>js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">let</span> b = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">[a, b] = [b, a];</span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// 3</span></span><br><span class="line"><span class="built_in">console</span>.log(b); <span class="comment">// 1</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular-2-training-book.rangle.io/handout/features/destructuring.html" title="angular-2-training-book" target="_blank" rel="external">angular-2-training-book</a> <a href="https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment" title="MDN" target="_blank" rel="external">MDN</a>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;解構賦值是一種優雅的方式能夠將&lt;code&gt;{}&lt;/code&gt;與&lt;code&gt;[]&lt;/code&gt;的值讀出來&lt;br&gt;
+    
+    </summary>
+    
+      <category term="javascript" scheme="https://mileslin.github.io/categories/javascript/"/>
+    
+    
+      <category term="javascript" scheme="https://mileslin.github.io/tags/javascript/"/>
+    
+  </entry>
+  
+  <entry>
     <title>擴充套件屬性，以sweetalert為例</title>
     <link href="https://mileslin.github.io/2017/06/%E6%93%B4%E5%85%85%E5%A5%97%E4%BB%B6%E5%B1%AC%E6%80%A7%EF%BC%8C%E4%BB%A5sweetalert%E7%82%BA%E4%BE%8B/"/>
     <id>https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/</id>
     <published>2017-06-23T06:25:13.000Z</published>
-    <updated>2017-06-23T06:50:42.476Z</updated>
+    <updated>2017-06-28T15:51:45.274Z</updated>
     
     <content type="html"><![CDATA[<p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>error_input</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">swal({</span><br><span class="line">  title: <span class="string">'Oops !!!'</span>,</span><br><span class="line">  input: <span class="string">'email'</span> <span class="comment">// &lt;- error</span></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -79,7 +108,7 @@
     <link href="https://mileslin.github.io/2017/05/%E7%82%BA%E4%BB%80%E9%BA%BC%E9%9C%80%E8%A6%81-Domain-Driven-Design/"/>
     <id>https://mileslin.github.io/2017/05/為什麼需要-Domain-Driven-Design/</id>
     <published>2017-05-21T15:51:09.000Z</published>
-    <updated>2017-06-08T07:43:30.044Z</updated>
+    <updated>2017-06-07T17:29:51.270Z</updated>
     
     <content type="html"><![CDATA[<p>最近開始看 Donmain-Driven Design 的 <a href="https://app.pluralsight.com/library/courses/domain-driven-design-fundamentals/table-of-contents" title="TitleAttribute" target="_blank" rel="external">plurasight 的影片</a> ，其裡面有一句話深深吸引我，而當我開始看 DDD 的教學影片時，發現需要知道的內容，是多麼的廣泛，這句話當之無愧。。<br> <blockquote><p>The more you know, the more you realize you know nothing</p>
 <footer><strong>Socrates</strong></footer></blockquote></p>
@@ -143,7 +172,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/vscode-%E8%A8%AD%E5%AE%9A%E8%87%AA%E5%8B%95%E8%A7%B8%E7%99%BC-suggestions/"/>
     <id>https://mileslin.github.io/2017/05/vscode-設定自動觸發-suggestions/</id>
     <published>2017-05-09T11:07:21.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-06-02T17:03:33.848Z</updated>
     
     <content type="html"><![CDATA[<p>某一版 vscode 更新後，寫 markdown 文件時不會自動跑出小視窗提醒能輸入的 snippet，需要點 <span class="highlight-text primary">ctrl + space</span>
 才會出現視窗，可是中文輸入法的 <span class="highlight-text primary">ctrl + space</span> 有自己的預設行為啊 !! 。</p>
@@ -181,7 +210,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/Two-way-data-binding-event-%E7%9A%84%E5%AF%AB%E6%B3%95/"/>
     <id>https://mileslin.github.io/2017/05/Two-way-data-binding-event-的寫法/</id>
     <published>2017-05-06T08:26:25.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-05-09T12:53:24.643Z</updated>
     
     <content type="html"><![CDATA[<p>之前學的 two way binding 的寫法如下</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"firstName"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -216,7 +245,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/User-input-%E5%AF%A6%E7%94%A8%E7%9A%84-key-%E4%BA%8B%E4%BB%B6/"/>
     <id>https://mileslin.github.io/2017/05/User-input-實用的-key-事件/</id>
     <published>2017-05-02T16:30:27.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-05-02T16:54:44.208Z</updated>
     
     <content type="html"><![CDATA[<p>使用者輸入資料的時候，通常會綁定一些事情，做一些邏輯之類的，例如:使用者點選 Enter 則執行搜尋功能等等….</p>
 <a id="more"></a>
@@ -250,7 +279,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/%E4%BD%BF%E7%94%A8-Angular-CLI-%E5%BB%BA%E7%AB%8B-Angular-%E5%B0%88%E6%A1%88%E6%9E%B6%E6%A7%8B%E8%AA%AA%E6%98%8E/"/>
     <id>https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/</id>
     <published>2017-04-30T09:46:33.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-04-30T15:19:26.000Z</updated>
     
     <content type="html"><![CDATA[<p>從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 <a href="https://github.com/angular/angular-cli" title="Angular CLI" target="_blank" rel="external">Angular CLI</a> 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。</p>
 <a id="more"></a>
@@ -388,7 +417,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/Autofac-%E8%A8%AD%E5%AE%9A-Web-API-Register-Controller-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/</id>
     <published>2017-04-28T12:52:13.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-04-28T14:05:24.068Z</updated>
     
     <content type="html"><![CDATA[<p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)</p>
 <a id="more"></a>
@@ -432,7 +461,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/NLog-%E5%BB%BA%E7%BD%AE%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/NLog-建置筆記/</id>
     <published>2017-04-26T13:54:29.000Z</published>
-    <updated>2017-06-08T07:43:30.215Z</updated>
+    <updated>2017-04-28T14:04:32.657Z</updated>
     
     <content type="html"><![CDATA[<p>最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。</p>
 <a id="more"></a>
@@ -497,7 +526,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/</id>
     <published>2017-04-23T14:43:07.000Z</published>
-    <updated>2017-06-08T07:43:30.342Z</updated>
+    <updated>2017-04-28T14:04:32.746Z</updated>
     
     <content type="html"><![CDATA[<!-- excerpt -->
 <ul>
@@ -553,7 +582,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/</id>
     <published>2017-04-22T15:57:37.000Z</published>
-    <updated>2017-06-08T07:43:30.257Z</updated>
+    <updated>2017-04-28T14:04:32.743Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>移除元素功能跟 insert 元素功能 <code>Array.prototype.splice()</code></li>
@@ -610,7 +639,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/</id>
     <published>2017-04-21T15:08:58.000Z</published>
-    <updated>2017-04-22T16:50:24.000Z</updated>
+    <updated>2017-04-21T16:06:26.725Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>回傳淺複製的 Array ，<code>Array.prototype.slice()</code></li>
@@ -672,7 +701,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/</id>
     <published>2017-04-20T15:55:24.000Z</published>
-    <updated>2017-04-22T16:50:24.000Z</updated>
+    <updated>2017-04-20T17:21:08.856Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>可累加 Array 的元素，也可以用來操作元素的值然後回傳 <code>Array.prototype.reduce()</code></li>
@@ -733,7 +762,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/</id>
     <published>2017-04-18T16:06:55.000Z</published>
-    <updated>2017-06-08T07:43:30.299Z</updated>
+    <updated>2017-04-20T15:52:47.860Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立一個全新運算過後的 Array，且不會改到原本的 Array <code>Array.prototype.map()</code></li>
@@ -775,7 +804,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/</id>
     <published>2017-04-17T16:40:33.000Z</published>
-    <updated>2017-04-18T16:04:56.000Z</updated>
+    <updated>2017-04-17T17:27:24.202Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>判斷 Array 是否有包含某一個值 <code>Array.prototype.includes()</code></li>
@@ -835,7 +864,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/</id>
     <published>2017-04-16T04:02:43.000Z</published>
-    <updated>2017-04-18T16:04:56.000Z</updated>
+    <updated>2017-04-16T05:12:35.730Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>使 Array 填滿指定的值 <code>Array.prototype.fill()</code></li>
@@ -899,7 +928,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/</id>
     <published>2017-04-15T09:32:54.000Z</published>
-    <updated>2017-04-18T16:04:56.000Z</updated>
+    <updated>2017-04-15T10:19:21.137Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>複製 Array 自己的元素 <code>Array.prototype.copyWithin()</code></li>
@@ -951,7 +980,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/</id>
     <published>2017-04-13T16:33:29.000Z</published>
-    <updated>2017-04-18T16:04:56.000Z</updated>
+    <updated>2017-04-15T10:06:21.232Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>從現有 Array 建立新 Array 物件 <code>Array.from()</code></li>
@@ -993,7 +1022,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%BE%8C%E7%AF%87/"/>
     <id>https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/</id>
     <published>2017-03-18T17:29:33.000Z</published>
-    <updated>2017-06-08T07:43:30.132Z</updated>
+    <updated>2017-04-13T16:13:25.090Z</updated>
     
     <content type="html"><![CDATA[<h3 id="延續前篇"><a href="#延續前篇" class="headerlink" title="延續前篇 "></a>延續前篇 <a href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/" title="前篇">PayPal 付款流程整合 前篇</a></h3><a id="more"></a>
 <h2 id="Client-端整合"><a href="#Client-端整合" class="headerlink" title="Client 端整合"></a>Client 端整合</h2><p>單純用 Client 整合的話只需要單純用 HTML 跟 JavaScript 就能完成，不需要寫到 Server 端的程式碼。</p>
@@ -1072,107 +1101,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <summary type="html">
     
       &lt;h3 id=&quot;延續前篇&quot;&gt;&lt;a href=&quot;#延續前篇&quot; class=&quot;headerlink&quot; title=&quot;延續前篇 &quot;&gt;&lt;/a&gt;延續前篇 &lt;a href=&quot;https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/&quot; title=&quot;前篇&quot;&gt;PayPal 付款流程整合 前篇&lt;/a&gt;&lt;/h3&gt;
-    
-    </summary>
-    
-      <category term="PayPal" scheme="https://mileslin.github.io/categories/PayPal/"/>
-    
-    
-      <category term="PayPal" scheme="https://mileslin.github.io/tags/PayPal/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>PayPal 付款流程整合 前篇</title>
-    <link href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%89%8D%E7%AF%87/"/>
-    <id>https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/</id>
-    <published>2017-03-18T10:33:53.000Z</published>
-    <updated>2017-06-08T07:43:30.173Z</updated>
-    
-    <content type="html"><![CDATA[<p>現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。</p>
-<ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="付款流程" target="_blank" rel="external">付款流程</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/" title="加入 PayPal 付款按鈕" target="_blank" rel="external">加入 PayPal 付款按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/" title="選擇整合方式" target="_blank" rel="external">選擇整合方式</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Client 端整合" target="_blank" rel="external">Client 端整合</a> 或 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Server 端整合" target="_blank" rel="external">Server 端整合</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程" target="_blank" rel="external">測試整合流程</a>
-</li>
-</ul>
-<a id="more"></a>
-<h2 id="付款流程"><a href="#付款流程" class="headerlink" title="付款流程"></a>付款流程</h2><p>付款流程示意圖<br><div class="figure " style="width:;"><a class="fancybox" href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/in-context-flow.png" title="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/" data-fancybox-group="" target="_blank" rel="external"><img class="fig-img" src="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/in-context-flow.png" alt="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/"></a><span class="caption">圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/</span></div></p>
-<ol>
-<li>付款人按下付款按鈕<ul>
-<li>會使用 PayPal 提供的 <code>checkout.js</code> 跳出 lightbox window</li>
-<li>接下來就是使用 javascript 或者 server 端呼叫 PayPal API 初始化帳單</li>
-<li>一旦帳單初始化付款流程就會在 lightbox window 正式開始</li>
-</ul>
-</li>
-<li><p>付款人需登入 PayPal</p>
-<div class="figure " style="width:;"><a class="fancybox" href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png" title="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/" data-fancybox-group="" target="_blank" rel="external"><img class="fig-img" src="https://www.paypalobjects.com/webstatic/en_US/developer/docs/limited-release/Login_MiniBrowser.png" alt="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/"></a><span class="caption">圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/</span></div>
-</li>
-<li><p>付款人會授權 PayPal 帳單</p>
-<div class="figure " style="width:;"><a class="fancybox" href="https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png" title="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/" data-fancybox-group="" target="_blank" rel="external"><img class="fig-img" src="https://developer.paypal.com/img/docs/ec/RYI_MiniBrowser.png" alt="圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/"></a><span class="caption">圖片來自 : https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/</span></div>
-</li>
-<li><p>付款人同意帳單後，PayPay 會關掉 lightbox window，付款人回到原本的網頁畫面。  此刻，我們可以顯示一個確認頁面，呼叫 PapPal REST API 來顯示帳單明細，內容包含帳單地址跟Email等等….</p>
-</li>
-<li><p>在確認頁面裡面，呼叫付款完成的 PayPal API 來完成付款。</p>
-</li>
-</ol>
-<p>補充 : <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/prerequisites/" title="支援的瀏覽器" target="_blank" rel="external">Express Checkout 支援的瀏覽器</a></p>
-<h2 id="加入-PayPal-付款按鈕"><a href="#加入-PayPal-付款按鈕" class="headerlink" title="加入 PayPal 付款按鈕"></a>加入 PayPal 付款按鈕</h2><p>載入checkout.js<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Include checkout.js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=<span class="string">"https://www.paypalobjects.com/api/checkout.js"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<div class="alert danger"><p>請使用官方提供的線上版本，不要下載到local端。</p>
-</div>
-<h4 id="Render-the-PayPal-button"><a href="#Render-the-PayPal-button" class="headerlink" title="Render the PayPal button"></a>Render the PayPal button</h4><figure class="codeblock codeblock--tabbed"><figcaption><span>Render button</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"paypal-button"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span><br><span class="line">    paypal.Button.render({</span><br><span class="line">    </span><br><span class="line">        <span class="attr">env</span>: <span class="string">'production'</span>, <span class="comment">// Specify 'sandbox' for the test environment</span></span><br><span class="line"></span><br><span class="line">        payment: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>{</span><br><span class="line">            <span class="comment">// Set up the payment here, when the buyer clicks on the button</span></span><br><span class="line">        },</span><br><span class="line"></span><br><span class="line">        <span class="attr">onAuthorize</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data, actions</span>) </span>{</span><br><span class="line">            <span class="comment">// Execute the payment here, when the buyer approves the transaction</span></span><br><span class="line">       }</span><br><span class="line">            </span><br><span class="line">    }, <span class="string">'#paypal-button'</span>);</span><br><span class="line"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><ul>
-<li>可以開啟瀏覽器開發工具，確認看看載入是否有錯誤</li>
-<li>IE的環境下建議加入 <code>&lt;!DOCTYPE html&gt;</code> 和 <code>&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot; /&gt;</code> 可避免一些兼容性的錯誤</li>
-</ul>
-</div>
-<p>補充 : </p>
-<ul>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/" title="客製化按鈕" target="_blank" rel="external">客製化按鈕</a></li>
-<li><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/customize-button/" title="checkout.js 更多應用" target="_blank" rel="external">checkout.js 更多應用</a>
-</li>
-</ul>
-<h2 id="選擇整合方式"><a href="#選擇整合方式" class="headerlink" title="選擇整合方式"></a>選擇整合方式</h2><p>Client 整合 :</p>
-<ul>
-<li>只需要使用 HTML 跟 JavaScript 就可以完成付款流程</li>
-</ul>
-<p>Server 整合 :</p>
-<ul>
-<li>更有彈性</li>
-<li>在 server 端呼叫 REST Payments API 建立帳單、付款等動作。</li>
-</ul>
-<h4 id="整合流程說明"><a href="#整合流程說明" class="headerlink" title="整合流程說明 :"></a>整合流程說明 :</h4><ol>
-<li><code>checkout.js</code> render PayPal 按鈕</li>
-<li>付款人點擊按鈕，建立帳單，並且彈出 lightbox window 。<br>建立帳單的方式，有兩種，參考上方的說明 : <ul>
-<li>Client 整合</li>
-<li>Server 整合</li>
-</ul>
-</li>
-<li>初始化付款流程</li>
-<li>付款人登入並且授權帳單</li>
-<li>顯示確認頁面 (選擇性，不一定要執行此步驟)</li>
-<li>付款完成<ul>
-<li>Client 整合 : <code>checkout.js</code> 自動在 client 端執行付款完成手續</li>
-<li>Server 整合 : Server 呼叫 REST API 完成付款</li>
-</ul>
-</li>
-<li>顯示付款完成頁面</li>
-</ol>
-<h3 id=""><a href="#" class="headerlink" title=""></a><a href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%BE%8C%E7%AF%87/" title="後篇">PayPal 付款流程整合 後篇</a></h3><h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/" title="官方文件" target="_blank" rel="external">官方文件</a>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;現在新的PayPal新的API付款方式不像以前需要整個頁面導向PayPal，而是整個付款回流會在原本的網頁做完付款的動作。  依照官方的說明，總共有五個步驟要搞懂。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/checkout-flow/&quot; title=&quot;付款流程&quot;&gt;付款流程&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/add-paypal-button/&quot; title=&quot;加入 PayPal 付款按鈕&quot;&gt;加入 PayPal 付款按鈕&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/choose-integration-method/&quot; title=&quot;選擇整合方式&quot;&gt;選擇整合方式&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/&quot; title=&quot;Client 端整合&quot;&gt;Client 端整合&lt;/a&gt; 或 &lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/&quot; title=&quot;Server 端整合&quot;&gt;Server 端整合&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/&quot; title=&quot;測試整合流程&quot;&gt;測試整合流程&lt;/a&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
     
     </summary>
     
