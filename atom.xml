@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-01-31T14:55:39.253Z</updated>
+  <updated>2017-02-13T04:30:04.000Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-01-31T14:55:39.253Z</updated>
+    <updated>2017-02-13T04:30:04.000Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -41,11 +41,45 @@
   </entry>
   
   <entry>
+    <title>單元測試 Model 驗證</title>
+    <link href="https://mileslin.github.io/2017/06/%E5%96%AE%E5%85%83%E6%B8%AC%E8%A9%A6Model%E9%A9%97%E8%AD%89/"/>
+    <id>https://mileslin.github.io/2017/06/單元測試Model驗證/</id>
+    <published>2017-06-30T04:17:39.000Z</published>
+    <updated>2017-06-30T04:33:11.263Z</updated>
+    
+    <content type="html"><![CDATA[<p>MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。</p>
+<a id="more"></a>
+<p>首先我們會有一個要被驗證的 Model<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Model</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">VM</span> : <span class="title">IValidatableObject</span></span><br><span class="line">{        </span><br><span class="line">    [Required]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Email { <span class="keyword">get</span>; <span class="keyword">set</span>; }</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Name { <span class="keyword">get</span>; <span class="keyword">set</span>; }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerable&lt;ValidationResult&gt; <span class="title">Validate</span>(<span class="params">ValidationContext validationContext</span>)</span><br><span class="line">    </span>{            </span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.Name == <span class="string">"Test"</span>)            </span><br><span class="line">        {</span><br><span class="line">            <span class="function"><span class="keyword">yield</span> return new <span class="title">ValidationResult</span>(<span class="params"><span class="string">"Please, set right name"</span></span>)</span>;</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="使用-Validator-驗證-Model"><a href="#使用-Validator-驗證-Model" class="headerlink" title="使用 Validator 驗證 Model"></a>使用 Validator 驗證 Model</h2><p>寫單元測試的話，其實很簡單，只要用 <code>Validator.TryValidateObject</code> 就能夠知道是否驗證成功，以及取得錯誤訊息。<br>所以寫單元測試就兩個重點要記得，這樣就能輕易寫 Model 驗證的單元測試了:</p>
+<ul>
+<li><code>Validator.TryValidateObject</code> 回傳是否驗證成功</li>
+<li>傳入 <code>List&lt;ValidationResult&gt;</code> 取得錯誤訊息</li>
+</ul>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Unit Test</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[TestMethod()]</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ValidateTest</span>(<span class="params"></span>)</span><br><span class="line"></span>{</span><br><span class="line">    <span class="comment">// Arrange</span></span><br><span class="line">    <span class="keyword">var</span> model = <span class="keyword">new</span> VM()</span><br><span class="line">    {</span><br><span class="line">        Email = <span class="literal">null</span></span><br><span class="line">    };</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Act</span></span><br><span class="line">    <span class="keyword">var</span> validationResults = <span class="keyword">new</span> List&lt;ValidationResult&gt;();</span><br><span class="line">    <span class="keyword">var</span> actual = Validator.TryValidateObject(model, <span class="keyword">new</span> ValidationContext(model), validationResults, validateAllProperties: <span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Assert</span></span><br><span class="line">    Assert.IsFalse(actual, <span class="string">"Expected validation to fail."</span>);</span><br><span class="line">    Assert.IsTrue(validationResults[<span class="number">0</span>].MemberNames.ElementAt(<span class="number">0</span>) == <span class="keyword">nameof</span>(model.Email));</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://www.intertech.com/Blog/unit-test-net-entity-validation/" title="How to Unit Test .NET Entity Validation" target="_blank" rel="external">How to Unit Test .NET Entity Validation</a>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Unit Test" scheme="https://mileslin.github.io/categories/Unit-Test/"/>
+    
+    
+      <category term="MVC" scheme="https://mileslin.github.io/tags/MVC/"/>
+    
+      <category term="Unit Test" scheme="https://mileslin.github.io/tags/Unit-Test/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Destructuring assignment</title>
     <link href="https://mileslin.github.io/2017/06/Destructuring-assignment/"/>
     <id>https://mileslin.github.io/2017/06/Destructuring-assignment/</id>
     <published>2017-06-28T15:52:51.000Z</published>
-    <updated>2017-06-28T16:22:23.450Z</updated>
+    <updated>2017-06-30T04:12:37.529Z</updated>
     
     <content type="html"><![CDATA[<p>解構賦值是一種優雅的方式能夠將<code>{}</code>與<code>[]</code>的值讀出來<br><a id="more"></a></p>
 <h2 id="讀取陣列並-assign-到變數上"><a href="#讀取陣列並-assign-到變數上" class="headerlink" title="讀取陣列並 assign 到變數上"></a>讀取陣列並 assign 到變數上</h2><p><em>陣列的解構賦值用陣列去接</em><br><figure class="codeblock codeblock--tabbed"><figcaption><span>JavaScript</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> foo = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">let</span> [one, two, three] = foo;</span><br><span class="line"><span class="built_in">console</span>.log(one); <span class="comment">// 'one'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
@@ -74,7 +108,7 @@
     <link href="https://mileslin.github.io/2017/06/%E6%93%B4%E5%85%85%E5%A5%97%E4%BB%B6%E5%B1%AC%E6%80%A7%EF%BC%8C%E4%BB%A5sweetalert%E7%82%BA%E4%BE%8B/"/>
     <id>https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/</id>
     <published>2017-06-23T06:25:13.000Z</published>
-    <updated>2017-06-28T15:51:45.274Z</updated>
+    <updated>2017-06-23T06:50:42.476Z</updated>
     
     <content type="html"><![CDATA[<p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>error_input</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">swal({</span><br><span class="line">  title: <span class="string">'Oops !!!'</span>,</span><br><span class="line">  input: <span class="string">'email'</span> <span class="comment">// &lt;- error</span></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -108,7 +142,7 @@
     <link href="https://mileslin.github.io/2017/05/%E7%82%BA%E4%BB%80%E9%BA%BC%E9%9C%80%E8%A6%81-Domain-Driven-Design/"/>
     <id>https://mileslin.github.io/2017/05/為什麼需要-Domain-Driven-Design/</id>
     <published>2017-05-21T15:51:09.000Z</published>
-    <updated>2017-06-07T17:29:51.270Z</updated>
+    <updated>2017-06-08T07:43:30.044Z</updated>
     
     <content type="html"><![CDATA[<p>最近開始看 Donmain-Driven Design 的 <a href="https://app.pluralsight.com/library/courses/domain-driven-design-fundamentals/table-of-contents" title="TitleAttribute" target="_blank" rel="external">plurasight 的影片</a> ，其裡面有一句話深深吸引我，而當我開始看 DDD 的教學影片時，發現需要知道的內容，是多麼的廣泛，這句話當之無愧。。<br> <blockquote><p>The more you know, the more you realize you know nothing</p>
 <footer><strong>Socrates</strong></footer></blockquote></p>
@@ -172,7 +206,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/vscode-%E8%A8%AD%E5%AE%9A%E8%87%AA%E5%8B%95%E8%A7%B8%E7%99%BC-suggestions/"/>
     <id>https://mileslin.github.io/2017/05/vscode-設定自動觸發-suggestions/</id>
     <published>2017-05-09T11:07:21.000Z</published>
-    <updated>2017-06-02T17:03:33.848Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>某一版 vscode 更新後，寫 markdown 文件時不會自動跑出小視窗提醒能輸入的 snippet，需要點 <span class="highlight-text primary">ctrl + space</span>
 才會出現視窗，可是中文輸入法的 <span class="highlight-text primary">ctrl + space</span> 有自己的預設行為啊 !! 。</p>
@@ -210,7 +244,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/Two-way-data-binding-event-%E7%9A%84%E5%AF%AB%E6%B3%95/"/>
     <id>https://mileslin.github.io/2017/05/Two-way-data-binding-event-的寫法/</id>
     <published>2017-05-06T08:26:25.000Z</published>
-    <updated>2017-05-09T12:53:24.643Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>之前學的 two way binding 的寫法如下</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"firstName"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -245,7 +279,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/User-input-%E5%AF%A6%E7%94%A8%E7%9A%84-key-%E4%BA%8B%E4%BB%B6/"/>
     <id>https://mileslin.github.io/2017/05/User-input-實用的-key-事件/</id>
     <published>2017-05-02T16:30:27.000Z</published>
-    <updated>2017-05-02T16:54:44.208Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>使用者輸入資料的時候，通常會綁定一些事情，做一些邏輯之類的，例如:使用者點選 Enter 則執行搜尋功能等等….</p>
 <a id="more"></a>
@@ -279,7 +313,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/%E4%BD%BF%E7%94%A8-Angular-CLI-%E5%BB%BA%E7%AB%8B-Angular-%E5%B0%88%E6%A1%88%E6%9E%B6%E6%A7%8B%E8%AA%AA%E6%98%8E/"/>
     <id>https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/</id>
     <published>2017-04-30T09:46:33.000Z</published>
-    <updated>2017-04-30T15:19:26.000Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 <a href="https://github.com/angular/angular-cli" title="Angular CLI" target="_blank" rel="external">Angular CLI</a> 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。</p>
 <a id="more"></a>
@@ -417,7 +451,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/Autofac-%E8%A8%AD%E5%AE%9A-Web-API-Register-Controller-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/</id>
     <published>2017-04-28T12:52:13.000Z</published>
-    <updated>2017-04-28T14:05:24.068Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)</p>
 <a id="more"></a>
@@ -461,7 +495,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/NLog-%E5%BB%BA%E7%BD%AE%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/NLog-建置筆記/</id>
     <published>2017-04-26T13:54:29.000Z</published>
-    <updated>2017-04-28T14:04:32.657Z</updated>
+    <updated>2017-06-08T07:43:30.215Z</updated>
     
     <content type="html"><![CDATA[<p>最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。</p>
 <a id="more"></a>
@@ -526,7 +560,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/</id>
     <published>2017-04-23T14:43:07.000Z</published>
-    <updated>2017-04-28T14:04:32.746Z</updated>
+    <updated>2017-06-08T07:43:30.342Z</updated>
     
     <content type="html"><![CDATA[<!-- excerpt -->
 <ul>
@@ -582,7 +616,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/</id>
     <published>2017-04-22T15:57:37.000Z</published>
-    <updated>2017-04-28T14:04:32.743Z</updated>
+    <updated>2017-06-08T07:43:30.257Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>移除元素功能跟 insert 元素功能 <code>Array.prototype.splice()</code></li>
@@ -639,7 +673,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/</id>
     <published>2017-04-21T15:08:58.000Z</published>
-    <updated>2017-04-21T16:06:26.725Z</updated>
+    <updated>2017-04-22T16:50:24.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>回傳淺複製的 Array ，<code>Array.prototype.slice()</code></li>
@@ -701,7 +735,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/</id>
     <published>2017-04-20T15:55:24.000Z</published>
-    <updated>2017-04-20T17:21:08.856Z</updated>
+    <updated>2017-04-22T16:50:24.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>可累加 Array 的元素，也可以用來操作元素的值然後回傳 <code>Array.prototype.reduce()</code></li>
@@ -762,7 +796,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/</id>
     <published>2017-04-18T16:06:55.000Z</published>
-    <updated>2017-04-20T15:52:47.860Z</updated>
+    <updated>2017-06-08T07:43:30.299Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立一個全新運算過後的 Array，且不會改到原本的 Array <code>Array.prototype.map()</code></li>
@@ -804,7 +838,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/</id>
     <published>2017-04-17T16:40:33.000Z</published>
-    <updated>2017-04-17T17:27:24.202Z</updated>
+    <updated>2017-04-18T16:04:56.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>判斷 Array 是否有包含某一個值 <code>Array.prototype.includes()</code></li>
@@ -864,7 +898,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/</id>
     <published>2017-04-16T04:02:43.000Z</published>
-    <updated>2017-04-16T05:12:35.730Z</updated>
+    <updated>2017-04-18T16:04:56.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>使 Array 填滿指定的值 <code>Array.prototype.fill()</code></li>
@@ -928,7 +962,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/</id>
     <published>2017-04-15T09:32:54.000Z</published>
-    <updated>2017-04-15T10:19:21.137Z</updated>
+    <updated>2017-04-18T16:04:56.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>複製 Array 自己的元素 <code>Array.prototype.copyWithin()</code></li>
@@ -980,7 +1014,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/</id>
     <published>2017-04-13T16:33:29.000Z</published>
-    <updated>2017-04-15T10:06:21.232Z</updated>
+    <updated>2017-04-18T16:04:56.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>從現有 Array 建立新 Array 物件 <code>Array.from()</code></li>
@@ -1014,100 +1048,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
       <category term="javascript" scheme="https://mileslin.github.io/tags/javascript/"/>
     
       <category term="array" scheme="https://mileslin.github.io/tags/array/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>PayPal 付款流程整合 後篇</title>
-    <link href="https://mileslin.github.io/2017/03/PayPal-%E4%BB%98%E6%AC%BE%E6%B5%81%E7%A8%8B%E6%95%B4%E5%90%88-%E5%BE%8C%E7%AF%87/"/>
-    <id>https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/</id>
-    <published>2017-03-18T17:29:33.000Z</published>
-    <updated>2017-04-13T16:13:25.090Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="延續前篇"><a href="#延續前篇" class="headerlink" title="延續前篇 "></a>延續前篇 <a href="https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/" title="前篇">PayPal 付款流程整合 前篇</a></h3><a id="more"></a>
-<h2 id="Client-端整合"><a href="#Client-端整合" class="headerlink" title="Client 端整合"></a>Client 端整合</h2><p>單純用 Client 整合的話只需要單純用 HTML 跟 JavaScript 就能完成，不需要寫到 Server 端的程式碼。</p>
-<ul>
-<li><p>建立 <a href="https://developer.paypal.com/docs/integration/direct/make-your-first-call/#create-a-paypal-app" title="PayPal app" target="_blank" rel="external">PayPal app</a> 取得 credentials，傳入 client ID 。</p>
-<div class="figure " style="width:;"><a class="fancybox" href="SetClientID.jpg" title="" data-fancybox-group=""><img class="fig-img" src="SetClientID.jpg" alt=""></a></div>
-</li>
-<li><p>在 <code>payment</code> function 使用 <code>paypal.rest.payment.create()</code> 設定付款選項。參考 : <a href="https://developer.paypal.com/docs/api/payments/#payment_create_request" title="如何建立帳單" target="_blank" rel="external">如何建立帳單</a></p>
-</li>
-<li><p>在 <code>onAuthorize</code> call back 顯示成功頁面</p>
-</li>
-</ul>
-<p>以下程式碼說明如何在正式環境建立一個 $1.00 USD的帳單，當付款成功後，顯示成功頁面。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Sample</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"paypal-button"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span> </span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://www.paypalobjects.com/api/checkout.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span><br><span class="line">    paypal.Button.render({</span><br><span class="line">    </span><br><span class="line">        <span class="attr">env</span>: <span class="string">'production'</span>, <span class="comment">// Optional: specify 'sandbox' environment</span></span><br><span class="line">    </span><br><span class="line">        client: {</span><br><span class="line">            <span class="attr">sandbox</span>:    <span class="string">'xxxxxxxxx'</span>,</span><br><span class="line">            <span class="attr">production</span>: <span class="string">'xxxxxxxxx'</span></span><br><span class="line">        },</span><br><span class="line"></span><br><span class="line">        <span class="attr">payment</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>{</span><br><span class="line">        </span><br><span class="line">            <span class="keyword">var</span> env    = <span class="keyword">this</span>.props.env;</span><br><span class="line">            <span class="keyword">var</span> client = <span class="keyword">this</span>.props.client;</span><br><span class="line">        </span><br><span class="line">            <span class="keyword">return</span> paypal.rest.payment.create(env, client, {</span><br><span class="line">                <span class="attr">transactions</span>: [</span><br><span class="line">                    {</span><br><span class="line">                        <span class="attr">amount</span>: { <span class="attr">total</span>: <span class="string">'1.00'</span>, <span class="attr">currency</span>: <span class="string">'USD'</span> }</span><br><span class="line">                    }</span><br><span class="line">                ]</span><br><span class="line">            });</span><br><span class="line">        },</span><br><span class="line"></span><br><span class="line">        <span class="attr">commit</span>: <span class="literal">true</span>, <span class="comment">// Optional: show a 'Pay Now' button in the checkout flow</span></span><br><span class="line"></span><br><span class="line">        onAuthorize: <span class="function"><span class="keyword">function</span>(<span class="params">data, actions</span>) </span>{</span><br><span class="line">        </span><br><span class="line">            <span class="comment">// Optional: display a confirmation page here</span></span><br><span class="line">        </span><br><span class="line">            <span class="keyword">return</span> actions.payment.execute().then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>{</span><br><span class="line">                <span class="comment">// Show a success page to the buyer</span></span><br><span class="line">            });</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">    }, <span class="string">'#paypal-button'</span>);</span><br><span class="line"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>範例來源 :<br><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/basic-integration/" title="Basic client integration" target="_blank" rel="external">Basic client integration</a></p>
-<h5 id="調整參數說明"><a href="#調整參數說明" class="headerlink" title="調整參數說明 :"></a>調整參數說明 :</h5><table>
-<thead>
-<tr>
-<th style="text-align:left">說明</th>
-<th style="text-align:left">修改說明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">沙盒整合測試</td>
-<td style="text-align:left"><code>env: sandbox</code></td>
-</tr>
-<tr>
-<td style="text-align:left">立即執行付款</td>
-<td style="text-align:left"><code>commit: true</code> 會顯示 <strong>Pay Now</strong> 按鈕，沒設定會顯示 <strong>Continue</strong> 按鈕</td>
-</tr>
-<tr>
-<td style="text-align:left">付款之前顯示確認頁面</td>
-<td style="text-align:left">在 <code>onAuthorize</code> call back 可使用 <code>actions.payment.get()</code> 取得帳單和付款人資訊 <div class="alert info"><p>必須顯示付款確認頁面，否則 <code>actions.payment.execute()</code> 和 <code>actions.payment.get()</code> 會無法使用。</p>
-</div></td>
-</tr>
-</tbody>
-</table>
-<h2 id="Server-端整合"><a href="#Server-端整合" class="headerlink" title="Server 端整合"></a>Server 端整合</h2><p>Server 端整合有更多的彈性，更多的控制權來完成付款流程。</p>
-<h3 id="設置-Client-環境"><a href="#設置-Client-環境" class="headerlink" title="設置 Client 環境"></a>設置 Client 環境</h3><ol>
-<li>載入 <code>checkout.js</code></li>
-<li>設定 <code>payment</code> function 建立帳單<ul>
-<li>呼叫 Server <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/#set-up-the-payment" title="建立帳單" target="_blank" rel="external">建立帳單</a></li>
-<li>從建立帳單的 API 取得 <code>paymentID</code>，呼叫<code>resolve(data.paymentID</code>，開始付款人授權流程。</li>
-</ul>
-</li>
-<li>設定 <code>onAuthorize</code> 完成付款<ul>
-<li>之後的 REST Payments API 呼叫，都需要用到 <code>data.paymentID</code> 和 <code>data.payerID</code>，</li>
-<li>可選擇是否顯示帳單明細</li>
-<li>呼叫 Server 端 <a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/#execute-the-payment" title="執行付款" target="_blank" rel="external">執行付款</a></li>
-</ul>
-</li>
-</ol>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Sample</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"paypal-button"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://www.paypalobjects.com/api/checkout.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span><br><span class="line">    paypal.Button.render({</span><br><span class="line">    </span><br><span class="line">        <span class="attr">env</span>: <span class="string">'production'</span>, <span class="comment">// Optional: specify 'sandbox' environment</span></span><br><span class="line">    </span><br><span class="line">        payment: <span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>{</span><br><span class="line">               </span><br><span class="line">            <span class="keyword">var</span> CREATE_PAYMENT_URL = <span class="string">'https://my-store.com/paypal/create-payment'</span>;</span><br><span class="line">                </span><br><span class="line">            paypal.request.post(CREATE_PAYMENT_URL)</span><br><span class="line">                .then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>{ resolve(data.paymentID); })</span><br><span class="line">                .catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>{ reject(err); });</span><br><span class="line">        },</span><br><span class="line"></span><br><span class="line">        <span class="attr">onAuthorize</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>{</span><br><span class="line">        </span><br><span class="line">            <span class="comment">// Note: you can display a confirmation page before executing</span></span><br><span class="line">            </span><br><span class="line">            <span class="keyword">var</span> EXECUTE_PAYMENT_URL = <span class="string">'https://my-store.com/paypal/execute-payment'</span>;</span><br><span class="line"></span><br><span class="line">            paypal.request.post(EXECUTE_PAYMENT_URL,</span><br><span class="line">                    { <span class="attr">paymentID</span>: data.paymentID, <span class="attr">payerID</span>: data.payerID })</span><br><span class="line">                    </span><br><span class="line">                .then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>{ <span class="comment">/* Go to a success page */</span> })</span><br><span class="line">                .catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>{ <span class="comment">/* Go to an error page  */</span> });</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">    }, <span class="string">'#paypal-button'</span>);</span><br><span class="line"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>範例來源 :<br><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-integration/" title="Advanced server integration" target="_blank" rel="external">Advanced server integration</a></p>
-<h3 id="Server-如何整合付款流程說明"><a href="#Server-如何整合付款流程說明" class="headerlink" title="Server 如何整合付款流程說明"></a>Server 如何整合付款流程說明</h3><ol>
-<li>Client 端的 <code>payment</code> method 呼叫 Server</li>
-<li>Server 呼叫 Payments API 建立帳單<!-- classes : info success warning danger no-icon -->
-<div class="alert info"><p>記得呼叫 <code>create-payment</code> API 時，傳入 <code>redirect_urls</code>，當付款完成後，可以在 <code>onAuthorize</code> function 取得 <code>redirect_urls</code>。</p>
-</div></li>
-<li>繼步驟2，會取得 JSON 回應<div class="figure " style="width:;"><a class="fancybox" href="CreatedPaymentResponse.jpg" title="" data-fancybox-group=""><img class="fig-img" src="CreatedPaymentResponse.jpg" alt=""></a></div></li>
-<li>Server 送出回應到 Client 藉以取得 paymentID<div class="figure " style="width:;"><a class="fancybox" href="PaymentID.jpg" title="" data-fancybox-group=""><img class="fig-img" src="PaymentID.jpg" alt=""></a></div></li>
-<li>開始初始化付款流程， 在 client 建立的 <code>payment</code> method 從回傳的 JSON 訊息傳 <code>paymentID</code> 到 <code>checkout.js</code> script</li>
-<li>開啟 lightbox 讓付款人同意付款</li>
-</ol>
-<h4 id="執行付款"><a href="#執行付款" class="headerlink" title="執行付款"></a>執行付款</h4><p>使用者同意付款後， <code>checkout.js</code> 會呼叫 <code>onAuthorize</code> call back。<br><!-- classes : info success warning danger no-icon --><br><div class="alert info"><p>執行付款之前，建議可以顯示付款明細</p>
-</div></p>
-<ol>
-<li><code>onAuthorize</code> call back 呼叫 Server 並傳入 <code>data.paymentID</code> 和 <code>data.payerID</code>，執行付款</li>
-<li>Server 呼叫付款完成 API 完成付款</li>
-</ol>
-<h3 id=""><a href="#" class="headerlink" title=""></a><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-payments-api/" title="Server 呼叫 API 步驟" target="_blank" rel="external">Server 呼叫 API 步驟</a></h3><h2 id="-1"><a href="#-1" class="headerlink" title=""></a><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程" target="_blank" rel="external">測試整合流程</a></h2><p>要做 end-to-end 測試，須先建立 merchant<em>(Business)</em> 和 buyer<em>(Personal)</em> 帳號，才可以做沙盒環境測試。  <a href="https://developer.paypal.com/docs/api/quickstart/sandbox-account/" title="建立帳號說明" target="_blank" rel="external">建立帳號說明</a> 。</p>
-<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>目前只把 PayPal 付款流程大致了解，有這些概念後，再去參考 API 文件應該會容易許多。</p>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://demo.paypal.com/us/demo/home" title="Demo" target="_blank" rel="external">PayPal 和 Braintree Demo (包含程式碼)</a>]]></content>
-    
-    <summary type="html">
-    
-      &lt;h3 id=&quot;延續前篇&quot;&gt;&lt;a href=&quot;#延續前篇&quot; class=&quot;headerlink&quot; title=&quot;延續前篇 &quot;&gt;&lt;/a&gt;延續前篇 &lt;a href=&quot;https://mileslin.github.io/2017/03/PayPal-付款流程整合-前篇/&quot; title=&quot;前篇&quot;&gt;PayPal 付款流程整合 前篇&lt;/a&gt;&lt;/h3&gt;
-    
-    </summary>
-    
-      <category term="PayPal" scheme="https://mileslin.github.io/categories/PayPal/"/>
-    
-    
-      <category term="PayPal" scheme="https://mileslin.github.io/tags/PayPal/"/>
     
   </entry>
   
