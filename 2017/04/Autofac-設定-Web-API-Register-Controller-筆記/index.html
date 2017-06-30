@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/index.html">
 <meta property="og:site_name" content="Miles's Journey">
 <meta property="og:description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
-<meta property="og:updated_time" content="2017-05-21T15:19:06.000Z">
+<meta property="og:updated_time" content="2017-06-30T10:24:46.636Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Autofac 設定 Web API Register Controller 筆記">
 <meta name="twitter:description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
@@ -278,6 +278,7 @@
 <a id="more"></a>
 <h2 id="使用容器註冊物件"><a href="#使用容器註冊物件" class="headerlink" title="使用容器註冊物件"></a>使用容器註冊物件</h2><p>為了方便整理，我會先新增 <code>AutofacConfig.cs</code> 放在 App_Start 資料夾裡面， <code>AutofacConfig.cs</code> 則負責註冊。</p>
 <ul>
+<li>安裝 <a href="https://www.nuget.org/packages/Autofac.WebApi2/" title="Autofac.WebAPi2" target="_blank" rel="external">Autofac.WebAPi2</a></li>
 <li>先註冊所有 Web API Controller 到 ContainerBuilder</li>
 <li>註冊所有 Controller 要相依的物件，這邊以 IConfiguration 為例子，表示 Controller 建構式注入 IConfiguration 時會取得 Configuration 物件</li>
 <li>開啟 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper()</code><figure class="codeblock codeblock--tabbed"><figcaption><span>AutofacConfig</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AutofacConfig</span></span><br><span class="line">{</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Bootstrapper</span>(<span class="params"></span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Get your HttpConfiguration.</span></span><br><span class="line">        <span class="keyword">var</span> config = GlobalConfiguration.Configuration;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Register your Web API controllers.</span></span><br><span class="line">        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// OPTIONAL: Register the Autofac filter provider.</span></span><br><span class="line">        builder.RegisterWebApiFilterProvider(config);</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> container = builder.Build();</span><br><span class="line"></span><br><span class="line">        config.DependencyResolver = <span class="keyword">new</span> AutofacWebApiDependencyResolver(container);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -757,7 +758,7 @@
                 data-message-zero="no post found"
                 data-message-one="1 post found"
                 data-message-other="{n} posts found">
-                32 posts found
+                33 posts found
             </p>
         </div>
     </div>

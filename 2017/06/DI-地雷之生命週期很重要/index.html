@@ -6,10 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Miles&#39;s Journey">
-    <title>Routing Basics - Miles&#39;s Journey</title>
+    <title>DI 地雷之生命週期很重要 - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,Angular">
+        <meta name="keywords" content=".NET,C#,.NET,Autofac">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,18 +17,24 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="前言今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。">
+    <meta name="description" content="目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:
+DI 的三種生命週期很重要!!  不要亂設定!!">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Routing Basics">
-<meta property="og:url" content="https://mileslin.github.io/2017/02/Routing-Basics/index.html">
+<meta property="og:title" content="DI 地雷之生命週期很重要">
+<meta property="og:url" content="https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="前言今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。">
-<meta property="og:image" content="https://mileslin.github.io/1_Two_Component.jpg">
-<meta property="og:updated_time" content="2017-02-13T04:30:04.000Z">
+<meta property="og:description" content="目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:
+DI 的三種生命週期很重要!!  不要亂設定!!">
+<meta property="og:image" content="https://mileslin.github.io/UrlChange.gif">
+<meta property="og:image" content="https://mileslin.github.io/Inject.jpg">
+<meta property="og:image" content="https://mileslin.github.io/InstancePerDependency.jpg">
+<meta property="og:image" content="https://mileslin.github.io/UrlNoChange.gif">
+<meta property="og:updated_time" content="2017-06-30T11:45:31.320Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Routing Basics">
-<meta name="twitter:description" content="前言今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。">
-<meta name="twitter:image" content="https://mileslin.github.io/1_Two_Component.jpg">
+<meta name="twitter:title" content="DI 地雷之生命週期很重要">
+<meta name="twitter:description" content="目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:
+DI 的三種生命週期很重要!!  不要亂設定!!">
+<meta name="twitter:image" content="https://mileslin.github.io/UrlChange.gif">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -38,8 +44,8 @@
         <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
     
     
-        <meta property="og:image" content="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" />
+        <meta property="og:image" content="https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/Inject.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/Inject.jpg" />
     
     
     
@@ -257,19 +263,19 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title" itemprop="headline">
-            Routing Basics
+            DI 地雷之生命週期很重要
         </h1>
     
     <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-02-08T01:06:40+08:00">
+    <time itemprop="datePublished" datetime="2017-06-30T18:50:44+08:00">
 	
-		    Feb 08, 2017
+		    Jun 30, 2017
     	
     </time>
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/Angular/">Angular</a>
+    <a class="category-link" href="/categories/Autofac/">Autofac</a>
 
 
     
@@ -279,22 +285,43 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p>
-<a id="more"></a>
-<h2 id="Routing如何使用"><a href="#Routing如何使用" class="headerlink" title="Routing如何使用?"></a>Routing如何使用?</h2><p>1.使用<code>angular/router</code>內建的router<br>2.將要使用Route的component設定在Routing設定裡面<br>3.在顯示的頁面裡面，設定route-link<br>4.當user點擊route-link的時候，顯示頁面</p>
-<h2 id="範例"><a href="#範例" class="headerlink" title="範例"></a>範例</h2><p>首先我們先有app-component當作首頁，建立兩個component一個是<code>welcome</code>一個是<code>detail</code>。<br><div class="figure " style="width:;"><a class="fancybox" href="1_Two_Component.jpg" title="Component" data-fancybox-group=""><img class="fig-img" src="1_Two_Component.jpg" alt="Component"></a><span class="caption">Component</span></div></p>
-<p>Component建立完，接下來就是要到<code>app.module.ts</code>設定一下Router。</p>
-<ol>
-<li><code>import { RouterModule } from &#39;@angular/router&#39;;</code></li>
-<li>設定<code>RouterModule.forRoot</code></li>
-</ol>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>ConfigurationRouting</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { BrowserModule } from <span class="string">'@angular/platform-browser'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule } from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { FormsModule } from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { HttpModule } from <span class="string">'@angular/http'</span>;</span><br><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>; <span class="comment">// Import RouterModule</span></span><br><span class="line"><span class="keyword">import</span> { AppComponent } from <span class="string">'./app.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { WelcomeComponent } from <span class="string">'./welcome/welcome.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { DetailComponent } from <span class="string">'./detail/detail.component'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  declarations: [</span><br><span class="line">    AppComponent,</span><br><span class="line">    WelcomeComponent,</span><br><span class="line">    DetailComponent</span><br><span class="line">  ],</span><br><span class="line">  imports: [</span><br><span class="line">    BrowserModule,</span><br><span class="line">    FormsModule,</span><br><span class="line">    HttpModule,</span><br><span class="line">    RouterModule.forRoot([</span><br><span class="line">      { path: <span class="string">'detail'</span>, component: DetailComponent },</span><br><span class="line">      { path: <span class="string">'detail/:id'</span>, component: DetailComponent },</span><br><span class="line">      { path: <span class="string">'welcome'</span>, component: WelcomeComponent },</span><br><span class="line">      { path: <span class="string">''</span>, redirectTo: <span class="string">'welcome'</span>, pathMatch: <span class="string">'full'</span> },</span><br><span class="line">      { path: <span class="string">'**'</span>, redirectTo: <span class="string">'welcome'</span>, pathMatch: <span class="string">'full'</span> },</span><br><span class="line">    ])</span><br><span class="line">  ],</span><br><span class="line">  providers: [],</span><br><span class="line">  bootstrap: [AppComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>這邊要注意router的設定順序，當第一個比對到了，就不會再往下比對，所以記得把<code>wildcard path</code>的設定放在最後一個。</p>
+            <p>目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:</p>
+<div class="alert warning"><p>DI 的三種生命週期很重要!!  不要亂設定!!</p>
 </div>
-<p>設定完之後，再經由route-link的方式來連結這兩個component。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>route-link</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> [<span class="attr">routerLink</span>]=<span class="string">"['/welcome']"</span>&gt;</span>Welcome<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> [<span class="attr">routerLink</span>]=<span class="string">"['/detail']"</span>&gt;</span>Detail<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<p>最後使用 <code>&lt;router-outlet&gt;&lt;/router-outlet&gt;</code> 來決定Component要顯示的位置<br><figure class="codeblock codeblock--tabbed"><figcaption><span>router-outlet</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> [<span class="attr">routerLink</span>]=<span class="string">"['/welcome']"</span>&gt;</span>Welcome<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> [<span class="attr">routerLink</span>]=<span class="string">"['/detail']"</span>&gt;</span>Detail<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">router-outlet</span>&gt;</span><span class="tag">&lt;/<span class="name">router-outlet</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h3 id="後記"><a href="#後記" class="headerlink" title="後記"></a>後記</h3><p>在index.html，會看到<code>&lt;base href=&quot;/&quot;&gt;</code>這個tag，這是告訴router如何組成navigation URLs，如果沒有這個tag的話，需要再RouterModule設定 useHash:true這樣router才可以正常運作。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>RouterModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RouterModule.forRoot([], {useHash: <span class="literal">true</span>})</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular.io/docs/ts/latest/tutorial/toh-pt5.html" title="angular.io" target="_blank" rel="external">angular.io</a>
+<a id="more"></a>
+<h2 id="前提概要"><a href="#前提概要" class="headerlink" title="前提概要"></a>前提概要</h2><p>因為我最近都在整合 PayPal 的服務，所以很常要寫程式發 <code>http request</code>，而我用的則是 <a href="http://restsharp.org/" title="RestSharp" target="_blank" rel="external">RestSharp</a> 這個套件，他是一個只要設定網址、header、body等等…就能夠很輕易地發送 <code>http request</code>。</p>
+<p>根據 PayPal API 的規範，在使用付款或者建立發票等等的 API ，要先去呼叫 OAuth API 取的 token。</p>
+<p>所以我程式就這樣設計</p>
+<ul>
+<li>使用 <a href="http://restsharp.org/" title="RestSharp" target="_blank" rel="external">RestSharp</a> 套件的 RestClient 發送 <code>http request</code></li>
+<li>PayPalService 使用 <span class="highlight-text success">RestClient
+ </span> 呼叫 OAuth API 取得 token。</li>
+<li>InvoiceService 使用 <span class="highlight-text success">RestClient
+ </span> 呼叫發票相關 API 建立發票，而在呼叫建立發票 request 的時後，要傳入 token。</li>
+</ul>
+<h2 id="程式範例"><a href="#程式範例" class="headerlink" title="程式範例"></a>程式範例</h2><p>為了讓程式能夠更容易了解，我有將原本的程式碼簡化，而這三個類別程式碼如下</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info no-icon"><p>PayPalService 與 InvoiceService 都是呼叫 restClient.Url 設定網址，接下來就是發送 request</p>
+</div>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>code</span><ul class="tabs"><li class="tab active">RestClient</li><li class="tab">PayPalService</li><li class="tab">InvoiceService</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class RestClient : IRestClient</span><br><span class="line">{</span><br><span class="line">    public string Url { get; set; }</span><br><span class="line"></span><br><span class="line">    public string SendRequest(RestRequest request)</span><br><span class="line">    {</span><br><span class="line">        return $"I use this url:{Url} send request";</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><figure class="highlight plain" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class PayPalService : IPayPalService</span><br><span class="line">{</span><br><span class="line">    private IRestClient _restClient;</span><br><span class="line"></span><br><span class="line">    public PayPalService(IRestClient restClient)</span><br><span class="line">    {</span><br><span class="line">        this._restClient = restClient;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    public string GetToken()</span><br><span class="line">    {</span><br><span class="line">        string url = @"https://api.PayPal/GetToken/xxx";</span><br><span class="line">        _restClient.Url = url;</span><br><span class="line"></span><br><span class="line">        var request = new RestRequest(Method.POST);            </span><br><span class="line">        string result = _restClient.SendRequest(request);</span><br><span class="line"></span><br><span class="line">        return result;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><figure class="highlight plain" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public class InvoiceService : IInvoiceService</span><br><span class="line">{</span><br><span class="line">    private IRestClient _restClient;</span><br><span class="line">    private IPayPalService _payPalService;</span><br><span class="line">    public InvoiceService(</span><br><span class="line">        IRestClient restClient,</span><br><span class="line">        IPayPalService payPalService)</span><br><span class="line">    {</span><br><span class="line">        this._restClient = restClient;</span><br><span class="line">        this._payPalService = payPalService;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    public void CreateInvoice()</span><br><span class="line">    {</span><br><span class="line">        string url = @"https://api.PayPal/xxx/invoice";</span><br><span class="line">        _restClient.Url = url;</span><br><span class="line"></span><br><span class="line">        string token = this._payPalService.GetToken();</span><br><span class="line"></span><br><span class="line">        var request = new RestRequest(Method.POST);            </span><br><span class="line">        request.AddHeader("authorization", $"{token}");                        </span><br><span class="line">        string result = _restClient.SendRequest(request);</span><br><span class="line"></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>接下來我有一個 <code>ValuesController</code> 建構式注入 <code>IInvoiceService</code>， 並且有一個建立發票的API。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>ValuesController</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ValuesController</span> : <span class="title">ApiController</span></span><br><span class="line">{</span><br><span class="line">    <span class="keyword">private</span> IInvoiceService _invoiceService;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ValuesController</span>(<span class="params">IInvoiceService invoiceService</span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">this</span>._invoiceService = invoiceService;</span><br><span class="line">    }</span><br><span class="line">    </span><br><span class="line">    [HttpGet]</span><br><span class="line">    <span class="function"><span class="keyword">public</span> IHttpActionResult <span class="title">CreateInvoice</span>(<span class="params"></span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">this</span>._invoiceService.CreateInvoice();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Ok();</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h4 id="程式碼跑執行之網址改變了"><a href="#程式碼跑執行之網址改變了" class="headerlink" title="程式碼跑執行之網址改變了"></a>程式碼跑執行之網址改變了</h4><div class="figure " style="width:;"><a class="fancybox" href="UrlChange.gif" title="Url 改變了 !!" data-fancybox-group=""><img class="fig-img" src="UrlChange.gif" alt="Url 改變了 !!"></a><span class="caption">Url 改變了 !!</span></div><div style="clear:both;"></div>
+<h3 id="為什麼會這樣"><a href="#為什麼會這樣" class="headerlink" title="為什麼會這樣"></a>為什麼會這樣</h3><p>因為我 DI 注入的時候使用 <code>InstancePerLifetimeScope</code> 的生命週期</p>
+<div class="figure " style="width:;"><a class="fancybox" href="Inject.jpg" title="" data-fancybox-group=""><img class="fig-img" src="Inject.jpg" alt=""></a></div>
+<div class="alert danger no-icon"><p>意思是說，只要是同一個 request 就會使用同一個物件 !!!</p>
+<p>PayPalService 與 InvoiceService 使用的是同一個 RestClient 物件</p>
+<p>所以在取得 Token 的時候，把 InvoiceService 設定好的 Url 覆寫掉了</p>
+</div>
+<h3 id="DI-三種生命週期"><a href="#DI-三種生命週期" class="headerlink" title="DI 三種生命週期"></a>DI 三種生命週期</h3><ul>
+<li>SingleInstance           : 整個應用程式都是使用同一個物件</li>
+<li>InstancePerLifetimeScope : 只要是同一個 request 則使用同一個物件</li>
+<li>InstancePerDependency    : 只要有注入都是一個全新的物件</li>
+</ul>
+<p>所以我只要將 RestClient 注入的生命週期改成 <code>InstancePerDependency</code>，問題就會解決了。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="InstancePerDependency.jpg" title="" data-fancybox-group=""><img class="fig-img" src="InstancePerDependency.jpg" alt=""></a></div>
+<p>執行結果<br><div class="figure " style="width:;"><a class="fancybox" href="UrlNoChange.gif" title="Url 沒有改變 !!" data-fancybox-group=""><img class="fig-img" src="UrlNoChange.gif" alt="Url 沒有改變 !!"></a><span class="caption">Url 沒有改變 !!</span></div><div style="clear:both;"></div></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="http://docs.autofac.org/en/latest/lifetime/instance-scope.html#" title="Autofac" target="_blank" rel="external">docs.autofac.org</a>
             
         </div>
     </div>
@@ -303,7 +330,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a>
+    <a class="tag tag--primary tag--small t-link" href="/tags/NET/">.NET</a> <a class="tag tag--primary tag--small t-link" href="/tags/Autofac/">Autofac</a> <a class="tag tag--primary tag--small t-link" href="/tags/C/">C#</a>
 
             </div>
         
@@ -312,7 +339,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Navigation-and-Routing-Additional-Techniques/"  data-tooltip="Navigation and Routing Additional Techniques">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -320,7 +347,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Binding-syntax/" data-tooltip="Binding syntax">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/單元測試Model驗證/" data-tooltip="單元測試 Model 驗證">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -335,17 +362,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Routing-Basics/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Routing-Basics/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Routing-Basics/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -393,7 +420,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Navigation-and-Routing-Additional-Techniques/"  data-tooltip="Navigation and Routing Additional Techniques">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -401,7 +428,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Binding-syntax/" data-tooltip="Binding syntax">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/單元測試Model驗證/" data-tooltip="單元測試 Model 驗證">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -416,17 +443,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Routing-Basics/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Routing-Basics/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Routing-Basics/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -452,17 +479,17 @@
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
     <ul class="share-options">
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Routing-Basics/">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
                 <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Routing-Basics/">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
                 <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Routing-Basics/">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
                 <i class="fa fa-twitter"></i><span>Share on Twitter</span>
             </a>
         </li>
@@ -776,9 +803,9 @@
     
         <script>
              var disqus_config = function () {
-                 this.page.url = 'https://mileslin.github.io/2017/02/Routing-Basics/';
+                 this.page.url = 'https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/';
                  
-                    this.page.identifier = '2017/02/Routing-Basics/';
+                    this.page.identifier = '2017/06/DI-地雷之生命週期很重要/';
                  
              };
             (function() {
