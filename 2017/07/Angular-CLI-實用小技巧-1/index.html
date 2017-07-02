@@ -6,10 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Miles&#39;s Journey">
-    <title>Dive into Angular Modules - Miles&#39;s Journey</title>
+    <title>Angular CLI 實用小技巧 1 - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,Angular">
+        <meta name="keywords" content=".NET,Angular CLI,Angular">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,16 +17,16 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="前言今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。">
+    <meta name="description" content="Angular CLI 實用小技巧">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Dive into Angular Modules">
-<meta property="og:url" content="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/index.html">
+<meta property="og:title" content="Angular CLI 實用小技巧 1">
+<meta property="og:url" content="https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="前言今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。">
-<meta property="og:updated_time" content="2017-04-13T16:13:25.078Z">
+<meta property="og:description" content="Angular CLI 實用小技巧">
+<meta property="og:updated_time" content="2017-07-02T15:56:05.172Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Dive into Angular Modules">
-<meta name="twitter:description" content="前言今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。">
+<meta name="twitter:title" content="Angular CLI 實用小技巧 1">
+<meta name="twitter:description" content="Angular CLI 實用小技巧">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -252,13 +252,13 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title" itemprop="headline">
-            Dive into Angular Modules
+            Angular CLI 實用小技巧 1
         </h1>
     
     <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-02-14T23:09:20+08:00">
+    <time itemprop="datePublished" datetime="2017-07-02T22:47:41+08:00">
 	
-		    Feb 14, 2017
+		    Jul 02, 2017
     	
     </time>
     
@@ -274,32 +274,30 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br><a id="more"></a></p>
-<h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><p>在剛開始學Angular的時候都是把所有Component放在App Module底下，當這樣程式大的時候會變得難以維護，今天會說明Feature Module、Shared Module和Router Module，如何讓我們的程式碼更為乾淨，更好維護，而這些骨子裡其實都是Angular Module。</p>
-<ul>
-<li><strong>Feature Module</strong> 就是產品資訊、基本資料等等…之類的需求</li>
-<li><strong>Shared Module</strong> 就是把共同用到的<em>Pipe、Component、Module</em>等等…放在這邊</li>
-<li><strong>Router Module</strong> 職責在分得更細一點的話，就可以再分出<strong>Router Module</strong>來負責Router設定的工作</li>
-</ul>
-<h2 id="Feature-Module"><a href="#Feature-Module" class="headerlink" title="Feature Module"></a>Feature Module</h2><p>先執行指令，產生Component跟Module。<code>ng g c product.component</code>、<code>ng g module product.module</code>，然後把AppModule有關product的程式碼，都移到ProductModule裡面。</p>
-<h5 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h5><ol>
-<li>AppModule移除ProductComponent</li>
-<li>因為FormsModule移到ProductModule裡去了，所以AppModule移除FormsModule</li>
-</ol>
-<p>而我們的ProductModule程式碼會變成這樣<br><figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { FormsModule } from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule } from <span class="string">'@angular/common'</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    CommonModule,</span><br><span class="line">    FormsModule,</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h4 id="程式碼說明"><a href="#程式碼說明" class="headerlink" title="程式碼說明"></a>程式碼說明</h4><ul>
-<li><strong>CommonModule</strong> 說明可提供ngFor跟ngIf directives的功能</li>
-<li><strong>FormsModule</strong> 提供ngModel 功能</li>
-<li><strong>RouterModule.forChild</strong>跟<strong>RouterModule.forRoot</strong>的差別是 =&gt; <span class="highlight-text primary">不會再註冊一次Router Service。</span></li>
-</ul>
-<h2 id="Shared-Module"><a href="#Shared-Module" class="headerlink" title="Shared Module"></a>Shared Module</h2><p>Shared Module負責Feature Module共同的部分，只要 <span class="highlight-text primary">Feature Module Import Shared Module</span>  就可以取得這些功能。</p>
-<p>一樣產生Component跟Module。<code>ng g c shared.component</code>、<code>ng g module shared.module</code> ，然後把AppModule有關shared的程式碼，都移到SharedModule裡面。<br>所以我們要做的就是把Feature Module共同的部分放到Shared Module，然後Shared Module要export這些要共用的部分，例如<strong>SharedComponent、CommonModule、FormsModule</strong>。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>SharedModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { FormsModule } from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { SharedComponent } from <span class="string">'./shared.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule } from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule } from <span class="string">'@angular/common'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    CommonModule</span><br><span class="line">  ],</span><br><span class="line">  declarations: [SharedComponent],</span><br><span class="line">  exports:[</span><br><span class="line">    CommonModule,</span><br><span class="line">    FormsModule,</span><br><span class="line">    SharedComponent</span><br><span class="line">  ]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> SharedModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>所以我們的ProductModule只要import SharedModule 就可以有SharedModule export的功能，例如CommonModule跟FormsModule。  記得import SharedModule後，就要把ProductModule裡面原本的CommonModule跟FormsModule移除。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule refactoring</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { SharedModule } from <span class="string">'./../shared/SharedModule'</span>;</span><br><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    SharedModule,</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="Router-Module"><a href="#Router-Module" class="headerlink" title="Router Module"></a>Router Module</h2><p>現在要做的就是把ProductModule的Router設定移出來，首先先產生Routing Module <code>ng g module product-routing.module</code>，加入Product的Router設定，並且export RouterModule。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Product-RoutingModule</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./../product/product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { RouterModule } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    RouterModule.forChild(</span><br><span class="line">      [</span><br><span class="line">        { path: <span class="string">'product'</span>, component: ProductComponent }</span><br><span class="line">      ]</span><br><span class="line">    )</span><br><span class="line">  ],</span><br><span class="line">  exports: [RouterModule]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductRoutingModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure><br>而我們的productModule把Router設定拿掉，改成 <span class="highlight-text primary">import ProductRoutingModule</span> 就可以了。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>ProductModule refactoring routing</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { ProductRoutingModule } from <span class="string">'./../product-routing/product-routing.module'</span>;</span><br><span class="line"><span class="keyword">import</span> { SharedModule } from <span class="string">'./../shared/SharedModule'</span>;</span><br><span class="line"><span class="keyword">import</span> { ProductComponent } from <span class="string">'./product.component'</span>;</span><br><span class="line"><span class="keyword">import</span> { NgModule, Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports: [</span><br><span class="line">    SharedModule,</span><br><span class="line">    ProductRoutingModule</span><br><span class="line">  ],</span><br><span class="line">  declarations: [ProductComponent]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>備註: AppModule的Router也是用這種方式refactoring，差別在於因為是root application module要使用的Router 所以要用RouterModule.forRoot。</p>
-<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>今天終於把Angular Module之間的互動以及一些簡單的Module設計方式說明完了，其中有關import和export的說明可以參考這篇 <a href="https://mileslin.github.io/2017/02/NgModule-Decorator/" title="NgModule Decorator">NgModule Decorator</a></p>
+            <p>Angular CLI 實用小技巧</p>
+<a id="more"></a>
+<h2 id="建立專案與元件類型"><a href="#建立專案與元件類型" class="headerlink" title="建立專案與元件類型"></a>建立專案與元件類型</h2><p><code>--skip-install</code> 建立NG專案的時候，不會執行 <code>npm install</code>。<br><div class="alert info no-icon"><p>ng new ngtest –skip-install</p>
+</div></p>
+<p><code>--help</code> 顯示建立專案時，有哪些參數可以設定。<br><div class="alert info no-icon"><p>ng new –help</p>
+</div></p>
+<p><code>--routing</code> 建立專案時，建立 app-routing.module.ts ， 並且 app.module.ts 自動 import AppRoutingModule。<br><div class="alert info no-icon"><p>ng new ngtest –routing</p>
+</div></p>
+<p><code>--style scss</code> 使用 sass 寫 css 。<br><div class="alert info no-icon"><p>ng new ngtest –style scss</p>
+</div></p>
+<p><code>--dry-run</code> 不會建立檔案與修改檔案，但會顯示建立哪些檔案，修改哪些檔案。<br><div class="alert info no-icon"><p>ng g c –dry-run</p>
+</div></p>
+<p><code>--spec false</code> 建立 component 的時候不要建立 *.spec 測試檔。<br><div class="alert info no-icon"><p>ng g c my-component  –spec false</p>
+</div></p>
+<h2 id="其他類型"><a href="#其他類型" class="headerlink" title="其他類型"></a>其他類型</h2><p>啟動 Angular 專案，並且開啟瀏覽器。<br><div class="alert info no-icon"><p>ng serve -o</p>
+</div></p>
+<p>檢查 typescript 程式碼的一致性。 加上參數 <code>--help</code> 會顯示有哪些設定參數可用。<br><div class="alert info no-icon"><p>ng lint </p>
+</div></p>
+<p><code>--format stylish</code> cmd 顯示的輸出結果經過格式化，閱讀性更佳。<br><div class="alert info no-icon"><p>ng lint –format stylish</p>
+</div></p>
+<p><code>--fix</code> 嘗試自動修正程式碼。<br><div class="alert info no-icon"><p>ng lint –fix</p>
+</div></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://app.pluralsight.com/library/courses/angular-cli/table-of-contents" title="PluralSight Angular CLI Course" target="_blank" rel="external">PluralSight Angular CLI Course</a>
+<a href="https://github.com/angular/angular-cli" title="Angular-CLI" target="_blank" rel="external">Angular-CLI</a>
 
             
         </div>
@@ -309,7 +307,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a>
+    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a> <a class="tag tag--primary tag--small t-link" href="/tags/Angular-CLI/">Angular CLI</a>
 
             </div>
         
@@ -318,7 +316,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/03/PayPal-付款流程整合-前篇/"  data-tooltip="PayPal 付款流程整合 前篇">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -326,7 +324,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/NgModule-Decorator/" data-tooltip="NgModule Decorator">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/DI-地雷之生命週期很重要/" data-tooltip="DI 地雷之生命週期很重要">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -341,17 +339,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -399,7 +397,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/03/PayPal-付款流程整合-前篇/"  data-tooltip="PayPal 付款流程整合 前篇">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -407,7 +405,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/NgModule-Decorator/" data-tooltip="NgModule Decorator">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/DI-地雷之生命週期很重要/" data-tooltip="DI 地雷之生命週期很重要">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -422,17 +420,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -458,17 +456,17 @@
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
     <ul class="share-options">
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/">
                 <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/">
                 <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/">
                 <i class="fa fa-twitter"></i><span>Share on Twitter</span>
             </a>
         </li>
@@ -782,9 +780,9 @@
     
         <script>
              var disqus_config = function () {
-                 this.page.url = 'https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/';
+                 this.page.url = 'https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/';
                  
-                    this.page.identifier = '2017/02/Dive-into-Angular-Modules/';
+                    this.page.identifier = '2017/07/Angular-CLI-實用小技巧-1/';
                  
              };
             (function() {

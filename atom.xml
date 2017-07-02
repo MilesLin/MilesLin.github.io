@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-02-13T04:30:04.000Z</updated>
+  <updated>2017-01-31T14:55:39.253Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-02-13T04:30:04.000Z</updated>
+    <updated>2017-01-31T14:55:39.253Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -41,11 +41,59 @@
   </entry>
   
   <entry>
+    <title>Angular CLI 實用小技巧 1</title>
+    <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-1/"/>
+    <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/</id>
+    <published>2017-07-02T14:47:41.000Z</published>
+    <updated>2017-07-02T15:56:05.172Z</updated>
+    
+    <content type="html"><![CDATA[<p>Angular CLI 實用小技巧</p>
+<a id="more"></a>
+<h2 id="建立專案與元件類型"><a href="#建立專案與元件類型" class="headerlink" title="建立專案與元件類型"></a>建立專案與元件類型</h2><p><code>--skip-install</code> 建立NG專案的時候，不會執行 <code>npm install</code>。<br><div class="alert info no-icon"><p>ng new ngtest –skip-install</p>
+</div></p>
+<p><code>--help</code> 顯示建立專案時，有哪些參數可以設定。<br><div class="alert info no-icon"><p>ng new –help</p>
+</div></p>
+<p><code>--routing</code> 建立專案時，建立 app-routing.module.ts ， 並且 app.module.ts 自動 import AppRoutingModule。<br><div class="alert info no-icon"><p>ng new ngtest –routing</p>
+</div></p>
+<p><code>--style scss</code> 使用 sass 寫 css 。<br><div class="alert info no-icon"><p>ng new ngtest –style scss</p>
+</div></p>
+<p><code>--dry-run</code> 不會建立檔案與修改檔案，但會顯示建立哪些檔案，修改哪些檔案。<br><div class="alert info no-icon"><p>ng g c –dry-run</p>
+</div></p>
+<p><code>--spec false</code> 建立 component 的時候不要建立 *.spec 測試檔。<br><div class="alert info no-icon"><p>ng g c my-component  –spec false</p>
+</div></p>
+<h2 id="其他類型"><a href="#其他類型" class="headerlink" title="其他類型"></a>其他類型</h2><p>啟動 Angular 專案，並且開啟瀏覽器。<br><div class="alert info no-icon"><p>ng serve -o</p>
+</div></p>
+<p>檢查 typescript 程式碼的一致性。 加上參數 <code>--help</code> 會顯示有哪些設定參數可用。<br><div class="alert info no-icon"><p>ng lint </p>
+</div></p>
+<p><code>--format stylish</code> cmd 顯示的輸出結果經過格式化，閱讀性更佳。<br><div class="alert info no-icon"><p>ng lint –format stylish</p>
+</div></p>
+<p><code>--fix</code> 嘗試自動修正程式碼。<br><div class="alert info no-icon"><p>ng lint –fix</p>
+</div></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://app.pluralsight.com/library/courses/angular-cli/table-of-contents" title="PluralSight Angular CLI Course" target="_blank" rel="external">PluralSight Angular CLI Course</a>
+<a href="https://github.com/angular/angular-cli" title="Angular-CLI" target="_blank" rel="external">Angular-CLI</a>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Angular CLI 實用小技巧&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
+    
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+  </entry>
+  
+  <entry>
     <title>DI 地雷之生命週期很重要</title>
     <link href="https://mileslin.github.io/2017/06/DI-%E5%9C%B0%E9%9B%B7%E4%B9%8B%E7%94%9F%E5%91%BD%E9%80%B1%E6%9C%9F%E5%BE%88%E9%87%8D%E8%A6%81/"/>
     <id>https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/</id>
     <published>2017-06-30T10:50:44.000Z</published>
-    <updated>2017-06-30T11:45:31.320Z</updated>
+    <updated>2017-07-02T11:35:37.714Z</updated>
     
     <content type="html"><![CDATA[<p>目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:</p>
 <div class="alert warning"><p>DI 的三種生命週期很重要!!  不要亂設定!!</p>
@@ -109,7 +157,7 @@
     <link href="https://mileslin.github.io/2017/06/%E5%96%AE%E5%85%83%E6%B8%AC%E8%A9%A6Model%E9%A9%97%E8%AD%89/"/>
     <id>https://mileslin.github.io/2017/06/單元測試Model驗證/</id>
     <published>2017-06-30T04:17:39.000Z</published>
-    <updated>2017-06-30T04:33:11.263Z</updated>
+    <updated>2017-07-02T11:35:37.761Z</updated>
     
     <content type="html"><![CDATA[<p>MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。</p>
 <a id="more"></a>
@@ -143,7 +191,7 @@
     <link href="https://mileslin.github.io/2017/06/Destructuring-assignment/"/>
     <id>https://mileslin.github.io/2017/06/Destructuring-assignment/</id>
     <published>2017-06-28T15:52:51.000Z</published>
-    <updated>2017-06-30T04:12:37.529Z</updated>
+    <updated>2017-06-28T16:22:23.450Z</updated>
     
     <content type="html"><![CDATA[<p>解構賦值是一種優雅的方式能夠將<code>{}</code>與<code>[]</code>的值讀出來<br><a id="more"></a></p>
 <h2 id="讀取陣列並-assign-到變數上"><a href="#讀取陣列並-assign-到變數上" class="headerlink" title="讀取陣列並 assign 到變數上"></a>讀取陣列並 assign 到變數上</h2><p><em>陣列的解構賦值用陣列去接</em><br><figure class="codeblock codeblock--tabbed"><figcaption><span>JavaScript</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> foo = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">let</span> [one, two, three] = foo;</span><br><span class="line"><span class="built_in">console</span>.log(one); <span class="comment">// 'one'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
@@ -172,7 +220,7 @@
     <link href="https://mileslin.github.io/2017/06/%E6%93%B4%E5%85%85%E5%A5%97%E4%BB%B6%E5%B1%AC%E6%80%A7%EF%BC%8C%E4%BB%A5sweetalert%E7%82%BA%E4%BE%8B/"/>
     <id>https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/</id>
     <published>2017-06-23T06:25:13.000Z</published>
-    <updated>2017-06-23T06:50:42.476Z</updated>
+    <updated>2017-06-28T15:51:45.274Z</updated>
     
     <content type="html"><![CDATA[<p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>error_input</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">swal({</span><br><span class="line">  title: <span class="string">'Oops !!!'</span>,</span><br><span class="line">  input: <span class="string">'email'</span> <span class="comment">// &lt;- error</span></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -206,7 +254,7 @@
     <link href="https://mileslin.github.io/2017/05/%E7%82%BA%E4%BB%80%E9%BA%BC%E9%9C%80%E8%A6%81-Domain-Driven-Design/"/>
     <id>https://mileslin.github.io/2017/05/為什麼需要-Domain-Driven-Design/</id>
     <published>2017-05-21T15:51:09.000Z</published>
-    <updated>2017-06-08T07:43:30.044Z</updated>
+    <updated>2017-06-07T17:29:51.270Z</updated>
     
     <content type="html"><![CDATA[<p>最近開始看 Donmain-Driven Design 的 <a href="https://app.pluralsight.com/library/courses/domain-driven-design-fundamentals/table-of-contents" title="TitleAttribute" target="_blank" rel="external">plurasight 的影片</a> ，其裡面有一句話深深吸引我，而當我開始看 DDD 的教學影片時，發現需要知道的內容，是多麼的廣泛，這句話當之無愧。。<br> <blockquote><p>The more you know, the more you realize you know nothing</p>
 <footer><strong>Socrates</strong></footer></blockquote></p>
@@ -270,7 +318,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/vscode-%E8%A8%AD%E5%AE%9A%E8%87%AA%E5%8B%95%E8%A7%B8%E7%99%BC-suggestions/"/>
     <id>https://mileslin.github.io/2017/05/vscode-設定自動觸發-suggestions/</id>
     <published>2017-05-09T11:07:21.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-06-02T17:03:33.848Z</updated>
     
     <content type="html"><![CDATA[<p>某一版 vscode 更新後，寫 markdown 文件時不會自動跑出小視窗提醒能輸入的 snippet，需要點 <span class="highlight-text primary">ctrl + space</span>
 才會出現視窗，可是中文輸入法的 <span class="highlight-text primary">ctrl + space</span> 有自己的預設行為啊 !! 。</p>
@@ -308,7 +356,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/Two-way-data-binding-event-%E7%9A%84%E5%AF%AB%E6%B3%95/"/>
     <id>https://mileslin.github.io/2017/05/Two-way-data-binding-event-的寫法/</id>
     <published>2017-05-06T08:26:25.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-05-09T12:53:24.643Z</updated>
     
     <content type="html"><![CDATA[<p>之前學的 two way binding 的寫法如下</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"firstName"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -343,7 +391,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/User-input-%E5%AF%A6%E7%94%A8%E7%9A%84-key-%E4%BA%8B%E4%BB%B6/"/>
     <id>https://mileslin.github.io/2017/05/User-input-實用的-key-事件/</id>
     <published>2017-05-02T16:30:27.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-05-02T16:54:44.208Z</updated>
     
     <content type="html"><![CDATA[<p>使用者輸入資料的時候，通常會綁定一些事情，做一些邏輯之類的，例如:使用者點選 Enter 則執行搜尋功能等等….</p>
 <a id="more"></a>
@@ -377,7 +425,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/%E4%BD%BF%E7%94%A8-Angular-CLI-%E5%BB%BA%E7%AB%8B-Angular-%E5%B0%88%E6%A1%88%E6%9E%B6%E6%A7%8B%E8%AA%AA%E6%98%8E/"/>
     <id>https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/</id>
     <published>2017-04-30T09:46:33.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-04-30T15:19:26.000Z</updated>
     
     <content type="html"><![CDATA[<p>從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 <a href="https://github.com/angular/angular-cli" title="Angular CLI" target="_blank" rel="external">Angular CLI</a> 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。</p>
 <a id="more"></a>
@@ -504,9 +552,9 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -515,7 +563,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/Autofac-%E8%A8%AD%E5%AE%9A-Web-API-Register-Controller-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/</id>
     <published>2017-04-28T12:52:13.000Z</published>
-    <updated>2017-06-30T10:24:46.636Z</updated>
+    <updated>2017-07-02T11:35:37.711Z</updated>
     
     <content type="html"><![CDATA[<p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)</p>
 <a id="more"></a>
@@ -560,7 +608,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/NLog-%E5%BB%BA%E7%BD%AE%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/NLog-建置筆記/</id>
     <published>2017-04-26T13:54:29.000Z</published>
-    <updated>2017-06-08T07:43:30.215Z</updated>
+    <updated>2017-04-28T14:04:32.657Z</updated>
     
     <content type="html"><![CDATA[<p>最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。</p>
 <a id="more"></a>
@@ -625,7 +673,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/</id>
     <published>2017-04-23T14:43:07.000Z</published>
-    <updated>2017-06-08T07:43:30.342Z</updated>
+    <updated>2017-04-28T14:04:32.746Z</updated>
     
     <content type="html"><![CDATA[<!-- excerpt -->
 <ul>
@@ -681,7 +729,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/</id>
     <published>2017-04-22T15:57:37.000Z</published>
-    <updated>2017-06-08T07:43:30.257Z</updated>
+    <updated>2017-04-28T14:04:32.743Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>移除元素功能跟 insert 元素功能 <code>Array.prototype.splice()</code></li>
@@ -738,7 +786,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/</id>
     <published>2017-04-21T15:08:58.000Z</published>
-    <updated>2017-04-22T16:50:24.000Z</updated>
+    <updated>2017-04-21T16:06:26.725Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>回傳淺複製的 Array ，<code>Array.prototype.slice()</code></li>
@@ -800,7 +848,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/</id>
     <published>2017-04-20T15:55:24.000Z</published>
-    <updated>2017-04-22T16:50:24.000Z</updated>
+    <updated>2017-04-20T17:21:08.856Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>可累加 Array 的元素，也可以用來操作元素的值然後回傳 <code>Array.prototype.reduce()</code></li>
@@ -861,7 +909,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/</id>
     <published>2017-04-18T16:06:55.000Z</published>
-    <updated>2017-06-08T07:43:30.299Z</updated>
+    <updated>2017-04-20T15:52:47.860Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立一個全新運算過後的 Array，且不會改到原本的 Array <code>Array.prototype.map()</code></li>
@@ -903,7 +951,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/</id>
     <published>2017-04-17T16:40:33.000Z</published>
-    <updated>2017-04-18T16:04:56.000Z</updated>
+    <updated>2017-04-17T17:27:24.202Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>判斷 Array 是否有包含某一個值 <code>Array.prototype.includes()</code></li>
@@ -963,7 +1011,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/</id>
     <published>2017-04-16T04:02:43.000Z</published>
-    <updated>2017-04-18T16:04:56.000Z</updated>
+    <updated>2017-04-16T05:12:35.730Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>使 Array 填滿指定的值 <code>Array.prototype.fill()</code></li>
@@ -1009,58 +1057,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
 &lt;li&gt;過濾 Array 的資料，用起來跟 LINQ 的 &lt;strong&gt;where&lt;/strong&gt; 一樣 &lt;code&gt;Array.prototype.filter()&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;找到第一筆相符的資料 &lt;code&gt;Array.prototype.find()&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;找到第一筆相符資料的 index &lt;code&gt;Array.prototype.findIndex()&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="javascript" scheme="https://mileslin.github.io/categories/javascript/"/>
-    
-    
-      <category term="javascript" scheme="https://mileslin.github.io/tags/javascript/"/>
-    
-      <category term="array" scheme="https://mileslin.github.io/tags/array/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>javascript array methods practice II</title>
-    <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/"/>
-    <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/</id>
-    <published>2017-04-15T09:32:54.000Z</published>
-    <updated>2017-04-18T16:04:56.000Z</updated>
-    
-    <content type="html"><![CDATA[<ul>
-<li>複製 Array 自己的元素 <code>Array.prototype.copyWithin()</code></li>
-<li>回傳 Array Iterator object ，terator object可取得 index 跟 value <code>Array.prototype.entries()</code></li>
-<li>對 Array 的所有元素做驗證 <code>Array.prototype.every()</code></li>
-</ul>
-<a id="more"></a>
-<h2 id="Array-prototype-copyWithin"><a href="#Array-prototype-copyWithin" class="headerlink" title="Array.prototype.copyWithin()"></a>Array.prototype.copyWithin()</h2><p>只會複製一次，原本的欄位大小是不會變的。  且沒有複製到的陣列位置，原本的值是不會改變的。</p>
-<h4 id="參數說明-arr-copyWithin-target-start-end"><a href="#參數說明-arr-copyWithin-target-start-end" class="headerlink" title="參數說明 arr.copyWithin(target, start, end)"></a>參數說明 <code>arr.copyWithin(target, start, end)</code></h4><ul>
-<li>target : 從第幾個位址開始複製</li>
-<li>start : 複製的第一個 value 位置 (optional)</li>
-<li>end : 複製的最後一個 value 位置 (optional)</li>
-</ul>
-<p>如以下範例:<br>1.第一個參數 2 ，表示會從 Array 裡面 value 是「3」的那個元素開始複製<br>2.第二個參數 4 ，原本的 Array 是數字 1~12，表示會省略前面 4 個元素，從 4 這個 value = 5 開始複製<br>3.第三個參數 6 ，表示只會複製到第 6 個元素 value = 6 結束<br><figure class="codeblock codeblock--tabbed"><figcaption><span>copyWithin</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>,<span class="number">11</span>,<span class="number">12</span>].copyWithin(<span class="number">2</span>,<span class="number">4</span>,<span class="number">6</span>);</span><br><span class="line"><span class="comment">//[1, 2, 5, 6, 5, 6, 7, 8, 9, 10, 11, 12]</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<p>如果參數是負數，則會從右邊開始複製<br><figure class="codeblock codeblock--tabbed"><figcaption><span>negative</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>].copyWithin(<span class="number">-2</span>);</span><br><span class="line"><span class="comment">// [1, 2, 3, 1, 2]</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="Array-prototype-entries"><a href="#Array-prototype-entries" class="headerlink" title="Array.prototype.entries()"></a>Array.prototype.entries()</h2><p>iterator 原生用法<br><figure class="codeblock codeblock--tabbed"><figcaption><span>iterator</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>];</span><br><span class="line"><span class="keyword">var</span> iterator = a.entries();</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next().value); <span class="comment">// [0, 'a']</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next().value); <span class="comment">// [1, 'b']</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next().value); <span class="comment">// [2, 'c']</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<p>foreach的用法<br><figure class="codeblock codeblock--tabbed"><figcaption><span>iterator</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>];</span><br><span class="line"><span class="keyword">var</span> iterator = a.entries();</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> e <span class="keyword">of</span> iterator) {</span><br><span class="line">  <span class="built_in">console</span>.log(e);</span><br><span class="line">}</span><br><span class="line"><span class="comment">// [0, 'a']</span></span><br><span class="line"><span class="comment">// [1, 'b']</span></span><br><span class="line"><span class="comment">// [2, 'c']</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="Array-prototype-every"><a href="#Array-prototype-every" class="headerlink" title="Array.prototype.every()"></a>Array.prototype.every()</h2><p>驗證元素的內容是否符合規則，其只要有一個元素是 false ，則會馬上回傳 false 不會往下執行。</p>
-<h4 id="參數說明"><a href="#參數說明" class="headerlink" title="參數說明"></a>參數說明</h4><ul>
-<li>element : 當下元素的 value</li>
-<li>index : 當下元素的 index ，從 0 開始</li>
-<li>array : array 本身</li>
-</ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>every</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isBigEnough</span>(<span class="params">element, index, array</span>) </span>{ </span><br><span class="line">  <span class="keyword">return</span> element &gt;= <span class="number">10</span>; </span><br><span class="line">} </span><br><span class="line"></span><br><span class="line">[<span class="number">12</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">130</span>, <span class="number">44</span>].every(isBigEnough);   <span class="comment">// false </span></span><br><span class="line">[<span class="number">12</span>, <span class="number">54</span>, <span class="number">18</span>, <span class="number">130</span>, <span class="number">44</span>].every(isBigEnough); <span class="comment">// true</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>arrow function 的用法<br><figure class="codeblock codeblock--tabbed"><figcaption><span>every</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">12</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">130</span>, <span class="number">44</span>].every(<span class="function"><span class="params">x</span> =&gt;</span> x &gt;= <span class="number">10</span>); <span class="comment">// false</span></span><br><span class="line">[<span class="number">12</span>, <span class="number">54</span>, <span class="number">18</span>, <span class="number">130</span>, <span class="number">44</span>].every(<span class="function"><span class="params">x</span> =&gt;</span> x &gt;= <span class="number">10</span>); <span class="comment">// true</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">參考連結</a>]]></content>
-    
-    <summary type="html">
-    
-      &lt;ul&gt;
-&lt;li&gt;複製 Array 自己的元素 &lt;code&gt;Array.prototype.copyWithin()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;回傳 Array Iterator object ，terator object可取得 index 跟 value &lt;code&gt;Array.prototype.entries()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;對 Array 的所有元素做驗證 &lt;code&gt;Array.prototype.every()&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
     
     </summary>
