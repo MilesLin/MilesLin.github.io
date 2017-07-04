@@ -41,6 +41,86 @@
   </entry>
   
   <entry>
+    <title>Angular CLI 實用小技巧 2</title>
+    <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-2/"/>
+    <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/</id>
+    <published>2017-07-04T15:26:07.000Z</published>
+    <updated>2017-07-04T17:25:42.183Z</updated>
+    
+    <content type="html"><![CDATA[<p>Angular CLI 實用小技巧</p>
+<a id="more"></a>
+<h2 id="建立-Component-小技巧"><a href="#建立-Component-小技巧" class="headerlink" title="建立 Component 小技巧"></a>建立 Component 小技巧</h2><div class="alert info no-icon"><p>ng g c &lt; options &gt;</p>
+</div>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Options</th>
+<th style="text-align:center">Alias</th>
+<th style="text-align:center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">--flat</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">不要建立 Component 資料夾</td>
+</tr>
+<tr>
+<td style="text-align:center">--inline-template</td>
+<td style="text-align:center">-it</td>
+<td style="text-align:center">不會建立 .html，將 html template 寫在 .ts file</td>
+</tr>
+<tr>
+<td style="text-align:center">--inline-style</td>
+<td style="text-align:center">-is</td>
+<td style="text-align:center">不會建立 .css，將 style 寫在 .ts file</td>
+</tr>
+<tr>
+<td style="text-align:center">--spec false</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">不會建立 .spec</td>
+</tr>
+<tr>
+<td style="text-align:center">--prefix my</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">selector 加上 my prefix. ex: my-pet instead of app-pet</td>
+</tr>
+<tr>
+<td style="text-align:center">--dry-run</td>
+<td style="text-align:center">-d</td>
+<td style="text-align:center">顯示那些檔案會新增跟那些檔案會變更</td>
+</tr>
+</tbody>
+</table>
+<h2 id="建立-Service-小技巧"><a href="#建立-Service-小技巧" class="headerlink" title="建立 Service 小技巧"></a>建立 Service 小技巧</h2><p><em>此功能也能用在建立 Component 上</em><br><div class="alert info no-icon"><p>新增 service 並自動加入指定 module providers<br>ng g s my-service -m app.module</p>
+</div></p>
+<h2 id="建立-Classes-Interfaces-Enums-小技巧"><a href="#建立-Classes-Interfaces-Enums-小技巧" class="headerlink" title="建立 Classes, Interfaces, Enums 小技巧"></a>建立 Classes, Interfaces, Enums 小技巧</h2><div class="alert info no-icon"><p>在 models 底下建立 class<br>ng g cl models/customer</p>
+</div>
+<div class="alert info no-icon"><p>在 models 底下建立 interface<br>ng g i models/person</p>
+</div>
+<div class="alert info no-icon"><p>在 models 底下建立 enum<br>ng g e models/gender</p>
+</div>
+<h2 id="建立預設值-超好用"><a href="#建立預設值-超好用" class="headerlink" title="建立預設值(超好用)"></a>建立<options>預設值(超好用)</options></h2><p>此設定會寫在 .angular-cli.json 底下 defautls 區塊<br><div class="figure " style="width:;"><a class="fancybox" href="defaults.jpg" title="" data-fancybox-group=""><img class="fig-img" src="defaults.jpg" alt=""></a></div></p>
+<div class="alert success no-icon"><p>建立 component 時候，自動不產生 .spec<br>ng set sefaults.component.spec false</p>
+</div>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Angular CLI 實用小技巧&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
+    
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Angular CLI 實用小技巧 1</title>
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-1/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/</id>
@@ -993,70 +1073,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
 &lt;li&gt;判斷該元素是 Array 哪一個 Index &lt;code&gt;Array.prototype.indexOf()&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;將 Array 用指定的值 join 成一個字串 &lt;code&gt;Array.prototype.join()&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;判斷該是 Array 哪一個 Index，但是是從右邊開始算起 &lt;code&gt;Array.prototype.lastIndexOf()&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="javascript" scheme="https://mileslin.github.io/categories/javascript/"/>
-    
-    
-      <category term="javascript" scheme="https://mileslin.github.io/tags/javascript/"/>
-    
-      <category term="array" scheme="https://mileslin.github.io/tags/array/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>javascript array methods practice III</title>
-    <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/"/>
-    <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/</id>
-    <published>2017-04-16T04:02:43.000Z</published>
-    <updated>2017-04-16T05:12:35.730Z</updated>
-    
-    <content type="html"><![CDATA[<ul>
-<li>使 Array 填滿指定的值 <code>Array.prototype.fill()</code></li>
-<li>過濾 Array 的資料，用起來跟 LINQ 的 <strong>where</strong> 一樣 <code>Array.prototype.filter()</code></li>
-<li>找到第一筆相符的資料 <code>Array.prototype.find()</code></li>
-<li>找到第一筆相符資料的 index <code>Array.prototype.findIndex()</code></li>
-</ul>
-<a id="more"></a>
-<h2 id="Array-prototype-fill"><a href="#Array-prototype-fill" class="headerlink" title="Array.prototype.fill()"></a>Array.prototype.fill()</h2><p>可讓 Array 填滿指定的值，更改是原本的 Array</p>
-<h4 id="參數說明-arr-fill-value-start-end"><a href="#參數說明-arr-fill-value-start-end" class="headerlink" title="參數說明 arr.fill(value, start, end)"></a>參數說明 <code>arr.fill(value, start, end)</code></h4><ul>
-<li>value : 要填入的值</li>
-<li>start : 從哪一個元素開始填，預設第0個 (optional)</li>
-<li>end : 填到哪一個元素，預設是此陣列的長度 (optional)</li>
-</ul>
-<p>Note : start 跟 end 若填負數，則是從右邊開始算</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>fill</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>);               <span class="comment">// [4, 4, 4]</span></span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>, <span class="number">1</span>);            <span class="comment">// [1, 4, 4]</span></span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>, <span class="number">1</span>, <span class="number">2</span>);         <span class="comment">// [1, 4, 3]</span></span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].fill(<span class="number">4</span>, <span class="number">1</span>, <span class="number">1</span>);         <span class="comment">// [1, 2, 3]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-filter"><a href="#Array-prototype-filter" class="headerlink" title="Array.prototype.filter()"></a>Array.prototype.filter()</h2><p>過濾 Array 的內容，且回傳的 Array 是一個全新的 Array</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>filter</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isBigEnough</span>(<span class="params">value,index,array</span>) </span>{</span><br><span class="line">	</span><br><span class="line">  <span class="keyword">return</span> value &gt;= <span class="number">10</span>;</span><br><span class="line">}</span><br><span class="line"><span class="keyword">var</span> filtered = [<span class="number">12</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">130</span>, <span class="number">44</span>].filter(isBigEnough);</span><br><span class="line"></span><br><span class="line"><span class="comment">//arrow function</span></span><br><span class="line">[<span class="number">12</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">130</span>, <span class="number">44</span>].filter( <span class="function">(<span class="params">value,index,array</span>) =&gt;</span>{</span><br><span class="line">	  </span><br><span class="line">  <span class="keyword">return</span> value &gt;= <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-find"><a href="#Array-prototype-find" class="headerlink" title="Array.prototype.find()"></a>Array.prototype.find()</h2><p>找到第一筆相符的元素，如果都找不到，則回傳 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined" title="undefiend" target="_blank" rel="external">undefiend</a> </p>
-<h4 id="參數說明-arr-find-value-index-array"><a href="#參數說明-arr-find-value-index-array" class="headerlink" title="參數說明 arr.find(value, index, array)"></a>參數說明 <code>arr.find(value, index, array)</code></h4><ul>
-<li>element : 當下元素的 value</li>
-<li>index : 當下元素的 index ，從 0 開始 (optional)</li>
-<li>array : array 本身 (optional)</li>
-</ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>find</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> inventory = [</span><br><span class="line">  {<span class="attr">name</span>: <span class="string">'apples'</span>, <span class="attr">quantity</span>: <span class="number">2</span>},</span><br><span class="line">  {<span class="attr">name</span>: <span class="string">'bananas'</span>, <span class="attr">quantity</span>: <span class="number">0</span>},</span><br><span class="line">  {<span class="attr">name</span>: <span class="string">'cherries'</span>, <span class="attr">quantity</span>: <span class="number">5</span>}</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">findCherries</span>(<span class="params">fruit</span>) </span>{ </span><br><span class="line">    <span class="keyword">return</span> fruit.name === <span class="string">'cherries'</span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(inventory.find(findCherries)); </span><br><span class="line"></span><br><span class="line"><span class="comment">// arrow function</span></span><br><span class="line"><span class="keyword">var</span> result =inventory.find(<span class="function">(<span class="params">x</span>) =&gt;</span> x.name === <span class="string">'cherries'</span>);</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>在每一個元素的訪問過程裡面，做了刪除元素的動作，該元素並不會因為被刪除而沒被訪問到。  只是因為該元素已經被刪除，所以訪問到該元素時 value = undefined。</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>-</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="number">0</span>,<span class="number">1</span>,<span class="number">5</span>,<span class="number">6</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// Shows all indexes, including deleted</span></span><br><span class="line">a.find(<span class="function"><span class="keyword">function</span>(<span class="params">value, index</span>) </span>{</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Delete element 5 on first iteration</span></span><br><span class="line">  <span class="keyword">if</span> (index == <span class="number">0</span>) {</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'Deleting a[2] with value '</span> + a[<span class="number">2</span>]);</span><br><span class="line">    <span class="keyword">delete</span> a[<span class="number">2</span>];    </span><br><span class="line">  }</span><br><span class="line">  <span class="comment">// Element 5 is still visited even though deleted. value = undefined</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'Visited index '</span> + index + <span class="string">' with value '</span> + value); </span><br><span class="line">});</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line"><span class="comment">//[0,1,undefined,6]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-findIndex"><a href="#Array-prototype-findIndex" class="headerlink" title="Array.prototype.findIndex()"></a>Array.prototype.findIndex()</h2><p>回傳第一筆符合條件的 index，若都沒有符合條件或者是 Empty Array 則回傳 -1 。</p>
-<h4 id="參數說明-arr-findIndex-value-index-array"><a href="#參數說明-arr-findIndex-value-index-array" class="headerlink" title="參數說明 arr.findIndex(value, index, array)"></a>參數說明 <code>arr.findIndex(value, index, array)</code></h4><ul>
-<li>element : 當下元素的 value</li>
-<li>index : 當下元素的 index ，從 0 開始 (optional)</li>
-<li>array : array 本身 (optional)</li>
-</ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>findIndex</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isBigEnough</span>(<span class="params">element</span>) </span>{</span><br><span class="line">      <span class="keyword">return</span> element &gt;= <span class="number">15</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> result = [<span class="number">12</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">130</span>, <span class="number">44</span>].findIndex(isBigEnough); </span><br><span class="line">  <span class="built_in">console</span>.log(result); <span class="comment">// 3</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// arrow function</span></span><br><span class="line"><span class="keyword">var</span> result = [<span class="number">12</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">130</span>, <span class="number">44</span>].findIndex(<span class="function">(<span class="params">x</span>) =&gt;</span> x &gt;= <span class="number">15</span>);</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">參考連結</a>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;ul&gt;
-&lt;li&gt;使 Array 填滿指定的值 &lt;code&gt;Array.prototype.fill()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;過濾 Array 的資料，用起來跟 LINQ 的 &lt;strong&gt;where&lt;/strong&gt; 一樣 &lt;code&gt;Array.prototype.filter()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;找到第一筆相符的資料 &lt;code&gt;Array.prototype.find()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;找到第一筆相符資料的 index &lt;code&gt;Array.prototype.findIndex()&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
     
     </summary>
