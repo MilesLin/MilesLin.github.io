@@ -6,10 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Miles&#39;s Journey">
-    <title>動態指定泛型型別 - Miles&#39;s Journey</title>
+    <title>Angular CLI 實用小技巧 3 - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,Generics">
+        <meta name="keywords" content=".NET,Angular CLI,Angular">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,22 +17,20 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="前言今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，
-但是想想實用性好像不太大，可是把這技術忘掉太可惜XD
-還是記錄下來，以防忘記">
+    <meta name="description" content="Angular CLI 實用小技巧">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="動態指定泛型型別">
-<meta property="og:url" content="https://mileslin.github.io/2016/12/動態指定泛型型別/index.html">
+<meta property="og:title" content="Angular CLI 實用小技巧 3">
+<meta property="og:url" content="https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="前言今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，
-但是想想實用性好像不太大，可是把這技術忘掉太可惜XD
-還是記錄下來，以防忘記">
-<meta property="og:updated_time" content="2017-06-07T17:29:51.267Z">
+<meta property="og:description" content="Angular CLI 實用小技巧">
+<meta property="og:image" content="https://mileslin.github.io/environments_setting.jpg">
+<meta property="og:image" content="https://mileslin.github.io/environments_folder.jpg">
+<meta property="og:image" content="https://mileslin.github.io/package.jpg">
+<meta property="og:updated_time" content="2017-07-08T16:54:53.060Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="動態指定泛型型別">
-<meta name="twitter:description" content="前言今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，
-但是想想實用性好像不太大，可是把這技術忘掉太可惜XD
-還是記錄下來，以防忘記">
+<meta name="twitter:title" content="Angular CLI 實用小技巧 3">
+<meta name="twitter:description" content="Angular CLI 實用小技巧">
+<meta name="twitter:image" content="https://mileslin.github.io/environments_setting.jpg">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -41,6 +39,9 @@
     
         <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
     
+    
+        <meta property="og:image" content="https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/environments_folder.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/environments_folder.jpg" />
     
     
     
@@ -258,19 +259,19 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title" itemprop="headline">
-            動態指定泛型型別
+            Angular CLI 實用小技巧 3
         </h1>
     
     <div class="post-meta">
-    <time itemprop="datePublished" datetime="2016-12-30T10:40:59+08:00">
+    <time itemprop="datePublished" datetime="2017-07-08T23:07:00+08:00">
 	
-		    Dec 30, 2016
+		    Jul 08, 2017
     	
     </time>
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/C/">C#</a>
+    <a class="category-link" href="/categories/Angular/">Angular</a>
 
 
     
@@ -280,14 +281,168 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
-<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
-<p>還是記錄下來，以防忘記<br><a id="more"></a></p>
-<h3 id="以下程式範例"><a href="#以下程式範例" class="headerlink" title="以下程式範例"></a>以下程式範例</h3><figure class="codeblock codeblock--tabbed"><figcaption><span>類別</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">// where 條件說明 </span><br><span class="line">// class : 傳入一定要是參考型別</span><br><span class="line">// new() : 該類別一定要有公開的建構式方法</span><br><span class="line">public class DynamicGeneric&lt;T&gt; where T : class , new()</span><br><span class="line">{</span><br><span class="line">    public string Name { get; set; }</span><br><span class="line"></span><br><span class="line">    public void SayHello() </span><br><span class="line">    {</span><br><span class="line">        Console.WriteLine("Hello");</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    public T GetInstance() </span><br><span class="line">    {            </span><br><span class="line">        return new T();</span><br><span class="line">    }</span><br><span class="line">    </span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">public class MyClass1</span><br><span class="line">{</span><br><span class="line">    public string MyProperty { get; set; }</span><br><span class="line"></span><br><span class="line">    public void MyMethod() </span><br><span class="line">    {</span><br><span class="line">        Console.WriteLine("I'm Class1 Method");</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h3 id="執行過程"><a href="#執行過程" class="headerlink" title="執行過程"></a>執行過程</h3><figure class="codeblock codeblock--tabbed"><figcaption><span>執行過程</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span><br><span class="line"></span>{            </span><br><span class="line">    <span class="comment">// 動態指定泛型的方法</span></span><br><span class="line">    <span class="comment">// 效果大概像這樣</span></span><br><span class="line">    <span class="comment">// var type = typeof(MyClass1);</span></span><br><span class="line">    <span class="comment">// DynamicGeneric&lt;type&gt; d = new DynamicGeneric&lt;type&gt;();</span></span><br><span class="line">    <span class="comment">// 當然，上面這兩行是不能跑的，只是要表達將泛型用變數的方式傳入</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Step 1: 取得該類別Type</span></span><br><span class="line">    <span class="keyword">var</span> genericListType = <span class="keyword">typeof</span>(DynamicGeneric&lt;&gt;);</span><br><span class="line">    <span class="comment">// Step 2: 指定泛型型別</span></span><br><span class="line">    <span class="keyword">var</span> specificListType = genericListType.MakeGenericType(<span class="keyword">typeof</span>(MyClass1));</span><br><span class="line">    <span class="comment">// Step 3: 建立Instance</span></span><br><span class="line">    <span class="keyword">object</span> instance = Activator.CreateInstance(specificListType);</span><br><span class="line">    <span class="comment">/*------------------這樣就動態指定泛型完成了------------------*/</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 因為回傳的物件是object，除非轉型才能用強行別的方式操作</span></span><br><span class="line">    <span class="comment">// 不然就得用反射方法(Reflection)，來操作方法或屬性</span></span><br><span class="line">    </span><br><span class="line">    Type instanceType = instance.GetType();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 取得屬性值</span></span><br><span class="line">    <span class="keyword">string</span> name = instanceType.InvokeMember(</span><br><span class="line">            <span class="string">"Name"</span>, <span class="comment">// 屬性名稱</span></span><br><span class="line">            System.Reflection.BindingFlags.GetProperty, <span class="comment">// 執行取得屬性</span></span><br><span class="line">            <span class="literal">null</span>,</span><br><span class="line">            instance,</span><br><span class="line">            <span class="literal">null</span></span><br><span class="line">        ) <span class="keyword">as</span> <span class="keyword">string</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 執行方法</span></span><br><span class="line">    instanceType.InvokeMember(</span><br><span class="line">            <span class="string">"SayHello"</span>,<span class="comment">//方法名稱</span></span><br><span class="line">            BindingFlags.InvokeMethod, <span class="comment">// 執行調用方法</span></span><br><span class="line">            <span class="literal">null</span>,</span><br><span class="line">            instance,</span><br><span class="line">            <span class="literal">null</span></span><br><span class="line">        ); <span class="comment">// output : Hello</span></span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h4 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h4><a href="http://stackoverflow.com/questions/2078914/creating-a-generict-type-instance-with-a-variable-containing-the-type" target="_blank" rel="external">stackoverflow</a>
-<a href="https://www.dotblogs.com.tw/joysdw12/2012/09/13/74761" target="_blank" rel="external">dotblogs</a>
-<a href="https://msdn.microsoft.com/zh-tw/library/66btctbe(v=vs.110).aspx" target="_blank" rel="external">msdn</a>
+            <p>Angular CLI 實用小技巧</p>
+<a id="more"></a>
+<h2 id="Build-與-Environment"><a href="#Build-與-Environment" class="headerlink" title="Build 與 Environment"></a>Build 與 Environment</h2><p><code>build</code> 可將 Angular 專案打包，之後可以部屬到 serve 上，而 <code>environment</code> 是用來設定一些 Angular 會用到的參數，例如: 開發時的 host 是 <a href="http://dev/" target="_blank" rel="external">http://dev/</a> ， production host 是 <a href="http://prod/" target="_blank" rel="external">http://prod/</a> ，就可以將參數寫在 environment.ts。<br><div class="figure " style="width:;"><a class="fancybox" href="environments_setting.jpg" title="environment" data-fancybox-group=""><img class="fig-img" src="environments_setting.jpg" alt="environment"></a><span class="caption">environment</span></div></p>
+<h3 id="比較-Dev-Build-與-Prod-Build"><a href="#比較-Dev-Build-與-Prod-Build" class="headerlink" title="比較 Dev Build 與 Prod Build:"></a>比較 Dev Build 與 Prod Build:</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">說明</th>
+<th style="text-align:left">ng build</th>
+<th style="text-align:left">ng build --prod</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">使用的 Environment 檔案 <div class="figure " style="width:;"><a class="fancybox" href="environments_folder.jpg" title="" data-fancybox-group=""><img class="fig-img" src="environments_folder.jpg" alt=""></a></div></td>
+<td style="text-align:left">environment.ts</td>
+<td style="text-align:left">environment.prod.ts</td>
+</tr>
+<tr>
+<td style="text-align:left">不要讓檔案被 Cache <em>(Cache-busting)</em></td>
+<td style="text-align:left">只有 css 檔案參考到的圖檔</td>
+<td style="text-align:left">所有檔案</td>
+</tr>
+<tr>
+<td style="text-align:left">Source maps</td>
+<td style="text-align:left">建立</td>
+<td style="text-align:left">不建立</td>
+</tr>
+<tr>
+<td style="text-align:left">Extracted CSS</td>
+<td style="text-align:left">global CSS output to .js</td>
+<td style="text-align:left">yes, to css files</td>
+</tr>
+<tr>
+<td style="text-align:left">醜化 <em>(Uglification)</em></td>
+<td style="text-align:left">無</td>
+<td style="text-align:left">有</td>
+</tr>
+<tr>
+<td style="text-align:left">移除沒用到的程式碼 <em>(Tree-Shaking)</em></td>
+<td style="text-align:left">無</td>
+<td style="text-align:left">有</td>
+</tr>
+<tr>
+<td style="text-align:left">Ahead of time compilation <em>AOT</em></td>
+<td style="text-align:left">無</td>
+<td style="text-align:left">有</td>
+</tr>
+<tr>
+<td style="text-align:left">Bundling</td>
+<td style="text-align:left">有</td>
+<td style="text-align:left">有</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dev-ng-build-參數設定小技巧"><a href="#dev-ng-build-參數設定小技巧" class="headerlink" title="dev ng build 參數設定小技巧"></a>dev ng build 參數設定小技巧</h3><p><em>這四行執行結果都一樣</em><br><div class="alert info no-icon"><p>ng build --target=development --environment=dev<br>ng build --dev -e=dev<br>ng build --dev<br>ng build</p>
+</div></p>
+<h3 id="prod-ng-build-參數設定小技巧"><a href="#prod-ng-build-參數設定小技巧" class="headerlink" title="prod ng build 參數設定小技巧"></a>prod ng build 參數設定小技巧</h3><p><em>這三行執行結果都一樣</em><br><div class="alert info no-icon"><p>ng build --target=production --environment=prod<br>ng build --prod -e=prod<br>ng build --prod</p>
+</div></p>
+<h3 id="ng-build-其他參數設定"><a href="#ng-build-其他參數設定" class="headerlink" title="ng build 其他參數設定"></a>ng build 其他參數設定</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">參數</th>
+<th style="text-align:left">別名</th>
+<th style="text-align:left">說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">--sourcemap</td>
+<td style="text-align:left">-sm</td>
+<td style="text-align:left">建立 source map</td>
+</tr>
+<tr>
+<td style="text-align:left">--aot</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">Ahead of Time compilation</td>
+</tr>
+<tr>
+<td style="text-align:left">--watch</td>
+<td style="text-align:left">-w</td>
+<td style="text-align:left">監控程式碼變成，並重新 build</td>
+</tr>
+</tbody>
+</table>
+<h4 id="輸出-Build-Bundles-說明"><a href="#輸出-Build-Bundles-說明" class="headerlink" title="輸出 Build Bundles 說明"></a>輸出 Build Bundles 說明</h4><p>專案 build 之後，會將專案用到的 js bundle  起來，每一個 bundle js 都有自己的職責。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">js 檔案</th>
+<th style="text-align:left">說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">inline.bundle.js</td>
+<td style="text-align:left">WebPack runtime，應用程式拿來用來讀取 module 用</td>
+</tr>
+<tr>
+<td style="text-align:left">main.bundle.js</td>
+<td style="text-align:left">我們寫的程式碼</td>
+</tr>
+<tr>
+<td style="text-align:left">polyfills.bundle.js</td>
+<td style="text-align:left">用來支援不同的瀏覽器</td>
+</tr>
+<tr>
+<td style="text-align:left">styles.bundle.js</td>
+<td style="text-align:left">紀錄 styles 被放在哪裡</td>
+</tr>
+<tr>
+<td style="text-align:left">vendor.bundle.js</td>
+<td style="text-align:left">包含 Angular 和其他 third-party 檔案</td>
+</tr>
+</tbody>
+</table>
+<h2 id="啟動-webpack-dev-server"><a href="#啟動-webpack-dev-server" class="headerlink" title="啟動 webpack-dev-server"></a>啟動 webpack-dev-server</h2><div class="alert info no-icon"><p>ng serve</p>
+</div>
+<h3 id="設定參數說明"><a href="#設定參數說明" class="headerlink" title="設定參數說明:"></a>設定參數說明:</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">參數</th>
+<th style="text-align:left">別名</th>
+<th style="text-align:left">說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">--open</td>
+<td style="text-align:left">-o</td>
+<td style="text-align:left">ng serve 後，開啟網頁</td>
+</tr>
+<tr>
+<td style="text-align:left">--port</td>
+<td style="text-align:left">-p</td>
+<td style="text-align:left">指定 port 號</td>
+</tr>
+<tr>
+<td style="text-align:left">--live-reload</td>
+<td style="text-align:left">-lr</td>
+<td style="text-align:left">檔案發生變更後，是否直接重新整理瀏覽器 <em>(-lr true or false)</em></td>
+</tr>
+<tr>
+<td style="text-align:left">--ssl</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">使用 https</td>
+</tr>
+<tr>
+<td style="text-align:left">--proxy-config</td>
+<td style="text-align:left">-pc</td>
+<td style="text-align:left">Proxy configuration file</td>
+</tr>
+<tr>
+<td style="text-align:left">--prod</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">啟動時 server，使用 --prod 的設定</td>
+</tr>
+</tbody>
+</table>
+<h2 id="停掉-Angular-CLI-，-使用-webpack-控制專案"><a href="#停掉-Angular-CLI-，-使用-webpack-控制專案" class="headerlink" title="停掉 Angular CLI ， 使用 webpack 控制專案"></a>停掉 Angular CLI ， 使用 webpack 控制專案</h2><p>這個功能可讓懂前端開發工具的人，能夠有更多靈活的應用。<br><div class="alert info no-icon"><p>ng eject</p>
+</div><br>執行指令後 Angular CLI 的功能都將會無法使用，例如 <code>ng build</code>, <code>ng serve</code> 等等…。</p>
+<p><code>webpack.config.js</code>會被加入專案中，必且可以比較 <code>package.json</code> 改變的內容，會看到所有控制都交由原生的前端工具來執行。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="package.jpg" title="package" data-fancybox-group=""><img class="fig-img" src="package.jpg" alt="package"></a><span class="caption">package</span></div>
             
         </div>
     </div>
@@ -296,7 +451,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="/tags/C/">C#</a> <a class="tag tag--primary tag--small t-link" href="/tags/Generics/">Generics</a>
+    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a> <a class="tag tag--primary tag--small t-link" href="/tags/Angular-CLI/">Angular CLI</a>
 
             </div>
         
@@ -305,7 +460,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/01/Anatomy-of-an-Angular-2-Application/"  data-tooltip="Anatomy of an Angular Application">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -313,7 +468,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/Angular-CLI-實用小技巧-2/" data-tooltip="Angular CLI 實用小技巧 2">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -328,17 +483,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2016/12/動態指定泛型型別/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2016/12/動態指定泛型型別/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2016/12/動態指定泛型型別/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -386,7 +541,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/01/Anatomy-of-an-Angular-2-Application/"  data-tooltip="Anatomy of an Angular Application">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -394,7 +549,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/Angular-CLI-實用小技巧-2/" data-tooltip="Angular CLI 實用小技巧 2">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -409,17 +564,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2016/12/動態指定泛型型別/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2016/12/動態指定泛型型別/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2016/12/動態指定泛型型別/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -445,17 +600,17 @@
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
     <ul class="share-options">
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2016/12/動態指定泛型型別/">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
                 <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2016/12/動態指定泛型型別/">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
                 <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2016/12/動態指定泛型型別/">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
                 <i class="fa fa-twitter"></i><span>Share on Twitter</span>
             </a>
         </li>
@@ -769,9 +924,9 @@
     
         <script>
              var disqus_config = function () {
-                 this.page.url = 'https://mileslin.github.io/2016/12/動態指定泛型型別/';
+                 this.page.url = 'https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/';
                  
-                    this.page.identifier = '2016/12/動態指定泛型型別/';
+                    this.page.identifier = '2017/07/Angular-CLI-實用小技巧-3/';
                  
              };
             (function() {

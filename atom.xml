@@ -41,11 +41,196 @@
   </entry>
   
   <entry>
+    <title>Angular CLI 實用小技巧 3</title>
+    <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-3/"/>
+    <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/</id>
+    <published>2017-07-08T15:07:00.000Z</published>
+    <updated>2017-07-08T16:54:53.060Z</updated>
+    
+    <content type="html"><![CDATA[<p>Angular CLI 實用小技巧</p>
+<a id="more"></a>
+<h2 id="Build-與-Environment"><a href="#Build-與-Environment" class="headerlink" title="Build 與 Environment"></a>Build 與 Environment</h2><p><code>build</code> 可將 Angular 專案打包，之後可以部屬到 serve 上，而 <code>environment</code> 是用來設定一些 Angular 會用到的參數，例如: 開發時的 host 是 <a href="http://dev/" target="_blank" rel="external">http://dev/</a> ， production host 是 <a href="http://prod/" target="_blank" rel="external">http://prod/</a> ，就可以將參數寫在 environment.ts。<br><div class="figure " style="width:;"><a class="fancybox" href="environments_setting.jpg" title="environment" data-fancybox-group=""><img class="fig-img" src="environments_setting.jpg" alt="environment"></a><span class="caption">environment</span></div></p>
+<h3 id="比較-Dev-Build-與-Prod-Build"><a href="#比較-Dev-Build-與-Prod-Build" class="headerlink" title="比較 Dev Build 與 Prod Build:"></a>比較 Dev Build 與 Prod Build:</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">說明</th>
+<th style="text-align:left">ng build</th>
+<th style="text-align:left">ng build --prod</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">使用的 Environment 檔案 <div class="figure " style="width:;"><a class="fancybox" href="environments_folder.jpg" title="" data-fancybox-group=""><img class="fig-img" src="environments_folder.jpg" alt=""></a></div></td>
+<td style="text-align:left">environment.ts</td>
+<td style="text-align:left">environment.prod.ts</td>
+</tr>
+<tr>
+<td style="text-align:left">不要讓檔案被 Cache <em>(Cache-busting)</em></td>
+<td style="text-align:left">只有 css 檔案參考到的圖檔</td>
+<td style="text-align:left">所有檔案</td>
+</tr>
+<tr>
+<td style="text-align:left">Source maps</td>
+<td style="text-align:left">建立</td>
+<td style="text-align:left">不建立</td>
+</tr>
+<tr>
+<td style="text-align:left">Extracted CSS</td>
+<td style="text-align:left">global CSS output to .js</td>
+<td style="text-align:left">yes, to css files</td>
+</tr>
+<tr>
+<td style="text-align:left">醜化 <em>(Uglification)</em></td>
+<td style="text-align:left">無</td>
+<td style="text-align:left">有</td>
+</tr>
+<tr>
+<td style="text-align:left">移除沒用到的程式碼 <em>(Tree-Shaking)</em></td>
+<td style="text-align:left">無</td>
+<td style="text-align:left">有</td>
+</tr>
+<tr>
+<td style="text-align:left">Ahead of time compilation <em>AOT</em></td>
+<td style="text-align:left">無</td>
+<td style="text-align:left">有</td>
+</tr>
+<tr>
+<td style="text-align:left">Bundling</td>
+<td style="text-align:left">有</td>
+<td style="text-align:left">有</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dev-ng-build-參數設定小技巧"><a href="#dev-ng-build-參數設定小技巧" class="headerlink" title="dev ng build 參數設定小技巧"></a>dev ng build 參數設定小技巧</h3><p><em>這四行執行結果都一樣</em><br><div class="alert info no-icon"><p>ng build --target=development --environment=dev<br>ng build --dev -e=dev<br>ng build --dev<br>ng build</p>
+</div></p>
+<h3 id="prod-ng-build-參數設定小技巧"><a href="#prod-ng-build-參數設定小技巧" class="headerlink" title="prod ng build 參數設定小技巧"></a>prod ng build 參數設定小技巧</h3><p><em>這三行執行結果都一樣</em><br><div class="alert info no-icon"><p>ng build --target=production --environment=prod<br>ng build --prod -e=prod<br>ng build --prod</p>
+</div></p>
+<h3 id="ng-build-其他參數設定"><a href="#ng-build-其他參數設定" class="headerlink" title="ng build 其他參數設定"></a>ng build 其他參數設定</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">參數</th>
+<th style="text-align:left">別名</th>
+<th style="text-align:left">說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">--sourcemap</td>
+<td style="text-align:left">-sm</td>
+<td style="text-align:left">建立 source map</td>
+</tr>
+<tr>
+<td style="text-align:left">--aot</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">Ahead of Time compilation</td>
+</tr>
+<tr>
+<td style="text-align:left">--watch</td>
+<td style="text-align:left">-w</td>
+<td style="text-align:left">監控程式碼變成，並重新 build</td>
+</tr>
+</tbody>
+</table>
+<h4 id="輸出-Build-Bundles-說明"><a href="#輸出-Build-Bundles-說明" class="headerlink" title="輸出 Build Bundles 說明"></a>輸出 Build Bundles 說明</h4><p>專案 build 之後，會將專案用到的 js bundle  起來，每一個 bundle js 都有自己的職責。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">js 檔案</th>
+<th style="text-align:left">說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">inline.bundle.js</td>
+<td style="text-align:left">WebPack runtime，應用程式拿來用來讀取 module 用</td>
+</tr>
+<tr>
+<td style="text-align:left">main.bundle.js</td>
+<td style="text-align:left">我們寫的程式碼</td>
+</tr>
+<tr>
+<td style="text-align:left">polyfills.bundle.js</td>
+<td style="text-align:left">用來支援不同的瀏覽器</td>
+</tr>
+<tr>
+<td style="text-align:left">styles.bundle.js</td>
+<td style="text-align:left">紀錄 styles 被放在哪裡</td>
+</tr>
+<tr>
+<td style="text-align:left">vendor.bundle.js</td>
+<td style="text-align:left">包含 Angular 和其他 third-party 檔案</td>
+</tr>
+</tbody>
+</table>
+<h2 id="啟動-webpack-dev-server"><a href="#啟動-webpack-dev-server" class="headerlink" title="啟動 webpack-dev-server"></a>啟動 webpack-dev-server</h2><div class="alert info no-icon"><p>ng serve</p>
+</div>
+<h3 id="設定參數說明"><a href="#設定參數說明" class="headerlink" title="設定參數說明:"></a>設定參數說明:</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">參數</th>
+<th style="text-align:left">別名</th>
+<th style="text-align:left">說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">--open</td>
+<td style="text-align:left">-o</td>
+<td style="text-align:left">ng serve 後，開啟網頁</td>
+</tr>
+<tr>
+<td style="text-align:left">--port</td>
+<td style="text-align:left">-p</td>
+<td style="text-align:left">指定 port 號</td>
+</tr>
+<tr>
+<td style="text-align:left">--live-reload</td>
+<td style="text-align:left">-lr</td>
+<td style="text-align:left">檔案發生變更後，是否直接重新整理瀏覽器 <em>(-lr true or false)</em></td>
+</tr>
+<tr>
+<td style="text-align:left">--ssl</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">使用 https</td>
+</tr>
+<tr>
+<td style="text-align:left">--proxy-config</td>
+<td style="text-align:left">-pc</td>
+<td style="text-align:left">Proxy configuration file</td>
+</tr>
+<tr>
+<td style="text-align:left">--prod</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">啟動時 server，使用 --prod 的設定</td>
+</tr>
+</tbody>
+</table>
+<h2 id="停掉-Angular-CLI-，-使用-webpack-控制專案"><a href="#停掉-Angular-CLI-，-使用-webpack-控制專案" class="headerlink" title="停掉 Angular CLI ， 使用 webpack 控制專案"></a>停掉 Angular CLI ， 使用 webpack 控制專案</h2><p>這個功能可讓懂前端開發工具的人，能夠有更多靈活的應用。<br><div class="alert info no-icon"><p>ng eject</p>
+</div><br>執行指令後 Angular CLI 的功能都將會無法使用，例如 <code>ng build</code>, <code>ng serve</code> 等等…。</p>
+<p><code>webpack.config.js</code>會被加入專案中，必且可以比較 <code>package.json</code> 改變的內容，會看到所有控制都交由原生的前端工具來執行。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="package.jpg" title="package" data-fancybox-group=""><img class="fig-img" src="package.jpg" alt="package"></a><span class="caption">package</span></div>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Angular CLI 實用小技巧&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
+    
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Angular CLI 實用小技巧 2</title>
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-2/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/</id>
     <published>2017-07-04T15:26:07.000Z</published>
-    <updated>2017-07-04T17:25:42.183Z</updated>
+    <updated>2017-07-08T16:01:05.286Z</updated>
     
     <content type="html"><![CDATA[<p>Angular CLI 實用小技巧</p>
 <a id="more"></a>
@@ -54,41 +239,41 @@
 <table>
 <thead>
 <tr>
-<th style="text-align:center">Options</th>
-<th style="text-align:center">Alias</th>
-<th style="text-align:center">Description</th>
+<th style="text-align:left">Options</th>
+<th style="text-align:left">Alias</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">--flat</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">不要建立 Component 資料夾</td>
+<td style="text-align:left">--flat</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">不要建立 Component 資料夾</td>
 </tr>
 <tr>
-<td style="text-align:center">--inline-template</td>
-<td style="text-align:center">-it</td>
-<td style="text-align:center">不會建立 .html，將 html template 寫在 .ts file</td>
+<td style="text-align:left">--inline-template</td>
+<td style="text-align:left">-it</td>
+<td style="text-align:left">不會建立 .html，將 html template 寫在 .ts file</td>
 </tr>
 <tr>
-<td style="text-align:center">--inline-style</td>
-<td style="text-align:center">-is</td>
-<td style="text-align:center">不會建立 .css，將 style 寫在 .ts file</td>
+<td style="text-align:left">--inline-style</td>
+<td style="text-align:left">-is</td>
+<td style="text-align:left">不會建立 .css，將 style 寫在 .ts file</td>
 </tr>
 <tr>
-<td style="text-align:center">--spec false</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">不會建立 .spec</td>
+<td style="text-align:left">--spec false</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">不會建立 .spec</td>
 </tr>
 <tr>
-<td style="text-align:center">--prefix my</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">selector 加上 my prefix. ex: my-pet instead of app-pet</td>
+<td style="text-align:left">--prefix my</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">selector 加上 my prefix. ex: my-pet instead of app-pet</td>
 </tr>
 <tr>
-<td style="text-align:center">--dry-run</td>
-<td style="text-align:center">-d</td>
-<td style="text-align:center">顯示那些檔案會新增跟那些檔案會變更</td>
+<td style="text-align:left">--dry-run</td>
+<td style="text-align:left">-d</td>
+<td style="text-align:left">顯示那些檔案會新增跟那些檔案會變更</td>
 </tr>
 </tbody>
 </table>
@@ -125,7 +310,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-1/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/</id>
     <published>2017-07-02T14:47:41.000Z</published>
-    <updated>2017-07-02T15:56:05.172Z</updated>
+    <updated>2017-07-08T14:59:31.726Z</updated>
     
     <content type="html"><![CDATA[<p>Angular CLI 實用小技巧</p>
 <a id="more"></a>
@@ -133,7 +318,7 @@
 </div></p>
 <p><code>--help</code> 顯示建立專案時，有哪些參數可以設定。<br><div class="alert info no-icon"><p>ng new –help</p>
 </div></p>
-<p><code>--routing</code> 建立專案時，建立 app-routing.module.ts ， 並且 app.module.ts 自動 import AppRoutingModule。<br><div class="alert info no-icon"><p>ng new ngtest –routing</p>
+<p><code>--routing</code> 建立專案時，建立 app-routing.module.ts ， 並且 app.module.ts 自動 import AppRoutingModule。   <em>此功能也能用在建立 module 。</em><br><div class="alert info no-icon"><p>ng new ngtest –routing<br>ng g m sales –routing</p>
 </div></p>
 <p><code>--style scss</code> 使用 sass 寫 css 。<br><div class="alert info no-icon"><p>ng new ngtest –style scss</p>
 </div></p>
@@ -1013,66 +1198,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
 &lt;li&gt;建立一個全新運算過後的 Array，且不會改到原本的 Array &lt;code&gt;Array.prototype.map()&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;移除 Array 最後一個元素 &lt;code&gt;Array.prototype.pop()&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;從最後面開始新增元素到 Array &lt;code&gt;Array.prototype.push()&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="javascript" scheme="https://mileslin.github.io/categories/javascript/"/>
-    
-    
-      <category term="javascript" scheme="https://mileslin.github.io/tags/javascript/"/>
-    
-      <category term="array" scheme="https://mileslin.github.io/tags/array/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>javascript array methods practice IV</title>
-    <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/"/>
-    <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/</id>
-    <published>2017-04-17T16:40:33.000Z</published>
-    <updated>2017-04-17T17:27:24.202Z</updated>
-    
-    <content type="html"><![CDATA[<ul>
-<li>判斷 Array 是否有包含某一個值 <code>Array.prototype.includes()</code></li>
-<li>判斷該元素是 Array 哪一個 Index <code>Array.prototype.indexOf()</code></li>
-<li>將 Array 用指定的值 join 成一個字串 <code>Array.prototype.join()</code></li>
-<li>判斷該是 Array 哪一個 Index，但是是從右邊開始算起 <code>Array.prototype.lastIndexOf()</code></li>
-</ul>
-<a id="more"></a>
-<h2 id="Array-prototype-includes"><a href="#Array-prototype-includes" class="headerlink" title="Array.prototype.includes()"></a>Array.prototype.includes()</h2><p>判斷 Array 是否有包含某一個值</p>
-<h4 id="參數說明-Array-prototype-includes-searchElement-fromIndex"><a href="#參數說明-Array-prototype-includes-searchElement-fromIndex" class="headerlink" title="參數說明 Array.prototype.includes(searchElement, fromIndex)"></a>參數說明 Array.prototype.includes(searchElement, fromIndex)</h4><ul>
-<li>searchElement : 被搜尋的元素</li>
-<li>fromIndex : 從第幾個元素開始找起，預設是0 (optional)</li>
-</ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>includes</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line">a.includes(<span class="number">2</span>); <span class="comment">// true </span></span><br><span class="line">a.includes(<span class="number">4</span>); <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = [<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>];</span><br><span class="line"></span><br><span class="line">arr.includes(<span class="string">'c'</span>, <span class="number">3</span>);   <span class="comment">//false</span></span><br><span class="line">arr.includes(<span class="string">'c'</span>, <span class="number">100</span>); <span class="comment">// false</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-indexOf"><a href="#Array-prototype-indexOf" class="headerlink" title="Array.prototype.indexOf()"></a>Array.prototype.indexOf()</h2><p>判斷該元素是 Array 哪一個 Index ，從左邊開始算起，找到第一個就回傳，如果找不到就回傳 -1</p>
-<h4 id="參數說明-Array-prototype-indexOf-searchElement-fromIndex"><a href="#參數說明-Array-prototype-indexOf-searchElement-fromIndex" class="headerlink" title="參數說明 Array.prototype.indexOf(searchElement, fromIndex)"></a>參數說明 Array.prototype.indexOf(searchElement, fromIndex)</h4><ul>
-<li>searchElement : 被搜尋的元素</li>
-<li>fromIndex : 從第幾個元素開始找起，預設是0 (optional)</li>
-</ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>indexOf</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="number">2</span>, <span class="number">9</span>, <span class="number">9</span>]; </span><br><span class="line">a.indexOf(<span class="number">2</span>); <span class="comment">// 0 </span></span><br><span class="line">a.indexOf(<span class="number">7</span>); <span class="comment">// -1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> array = [<span class="number">2</span>, <span class="number">9</span>, <span class="number">9</span>];</span><br><span class="line">array.indexOf(<span class="number">2</span>);     <span class="comment">// 0</span></span><br><span class="line">array.indexOf(<span class="number">7</span>);     <span class="comment">// -1</span></span><br><span class="line">array.indexOf(<span class="number">9</span>, <span class="number">2</span>);  <span class="comment">// 2</span></span><br><span class="line">array.indexOf(<span class="number">2</span>, <span class="number">-1</span>); <span class="comment">// -1</span></span><br><span class="line">array.indexOf(<span class="number">2</span>, <span class="number">-3</span>); <span class="comment">// 0</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-join"><a href="#Array-prototype-join" class="headerlink" title="Array.prototype.join()"></a>Array.prototype.join()</h2><p>將 Array 用指定的值 join 成一個字串，若沒有傳入參數，則預設是 comma<code>,</code>。 若傳入空字串，則不會有任何字串 join。</p>
-<h4 id="參數說明-Array-prototype-join-separator"><a href="#參數說明-Array-prototype-join-separator" class="headerlink" title="參數說明 Array.prototype.join(separator)"></a>參數說明 Array.prototype.join(separator)</h4><ul>
-<li>separator  : 要 join 的字串 (optional)</li>
-</ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>join</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="string">'Wind'</span>, <span class="string">'Rain'</span>, <span class="string">'Fire'</span>];</span><br><span class="line">a.join();    <span class="comment">// 'Wind,Rain,Fire'</span></span><br><span class="line">a.join(<span class="string">'-'</span>); <span class="comment">// 'Wind-Rain-Fire'</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-lastIndexOf"><a href="#Array-prototype-lastIndexOf" class="headerlink" title="Array.prototype.lastIndexOf()"></a>Array.prototype.lastIndexOf()</h2><p>判斷該元素是 Array 哪一個 Index ，從右邊開始算起，找到第一個就回傳，如果找不到就回傳 -1</p>
-<h4 id="參數說明-Array-prototype-lastIndexOf-searchElement-fromIndex"><a href="#參數說明-Array-prototype-lastIndexOf-searchElement-fromIndex" class="headerlink" title="參數說明 Array.prototype.lastIndexOf(searchElement, fromIndex)"></a>參數說明 Array.prototype.lastIndexOf(searchElement, fromIndex)</h4><ul>
-<li>searchElement : 被搜尋的元素</li>
-<li>fromIndex : 從第幾個元素開始找起，預設是0 (optional)</li>
-</ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>indexOf</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> numbers = [<span class="number">2</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">2</span>];</span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>); <span class="comment">// 3</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">7</span>); <span class="comment">// -1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> numbers = [<span class="number">2</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">2</span>];</span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>);     <span class="comment">// 3</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">7</span>);     <span class="comment">// -1</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">3</span>);  <span class="comment">// 3</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">2</span>);  <span class="comment">// 0</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">-2</span>); <span class="comment">// 0</span></span><br><span class="line">numbers.lastIndexOf(<span class="number">2</span>, <span class="number">-1</span>); <span class="comment">// 3</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">參考連結</a>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;ul&gt;
-&lt;li&gt;判斷 Array 是否有包含某一個值 &lt;code&gt;Array.prototype.includes()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;判斷該元素是 Array 哪一個 Index &lt;code&gt;Array.prototype.indexOf()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;將 Array 用指定的值 join 成一個字串 &lt;code&gt;Array.prototype.join()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;判斷該是 Array 哪一個 Index，但是是從右邊開始算起 &lt;code&gt;Array.prototype.lastIndexOf()&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
     
     </summary>
