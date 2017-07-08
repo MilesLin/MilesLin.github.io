@@ -45,9 +45,12 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-3/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/</id>
     <published>2017-07-08T15:07:00.000Z</published>
-    <updated>2017-07-08T16:54:53.060Z</updated>
+    <updated>2017-07-08T16:59:33.795Z</updated>
     
     <content type="html"><![CDATA[<p>Angular CLI 實用小技巧</p>
+<ul>
+<li>建置專案與環境參數設定</li>
+</ul>
 <a id="more"></a>
 <h2 id="Build-與-Environment"><a href="#Build-與-Environment" class="headerlink" title="Build 與 Environment"></a>Build 與 Environment</h2><p><code>build</code> 可將 Angular 專案打包，之後可以部屬到 serve 上，而 <code>environment</code> 是用來設定一些 Angular 會用到的參數，例如: 開發時的 host 是 <a href="http://dev/" target="_blank" rel="external">http://dev/</a> ， production host 是 <a href="http://prod/" target="_blank" rel="external">http://prod/</a> ，就可以將參數寫在 environment.ts。<br><div class="figure " style="width:;"><a class="fancybox" href="environments_setting.jpg" title="environment" data-fancybox-group=""><img class="fig-img" src="environments_setting.jpg" alt="environment"></a><span class="caption">environment</span></div></p>
 <h3 id="比較-Dev-Build-與-Prod-Build"><a href="#比較-Dev-Build-與-Prod-Build" class="headerlink" title="比較 Dev Build 與 Prod Build:"></a>比較 Dev Build 與 Prod Build:</h3><table>
@@ -213,6 +216,9 @@
     <summary type="html">
     
       &lt;p&gt;Angular CLI 實用小技巧&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;建置專案與環境參數設定&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -230,9 +236,13 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-2/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/</id>
     <published>2017-07-04T15:26:07.000Z</published>
-    <updated>2017-07-08T16:01:05.286Z</updated>
+    <updated>2017-07-08T17:00:11.656Z</updated>
     
     <content type="html"><![CDATA[<p>Angular CLI 實用小技巧</p>
+<ul>
+<li>建立元件與檔案 <em>(service,class,interface ….)</em></li>
+<li>建立檔案時指令的預設值設定</li>
+</ul>
 <a id="more"></a>
 <h2 id="建立-Component-小技巧"><a href="#建立-Component-小技巧" class="headerlink" title="建立 Component 小技巧"></a>建立 Component 小技巧</h2><div class="alert info no-icon"><p>ng g c &lt; options &gt;</p>
 </div>
@@ -293,6 +303,10 @@
     <summary type="html">
     
       &lt;p&gt;Angular CLI 實用小技巧&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;建立元件與檔案 &lt;em&gt;(service,class,interface ….)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;建立檔案時指令的預設值設定&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -310,9 +324,13 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-1/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/</id>
     <published>2017-07-02T14:47:41.000Z</published>
-    <updated>2017-07-08T14:59:31.726Z</updated>
+    <updated>2017-07-08T16:59:48.044Z</updated>
     
     <content type="html"><![CDATA[<p>Angular CLI 實用小技巧</p>
+<ul>
+<li>建立專案與元件</li>
+<li>程式碼一致性 <em>(lint)</em></li>
+</ul>
 <a id="more"></a>
 <h2 id="建立專案與元件類型"><a href="#建立專案與元件類型" class="headerlink" title="建立專案與元件類型"></a>建立專案與元件類型</h2><p><code>--skip-install</code> 建立NG專案的時候，不會執行 <code>npm install</code>。<br><div class="alert info no-icon"><p>ng new ngtest –skip-install</p>
 </div></p>
@@ -341,6 +359,10 @@
     <summary type="html">
     
       &lt;p&gt;Angular CLI 實用小技巧&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;建立專案與元件&lt;/li&gt;
+&lt;li&gt;程式碼一致性 &lt;em&gt;(lint)&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
