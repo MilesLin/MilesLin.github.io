@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-02-13T04:30:02.183Z</updated>
+  <updated>2017-02-13T04:30:04.000Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-02-13T04:30:02.183Z</updated>
+    <updated>2017-02-13T04:30:04.000Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -41,11 +41,67 @@
   </entry>
   
   <entry>
+    <title>ng build 並壓縮檔案</title>
+    <link href="https://mileslin.github.io/2017/07/ng-build-%E4%B8%A6%E5%A3%93%E7%B8%AE%E6%AA%94%E6%A1%88/"/>
+    <id>https://mileslin.github.io/2017/07/ng-build-並壓縮檔案/</id>
+    <published>2017-07-10T11:19:27.000Z</published>
+    <updated>2017-07-10T11:41:54.392Z</updated>
+    
+    <content type="html"><![CDATA[<p>在佈署 Angular 專案的時候為了能夠快速複製到遠端主機上，所以通常會 <code>ng build</code> 後，將 build 出來的檔案壓縮，要完成這一連串的流程，通常都是寫 cmd 來處理。</p>
+<a id="more"></a>
+<h2 id="使用-PowerShell-壓縮資料夾"><a href="#使用-PowerShell-壓縮資料夾" class="headerlink" title="使用 PowerShell 壓縮資料夾"></a>使用 PowerShell 壓縮資料夾</h2><p>命令提示字元預設是沒有將資料夾壓縮的功能，所以我這邊使用 PowerShell 幫我處理壓縮檔案。</p>
+<ol>
+<li>建立 zip.ps1 檔案</li>
+<li>貼上底下的程式碼。 <span class="highlight-text primary">記得修改$source與$destination的路徑</span><figure class="codeblock codeblock--tabbed"><figcaption><span>zip.ps1</span><ul class="tabs"><li class="tab active">ps1</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$source = "D:\Projects\Publish\Today_Deploy"</span><br><span class="line">$destination = "D:\Projects\Publish\Today_Deploy.zip"</span><br><span class="line">If(Test-path $destination) {Remove-item $destination}</span><br><span class="line">Add-Type -assembly "system.io.compression.filesystem"</span><br><span class="line">[io.compression.zipfile]::CreateFromDirectory($source,$destination)</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
+</ol>
+<p>之後命令提示字元只要使用 PowerShell 呼叫這個 script 檔案，就可以將檔案壓縮。<br><code>Powershell.exe -executionpolicy remotesigned -File  D:\Projects\zip.ps1</code></p>
+<h2 id="結合-ng-build-與壓縮指令"><a href="#結合-ng-build-與壓縮指令" class="headerlink" title="結合 ng build 與壓縮指令"></a>結合 ng build 與壓縮指令</h2><p>建立一個 deploy.bat 檔案，貼上底下的指令</p>
+<ol>
+<li>將路徑指定到 Angular 的根目錄</li>
+<li>執行 ng build 並將輸出指定到 F2E 資料夾</li>
+<li>執行壓縮</li>
+</ol>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>deploy.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /d D:\Projects\Trapac_Web_Payment\TraPacWebPayment.F2EWeb</span><br><span class="line"></span><br><span class="line">ng build --prod --output-<span class="built_in">path</span>=D:\Projects\Publish\Today_Deploy\F2E</span><br><span class="line"></span><br><span class="line">Powershell.exe -executionpolicy remotesigned -File  D:\Projects\zip.ps1</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p><strong>事情不會這麼順利的 !!!!</strong><br><div class="alert danger no-icon"><p>ng build 後，會把命令提示字元關掉，會造成第3行壓縮指令沒有執行 !!!</p>
+</div></p>
+<h2 id="拆成-3-個-bat"><a href="#拆成-3-個-bat" class="headerlink" title="拆成 3 個 bat"></a>拆成 3 個 bat</h2><ol>
+<li><p>建立 build.bat 貼上前 2 行指令</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>build.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /d D:\Projects\Trapac_Web_Payment\TraPacWebPayment.F2EWeb</span><br><span class="line"></span><br><span class="line">ng build --prod --output-<span class="built_in">path</span>=D:\Projects\Publish\Today_Deploy\F2E</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
+<li><p>建立 zip.bat 貼上第 3 行指令</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>deploy.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Powershell.exe -executionpolicy remotesigned -File  D:\Projects\zip.ps1</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
+<li><p>修改 deploy.bat ，呼叫 build.bat 與 zip.bat</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>deploy.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">call</span> D:\Projects\build.bat</span><br><span class="line"></span><br><span class="line"><span class="keyword">call</span> D:\Projects\zip.bat</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
+<li><p>執行 deploy.bat，用這種方式，就順利讓 <code>ng build</code> 之後還可以持續執行指令</p>
+</li>
+</ol>
+<h3 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h3><p>目前就自己研究出這種方式，可以讓 <code>ng build</code> 後，可持續執行後面的指令，如果讀者還有更好的方式，歡迎告知。</p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://blogs.technet.microsoft.com/heyscriptingguy/2015/03/09/use-powershell-to-create-zip-archive-of-folder/" title="use-powershell-to-create-zip" target="_blank" rel="external">use-powershell-to-create-zip</a>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在佈署 Angular 專案的時候為了能夠快速複製到遠端主機上，所以通常會 &lt;code&gt;ng build&lt;/code&gt; 後，將 build 出來的檔案壓縮，要完成這一連串的流程，通常都是寫 cmd 來處理。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
+    
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Angular CLI 實用小技巧 4</title>
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-4/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-4/</id>
     <published>2017-07-09T04:26:50.000Z</published>
-    <updated>2017-07-09T08:15:21.605Z</updated>
+    <updated>2017-07-10T11:15:49.686Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>unit tests<ul>
@@ -168,9 +224,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -179,7 +235,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-3/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/</id>
     <published>2017-07-08T15:07:00.000Z</published>
-    <updated>2017-07-09T08:15:26.692Z</updated>
+    <updated>2017-07-10T11:15:49.671Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建置專案與環境參數設定</li>
@@ -357,9 +413,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -368,7 +424,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-2/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/</id>
     <published>2017-07-04T15:26:07.000Z</published>
-    <updated>2017-07-09T08:15:30.192Z</updated>
+    <updated>2017-07-10T11:15:49.664Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立元件與檔案 <em>(service,class,interface ….)</em></li>
@@ -443,9 +499,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -454,7 +510,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-1/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/</id>
     <published>2017-07-02T14:47:41.000Z</published>
-    <updated>2017-07-09T08:15:34.565Z</updated>
+    <updated>2017-07-10T11:15:49.661Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立專案與元件</li>
@@ -497,9 +553,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -508,7 +564,7 @@
     <link href="https://mileslin.github.io/2017/06/DI-%E5%9C%B0%E9%9B%B7%E4%B9%8B%E7%94%9F%E5%91%BD%E9%80%B1%E6%9C%9F%E5%BE%88%E9%87%8D%E8%A6%81/"/>
     <id>https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/</id>
     <published>2017-06-30T10:50:44.000Z</published>
-    <updated>2017-07-05T03:09:49.189Z</updated>
+    <updated>2017-06-30T11:45:31.320Z</updated>
     
     <content type="html"><![CDATA[<p>目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:</p>
 <div class="alert warning"><p>DI 的三種生命週期很重要!!  不要亂設定!!</p>
@@ -572,7 +628,7 @@
     <link href="https://mileslin.github.io/2017/06/%E5%96%AE%E5%85%83%E6%B8%AC%E8%A9%A6Model%E9%A9%97%E8%AD%89/"/>
     <id>https://mileslin.github.io/2017/06/單元測試Model驗證/</id>
     <published>2017-06-30T04:17:39.000Z</published>
-    <updated>2017-07-05T03:09:49.227Z</updated>
+    <updated>2017-06-30T04:33:11.263Z</updated>
     
     <content type="html"><![CDATA[<p>MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。</p>
 <a id="more"></a>
@@ -606,7 +662,7 @@
     <link href="https://mileslin.github.io/2017/06/Destructuring-assignment/"/>
     <id>https://mileslin.github.io/2017/06/Destructuring-assignment/</id>
     <published>2017-06-28T15:52:51.000Z</published>
-    <updated>2017-07-05T03:09:49.225Z</updated>
+    <updated>2017-06-30T04:12:37.529Z</updated>
     
     <content type="html"><![CDATA[<p>解構賦值是一種優雅的方式能夠將<code>{}</code>與<code>[]</code>的值讀出來<br><a id="more"></a></p>
 <h2 id="讀取陣列並-assign-到變數上"><a href="#讀取陣列並-assign-到變數上" class="headerlink" title="讀取陣列並 assign 到變數上"></a>讀取陣列並 assign 到變數上</h2><p><em>陣列的解構賦值用陣列去接</em><br><figure class="codeblock codeblock--tabbed"><figcaption><span>JavaScript</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> foo = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">let</span> [one, two, three] = foo;</span><br><span class="line"><span class="built_in">console</span>.log(one); <span class="comment">// 'one'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
@@ -635,7 +691,7 @@
     <link href="https://mileslin.github.io/2017/06/%E6%93%B4%E5%85%85%E5%A5%97%E4%BB%B6%E5%B1%AC%E6%80%A7%EF%BC%8C%E4%BB%A5sweetalert%E7%82%BA%E4%BE%8B/"/>
     <id>https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/</id>
     <published>2017-06-23T06:25:13.000Z</published>
-    <updated>2017-07-05T03:09:49.228Z</updated>
+    <updated>2017-06-23T06:50:42.476Z</updated>
     
     <content type="html"><![CDATA[<p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>error_input</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">swal({</span><br><span class="line">  title: <span class="string">'Oops !!!'</span>,</span><br><span class="line">  input: <span class="string">'email'</span> <span class="comment">// &lt;- error</span></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -669,7 +725,7 @@
     <link href="https://mileslin.github.io/2017/05/%E7%82%BA%E4%BB%80%E9%BA%BC%E9%9C%80%E8%A6%81-Domain-Driven-Design/"/>
     <id>https://mileslin.github.io/2017/05/為什麼需要-Domain-Driven-Design/</id>
     <published>2017-05-21T15:51:09.000Z</published>
-    <updated>2017-05-21T17:01:39.882Z</updated>
+    <updated>2017-06-08T07:43:30.044Z</updated>
     
     <content type="html"><![CDATA[<p>最近開始看 Donmain-Driven Design 的 <a href="https://app.pluralsight.com/library/courses/domain-driven-design-fundamentals/table-of-contents" title="TitleAttribute" target="_blank" rel="external">plurasight 的影片</a> ，其裡面有一句話深深吸引我，而當我開始看 DDD 的教學影片時，發現需要知道的內容，是多麼的廣泛，這句話當之無愧。。<br> <blockquote><p>The more you know, the more you realize you know nothing</p>
 <footer><strong>Socrates</strong></footer></blockquote></p>
@@ -733,7 +789,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/vscode-%E8%A8%AD%E5%AE%9A%E8%87%AA%E5%8B%95%E8%A7%B8%E7%99%BC-suggestions/"/>
     <id>https://mileslin.github.io/2017/05/vscode-設定自動觸發-suggestions/</id>
     <published>2017-05-09T11:07:21.000Z</published>
-    <updated>2017-05-21T15:19:04.156Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>某一版 vscode 更新後，寫 markdown 文件時不會自動跑出小視窗提醒能輸入的 snippet，需要點 <span class="highlight-text primary">ctrl + space</span>
 才會出現視窗，可是中文輸入法的 <span class="highlight-text primary">ctrl + space</span> 有自己的預設行為啊 !! 。</p>
@@ -771,7 +827,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/Two-way-data-binding-event-%E7%9A%84%E5%AF%AB%E6%B3%95/"/>
     <id>https://mileslin.github.io/2017/05/Two-way-data-binding-event-的寫法/</id>
     <published>2017-05-06T08:26:25.000Z</published>
-    <updated>2017-05-21T15:19:04.155Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>之前學的 two way binding 的寫法如下</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"firstName"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -806,7 +862,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/User-input-%E5%AF%A6%E7%94%A8%E7%9A%84-key-%E4%BA%8B%E4%BB%B6/"/>
     <id>https://mileslin.github.io/2017/05/User-input-實用的-key-事件/</id>
     <published>2017-05-02T16:30:27.000Z</published>
-    <updated>2017-05-21T15:19:04.156Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>使用者輸入資料的時候，通常會綁定一些事情，做一些邏輯之類的，例如:使用者點選 Enter 則執行搜尋功能等等….</p>
 <a id="more"></a>
@@ -840,7 +896,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/%E4%BD%BF%E7%94%A8-Angular-CLI-%E5%BB%BA%E7%AB%8B-Angular-%E5%B0%88%E6%A1%88%E6%9E%B6%E6%A7%8B%E8%AA%AA%E6%98%8E/"/>
     <id>https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/</id>
     <published>2017-04-30T09:46:33.000Z</published>
-    <updated>2017-05-21T15:19:04.158Z</updated>
+    <updated>2017-05-21T15:19:06.000Z</updated>
     
     <content type="html"><![CDATA[<p>從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 <a href="https://github.com/angular/angular-cli" title="Angular CLI" target="_blank" rel="external">Angular CLI</a> 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。</p>
 <a id="more"></a>
@@ -967,9 +1023,9 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -978,7 +1034,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/Autofac-%E8%A8%AD%E5%AE%9A-Web-API-Register-Controller-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/</id>
     <published>2017-04-28T12:52:13.000Z</published>
-    <updated>2017-07-05T03:09:49.187Z</updated>
+    <updated>2017-06-30T10:24:46.636Z</updated>
     
     <content type="html"><![CDATA[<p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)</p>
 <a id="more"></a>
@@ -1023,7 +1079,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/NLog-%E5%BB%BA%E7%BD%AE%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/NLog-建置筆記/</id>
     <published>2017-04-26T13:54:29.000Z</published>
-    <updated>2017-04-26T14:58:38.000Z</updated>
+    <updated>2017-06-08T07:43:30.215Z</updated>
     
     <content type="html"><![CDATA[<p>最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。</p>
 <a id="more"></a>
@@ -1088,7 +1144,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/</id>
     <published>2017-04-23T14:43:07.000Z</published>
-    <updated>2017-04-23T17:17:59.102Z</updated>
+    <updated>2017-06-08T07:43:30.342Z</updated>
     
     <content type="html"><![CDATA[<!-- excerpt -->
 <ul>
@@ -1144,7 +1200,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/</id>
     <published>2017-04-22T15:57:37.000Z</published>
-    <updated>2017-04-22T17:34:28.866Z</updated>
+    <updated>2017-06-08T07:43:30.257Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>移除元素功能跟 insert 元素功能 <code>Array.prototype.splice()</code></li>
@@ -1201,7 +1257,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/</id>
     <published>2017-04-21T15:08:58.000Z</published>
-    <updated>2017-04-22T16:50:23.287Z</updated>
+    <updated>2017-04-22T16:50:24.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>回傳淺複製的 Array ，<code>Array.prototype.slice()</code></li>
@@ -1245,67 +1301,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
 &lt;li&gt;回傳淺複製的 Array ，&lt;code&gt;Array.prototype.slice()&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;驗證其中一個元素是否符合規則，若符合則回傳 true &lt;code&gt;Array.prototype.some()&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;排序 Array &lt;code&gt;Array.prototype.sort()&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="javascript" scheme="https://mileslin.github.io/categories/javascript/"/>
-    
-    
-      <category term="javascript" scheme="https://mileslin.github.io/tags/javascript/"/>
-    
-      <category term="array" scheme="https://mileslin.github.io/tags/array/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>javascript array methods practice VI</title>
-    <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/"/>
-    <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/</id>
-    <published>2017-04-20T15:55:24.000Z</published>
-    <updated>2017-04-22T16:50:23.285Z</updated>
-    
-    <content type="html"><![CDATA[<ul>
-<li>可累加 Array 的元素，也可以用來操作元素的值然後回傳 <code>Array.prototype.reduce()</code></li>
-<li>與 <code>Array.prototype.reduce()</code> 相似，差別在於是從右邊開始執行 <code>Array.prototype.reduceRight()</code></li>
-<li>反向 Array 本身的值 <code>Array.prototype.reverse()</code></li>
-<li>移除 Array 的第一個元素 <code>Array.prototype.shift()</code></li>
-</ul>
-<a id="more"></a>
-<h2 id="Array-prototype-reduce"><a href="#Array-prototype-reduce" class="headerlink" title="Array.prototype.reduce()"></a>Array.prototype.reduce()</h2><p>可累加 Array 的元素，累加元素的方式</p>
-<h4 id="參數說明"><a href="#參數說明" class="headerlink" title="參數說明"></a>參數說明</h4><ul>
-<li>initialValue : 給 accumulator 的初始值，如果沒有給此參數的話，accumulator 會取 Array 第一個元素的值，且會少跑 index = 0 的第一個迴圈</li>
-<li>accumulator : 累加過後的值</li>
-<li>currentValue : 現在的 value</li>
-<li>array : 整個 Array 的值</li>
-</ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>reduce int</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> initialValue = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">var</span> result = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].reduce(</span><br><span class="line">  <span class="function">(<span class="params">accumulator, currentValue, currentIndex, array</span>) =&gt;</span> {</span><br><span class="line">    <span class="keyword">return</span> accumulator + currentValue;</span><br><span class="line">  },</span><br><span class="line">  initialValue</span><br><span class="line">);</span><br><span class="line">  <span class="comment">// result = 20</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>用來攤平 Array</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Flatten an array of arrays</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> flattened = [[<span class="number">0</span>, <span class="number">1</span>], [<span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>]].reduce(</span><br><span class="line">  <span class="function">(<span class="params"> acc, cur </span>) =&gt;</span> acc.concat(cur),</span><br><span class="line">  []</span><br><span class="line">);</span><br><span class="line"><span class="comment">// flattened is [0, 1, 2, 3, 4, 5]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>用來計算 Array 裡面相同元素有幾個</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Counting instances of values in an object</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> names = [<span class="string">'Alice'</span>, <span class="string">'Bob'</span>, <span class="string">'Tiff'</span>, <span class="string">'Bruce'</span>, <span class="string">'Alice'</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> countedNames = names.reduce(<span class="function"><span class="keyword">function</span> (<span class="params">allNames, name</span>) </span>{ </span><br><span class="line">  <span class="keyword">if</span> (name <span class="keyword">in</span> allNames) {</span><br><span class="line">    allNames[name]++;</span><br><span class="line">  }</span><br><span class="line">  <span class="keyword">else</span> {</span><br><span class="line">    allNames[name] = <span class="number">1</span>;</span><br><span class="line">  }</span><br><span class="line">  <span class="keyword">return</span> allNames;</span><br><span class="line">}, {});</span><br><span class="line"><span class="comment">// countedNames is:</span></span><br><span class="line"><span class="comment">// { 'Alice': 2, 'Bob': 1, 'Tiff': 1, 'Bruce': 1 }</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>與 spread operator 混用，取得某一個欄位的所有值</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Bonding arrays contained in an array</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// friends - an array of objects </span></span><br><span class="line"><span class="comment">// where object field "books" - list of favorite books </span></span><br><span class="line"><span class="keyword">var</span> friends = [{</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Anna'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'Bible'</span>, <span class="string">'Harry Potter'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">21</span></span><br><span class="line">}, {</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Bob'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'War and peace'</span>, <span class="string">'Romeo and Juliet'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">26</span></span><br><span class="line">}, {</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Alice'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'The Lord of the Rings'</span>, <span class="string">'The Shining'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span></span><br><span class="line">}];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果 initialValue 沒有傳會造成 undefined is not a function 的 Exception</span></span><br><span class="line"><span class="comment">// allbooks - list which will contain all friends' books +  </span></span><br><span class="line"><span class="comment">// additional list contained in initialValue</span></span><br><span class="line"><span class="keyword">var</span> allbooks = friends.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">prev, curr</span>) </span>{</span><br><span class="line">  <span class="keyword">return</span> [...prev, ...curr.books];</span><br><span class="line">}, []);</span><br><span class="line"></span><br><span class="line"><span class="comment">// allbooks = [</span></span><br><span class="line"><span class="comment">//   'Bible', 'Harry Potter', 'War and peace', </span></span><br><span class="line"><span class="comment">//   'Romeo and Juliet', 'The Lord of the Rings',</span></span><br><span class="line"><span class="comment">//   'The Shining'</span></span><br><span class="line"><span class="comment">// ]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-reduceRight"><a href="#Array-prototype-reduceRight" class="headerlink" title="Array.prototype.reduceRight()"></a>Array.prototype.reduceRight()</h2><ul>
-<li>與 <code>Array.prototype.reduce()</code> 的差別，是從右邊開始執行。</li>
-</ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>reduceRight</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="string">'1'</span>, <span class="string">'2'</span>, <span class="string">'3'</span>, <span class="string">'4'</span>, <span class="string">'5'</span>]; </span><br><span class="line"><span class="keyword">var</span> left  = a.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">prev, cur</span>)      </span>{ <span class="keyword">return</span> prev + cur; }); </span><br><span class="line"><span class="keyword">var</span> right = a.reduceRight(<span class="function"><span class="keyword">function</span>(<span class="params">prev, cur</span>) </span>{ <span class="keyword">return</span> prev + cur; }); </span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(left);  <span class="comment">// "12345"</span></span><br><span class="line"><span class="built_in">console</span>.log(right); <span class="comment">// "54321"</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-reverse"><a href="#Array-prototype-reverse" class="headerlink" title="Array.prototype.reverse()"></a>Array.prototype.reverse()</h2><p>反向 Array 的值</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>reverse</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">var</span> reversed = a.reverse(); </span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a);        <span class="comment">// ['three', 'two', 'one']</span></span><br><span class="line"><span class="built_in">console</span>.log(reversed); <span class="comment">// ['three', 'two', 'one']</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-shift"><a href="#Array-prototype-shift" class="headerlink" title="Array.prototype.shift()"></a>Array.prototype.shift()</h2><p>pop() 是移除 Array 最後一個元素，而 shift 是移除 Array 的第一個元素，</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>shift</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myFish = [<span class="string">'angel'</span>, <span class="string">'clown'</span>, <span class="string">'mandarin'</span>, <span class="string">'surgeon'</span>];</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'myFish before:'</span>, myFish);</span><br><span class="line"><span class="comment">// myFish before: ['angel', 'clown', 'mandarin', 'surgeon']</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> shifted = myFish.shift(); </span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'myFish after:'</span>, myFish); </span><br><span class="line"><span class="comment">// myFish after: ['clown', 'mandarin', 'surgeon']</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'Removed this element:'</span>, shifted); </span><br><span class="line"><span class="comment">// Removed this element: angel</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">參考連結</a>]]></content>
-    
-    <summary type="html">
-    
-      &lt;ul&gt;
-&lt;li&gt;可累加 Array 的元素，也可以用來操作元素的值然後回傳 &lt;code&gt;Array.prototype.reduce()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;與 &lt;code&gt;Array.prototype.reduce()&lt;/code&gt; 相似，差別在於是從右邊開始執行 &lt;code&gt;Array.prototype.reduceRight()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;反向 Array 本身的值 &lt;code&gt;Array.prototype.reverse()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;移除 Array 的第一個元素 &lt;code&gt;Array.prototype.shift()&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
     
     </summary>
