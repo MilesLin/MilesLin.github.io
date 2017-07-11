@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://mileslin.github.io/2017/07/ng-build-並壓縮檔案/index.html">
 <meta property="og:site_name" content="Miles's Journey">
 <meta property="og:description" content="在佈署 Angular 專案的時候為了能夠快速複製到遠端主機上，所以通常會 ng build 後，將 build 出來的檔案壓縮，要完成這一連串的流程，通常都是寫 cmd 來處理。">
-<meta property="og:updated_time" content="2017-07-10T11:41:54.392Z">
+<meta property="og:updated_time" content="2017-07-10T11:46:05.141Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ng build 並壓縮檔案">
 <meta name="twitter:description" content="在佈署 Angular 專案的時候為了能夠快速複製到遠端主機上，所以通常會 ng build 後，將 build 出來的檔案壓縮，要完成這一連串的流程，通常都是寫 cmd 來處理。">
@@ -286,18 +286,18 @@
 <h2 id="結合-ng-build-與壓縮指令"><a href="#結合-ng-build-與壓縮指令" class="headerlink" title="結合 ng build 與壓縮指令"></a>結合 ng build 與壓縮指令</h2><p>建立一個 deploy.bat 檔案，貼上底下的指令</p>
 <ol>
 <li>將路徑指定到 Angular 的根目錄</li>
-<li>執行 ng build 並將輸出指定到 F2E 資料夾</li>
+<li>執行 ng build 並將輸出到 F2E 資料夾</li>
 <li>執行壓縮</li>
 </ol>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>deploy.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /d D:\Projects\Trapac_Web_Payment\TraPacWebPayment.F2EWeb</span><br><span class="line"></span><br><span class="line">ng build --prod --output-<span class="built_in">path</span>=D:\Projects\Publish\Today_Deploy\F2E</span><br><span class="line"></span><br><span class="line">Powershell.exe -executionpolicy remotesigned -File  D:\Projects\zip.ps1</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p><strong>事情不會這麼順利的 !!!!</strong><br><div class="alert danger no-icon"><p>ng build 後，會把命令提示字元關掉，會造成第3行壓縮指令沒有執行 !!!</p>
+<p><strong>結果:事情不會這麼順利的 !!!!</strong><br><div class="alert danger no-icon"><p>ng build 後，會把命令提示字元關掉，會造成第3行壓縮指令沒有執行 !!!</p>
 </div></p>
-<h2 id="拆成-3-個-bat"><a href="#拆成-3-個-bat" class="headerlink" title="拆成 3 個 bat"></a>拆成 3 個 bat</h2><ol>
+<h2 id="拆成-3-個-bat，讓後續指令能繼續進行"><a href="#拆成-3-個-bat，讓後續指令能繼續進行" class="headerlink" title="拆成 3 個 bat，讓後續指令能繼續進行"></a>拆成 3 個 bat，讓後續指令能繼續進行</h2><ol>
 <li><p>建立 build.bat 貼上前 2 行指令</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>build.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /d D:\Projects\Trapac_Web_Payment\TraPacWebPayment.F2EWeb</span><br><span class="line"></span><br><span class="line">ng build --prod --output-<span class="built_in">path</span>=D:\Projects\Publish\Today_Deploy\F2E</span><br></pre></td></tr></tbody></table></figure></div></figure>
 </li>
 <li><p>建立 zip.bat 貼上第 3 行指令</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>deploy.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Powershell.exe -executionpolicy remotesigned -File  D:\Projects\zip.ps1</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>zip.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Powershell.exe -executionpolicy remotesigned -File  D:\Projects\zip.ps1</span><br></pre></td></tr></tbody></table></figure></div></figure>
 </li>
 <li><p>修改 deploy.bat ，呼叫 build.bat 與 zip.bat</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>deploy.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">call</span> D:\Projects\build.bat</span><br><span class="line"></span><br><span class="line"><span class="keyword">call</span> D:\Projects\zip.bat</span><br></pre></td></tr></tbody></table></figure></div></figure>

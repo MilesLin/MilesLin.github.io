@@ -45,7 +45,7 @@
     <link href="https://mileslin.github.io/2017/07/ng-build-%E4%B8%A6%E5%A3%93%E7%B8%AE%E6%AA%94%E6%A1%88/"/>
     <id>https://mileslin.github.io/2017/07/ng-build-並壓縮檔案/</id>
     <published>2017-07-10T11:19:27.000Z</published>
-    <updated>2017-07-10T11:41:54.392Z</updated>
+    <updated>2017-07-10T11:46:05.141Z</updated>
     
     <content type="html"><![CDATA[<p>在佈署 Angular 專案的時候為了能夠快速複製到遠端主機上，所以通常會 <code>ng build</code> 後，將 build 出來的檔案壓縮，要完成這一連串的流程，通常都是寫 cmd 來處理。</p>
 <a id="more"></a>
@@ -59,18 +59,18 @@
 <h2 id="結合-ng-build-與壓縮指令"><a href="#結合-ng-build-與壓縮指令" class="headerlink" title="結合 ng build 與壓縮指令"></a>結合 ng build 與壓縮指令</h2><p>建立一個 deploy.bat 檔案，貼上底下的指令</p>
 <ol>
 <li>將路徑指定到 Angular 的根目錄</li>
-<li>執行 ng build 並將輸出指定到 F2E 資料夾</li>
+<li>執行 ng build 並將輸出到 F2E 資料夾</li>
 <li>執行壓縮</li>
 </ol>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>deploy.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /d D:\Projects\Trapac_Web_Payment\TraPacWebPayment.F2EWeb</span><br><span class="line"></span><br><span class="line">ng build --prod --output-<span class="built_in">path</span>=D:\Projects\Publish\Today_Deploy\F2E</span><br><span class="line"></span><br><span class="line">Powershell.exe -executionpolicy remotesigned -File  D:\Projects\zip.ps1</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p><strong>事情不會這麼順利的 !!!!</strong><br><div class="alert danger no-icon"><p>ng build 後，會把命令提示字元關掉，會造成第3行壓縮指令沒有執行 !!!</p>
+<p><strong>結果:事情不會這麼順利的 !!!!</strong><br><div class="alert danger no-icon"><p>ng build 後，會把命令提示字元關掉，會造成第3行壓縮指令沒有執行 !!!</p>
 </div></p>
-<h2 id="拆成-3-個-bat"><a href="#拆成-3-個-bat" class="headerlink" title="拆成 3 個 bat"></a>拆成 3 個 bat</h2><ol>
+<h2 id="拆成-3-個-bat，讓後續指令能繼續進行"><a href="#拆成-3-個-bat，讓後續指令能繼續進行" class="headerlink" title="拆成 3 個 bat，讓後續指令能繼續進行"></a>拆成 3 個 bat，讓後續指令能繼續進行</h2><ol>
 <li><p>建立 build.bat 貼上前 2 行指令</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>build.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /d D:\Projects\Trapac_Web_Payment\TraPacWebPayment.F2EWeb</span><br><span class="line"></span><br><span class="line">ng build --prod --output-<span class="built_in">path</span>=D:\Projects\Publish\Today_Deploy\F2E</span><br></pre></td></tr></tbody></table></figure></div></figure>
 </li>
 <li><p>建立 zip.bat 貼上第 3 行指令</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>deploy.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Powershell.exe -executionpolicy remotesigned -File  D:\Projects\zip.ps1</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>zip.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Powershell.exe -executionpolicy remotesigned -File  D:\Projects\zip.ps1</span><br></pre></td></tr></tbody></table></figure></div></figure>
 </li>
 <li><p>修改 deploy.bat ，呼叫 build.bat 與 zip.bat</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>deploy.bat</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">call</span> D:\Projects\build.bat</span><br><span class="line"></span><br><span class="line"><span class="keyword">call</span> D:\Projects\zip.bat</span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -90,9 +90,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
@@ -224,9 +224,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
@@ -235,13 +235,13 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-3/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/</id>
     <published>2017-07-08T15:07:00.000Z</published>
-    <updated>2017-07-10T11:15:49.671Z</updated>
+    <updated>2017-07-11T07:44:07.677Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建置專案與環境參數設定</li>
 </ul>
 <a id="more"></a>
-<h2 id="Build-與-Environment"><a href="#Build-與-Environment" class="headerlink" title="Build 與 Environment"></a>Build 與 Environment</h2><p><code>build</code> 可將 Angular 專案打包，之後可以部屬到 serve 上，而 <code>environment</code> 是用來設定一些 Angular 會用到的參數，例如: 開發時的 host 是 <a href="http://dev/" target="_blank" rel="external">http://dev/</a> ， production host 是 <a href="http://prod/" target="_blank" rel="external">http://prod/</a> ，就可以將參數寫在 environment.ts。<br><div class="figure " style="width:;"><a class="fancybox" href="environments_setting.jpg" title="environment" data-fancybox-group=""><img class="fig-img" src="environments_setting.jpg" alt="environment"></a><span class="caption">environment</span></div></p>
+<h2 id="Build-與-Environment"><a href="#Build-與-Environment" class="headerlink" title="Build 與 Environment"></a>Build 與 Environment</h2><p><code>build</code> 可將 Angular 專案打包，之後可以佈署到 server 上，而 <code>environment</code> 是用來設定一些 Angular 會用到的參數，例如: 開發時的 host 是 <a href="http://dev/" target="_blank" rel="external">http://dev/</a> ， production host 是 <a href="http://prod/" target="_blank" rel="external">http://prod/</a> ，就可以將參數寫在 environment.ts。<br><div class="figure " style="width:;"><a class="fancybox" href="environments_setting.jpg" title="environment" data-fancybox-group=""><img class="fig-img" src="environments_setting.jpg" alt="environment"></a><span class="caption">environment</span></div></p>
 <h3 id="比較-Dev-Build-與-Prod-Build"><a href="#比較-Dev-Build-與-Prod-Build" class="headerlink" title="比較 Dev Build 與 Prod Build:"></a>比較 Dev Build 與 Prod Build:</h3><table>
 <thead>
 <tr>
@@ -413,9 +413,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
@@ -499,9 +499,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
@@ -553,9 +553,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
@@ -1023,9 +1023,9 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
