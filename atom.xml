@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-02-13T04:30:04.000Z</updated>
+  <updated>2017-02-13T04:30:02.183Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-02-13T04:30:04.000Z</updated>
+    <updated>2017-02-13T04:30:02.183Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -41,11 +41,76 @@
   </entry>
   
   <entry>
+    <title>安裝 SQL Server 2014 Express 筆記</title>
+    <link href="https://mileslin.github.io/2017/07/%E5%AE%89%E8%A3%9D-SQL-Server-2014-Express-%E7%AD%86%E8%A8%98/"/>
+    <id>https://mileslin.github.io/2017/07/安裝-SQL-Server-2014-Express-筆記/</id>
+    <published>2017-07-15T05:45:36.000Z</published>
+    <updated>2017-07-15T06:50:15.436Z</updated>
+    
+    <content type="html"><![CDATA[<p>今天文章會說明，安裝 SQL Server Express 後，使用 Microsoft SQL Server Management Studio 的 sa 帳號登入。</p>
+<a id="more"></a>
+<h2 id="執行步驟"><a href="#執行步驟" class="headerlink" title="執行步驟"></a>執行步驟</h2><ol>
+<li><p>下載安裝檔<br>首先我們要先去 <a href="https://www.microsoft.com/zh-tw/download/details.aspx?id=42299" title="Microsoft® SQL Server® 2014 Express" target="_blank" rel="external">Microsoft® SQL Server® 2014 Express</a> 下載安裝檔案，要選擇符合作業系統的安裝檔。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="Express_Version.jpg" title="x64" data-fancybox-group=""><img class="fig-img" src="Express_Version.jpg" alt="x64"></a><span class="caption">x64</span></div>
+</li>
+<li><p>執行安裝<br>下載完畢後，執行安裝，會看到這個畫面，然後點選「新增 SQL Server 獨立安裝或將功能加入至現有安裝」</p>
+<div class="figure " style="width:;"><a class="fancybox" href="Add_SQL_Server.jpg" title="Add SQL Server" data-fancybox-group=""><img class="fig-img" src="Add_SQL_Server.jpg" alt="Add SQL Server"></a><span class="caption">Add SQL Server</span></div>
+</li>
+<li><p>選擇新安裝<br>在前幾個步驟安裝程式會做一些檢查，然後會直接來到「安裝類型」的步驟，選擇 「執行 SQL Server 2014 的新安裝」，點選下一步</p>
+<div class="figure " style="width:;"><a class="fancybox" href="New_Install.jpg" title="New Install" data-fancybox-group=""><img class="fig-img" src="New_Install.jpg" alt="New Install"></a><span class="caption">New Install</span></div>
+</li>
+<li><p>「特徵選取」，選擇要安裝的項目，以及執行個體的路徑</p>
+</li>
+<li><p>執行個體組態<br>設定具名執行個體，或者使用預設執行個體。 執行個體名稱要記錄起來，因為這是安裝完畢後，要連線的<span class="highlight-text primary">伺服器名稱</span><div class="figure " style="width:;"><a class="fancybox" href="執行個體組態.jpg" title="執行個體組態" data-fancybox-group=""><img class="fig-img" src="執行個體組態.jpg" alt="執行個體組態"></a><span class="caption">執行個體組態</span></div></p>
+</li>
+<li><p>伺服器組態<br>請確認 SQL Server Database Engine 啟動類型為自動，這樣安裝完才會執行啟動。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="伺服器組態.jpg" title="伺服器組態" data-fancybox-group=""><img class="fig-img" src="伺服器組態.jpg" alt="伺服器組態"></a><span class="caption">伺服器組態</span></div>
+</li>
+<li><p>資料庫引擎組態<br>請選擇 「混合模式」，並輸入密碼，此密碼的預設帳號是 <span class="highlight-text primary">sa</span><div class="figure " style="width:;"><a class="fancybox" href="資料庫引擎組態.jpg" title="資料庫引擎組態" data-fancybox-group=""><img class="fig-img" src="資料庫引擎組態.jpg" alt="資料庫引擎組態"></a><span class="caption">資料庫引擎組態</span></div></p>
+</li>
+<li><p>接下來就一直下一步，完成安裝。</p>
+</li>
+<li><p>開啟 「SQL Server 2014 組態管理員」，確定是否建立成功</p>
+<div class="figure " style="width:;"><a class="fancybox" href="確認服務已啟動.jpg" title="確認服務已啟動" data-fancybox-group=""><img class="fig-img" src="確認服務已啟動.jpg" alt="確認服務已啟動"></a><span class="caption">確認服務已啟動</span></div>
+</li>
+<li><p>使用 SSMS 連接資料庫</p>
+<ul>
+<li><p>選擇伺服器</p>
+<div class="figure " style="width:;"><a class="fancybox" href="選擇伺服器.jpg" title="選擇伺服器" data-fancybox-group=""><img class="fig-img" src="選擇伺服器.jpg" alt="選擇伺服器"></a><span class="caption">選擇伺服器</span></div>
+</li>
+<li><p>選擇剛剛建立的伺服器</p>
+<div class="figure " style="width:;"><a class="fancybox" href="選擇SQLEXPRESS.jpg" title="選擇 SQLEXPRESS" data-fancybox-group=""><img class="fig-img" src="選擇SQLEXPRESS.jpg" alt="選擇 SQLEXPRESS"></a><span class="caption">選擇 SQLEXPRESS</span></div>
+</li>
+<li><p>輸入剛剛安裝時候，輸入的密碼，帳號預設是 <span class="highlight-text primary">sa</span></p>
+<div class="figure " style="width:;"><a class="fancybox" href="輸入帳號密碼.jpg" title="輸入帳號密碼" data-fancybox-group=""><img class="fig-img" src="輸入帳號密碼.jpg" alt="輸入帳號密碼"></a><span class="caption">輸入帳號密碼</span></div>
+</li>
+<li><p>連線成功</p>
+<div class="figure " style="width:;"><a class="fancybox" href="連線成功.jpg" title="連線成功" data-fancybox-group=""><img class="fig-img" src="連線成功.jpg" alt="連線成功"></a><span class="caption">連線成功</span></div>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://www.youtube.com/watch?v=E_zFM7mzFUg" title="How to Install SQL Server 2014 Express and SQL Server Management Studio 2014 Express" target="_blank" rel="external">How to Install SQL Server 2014 Express and SQL Server Management Studio 2014 Express</a>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;今天文章會說明，安裝 SQL Server Express 後，使用 Microsoft SQL Server Management Studio 的 sa 帳號登入。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="SQL" scheme="https://mileslin.github.io/categories/SQL/"/>
+    
+    
+      <category term="SQL" scheme="https://mileslin.github.io/tags/SQL/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Command Line 筆記-遠端複製與壓縮</title>
     <link href="https://mileslin.github.io/2017/07/Command-Line-%E7%AD%86%E8%A8%98-%E9%81%A0%E7%AB%AF%E8%A4%87%E8%A3%BD%E8%88%87%E5%A3%93%E7%B8%AE/"/>
     <id>https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/</id>
     <published>2017-07-11T09:34:08.000Z</published>
-    <updated>2017-07-11T10:02:00.014Z</updated>
+    <updated>2017-07-15T05:44:43.738Z</updated>
     
     <content type="html"><![CDATA[<p>最近為了將的壓縮、解壓縮、遠端連線硬碟、複製貼上等等的繁瑣的事情寫成 bat 檔案，花了很多時間。  所以就來記錄一下，用 command line 自動化的功能。</p>
 <ul>
@@ -96,7 +161,7 @@
     <link href="https://mileslin.github.io/2017/07/ng-build-%E4%B8%A6%E5%A3%93%E7%B8%AE%E6%AA%94%E6%A1%88/"/>
     <id>https://mileslin.github.io/2017/07/ng-build-並壓縮檔案/</id>
     <published>2017-07-10T11:19:27.000Z</published>
-    <updated>2017-07-10T11:46:05.141Z</updated>
+    <updated>2017-07-15T05:44:43.740Z</updated>
     
     <content type="html"><![CDATA[<p>在佈署 Angular 專案的時候為了能夠快速複製到遠端主機上，所以通常會 <code>ng build</code> 後，將 build 出來的檔案壓縮，要完成這一連串的流程，通常都是寫 cmd 來處理。</p>
 <a id="more"></a>
@@ -152,7 +217,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-4/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-4/</id>
     <published>2017-07-09T04:26:50.000Z</published>
-    <updated>2017-07-10T11:15:49.686Z</updated>
+    <updated>2017-07-09T08:15:21.605Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>unit tests<ul>
@@ -286,7 +351,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-3/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/</id>
     <published>2017-07-08T15:07:00.000Z</published>
-    <updated>2017-07-11T07:44:07.677Z</updated>
+    <updated>2017-07-15T05:44:43.703Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建置專案與環境參數設定</li>
@@ -475,7 +540,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-2/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/</id>
     <published>2017-07-04T15:26:07.000Z</published>
-    <updated>2017-07-10T11:15:49.664Z</updated>
+    <updated>2017-07-09T08:15:30.192Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立元件與檔案 <em>(service,class,interface ….)</em></li>
@@ -561,7 +626,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-1/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/</id>
     <published>2017-07-02T14:47:41.000Z</published>
-    <updated>2017-07-10T11:15:49.661Z</updated>
+    <updated>2017-07-09T08:15:34.565Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立專案與元件</li>
@@ -615,7 +680,7 @@
     <link href="https://mileslin.github.io/2017/06/DI-%E5%9C%B0%E9%9B%B7%E4%B9%8B%E7%94%9F%E5%91%BD%E9%80%B1%E6%9C%9F%E5%BE%88%E9%87%8D%E8%A6%81/"/>
     <id>https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/</id>
     <published>2017-06-30T10:50:44.000Z</published>
-    <updated>2017-06-30T11:45:31.320Z</updated>
+    <updated>2017-07-05T03:09:49.189Z</updated>
     
     <content type="html"><![CDATA[<p>目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:</p>
 <div class="alert warning"><p>DI 的三種生命週期很重要!!  不要亂設定!!</p>
@@ -679,7 +744,7 @@
     <link href="https://mileslin.github.io/2017/06/%E5%96%AE%E5%85%83%E6%B8%AC%E8%A9%A6Model%E9%A9%97%E8%AD%89/"/>
     <id>https://mileslin.github.io/2017/06/單元測試Model驗證/</id>
     <published>2017-06-30T04:17:39.000Z</published>
-    <updated>2017-06-30T04:33:11.263Z</updated>
+    <updated>2017-07-05T03:09:49.227Z</updated>
     
     <content type="html"><![CDATA[<p>MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。</p>
 <a id="more"></a>
@@ -713,7 +778,7 @@
     <link href="https://mileslin.github.io/2017/06/Destructuring-assignment/"/>
     <id>https://mileslin.github.io/2017/06/Destructuring-assignment/</id>
     <published>2017-06-28T15:52:51.000Z</published>
-    <updated>2017-06-30T04:12:37.529Z</updated>
+    <updated>2017-07-05T03:09:49.225Z</updated>
     
     <content type="html"><![CDATA[<p>解構賦值是一種優雅的方式能夠將<code>{}</code>與<code>[]</code>的值讀出來<br><a id="more"></a></p>
 <h2 id="讀取陣列並-assign-到變數上"><a href="#讀取陣列並-assign-到變數上" class="headerlink" title="讀取陣列並 assign 到變數上"></a>讀取陣列並 assign 到變數上</h2><p><em>陣列的解構賦值用陣列去接</em><br><figure class="codeblock codeblock--tabbed"><figcaption><span>JavaScript</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> foo = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">let</span> [one, two, three] = foo;</span><br><span class="line"><span class="built_in">console</span>.log(one); <span class="comment">// 'one'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
@@ -742,7 +807,7 @@
     <link href="https://mileslin.github.io/2017/06/%E6%93%B4%E5%85%85%E5%A5%97%E4%BB%B6%E5%B1%AC%E6%80%A7%EF%BC%8C%E4%BB%A5sweetalert%E7%82%BA%E4%BE%8B/"/>
     <id>https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/</id>
     <published>2017-06-23T06:25:13.000Z</published>
-    <updated>2017-06-23T06:50:42.476Z</updated>
+    <updated>2017-07-05T03:09:49.228Z</updated>
     
     <content type="html"><![CDATA[<p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>error_input</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">swal({</span><br><span class="line">  title: <span class="string">'Oops !!!'</span>,</span><br><span class="line">  input: <span class="string">'email'</span> <span class="comment">// &lt;- error</span></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -776,7 +841,7 @@
     <link href="https://mileslin.github.io/2017/05/%E7%82%BA%E4%BB%80%E9%BA%BC%E9%9C%80%E8%A6%81-Domain-Driven-Design/"/>
     <id>https://mileslin.github.io/2017/05/為什麼需要-Domain-Driven-Design/</id>
     <published>2017-05-21T15:51:09.000Z</published>
-    <updated>2017-06-08T07:43:30.044Z</updated>
+    <updated>2017-05-21T17:01:39.882Z</updated>
     
     <content type="html"><![CDATA[<p>最近開始看 Donmain-Driven Design 的 <a href="https://app.pluralsight.com/library/courses/domain-driven-design-fundamentals/table-of-contents" title="TitleAttribute" target="_blank" rel="external">plurasight 的影片</a> ，其裡面有一句話深深吸引我，而當我開始看 DDD 的教學影片時，發現需要知道的內容，是多麼的廣泛，這句話當之無愧。。<br> <blockquote><p>The more you know, the more you realize you know nothing</p>
 <footer><strong>Socrates</strong></footer></blockquote></p>
@@ -840,7 +905,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/vscode-%E8%A8%AD%E5%AE%9A%E8%87%AA%E5%8B%95%E8%A7%B8%E7%99%BC-suggestions/"/>
     <id>https://mileslin.github.io/2017/05/vscode-設定自動觸發-suggestions/</id>
     <published>2017-05-09T11:07:21.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-05-21T15:19:04.156Z</updated>
     
     <content type="html"><![CDATA[<p>某一版 vscode 更新後，寫 markdown 文件時不會自動跑出小視窗提醒能輸入的 snippet，需要點 <span class="highlight-text primary">ctrl + space</span>
 才會出現視窗，可是中文輸入法的 <span class="highlight-text primary">ctrl + space</span> 有自己的預設行為啊 !! 。</p>
@@ -878,7 +943,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/Two-way-data-binding-event-%E7%9A%84%E5%AF%AB%E6%B3%95/"/>
     <id>https://mileslin.github.io/2017/05/Two-way-data-binding-event-的寫法/</id>
     <published>2017-05-06T08:26:25.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-05-21T15:19:04.155Z</updated>
     
     <content type="html"><![CDATA[<p>之前學的 two way binding 的寫法如下</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"firstName"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -913,7 +978,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/User-input-%E5%AF%A6%E7%94%A8%E7%9A%84-key-%E4%BA%8B%E4%BB%B6/"/>
     <id>https://mileslin.github.io/2017/05/User-input-實用的-key-事件/</id>
     <published>2017-05-02T16:30:27.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-05-21T15:19:04.156Z</updated>
     
     <content type="html"><![CDATA[<p>使用者輸入資料的時候，通常會綁定一些事情，做一些邏輯之類的，例如:使用者點選 Enter 則執行搜尋功能等等….</p>
 <a id="more"></a>
@@ -947,7 +1012,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/%E4%BD%BF%E7%94%A8-Angular-CLI-%E5%BB%BA%E7%AB%8B-Angular-%E5%B0%88%E6%A1%88%E6%9E%B6%E6%A7%8B%E8%AA%AA%E6%98%8E/"/>
     <id>https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/</id>
     <published>2017-04-30T09:46:33.000Z</published>
-    <updated>2017-05-21T15:19:06.000Z</updated>
+    <updated>2017-05-21T15:19:04.158Z</updated>
     
     <content type="html"><![CDATA[<p>從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 <a href="https://github.com/angular/angular-cli" title="Angular CLI" target="_blank" rel="external">Angular CLI</a> 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。</p>
 <a id="more"></a>
@@ -1085,7 +1150,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/Autofac-%E8%A8%AD%E5%AE%9A-Web-API-Register-Controller-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/</id>
     <published>2017-04-28T12:52:13.000Z</published>
-    <updated>2017-06-30T10:24:46.636Z</updated>
+    <updated>2017-07-05T03:09:49.187Z</updated>
     
     <content type="html"><![CDATA[<p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)</p>
 <a id="more"></a>
@@ -1130,7 +1195,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/NLog-%E5%BB%BA%E7%BD%AE%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/04/NLog-建置筆記/</id>
     <published>2017-04-26T13:54:29.000Z</published>
-    <updated>2017-06-08T07:43:30.215Z</updated>
+    <updated>2017-04-26T14:58:38.000Z</updated>
     
     <content type="html"><![CDATA[<p>最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。</p>
 <a id="more"></a>
@@ -1195,7 +1260,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/"/>
     <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/</id>
     <published>2017-04-23T14:43:07.000Z</published>
-    <updated>2017-06-08T07:43:30.342Z</updated>
+    <updated>2017-04-23T17:17:59.102Z</updated>
     
     <content type="html"><![CDATA[<!-- excerpt -->
 <ul>
@@ -1234,63 +1299,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <summary type="html">
     
       &lt;p&gt;Array 每一個 method 的簡短說明&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="javascript" scheme="https://mileslin.github.io/categories/javascript/"/>
-    
-    
-      <category term="javascript" scheme="https://mileslin.github.io/tags/javascript/"/>
-    
-      <category term="array" scheme="https://mileslin.github.io/tags/array/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>javascript array methods practice VIII</title>
-    <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/"/>
-    <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/</id>
-    <published>2017-04-22T15:57:37.000Z</published>
-    <updated>2017-06-08T07:43:30.257Z</updated>
-    
-    <content type="html"><![CDATA[<ul>
-<li>移除元素功能跟 insert 元素功能 <code>Array.prototype.splice()</code></li>
-<li>將 Array 元素toString，並且用 <code>,</code> 隔開 <code>Array.prototype.toString()</code></li>
-<li>從 Array 前面增加元素 <code>Array.prototype.unshift()</code></li>
-</ul>
-<a id="more"></a>
-<h2 id="Array-prototype-splice"><a href="#Array-prototype-splice" class="headerlink" title="Array.prototype.splice()"></a>Array.prototype.splice()</h2><p>移除元素功能跟 insert 元素功能。</p>
-<h4 id="參數說明"><a href="#參數說明" class="headerlink" title="參數說明"></a>參數說明</h4><ul>
-<li>start : 第幾個元素開始執行，從 0 開始計算</li>
-<li>deleteCount : 要移除幾個元素，若沒指定，則移除全部 (optional)</li>
-<li>item1, item2, … : 要被 insert 的元素 (optional)</li>
-</ul>
-<p>回傳值 : 回傳被移除的元素，若沒有元素被移除，則回傳空 Array</p>
-<!-- classes : info success warning danger no-icon -->
-<div class="alert info"><p>insert 元素</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>splice</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myFish = [<span class="string">'angel'</span>, <span class="string">'clown'</span>, <span class="string">'mandarin'</span>, <span class="string">'sturgeon'</span>];</span><br><span class="line"><span class="keyword">var</span> removed = myFish.splice(<span class="number">2</span>, <span class="number">0</span>, <span class="string">'drum'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// myFish is ["angel", "clown", "drum", "mandarin", "sturgeon"] </span></span><br><span class="line"><span class="comment">// removed is [], no elements removed</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>移除元素</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>splice</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myFish = [<span class="string">'angel'</span>, <span class="string">'clown'</span>, <span class="string">'drum'</span>, <span class="string">'mandarin'</span>, <span class="string">'sturgeon'</span>];</span><br><span class="line"><span class="keyword">var</span> removed = myFish.splice(<span class="number">3</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// removed is ["mandarin"]</span></span><br><span class="line"><span class="comment">// myFish is ["angel", "clown", "drum", "sturgeon"]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>移除元素與 insert 元素</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>splice</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myFish = [<span class="string">'angel'</span>, <span class="string">'clown'</span>, <span class="string">'drum'</span>, <span class="string">'sturgeon'</span>];</span><br><span class="line"><span class="keyword">var</span> removed = myFish.splice(<span class="number">2</span>, <span class="number">1</span>, <span class="string">'trumpet'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// myFish is ["angel", "clown", "trumpet", "sturgeon"]</span></span><br><span class="line"><span class="comment">// removed is ["drum"]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-toString"><a href="#Array-prototype-toString" class="headerlink" title="Array.prototype.toString()"></a>Array.prototype.toString()</h2><p>將 Array 元素toString，並且用 <code>,</code> 隔開</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>toString</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="number">3</span>,{<span class="attr">abc</span> : <span class="number">123</span>}]; </span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(arr.toString()); <span class="comment">//a,b,3,[object Object]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-unshift"><a href="#Array-prototype-unshift" class="headerlink" title="Array.prototype.unshift()"></a>Array.prototype.unshift()</h2><p>從 Array 前面增加元素</p>
-<p>回傳值 : 回傳增加元素後 Array 的 length</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>unshift</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>, <span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">arr.unshift(<span class="number">0</span>); <span class="comment">// result of call is 3, the new array length</span></span><br><span class="line"><span class="comment">// arr is [0, 1, 2]</span></span><br><span class="line"></span><br><span class="line">arr.unshift(<span class="number">-2</span>, <span class="number">-1</span>); <span class="comment">// = 5</span></span><br><span class="line"><span class="comment">// arr is [-2, -1, 0, 1, 2]</span></span><br><span class="line"></span><br><span class="line">arr.unshift([<span class="number">-3</span>]);</span><br><span class="line"><span class="comment">// arr is [[-3], -2, -1, 0, 1, 2]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">參考連結</a>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;ul&gt;
-&lt;li&gt;移除元素功能跟 insert 元素功能 &lt;code&gt;Array.prototype.splice()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;將 Array 元素toString，並且用 &lt;code&gt;,&lt;/code&gt; 隔開 &lt;code&gt;Array.prototype.toString()&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;從 Array 前面增加元素 &lt;code&gt;Array.prototype.unshift()&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
     
     </summary>
     
