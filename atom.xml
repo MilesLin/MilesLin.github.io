@@ -41,6 +41,50 @@
   </entry>
   
   <entry>
+    <title>啟用 Action Filter Property Injection 與 註冊 Web Abstractions</title>
+    <link href="https://mileslin.github.io/2017/07/%E5%95%9F%E7%94%A8-Action-Filter-Property-Injection-%E8%88%87-%E8%A8%BB%E5%86%8A-Web-Abstractions/"/>
+    <id>https://mileslin.github.io/2017/07/啟用-Action-Filter-Property-Injection-與-註冊-Web-Abstractions/</id>
+    <published>2017-07-22T15:02:16.000Z</published>
+    <updated>2017-07-22T16:23:44.138Z</updated>
+    
+    <content type="html"><![CDATA[<ul>
+<li>通常自動 Action Filter 的時候常常會用到一些資料庫的讀取，為了防止耦合性過高，所以建立取得 DBContext 實體的時候，可以用 DI 的方式注入。</li>
+<li>MVC 會很常用到 HttpContextBase 、 RequestContext 等等之類功能，所以也建議這些也可以用 DI 的方式注入。</li>
+</ul>
+<a id="more"></a>
+<p>簡短說明一下，此範例以 ASP.NET MVC5 為例，且在使用 Autofac 之前要先安裝 <a href="https://www.nuget.org/packages/Autofac.Mvc5/" title="Autofac.MVC5" target="_blank" rel="external">Autofac.MVC5</a>。  若完全不懂 DI 可以參考這篇 <a href="https://mileslin.github.io/2017/04/Autofac-%E8%A8%AD%E5%AE%9A-Web-API-Register-Controller-%E7%AD%86%E8%A8%98/" title="Autofac 設定 Web API Register Controller 筆記">Autofac 設定 Web API Register Controller 筆記</a> 或者參考 <a href="http://autofac.readthedocs.io/en/latest/integration/mvc.html#quick-start" title="Autofac 官方文件" target="_blank" rel="external">Autofac 官方文件</a>。</p>
+<p>其實根據 <a href="http://autofac.readthedocs.io/en/latest/integration/mvc.html#quick-start" title="Autofac官方文件" target="_blank" rel="external">Autofac官方文件</a> ，已經說明得很清楚了，重點就 2 行程式碼</p>
+<ul>
+<li>註冊 Web abstraction class : <code>builder.RegisterModule&lt;AutofacWebTypesModule&gt;();</code></li>
+<li>Action Filter 啟用 Property Injection : <code>builder.RegisterFilterProvider();</code></li>
+</ul>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Application_Start</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public class MvcApplication : System.Web.HttpApplication</span><br><span class="line">{</span><br><span class="line">    protected void Application_Start()</span><br><span class="line">    {</span><br><span class="line">        AreaRegistration.RegisterAllAreas();</span><br><span class="line">        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);</span><br><span class="line">        RouteConfig.RegisterRoutes(RouteTable.Routes);</span><br><span class="line">        BundleConfig.RegisterBundles(BundleTable.Bundles);</span><br><span class="line"></span><br><span class="line">        // 開始建立 Container</span><br><span class="line">        var builder = new ContainerBuilder();</span><br><span class="line"></span><br><span class="line">        // Register your MVC controllers. (MvcApplication is the name of</span><br><span class="line">        // the class in Global.asax.)</span><br><span class="line">        builder.RegisterControllers(typeof(MvcApplication).Assembly);</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;DateService&gt;()</span><br><span class="line">                 .As&lt;IDateService&gt;()</span><br><span class="line">                 .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">        // OPTIONAL: 註冊 web abstractions</span><br><span class="line">        builder.RegisterModule&lt;AutofacWebTypesModule&gt;();</span><br><span class="line"></span><br><span class="line">        // OPTIONAL: 啟用 property injection into action filters.</span><br><span class="line">        builder.RegisterFilterProvider();</span><br><span class="line"></span><br><span class="line">        // Set the dependency resolver to be Autofac.</span><br><span class="line">        var container = builder.Build();</span><br><span class="line">        DependencyResolver.SetResolver(new AutofacDependencyResolver(container));</span><br><span class="line"></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="測試結果"><a href="#測試結果" class="headerlink" title="測試結果"></a>測試結果</h3><p>成功取得 HttpContextBase 實體<br><div class="figure " style="width:;"><a class="fancybox" href="InjectHttpContextBase.jpg" title="Inject HttpContextBase" data-fancybox-group=""><img class="fig-img" src="InjectHttpContextBase.jpg" alt="Inject HttpContextBase"></a><span class="caption">Inject HttpContextBase</span></div></p>
+<p>成功 Property Injection<br><div class="figure " style="width:;"><a class="fancybox" href="PropertyInjection.jpg" title="Property Injection" data-fancybox-group=""><img class="fig-img" src="PropertyInjection.jpg" alt="Property Injection"></a><span class="caption">Property Injection</span></div></p>
+<h3 id="AutofacWebTypesModule-註冊的-abstraction-classes"><a href="#AutofacWebTypesModule-註冊的-abstraction-classes" class="headerlink" title="AutofacWebTypesModule 註冊的 abstraction classes"></a>AutofacWebTypesModule 註冊的 abstraction classes</h3><p>註冊 <code>AutofacWebTypesModule</code> 會把很多 MVC 用到的 abstraction class 註冊進去，其中註冊了哪類別，可參考 <a href="http://autofac.readthedocs.io/en/latest/integration/mvc.html#register-web-abstractions" title="官方文件 - register web abstractions" target="_blank" rel="external">官方文件 - register web abstractions</a></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="http://autofac.readthedocs.io/en/latest/integration/mvc.html#mvc" title="Autofac" target="_blank" rel="external">Autofac</a>, <a href="https://github.com/autofac/Examples/blob/master/src/MvcExample/Global.asax.cs" title="Autofac 建立 Container git 範例" target="_blank" rel="external">Autofac 建立 Container git 範例</a>]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;通常自動 Action Filter 的時候常常會用到一些資料庫的讀取，為了防止耦合性過高，所以建立取得 DBContext 實體的時候，可以用 DI 的方式注入。&lt;/li&gt;
+&lt;li&gt;MVC 會很常用到 HttpContextBase 、 RequestContext 等等之類功能，所以也建議這些也可以用 DI 的方式注入。&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="Autofac" scheme="https://mileslin.github.io/categories/Autofac/"/>
+    
+    
+      <category term="C#" scheme="https://mileslin.github.io/tags/C/"/>
+    
+      <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
+    
+      <category term="Autofac" scheme="https://mileslin.github.io/tags/Autofac/"/>
+    
+  </entry>
+  
+  <entry>
     <title>安裝 SQL Server 2014 Express 筆記</title>
     <link href="https://mileslin.github.io/2017/07/%E5%AE%89%E8%A3%9D-SQL-Server-2014-Express-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/07/安裝-SQL-Server-2014-Express-筆記/</id>
@@ -1252,62 +1296,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
       <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
     
       <category term="Nlog" scheme="https://mileslin.github.io/tags/Nlog/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>javascript array methods practice summary</title>
-    <link href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/"/>
-    <id>https://mileslin.github.io/2017/04/javascript-array-methods-practice-summary/</id>
-    <published>2017-04-23T14:43:07.000Z</published>
-    <updated>2017-04-23T17:17:59.102Z</updated>
-    
-    <content type="html"><![CDATA[<!-- excerpt -->
-<ul>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/#Array-from" title="Array.from">Array.from()</a>
-: 從現有 Array 建立新 Array 物件，也可以對要複製的 Array 做一些操作</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/#Array-isArray" title="Array.isArray">Array.isArray()</a>
-: 判斷物件是不是一個 Array</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-I/#Array-prototype-concat" title="Array.prototype.concat">Array.prototype.concat()</a> : 串接兩個 Array</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/#Array-prototype-copyWithin" title="Array.prototype.copyWithin">Array.prototype.copyWithin()</a> : 複製 Array 自己的元素，到自己的 Array 裡面</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/#Array-prototype-entries" title="Array.prototype.entries">Array.prototype.entries()</a> : 回傳 Array Iterator object ，iterator object可取得 index 跟 value</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-II/#Array-prototype-every" title="Array.prototype.every">Array.prototype.every()</a> : 對 Array 的所有元素做驗證，都驗證過了，則回傳 true</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/#Array-prototype-fill" title="Array.prototype.fill">Array.prototype.fill()</a> : 使 Array 填滿指定的值</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/#Array-prototype-filter" title="Array.prototype.filter">Array.prototype.filter()</a> : 過濾 Array 的資料，用起來跟 LINQ 的 <strong>where</strong> 一樣</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/#Array-prototype-find" title="Array.prototype.find">Array.prototype.find()</a> : 找到第一筆相符的資料</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-III/#Array-prototype-findIndex" title="Array.prototype.findIndex">Array.prototype.findIndex()</a> : 找到第一筆相符資料的 index</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/#Array-prototype-includes" title="Array.prototype.includes">Array.prototype.includes()</a> : 判斷 Array 是否有包含某一個值</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/#Array-prototype-indexOf" title="Array.prototype.indexOf">Array.prototype.indexOf()</a> : 判斷該元素是 Array 哪一個 Index</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/#Array-prototype-join" title="Array.prototype.join">Array.prototype.join()</a> : 將 Array 用指定的值 join 成一個字串</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-IV/#Array-prototype-lastIndexOf" title="Array.prototype.lastIndexOf">Array.prototype.lastIndexOf()</a> : 斷該元素是 Array 哪一個 Index，但是是從右邊開始算起</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/#Array-prototype-map" title="Array.prototype.map">Array.prototype.map()</a> : 建立一個全新運算過後的 Array，且不會改到原本的 Array</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/#Array-prototype-pop" title="Array.prototype.pop">Array.prototype.pop()</a> : 建除 Array 最後一個元素</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-V/#Array-prototype-push" title="Array.prototype.push">Array.prototype.push()</a> : 從最後面開始新增元素到 Array</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-reduce" title="Array.prototype.reduce">Array.prototype.reduce()</a> : 可累加 Array 的元素，也可以用來操作元素的值然後回傳</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-reduceRight" title="Array.prototype.reduceRight">Array.prototype.reduceRight()</a> : 與 <code>Array.prototype.reduce()</code> 相似，差別在於是從右邊開始執行</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-reverse" title="Array.prototype.reverse">Array.prototype.reverse()</a> : 反向 Array 本身的值</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/#Array-prototype-shift" title="Array.prototype.shift">Array.prototype.shift()</a> : 移除 Array 的第一個元素</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-slice" title="Array.prototype.slice">Array.prototype.slice()</a> : 回傳淺複製的 Array</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-some" title="Array.prototype.some">Array.prototype.some()</a> : 驗證其中一個元素是否符合規則，若符合則回傳 true</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VII/#Array-prototype-sort" title="Array.prototype.sort">Array.prototype.sort()</a> : 排序 Array</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/#Array-prototype-splice" title="Array.prototype.splice">Array.prototype.splice()</a> : 移除元素功能跟 insert 元素功能</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/#Array-prototype-toString" title="Array.prototype.toString">Array.prototype.toString()</a> :將 Array 元素toString，並且用 <code>,</code> 隔開</li>
-<li><a href="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VIII/#Array-prototype-unshift" title="Array.prototype.unshift">Array.prototype.unshift()</a> : 從 Array 前面增加元素</li>
-</ul>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">官方參考連結</a>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Array 每一個 method 的簡短說明&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="javascript" scheme="https://mileslin.github.io/categories/javascript/"/>
-    
-    
-      <category term="javascript" scheme="https://mileslin.github.io/tags/javascript/"/>
-    
-      <category term="array" scheme="https://mileslin.github.io/tags/array/"/>
     
   </entry>
   
