@@ -24,7 +24,7 @@
 <meta property="og:site_name" content="Miles's Journey">
 <meta property="og:description" content="ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。">
 <meta property="og:image" content="https://mileslin.github.io/IPrincipal.jpg">
-<meta property="og:updated_time" content="2017-07-23T08:39:06.659Z">
+<meta property="og:updated_time" content="2017-07-23T15:48:42.948Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ASP.NET 表單驗證">
 <meta name="twitter:description" content="ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。">
@@ -302,7 +302,7 @@
 <p>將 Identity 轉型為 <code>FormsIdentity</code>，取得整個 <code>FormsAuthenticationTicket</code></p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>FormsAuthenticationTicket</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">GetFormsAuthenticationTicket</span>(<span class="params"></span>)        </span><br><span class="line"></span>{</span><br><span class="line">    FormsIdentity id = (FormsIdentity)User.Identity;</span><br><span class="line">    FormsAuthenticationTicket ticket = id.Ticket;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">string</span> cookiePath = ticket.CookiePath;</span><br><span class="line">    DateTime expiration = ticket.Expiration;</span><br><span class="line">    <span class="keyword">bool</span> expired = ticket.Expired;</span><br><span class="line">    <span class="keyword">bool</span> isPersistent = ticket.IsPersistent;</span><br><span class="line">    DateTime issueDate = ticket.IssueDate;</span><br><span class="line">    <span class="keyword">string</span> name = ticket.Name;</span><br><span class="line">    <span class="keyword">string</span> userData = ticket.UserData;</span><br><span class="line">    <span class="keyword">int</span> verstion = ticket.Version;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> View();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
 <h2 id="實作登出"><a href="#實作登出" class="headerlink" title="實作登出"></a>實作登出</h2><p>登出只要簡單一行程式碼就可以了 <code>FormsAuthentication.SignOut();</code><br><figure class="codeblock codeblock--tabbed"><figcaption><span>SignOut</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">SignOut</span>(<span class="params"></span>)</span><br><span class="line"></span>{</span><br><span class="line">    FormsAuthentication.SignOut();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> RedirectToAction(<span class="string">"Index"</span>, <span class="string">"Home"</span>);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://blog.miniasp.com/post/2008/02/20/Explain-Forms-Authentication-in-ASPNET-20.aspx" title="簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式" target="_blank" rel="external">簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式</a>]</strong> <strong>[<a href="https://msdn.microsoft.com/en-us/library/aa480476.aspx" title="Explained: Forms Authentication in ASP.NET 2.0" target="_blank" rel="external">Explained: Forms Authentication in ASP.NET 2.0</a>]</strong> <strong>[<a href="https://msdn.microsoft.com/zh-tw/library/system.web.security.formsauthenticationticket.userdata.aspx" title="FormsAuthenticationTicket.UserData 屬性" target="_blank" rel="external">FormsAuthenticationTicket.UserData 屬性</a>]</strong> <strong>[<a href="https://app.pluralsight.com/player?course=mvc-applications-10-extension-points-improving&author=alex-wolf&name=mvc-applications-10-extension-points-improving-m10&clip=2&mode=live&start=89.741627&noteid=0c402383-86b5-4606-abc6-a9eea92dc6b5" title="Authorize Filter" target="_blank" rel="external">自訂 Authorize Filter</a>]</strong></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://blog.miniasp.com/post/2008/02/20/Explain-Forms-Authentication-in-ASPNET-20.aspx" title="簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式" target="_blank" rel="external">簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式</a>]</strong><br><strong>[<a href="https://msdn.microsoft.com/en-us/library/aa480476.aspx" title="Explained: Forms Authentication in ASP.NET 2.0" target="_blank" rel="external">Explained: Forms Authentication in ASP.NET 2.0</a>]</strong><br><strong>[<a href="https://msdn.microsoft.com/zh-tw/library/system.web.security.formsauthenticationticket.userdata.aspx" title="FormsAuthenticationTicket.UserData 屬性" target="_blank" rel="external">FormsAuthenticationTicket.UserData 屬性</a>]</strong><br><strong>[<a href="https://app.pluralsight.com/player?course=mvc-applications-10-extension-points-improving&author=alex-wolf&name=mvc-applications-10-extension-points-improving-m10&clip=2&mode=live&start=89.741627&noteid=0c402383-86b5-4606-abc6-a9eea92dc6b5" title="Authorize Filter" target="_blank" rel="external">自訂 Authorize Filter</a>]</strong></p>
 
             
         </div>
@@ -321,7 +321,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/自訂-AuthorizeFilter/"  data-tooltip="自訂 AuthorizeFilter">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -402,7 +402,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/自訂-AuthorizeFilter/"  data-tooltip="自訂 AuthorizeFilter">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -768,7 +768,7 @@
                 data-message-zero="no post found"
                 data-message-one="1 post found"
                 data-message-other="{n} posts found">
-                42 posts found
+                43 posts found
             </p>
         </div>
     </div>

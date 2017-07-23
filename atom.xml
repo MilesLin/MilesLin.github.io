@@ -41,11 +41,52 @@
   </entry>
   
   <entry>
+    <title>自訂 AuthorizeFilter</title>
+    <link href="https://mileslin.github.io/2017/07/%E8%87%AA%E8%A8%82-AuthorizeFilter/"/>
+    <id>https://mileslin.github.io/2017/07/自訂-AuthorizeFilter/</id>
+    <published>2017-07-24T15:16:40.000Z</published>
+    <updated>2017-07-23T15:47:52.452Z</updated>
+    
+    <content type="html"><![CDATA[<p>自行 AuthorizeFilter</p>
+<a id="more"></a>
+<h2 id="生命週期說明"><a href="#生命週期說明" class="headerlink" title="生命週期說明"></a>生命週期說明</h2><p>根據 mvc 的生命週期，其中有兩個驗證的點 <span class="highlight-text primary">Authentication Filter </span> 與 <span class="highlight-text primary">Authorization Filter</span> 來驗證使用者是否驗證成功，這兩個分別代表:</p>
+<ul>
+<li>Authentication Filter : 驗證你是誰 </li>
+<li>Authorization Filter : 驗證你能做什麼事情<div class="figure " style="width:;"><a class="fancybox" href="FilterExecutionProcess.jpg" title="來源 : goo.gl/uXbsgV" data-fancybox-group=""><img class="fig-img" src="FilterExecutionProcess.jpg" alt="來源 : goo.gl/uXbsgV"></a><span class="caption">來源 : goo.gl/uXbsgV</span></div>
+</li>
+</ul>
+<h2 id="實作-Authorization-Filter"><a href="#實作-Authorization-Filter" class="headerlink" title="實作 Authorization Filter"></a>實作 Authorization Filter</h2><p>這兩個實作方法差不多，而今天會實作 Authorization Filter 當作範例。</p>
+<ul>
+<li>首先新增一個 MyAuthorizationFilter</li>
+<li>繼承 FilterAttribute 與 實作 IAuthorizationFilter <em>(要注意命名空間是 System.Web.Mvc ，不要選錯了)</em></li>
+<li><span class="highlight-text success">驗證通過不要做任何事</span> vs <span class="highlight-text danger">驗證失敗 assign => filterContext.Result = new HttpUnauthorizedResult();</span>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>MyAuthorizationFilter</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class MyAuthorizationFilter : System.Web.Mvc.FilterAttribute, System.Web.Mvc.IAuthorizationFilter</span><br><span class="line">{</span><br><span class="line">    public void OnAuthorization(AuthorizationContext filterContext)</span><br><span class="line">    {</span><br><span class="line">        if (!filterContext.HttpContext.User.Identity.IsAuthenticated)</span><br><span class="line">        {</span><br><span class="line">            filterContext.Result = new HttpUnauthorizedResult();</span><br><span class="line">        }            </span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
+</ul>
+<p>至於 assign <code>HttpUnauthorizedResult()</code> 的意思是說，驗證沒通過，會將導向登入頁面。  這邊以表單驗證為例，登入頁面網址是設定在 web.config 。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="webconfig.jpg" title="config" data-fancybox-group=""><img class="fig-img" src="webconfig.jpg" alt="config"></a><span class="caption">config</span></div>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="http://www.paraesthesia.com/archive/2013/09/27/using-asp-net-mvc-5-iauthenticationfilter-for-authentication-challenges.aspx/" title="Using ASP.NET MVC 5 IAuthenticationFilter for Authentication Challenges" target="_blank" rel="external">Using ASP.NET MVC 5 IAuthenticationFilter for Authentication Challenges</a>]</strong><br> <strong>[<a href="https://app.pluralsight.com/player?course=mvc-applications-10-extension-points-improving&author=alex-wolf&name=mvc-applications-10-extension-points-improving-m10&clip=2&mode=live" title="pluralsight 範例" target="_blank" rel="external">pluralsight 範例</a>]</strong><br> <strong>[<a href="https://samritchie.net/2014/02/27/basic-auth-with-a-web-api-2-iauthenticationfilter/" title="附上 web api2 驗證說明" target="_blank" rel="external">附上 web api2 驗證說明</a>]</strong></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;自行 AuthorizeFilter&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Authentication" scheme="https://mileslin.github.io/categories/Authentication/"/>
+    
+    
+      <category term="Authentication" scheme="https://mileslin.github.io/tags/Authentication/"/>
+    
+  </entry>
+  
+  <entry>
     <title>ASP.NET 表單驗證</title>
     <link href="https://mileslin.github.io/2017/07/ASP-NET-%E8%A1%A8%E5%96%AE%E9%A9%97%E8%AD%89/"/>
     <id>https://mileslin.github.io/2017/07/ASP-NET-表單驗證/</id>
     <published>2017-07-23T06:49:29.000Z</published>
-    <updated>2017-07-23T08:39:06.659Z</updated>
+    <updated>2017-07-23T15:48:42.948Z</updated>
     
     <content type="html"><![CDATA[<p>ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。</p>
 <a id="more"></a>
@@ -70,7 +111,7 @@
 <p>將 Identity 轉型為 <code>FormsIdentity</code>，取得整個 <code>FormsAuthenticationTicket</code></p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>FormsAuthenticationTicket</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">GetFormsAuthenticationTicket</span>(<span class="params"></span>)        </span><br><span class="line"></span>{</span><br><span class="line">    FormsIdentity id = (FormsIdentity)User.Identity;</span><br><span class="line">    FormsAuthenticationTicket ticket = id.Ticket;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">string</span> cookiePath = ticket.CookiePath;</span><br><span class="line">    DateTime expiration = ticket.Expiration;</span><br><span class="line">    <span class="keyword">bool</span> expired = ticket.Expired;</span><br><span class="line">    <span class="keyword">bool</span> isPersistent = ticket.IsPersistent;</span><br><span class="line">    DateTime issueDate = ticket.IssueDate;</span><br><span class="line">    <span class="keyword">string</span> name = ticket.Name;</span><br><span class="line">    <span class="keyword">string</span> userData = ticket.UserData;</span><br><span class="line">    <span class="keyword">int</span> verstion = ticket.Version;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> View();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
 <h2 id="實作登出"><a href="#實作登出" class="headerlink" title="實作登出"></a>實作登出</h2><p>登出只要簡單一行程式碼就可以了 <code>FormsAuthentication.SignOut();</code><br><figure class="codeblock codeblock--tabbed"><figcaption><span>SignOut</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">SignOut</span>(<span class="params"></span>)</span><br><span class="line"></span>{</span><br><span class="line">    FormsAuthentication.SignOut();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> RedirectToAction(<span class="string">"Index"</span>, <span class="string">"Home"</span>);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://blog.miniasp.com/post/2008/02/20/Explain-Forms-Authentication-in-ASPNET-20.aspx" title="簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式" target="_blank" rel="external">簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式</a>]</strong> <strong>[<a href="https://msdn.microsoft.com/en-us/library/aa480476.aspx" title="Explained: Forms Authentication in ASP.NET 2.0" target="_blank" rel="external">Explained: Forms Authentication in ASP.NET 2.0</a>]</strong> <strong>[<a href="https://msdn.microsoft.com/zh-tw/library/system.web.security.formsauthenticationticket.userdata.aspx" title="FormsAuthenticationTicket.UserData 屬性" target="_blank" rel="external">FormsAuthenticationTicket.UserData 屬性</a>]</strong> <strong>[<a href="https://app.pluralsight.com/player?course=mvc-applications-10-extension-points-improving&author=alex-wolf&name=mvc-applications-10-extension-points-improving-m10&clip=2&mode=live&start=89.741627&noteid=0c402383-86b5-4606-abc6-a9eea92dc6b5" title="Authorize Filter" target="_blank" rel="external">自訂 Authorize Filter</a>]</strong></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://blog.miniasp.com/post/2008/02/20/Explain-Forms-Authentication-in-ASPNET-20.aspx" title="簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式" target="_blank" rel="external">簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式</a>]</strong><br><strong>[<a href="https://msdn.microsoft.com/en-us/library/aa480476.aspx" title="Explained: Forms Authentication in ASP.NET 2.0" target="_blank" rel="external">Explained: Forms Authentication in ASP.NET 2.0</a>]</strong><br><strong>[<a href="https://msdn.microsoft.com/zh-tw/library/system.web.security.formsauthenticationticket.userdata.aspx" title="FormsAuthenticationTicket.UserData 屬性" target="_blank" rel="external">FormsAuthenticationTicket.UserData 屬性</a>]</strong><br><strong>[<a href="https://app.pluralsight.com/player?course=mvc-applications-10-extension-points-improving&author=alex-wolf&name=mvc-applications-10-extension-points-improving-m10&clip=2&mode=live&start=89.741627&noteid=0c402383-86b5-4606-abc6-a9eea92dc6b5" title="Authorize Filter" target="_blank" rel="external">自訂 Authorize Filter</a>]</strong></p>
 ]]></content>
     
     <summary type="html">
@@ -300,9 +341,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
@@ -434,9 +475,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
@@ -623,9 +664,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
@@ -709,9 +750,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
@@ -763,9 +804,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
@@ -1239,54 +1280,9 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
-    
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
-  </entry>
-  
-  <entry>
-    <title>Autofac 設定 Web API Register Controller 筆記</title>
-    <link href="https://mileslin.github.io/2017/04/Autofac-%E8%A8%AD%E5%AE%9A-Web-API-Register-Controller-%E7%AD%86%E8%A8%98/"/>
-    <id>https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/</id>
-    <published>2017-04-28T12:52:13.000Z</published>
-    <updated>2017-07-05T03:09:49.187Z</updated>
-    
-    <content type="html"><![CDATA[<p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)</p>
-<a id="more"></a>
-<h2 id="使用容器註冊物件"><a href="#使用容器註冊物件" class="headerlink" title="使用容器註冊物件"></a>使用容器註冊物件</h2><p>為了方便整理，我會先新增 <code>AutofacConfig.cs</code> 放在 App_Start 資料夾裡面， <code>AutofacConfig.cs</code> 則負責註冊。</p>
-<ul>
-<li>安裝 <a href="https://www.nuget.org/packages/Autofac.WebApi2/" title="Autofac.WebAPi2" target="_blank" rel="external">Autofac.WebAPi2</a></li>
-<li>先註冊所有 Web API Controller 到 ContainerBuilder</li>
-<li>註冊所有 Controller 要相依的物件，這邊以 IConfiguration 為例子，表示 Controller 建構式注入 IConfiguration 時會取得 Configuration 物件</li>
-<li>開啟 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper()</code><figure class="codeblock codeblock--tabbed"><figcaption><span>AutofacConfig</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AutofacConfig</span></span><br><span class="line">{</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Bootstrapper</span>(<span class="params"></span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Get your HttpConfiguration.</span></span><br><span class="line">        <span class="keyword">var</span> config = GlobalConfiguration.Configuration;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Register your Web API controllers.</span></span><br><span class="line">        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// OPTIONAL: Register the Autofac filter provider.</span></span><br><span class="line">        builder.RegisterWebApiFilterProvider(config);</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> container = builder.Build();</span><br><span class="line"></span><br><span class="line">        config.DependencyResolver = <span class="keyword">new</span> AutofacWebApiDependencyResolver(container);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-</li>
-</ul>
-<p>打開 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper();</code><br><figure class="codeblock codeblock--tabbed"><figcaption><span>Global.asax.cs</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class WebApiApplication : System.Web.HttpApplication</span><br><span class="line">{</span><br><span class="line">    protected void Application_Start()</span><br><span class="line">    {</span><br><span class="line">        AreaRegistration.RegisterAllAreas();</span><br><span class="line">        GlobalConfiguration.Configure(WebApiConfig.Register);</span><br><span class="line">        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);</span><br><span class="line">        RouteConfig.RegisterRoutes(RouteTable.Routes);</span><br><span class="line">        BundleConfig.RegisterBundles(BundleTable.Bundles);</span><br><span class="line">        </span><br><span class="line">        // 加入這行</span><br><span class="line">        AutofacConfig.Bootstrapper();</span><br><span class="line"></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<p>接下來 Controller 就可以建構式注入 IConfiguration 取得 Configuration 物件<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Controller</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ValuesController</span> : <span class="title">ApiController</span></span><br><span class="line">{</span><br><span class="line">    IConfiguration _configuration;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ValuesController</span>(<span class="params">IConfiguration configuration</span>)</span><br><span class="line">    </span>{</span><br><span class="line">        _configuration = configuration;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="建立-Autofac-Module"><a href="#建立-Autofac-Module" class="headerlink" title="建立 Autofac.Module"></a>建立 Autofac.Module</h2><p>當註冊物件一多的時候，我們可以建立 <code>Aufofac.Module</code> 把註冊這件事情分散在各個 Module 處理。</p>
-<p>例如我建立一個 EFModule ，註冊 Entities。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>EFModule</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class EFModule : Autofac.Module</span><br><span class="line">{</span><br><span class="line">    protected override void Load(ContainerBuilder builder)</span><br><span class="line">    {</span><br><span class="line">        builder.RegisterType&lt;WebPaymentEntities&gt;()</span><br><span class="line">           .As&lt;WebPaymentEntities&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<p>我的 ContainerBuilder 只要註冊 Module 就好<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Register Module</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Bootstrapper</span>(<span class="params"></span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Get your HttpConfiguration.</span></span><br><span class="line">        <span class="keyword">var</span> config = GlobalConfiguration.Configuration;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Register your Web API controllers.</span></span><br><span class="line">        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// OPTIONAL: Register the Autofac filter provider.</span></span><br><span class="line">        builder.RegisterWebApiFilterProvider(config);</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 註冊 Module</span></span><br><span class="line">        builder.RegisterModule(<span class="keyword">new</span> EFModule());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> container = builder.Build();</span><br><span class="line"></span><br><span class="line">        config.DependencyResolver = <span class="keyword">new</span> AutofacWebApiDependencyResolver(container);</span><br><span class="line">    }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="一次註冊多個物件"><a href="#一次註冊多個物件" class="headerlink" title="一次註冊多個物件"></a>一次註冊多個物件</h2><p>在寫 MVC 或 Web API 的時候可以常見到 <a href="https://msdn.microsoft.com/en-us/library/ff649690.aspx" title="Repository Pattern" target="_blank" rel="external">Repository Pattern</a> 而 Repository Pattern 有一定的命名規格，例如: 介面 <code>IxxxRepository</code> 會對應到一個類別 <code>xxxRepository</code>。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Repository</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ProductRepository</span> : <span class="title">IProductRepository</span></span><br><span class="line">{</span><br><span class="line">    <span class="keyword">private</span> WebPaymentEntities context;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ImportContainerRepository</span>(<span class="params">WebPaymentEntities context</span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">this</span>.context = context;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<p>我們就可以用這命名的 Pattern 建立一個 Autofac Module 註冊所有的 Repository</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Respository Module</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class RepositoryModule : Autofac.Module</span><br><span class="line">{</span><br><span class="line">    protected override void Load(ContainerBuilder builder)</span><br><span class="line">    {</span><br><span class="line">        builder.RegisterAssemblyTypes(typeof(WebApiApplication).Assembly)</span><br><span class="line">               .Where(t =&gt; t.Name.EndsWith("Repository"))</span><br><span class="line">               .AsImplementedInterfaces()</span><br><span class="line">              .InstancePerLifetimeScope();</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>通常 Autofac 設定一次就很少再設定了，所以沒有研究很深，就先筆記到這邊，等之後需要其他應用的時候，再來詳細閱讀官方文件。</p>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="http://autofac.readthedocs.io/en/latest/integration/webapi.html#register-controllers" title="Autofac官方文件" target="_blank" rel="external">Autofac 官方文件</a>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="Autofac" scheme="https://mileslin.github.io/categories/Autofac/"/>
-    
-    
-      <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
-    
-      <category term="C#" scheme="https://mileslin.github.io/tags/C/"/>
-    
-      <category term="Autofac" scheme="https://mileslin.github.io/tags/Autofac/"/>
+      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   

@@ -6,10 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Miles&#39;s Journey">
-    <title>單元測試 Model 驗證 - Miles&#39;s Journey</title>
+    <title>Archives: 2017 - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,MVC,Unit Test">
+        <meta name="keywords" content=".NET,">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,16 +17,12 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。">
-<meta property="og:type" content="blog">
-<meta property="og:title" content="單元測試 Model 驗證">
-<meta property="og:url" content="https://mileslin.github.io/2017/06/單元測試Model驗證/index.html">
+    <meta property="og:type" content="blog">
+<meta property="og:title" content="Miles's Journey">
+<meta property="og:url" content="https://mileslin.github.io/archives/2017/page/5/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。">
-<meta property="og:updated_time" content="2017-07-05T03:09:49.227Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="單元測試 Model 驗證">
-<meta name="twitter:description" content="MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。">
+<meta name="twitter:title" content="Miles's Journey">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -68,7 +64,7 @@
         
     
 
-<header id="header" data-behavior="4">
+<header id="header" data-behavior="1">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
@@ -90,7 +86,7 @@
 
     
 
-<nav id="sidebar" data-behavior="4">
+<nav id="sidebar" data-behavior="1">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -241,131 +237,81 @@
 </nav>
 
             
-            <div id="main" data-behavior="4"
+            <div id="main" data-behavior="1"
                  class="
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    <section class="postShorten-group main-content-wrap">
     
     
-        <div class="post-header main-content-wrap text-left">
-    
-        <h1 class="post-title" itemprop="headline">
-            單元測試 Model 驗證
-        </h1>
-    
-    <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-06-30T12:17:39+08:00">
+    <article class="postShorten postShorten--thumbnailimg-right" itemscope itemType="http://schema.org/BlogPosting">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title" itemprop="headline">
+                    
+                        <a class="link-unstyled" href="/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            Anatomy of an Angular Application
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time itemprop="datePublished" datetime="2017-01-28T16:38:44+08:00">
 	
-		    Jun 30, 2017
+		    Jan 28, 2017
     	
     </time>
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/Unit-Test/">Unit Test</a>
+    <a class="category-link" href="/categories/Angular/">Angular</a>
 
 
     
 </div>
-
-</div>
-    
-    <div class="post-content markdown" itemprop="articleBody">
-        <div class="main-content-wrap">
-            <p>MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。</p>
-<a id="more"></a>
-<p>首先我們會有一個要被驗證的 Model<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Model</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">VM</span> : <span class="title">IValidatableObject</span></span><br><span class="line">{        </span><br><span class="line">    [Required]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Email { <span class="keyword">get</span>; <span class="keyword">set</span>; }</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Name { <span class="keyword">get</span>; <span class="keyword">set</span>; }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerable&lt;ValidationResult&gt; <span class="title">Validate</span>(<span class="params">ValidationContext validationContext</span>)</span><br><span class="line">    </span>{            </span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.Name == <span class="string">"Test"</span>)            </span><br><span class="line">        {</span><br><span class="line">            <span class="function"><span class="keyword">yield</span> return new <span class="title">ValidationResult</span>(<span class="params"><span class="string">"Please, set right name"</span></span>)</span>;</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="使用-Validator-驗證-Model"><a href="#使用-Validator-驗證-Model" class="headerlink" title="使用 Validator 驗證 Model"></a>使用 Validator 驗證 Model</h2><p>寫單元測試的話，其實很簡單，只要用 <code>Validator.TryValidateObject</code> 就能夠知道是否驗證成功，以及取得錯誤訊息。<br>所以寫單元測試就兩個重點要記得，這樣就能輕易寫 Model 驗證的單元測試了:</p>
-<ul>
-<li><code>Validator.TryValidateObject</code> 回傳是否驗證成功</li>
-<li>傳入 <code>List&lt;ValidationResult&gt;</code> 取得錯誤訊息</li>
-</ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Unit Test</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[TestMethod()]</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ValidateTest</span>(<span class="params"></span>)</span><br><span class="line"></span>{</span><br><span class="line">    <span class="comment">// Arrange</span></span><br><span class="line">    <span class="keyword">var</span> model = <span class="keyword">new</span> VM()</span><br><span class="line">    {</span><br><span class="line">        Email = <span class="literal">null</span></span><br><span class="line">    };</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Act</span></span><br><span class="line">    <span class="keyword">var</span> validationResults = <span class="keyword">new</span> List&lt;ValidationResult&gt;();</span><br><span class="line">    <span class="keyword">var</span> actual = Validator.TryValidateObject(model, <span class="keyword">new</span> ValidationContext(model), validationResults, validateAllProperties: <span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Assert</span></span><br><span class="line">    Assert.IsFalse(actual, <span class="string">"Expected validation to fail."</span>);</span><br><span class="line">    Assert.IsTrue(validationResults[<span class="number">0</span>].MemberNames.ElementAt(<span class="number">0</span>) == <span class="keyword">nameof</span>(model.Email));</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://www.intertech.com/Blog/unit-test-net-entity-validation/" title="How to Unit Test .NET Entity Validation" target="_blank" rel="external">How to Unit Test .NET Entity Validation</a>
-
-            
-        </div>
-    </div>
-    <div id="post-footer" class="post-footer main-content-wrap">
-        
-            <div class="post-footer-tags">
-                <span class="text-color-light text-small">TAGGED IN</span><br/>
-                
-    <a class="tag tag--primary tag--small t-link" href="/tags/MVC/">MVC</a> <a class="tag tag--primary tag--small t-link" href="/tags/Unit-Test/">Unit Test</a>
 
             </div>
-        
-        <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/DI-地雷之生命週期很重要/"  data-tooltip="DI 地雷之生命週期很重要">
-                
-                    <i class="fa fa-angle-left"></i>
-                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
-                </a>
-            </li>
-            <li class="post-action">
-                
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/Destructuring-assignment/" data-tooltip="Destructuring assignment">
-                
-                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/單元測試Model驗證/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/單元測試Model驗證/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/單元測試Model驗證/">
-                <i class="fa fa-twitter"></i>
-            </a>
-        </li>
-        
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
-                </a>
-            </li>
-        
-        <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <div class="postShorten-excerpt" itemprop="articleBody">
+                    <h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br>
+                    
+                        <a href="/2017/01/Anatomy-of-an-Angular-2-Application/" class="postShorten-excerpt_link link">
+                            Continue reading
+                        </a>
+                        
+                    
+                </div>
             
-                <i class="fa fa-list"></i>
+        </div>
+        
+            <a href="/2017/01/Anatomy-of-an-Angular-2-Application/">
+                <div class="postShorten-thumbnailimg">
+                    <img alt="" itemprop="image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg"/>
+                </div>
+            </a>
+            
+        
+    </article>
+    
+    <div class="pagination-bar">
+    <ul class="pagination">
+        
+        <li class="pagination-prev">
+            
+                <a class="btn btn--default btn--small" href="/archives/2017/page/4/">
+            
+                <i class="fa fa-angle-left text-base icon-mr"></i>
+                    <span>NEWER POSTS</span>
             </a>
         </li>
+        
+        
+        <li class="pagination-number">page 5 of 5</li>
     </ul>
 </div>
 
-
-        
-            
-                <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-</div>
-            
-        
-    </div>
-</article>
+</section>
 
 
 
@@ -376,90 +322,6 @@
 </footer>
 
             </div>
-            
-                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-                    <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/DI-地雷之生命週期很重要/"  data-tooltip="DI 地雷之生命週期很重要">
-                
-                    <i class="fa fa-angle-left"></i>
-                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
-                </a>
-            </li>
-            <li class="post-action">
-                
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/Destructuring-assignment/" data-tooltip="Destructuring assignment">
-                
-                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/單元測試Model驗證/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/單元測試Model驗證/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/單元測試Model驗證/">
-                <i class="fa fa-twitter"></i>
-            </a>
-        </li>
-        
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
-                </a>
-            </li>
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#">
-            
-                <i class="fa fa-list"></i>
-            </a>
-        </li>
-    </ul>
-</div>
-
-
-                </div>
-                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-    <ul class="share-options">
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/單元測試Model驗證/">
-                <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/單元測試Model驗證/">
-                <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/單元測試Model驗證/">
-                <i class="fa fa-twitter"></i><span>Share on Twitter</span>
-            </a>
-        </li>
-    </ul>
-</div>
-<div id="share-options-mask" class="share-options-mask"></div>
-
             
         </div>
         
@@ -762,25 +624,6 @@
 <script src="/assets/js/jquery.fancybox-thumbs.js"></script>
 <script src="/assets/js/tranquilpeak.js"></script>
 <!--SCRIPTS END-->
-
-    
-        <script>
-             var disqus_config = function () {
-                 this.page.url = 'https://mileslin.github.io/2017/06/單元測試Model驗證/';
-                 
-                    this.page.identifier = '2017/06/單元測試Model驗證/';
-                 
-             };
-            (function() {
-                var d = document, s = d.createElement('script');
-                var disqus_shortname = 'https-mileslin-github-io';
-                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-
-                s.setAttribute('data-timestamp', +new Date());
-                (d.head || d.body).appendChild(s);
-            })();
-        </script>
-    
 
 
 
