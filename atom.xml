@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-02-13T04:30:02.183Z</updated>
+  <updated>2017-01-31T14:55:39.253Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-02-13T04:30:02.183Z</updated>
+    <updated>2017-01-31T14:55:39.253Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -41,11 +41,41 @@
   </entry>
   
   <entry>
+    <title>Type Keyword and Union Types</title>
+    <link href="https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/"/>
+    <id>https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/</id>
+    <published>2017-07-24T15:49:42.000Z</published>
+    <updated>2017-07-24T16:30:43.456Z</updated>
+    
+    <content type="html"><![CDATA[<p>Type Keyword 是 typescript 能將型別取一個別名的方式，例如我將型別 <code>string</code> assign 給 myType，之後就可以用 myType 來定義變數的型別。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>type keyword</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> myType = <span class="built_in">string</span>;</span><br><span class="line"><span class="keyword">let</span> a: myType = <span class="string">'hello'</span>;</span><br><span class="line"><span class="keyword">let</span> b: myType = <span class="number">10</span>; <span class="comment">// Type 'number' is not assignable to type 'string'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<a id="more"></a>
+<h2 id="限定傳入字串的值"><a href="#限定傳入字串的值" class="headerlink" title="限定傳入字串的值"></a>限定傳入字串的值</h2><p>其中還有一種用法，就可以限制限定 myType 只能允許是有些特定字串的值，例如我只允許字串只能輸入 <code>&quot;cash&quot;</code> ，輸入其他字串則會顯示錯誤。<br><div class="figure " style="width:;"><a class="fancybox" href="myType_Cash.jpg" title="myType_Cash" data-fancybox-group=""><img class="fig-img" src="myType_Cash.jpg" alt="myType_Cash"></a><span class="caption">myType_Cash</span></div></p>
+<h2 id="搭配使用-Union-Types"><a href="#搭配使用-Union-Types" class="headerlink" title="搭配使用 Union Types"></a>搭配使用 Union Types</h2><p>搭配使用 Union Types ，可以讓傳入字串有更多選擇，例如我允許字串只能輸入 <code>&quot;cash&quot;</code>、<code>&quot;credit&quot;</code>、<code>&quot;paypal&quot;</code><br><div class="figure " style="width:;"><a class="fancybox" href="union_type.jpg" title="union_type" data-fancybox-group=""><img class="fig-img" src="union_type.jpg" alt="union_type"></a><span class="caption">union_type</span></div></p>
+<p><strong>可以不要有別名，直接在 function 參數裡面直接定義能傳入那些字串</strong><br><div class="figure " style="width:;"><a class="fancybox" href="define_in_function.jpg" title="define_in_function" data-fancybox-group=""><img class="fig-img" src="define_in_function.jpg" alt="define_in_function"></a><span class="caption">define_in_function</span></div></p>
+<h2 id="可用自訂義的型別"><a href="#可用自訂義的型別" class="headerlink" title="可用自訂義的型別"></a>可用自訂義的型別</h2><p>Union Types 也可以用自訂義的型別或介面<br><div class="figure " style="width:;"><a class="fancybox" href="use_interface_and_class.jpg" title="use_interface_and_class" data-fancybox-group=""><img class="fig-img" src="use_interface_and_class.jpg" alt="use_interface_and_class"></a><span class="caption">use_interface_and_class</span></div></p>
+<p><strong>可以自訂義 function type</strong><br><div class="figure " style="width:;"><a class="fancybox" href="callback.jpg" title="callback" data-fancybox-group=""><img class="fig-img" src="callback.jpg" alt="callback"></a><span class="caption">callback</span></div></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://angular-2-training-book.rangle.io/handout/features/type_keyword.html" title="type keyword" target="_blank" rel="external">type keyword</a>]</strong><br><strong>[<a href="http://www.typescriptlang.org/play/" title="typescript online" target="_blank" rel="external">typescript online</a>]</strong></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Type Keyword 是 typescript 能將型別取一個別名的方式，例如我將型別 &lt;code&gt;string&lt;/code&gt; assign 給 myType，之後就可以用 myType 來定義變數的型別。&lt;br&gt;&lt;figure class=&quot;codeblock codeblock--tabbed&quot;&gt;&lt;figcaption&gt;&lt;span&gt;type keyword&lt;/span&gt;&lt;ul class=&quot;tabs&quot;&gt;&lt;li class=&quot;tab active&quot;&gt;ts&lt;/li&gt;&lt;/ul&gt;&lt;/figcaption&gt;&lt;div class=&quot;tabs-content&quot;&gt;&lt;figure class=&quot;highlight ts&quot; style=&quot;display: block;&quot;&gt;&lt;table&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;type&lt;/span&gt; myType = &lt;span class=&quot;built_in&quot;&gt;string&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;let&lt;/span&gt; a: myType = &lt;span class=&quot;string&quot;&gt;&#39;hello&#39;&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;let&lt;/span&gt; b: myType = &lt;span class=&quot;number&quot;&gt;10&lt;/span&gt;; &lt;span class=&quot;comment&quot;&gt;// Type &#39;number&#39; is not assignable to type &#39;string&#39;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/div&gt;&lt;/figure&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="typescript" scheme="https://mileslin.github.io/categories/typescript/"/>
+    
+    
+      <category term="typescript" scheme="https://mileslin.github.io/tags/typescript/"/>
+    
+  </entry>
+  
+  <entry>
     <title>自訂 AuthorizeFilter</title>
     <link href="https://mileslin.github.io/2017/07/%E8%87%AA%E8%A8%82-AuthorizeFilter/"/>
     <id>https://mileslin.github.io/2017/07/自訂-AuthorizeFilter/</id>
     <published>2017-07-24T15:16:40.000Z</published>
-    <updated>2017-07-23T15:47:52.452Z</updated>
+    <updated>2017-07-24T14:48:34.495Z</updated>
     
     <content type="html"><![CDATA[<p>自行 AuthorizeFilter</p>
 <a id="more"></a>
@@ -86,7 +116,7 @@
     <link href="https://mileslin.github.io/2017/07/ASP-NET-%E8%A1%A8%E5%96%AE%E9%A9%97%E8%AD%89/"/>
     <id>https://mileslin.github.io/2017/07/ASP-NET-表單驗證/</id>
     <published>2017-07-23T06:49:29.000Z</published>
-    <updated>2017-07-23T15:48:42.948Z</updated>
+    <updated>2017-07-24T14:48:34.231Z</updated>
     
     <content type="html"><![CDATA[<p>ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。</p>
 <a id="more"></a>
@@ -136,7 +166,7 @@
     <link href="https://mileslin.github.io/2017/07/%E5%95%9F%E7%94%A8-Action-Filter-Property-Injection-%E8%88%87-%E8%A8%BB%E5%86%8A-Web-Abstractions/"/>
     <id>https://mileslin.github.io/2017/07/啟用-Action-Filter-Property-Injection-與-註冊-Web-Abstractions/</id>
     <published>2017-07-22T15:02:16.000Z</published>
-    <updated>2017-07-22T16:23:44.138Z</updated>
+    <updated>2017-07-24T14:48:34.247Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>通常自動 Action Filter 的時候常常會用到一些資料庫的讀取，為了防止耦合性過高，所以建立取得 DBContext 實體的時候，可以用 DI 的方式注入。</li>
@@ -180,7 +210,7 @@
     <link href="https://mileslin.github.io/2017/07/%E5%AE%89%E8%A3%9D-SQL-Server-2014-Express-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/07/安裝-SQL-Server-2014-Express-筆記/</id>
     <published>2017-07-15T05:45:36.000Z</published>
-    <updated>2017-07-15T06:50:15.436Z</updated>
+    <updated>2017-07-24T14:48:34.279Z</updated>
     
     <content type="html"><![CDATA[<p>今天文章會說明，安裝 SQL Server Express 後，使用 Microsoft SQL Server Management Studio 的 sa 帳號登入。</p>
 <a id="more"></a>
@@ -245,7 +275,7 @@
     <link href="https://mileslin.github.io/2017/07/Command-Line-%E7%AD%86%E8%A8%98-%E9%81%A0%E7%AB%AF%E8%A4%87%E8%A3%BD%E8%88%87%E5%A3%93%E7%B8%AE/"/>
     <id>https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/</id>
     <published>2017-07-11T09:34:08.000Z</published>
-    <updated>2017-07-15T05:44:43.738Z</updated>
+    <updated>2017-07-12T15:56:16.144Z</updated>
     
     <content type="html"><![CDATA[<p>最近為了將的壓縮、解壓縮、遠端連線硬碟、複製貼上等等的繁瑣的事情寫成 bat 檔案，花了很多時間。  所以就來記錄一下，用 command line 自動化的功能。</p>
 <ul>
@@ -296,7 +326,7 @@
     <link href="https://mileslin.github.io/2017/07/ng-build-%E4%B8%A6%E5%A3%93%E7%B8%AE%E6%AA%94%E6%A1%88/"/>
     <id>https://mileslin.github.io/2017/07/ng-build-並壓縮檔案/</id>
     <published>2017-07-10T11:19:27.000Z</published>
-    <updated>2017-07-15T05:44:43.740Z</updated>
+    <updated>2017-07-12T15:56:16.147Z</updated>
     
     <content type="html"><![CDATA[<p>在佈署 Angular 專案的時候為了能夠快速複製到遠端主機上，所以通常會 <code>ng build</code> 後，將 build 出來的檔案壓縮，要完成這一連串的流程，通常都是寫 cmd 來處理。</p>
 <a id="more"></a>
@@ -341,9 +371,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -352,7 +382,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-4/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-4/</id>
     <published>2017-07-09T04:26:50.000Z</published>
-    <updated>2017-07-09T08:15:21.605Z</updated>
+    <updated>2017-07-12T15:56:15.959Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>unit tests<ul>
@@ -475,9 +505,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -486,7 +516,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-3/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/</id>
     <published>2017-07-08T15:07:00.000Z</published>
-    <updated>2017-07-15T05:44:43.703Z</updated>
+    <updated>2017-07-12T15:56:15.957Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建置專案與環境參數設定</li>
@@ -664,9 +694,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -675,7 +705,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-2/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/</id>
     <published>2017-07-04T15:26:07.000Z</published>
-    <updated>2017-07-09T08:15:30.192Z</updated>
+    <updated>2017-07-12T15:56:15.953Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立元件與檔案 <em>(service,class,interface ….)</em></li>
@@ -750,9 +780,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -761,7 +791,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-1/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/</id>
     <published>2017-07-02T14:47:41.000Z</published>
-    <updated>2017-07-09T08:15:34.565Z</updated>
+    <updated>2017-07-12T15:56:15.950Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立專案與元件</li>
@@ -804,9 +834,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -815,7 +845,7 @@
     <link href="https://mileslin.github.io/2017/06/DI-%E5%9C%B0%E9%9B%B7%E4%B9%8B%E7%94%9F%E5%91%BD%E9%80%B1%E6%9C%9F%E5%BE%88%E9%87%8D%E8%A6%81/"/>
     <id>https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/</id>
     <published>2017-06-30T10:50:44.000Z</published>
-    <updated>2017-07-05T03:09:49.189Z</updated>
+    <updated>2017-07-02T11:35:37.714Z</updated>
     
     <content type="html"><![CDATA[<p>目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:</p>
 <div class="alert warning"><p>DI 的三種生命週期很重要!!  不要亂設定!!</p>
@@ -879,7 +909,7 @@
     <link href="https://mileslin.github.io/2017/06/%E5%96%AE%E5%85%83%E6%B8%AC%E8%A9%A6Model%E9%A9%97%E8%AD%89/"/>
     <id>https://mileslin.github.io/2017/06/單元測試Model驗證/</id>
     <published>2017-06-30T04:17:39.000Z</published>
-    <updated>2017-07-05T03:09:49.227Z</updated>
+    <updated>2017-07-02T11:35:37.761Z</updated>
     
     <content type="html"><![CDATA[<p>MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。</p>
 <a id="more"></a>
@@ -913,7 +943,7 @@
     <link href="https://mileslin.github.io/2017/06/Destructuring-assignment/"/>
     <id>https://mileslin.github.io/2017/06/Destructuring-assignment/</id>
     <published>2017-06-28T15:52:51.000Z</published>
-    <updated>2017-07-05T03:09:49.225Z</updated>
+    <updated>2017-06-28T16:22:23.450Z</updated>
     
     <content type="html"><![CDATA[<p>解構賦值是一種優雅的方式能夠將<code>{}</code>與<code>[]</code>的值讀出來<br><a id="more"></a></p>
 <h2 id="讀取陣列並-assign-到變數上"><a href="#讀取陣列並-assign-到變數上" class="headerlink" title="讀取陣列並 assign 到變數上"></a>讀取陣列並 assign 到變數上</h2><p><em>陣列的解構賦值用陣列去接</em><br><figure class="codeblock codeblock--tabbed"><figcaption><span>JavaScript</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> foo = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">let</span> [one, two, three] = foo;</span><br><span class="line"><span class="built_in">console</span>.log(one); <span class="comment">// 'one'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
@@ -942,7 +972,7 @@
     <link href="https://mileslin.github.io/2017/06/%E6%93%B4%E5%85%85%E5%A5%97%E4%BB%B6%E5%B1%AC%E6%80%A7%EF%BC%8C%E4%BB%A5sweetalert%E7%82%BA%E4%BE%8B/"/>
     <id>https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/</id>
     <published>2017-06-23T06:25:13.000Z</published>
-    <updated>2017-07-05T03:09:49.228Z</updated>
+    <updated>2017-06-28T15:51:45.274Z</updated>
     
     <content type="html"><![CDATA[<p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>error_input</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">swal({</span><br><span class="line">  title: <span class="string">'Oops !!!'</span>,</span><br><span class="line">  input: <span class="string">'email'</span> <span class="comment">// &lt;- error</span></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -976,7 +1006,7 @@
     <link href="https://mileslin.github.io/2017/05/%E7%82%BA%E4%BB%80%E9%BA%BC%E9%9C%80%E8%A6%81-Domain-Driven-Design/"/>
     <id>https://mileslin.github.io/2017/05/為什麼需要-Domain-Driven-Design/</id>
     <published>2017-05-21T15:51:09.000Z</published>
-    <updated>2017-05-21T17:01:39.882Z</updated>
+    <updated>2017-06-07T17:29:51.270Z</updated>
     
     <content type="html"><![CDATA[<p>最近開始看 Donmain-Driven Design 的 <a href="https://app.pluralsight.com/library/courses/domain-driven-design-fundamentals/table-of-contents" title="TitleAttribute" target="_blank" rel="external">plurasight 的影片</a> ，其裡面有一句話深深吸引我，而當我開始看 DDD 的教學影片時，發現需要知道的內容，是多麼的廣泛，這句話當之無愧。。<br> <blockquote><p>The more you know, the more you realize you know nothing</p>
 <footer><strong>Socrates</strong></footer></blockquote></p>
@@ -1040,7 +1070,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/vscode-%E8%A8%AD%E5%AE%9A%E8%87%AA%E5%8B%95%E8%A7%B8%E7%99%BC-suggestions/"/>
     <id>https://mileslin.github.io/2017/05/vscode-設定自動觸發-suggestions/</id>
     <published>2017-05-09T11:07:21.000Z</published>
-    <updated>2017-07-23T08:43:57.686Z</updated>
+    <updated>2017-07-24T14:48:34.245Z</updated>
     
     <content type="html"><![CDATA[<p>某一版 vscode 更新後，寫 markdown 文件時不會自動跑出小視窗提醒能輸入的 snippet，需要點 <span class="highlight-text primary">ctrl + space</span>
 才會出現視窗，可是中文輸入法的 <span class="highlight-text primary">ctrl + space</span> 有自己的預設行為啊 !! 。</p>
@@ -1084,7 +1114,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/Two-way-data-binding-event-%E7%9A%84%E5%AF%AB%E6%B3%95/"/>
     <id>https://mileslin.github.io/2017/05/Two-way-data-binding-event-的寫法/</id>
     <published>2017-05-06T08:26:25.000Z</published>
-    <updated>2017-05-21T15:19:04.155Z</updated>
+    <updated>2017-05-09T12:53:24.643Z</updated>
     
     <content type="html"><![CDATA[<p>之前學的 two way binding 的寫法如下</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"firstName"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -1119,7 +1149,7 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     <link href="https://mileslin.github.io/2017/05/User-input-%E5%AF%A6%E7%94%A8%E7%9A%84-key-%E4%BA%8B%E4%BB%B6/"/>
     <id>https://mileslin.github.io/2017/05/User-input-實用的-key-事件/</id>
     <published>2017-05-02T16:30:27.000Z</published>
-    <updated>2017-05-21T15:19:04.156Z</updated>
+    <updated>2017-05-02T16:54:44.208Z</updated>
     
     <content type="html"><![CDATA[<p>使用者輸入資料的時候，通常會綁定一些事情，做一些邏輯之類的，例如:使用者點選 Enter 則執行搜尋功能等等….</p>
 <a id="more"></a>
@@ -1145,144 +1175,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
       <category term="input" scheme="https://mileslin.github.io/tags/input/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>使用 Angular CLI 建立 Angular 專案架構說明</title>
-    <link href="https://mileslin.github.io/2017/04/%E4%BD%BF%E7%94%A8-Angular-CLI-%E5%BB%BA%E7%AB%8B-Angular-%E5%B0%88%E6%A1%88%E6%9E%B6%E6%A7%8B%E8%AA%AA%E6%98%8E/"/>
-    <id>https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/</id>
-    <published>2017-04-30T09:46:33.000Z</published>
-    <updated>2017-05-21T15:19:04.158Z</updated>
-    
-    <content type="html"><![CDATA[<p>從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 <a href="https://github.com/angular/angular-cli" title="Angular CLI" target="_blank" rel="external">Angular CLI</a> 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。</p>
-<a id="more"></a>
-<h2 id="建立專案"><a href="#建立專案" class="headerlink" title="建立專案"></a>建立專案</h2><p>首先我們要執行 cmd 指令 <code>ng new my-app</code> 建立 Angular 專案，Angular CLI 會幫我們建立這樣專案架構的專案<br><div class="figure " style="width:;"><a class="fancybox" href="Structure.jpg" title="Structure" data-fancybox-group=""><img class="fig-img" src="Structure.jpg" alt="Structure"></a><span class="caption">Structure</span></div></p>
-<h2 id="The-root-folder"><a href="#The-root-folder" class="headerlink" title="The root folder"></a>The root folder</h2><p>負責放支援建置 app 的設定檔</p>
-<table>
-<thead>
-<tr>
-<th>檔案</th>
-<th>說明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>e2e/</td>
-<td>負責放 End-to-End 測試程式碼的資料夾</td>
-</tr>
-<tr>
-<td>node_modules/</td>
-<td><code>Node.js</code> 建立的資料夾，負責放 third party modules 的資料夾，其 thrid party modules 清單則放在 <code>package.json</code>裡面</td>
-</tr>
-<tr>
-<td>.angular-cli.json</td>
-<td>放 Angular CLI 的設定檔 <a href="https://github.com/angular/angular-cli/wiki/angular-cli" title="Angular CLI Config Schema" target="_blank" rel="external">Angular CLI Config Schema</a></td>
-</tr>
-<tr>
-<td>.editorconfig</td>
-<td>幫助開發者使用不同的 IDEs 保持檔案格式一致性的設定檔 <a href="http://editorconfig.org" title="http://editorconfig.org editorconfig" target="_blank" rel="external"></a></td>
-</tr>
-<tr>
-<td>.gitignore</td>
-<td>Git 的設定檔，讓指定檔案不會 commit 到 Source control</td>
-</tr>
-<tr>
-<td>karma.conf.js</td>
-<td>Karma test 的 unit tests 設定 <a href="https://karma-runner.github.io/1.0/index.html" title="Karma" target="_blank" rel="external">Karma</a></td>
-</tr>
-<tr>
-<td>package.json</td>
-<td>npm 設定檔， third party 清單與版本資訊</td>
-</tr>
-<tr>
-<td>protractor.conf.js</td>
-<td>Angular end-to-end test framework <a href="http://www.protractortest.org/#/" title="Protractor" target="_blank" rel="external">Protractor</a> 設定檔</td>
-</tr>
-<tr>
-<td>README.md</td>
-<td>Angular CLI 基本指令文件</td>
-</tr>
-<tr>
-<td>tsconfig.json</td>
-<td>TypeScript 編譯器設定檔案</td>
-</tr>
-<tr>
-<td>tslint.json</td>
-<td>保持 code style 一致性的 <a href="https://palantir.github.io/tslint/" title="TSLint" target="_blank" rel="external">TSLint</a> 設定檔</td>
-</tr>
-</tbody>
-</table>
-<h2 id="The-src-folder"><a href="#The-src-folder" class="headerlink" title="The src folder"></a>The src folder</h2><p>寫程式碼的地方。  所有的 Angular components, templates, styles, images 等等…都放這邊。</p>
-<div class="figure " style="width:;"><a class="fancybox" href="Src.jpg" title="Src" data-fancybox-group=""><img class="fig-img" src="Src.jpg" alt="Src"></a><span class="caption">Src</span></div>
-<table>
-<thead>
-<tr>
-<th>檔案</th>
-<th>說明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>app/app.component.{ts,html,css,spec.ts}</td>
-<td>所有的 Componet、Service、Pipe、Unit test 等等..程式碼都是放在這個資料夾，而 <code>app.component</code> 則是 Angular CLI 預設建立的 root component</td>
-</tr>
-<tr>
-<td>app/app.module.ts</td>
-<td>預設的 <a href="https://angular.io/docs/ts/latest/guide/appmodule.html" title="root module" target="_blank" rel="external">root module</a> ， 告訴 Angular 有哪些 Components 、Modules、 Services，讓 Angular 知道如何 assemble the application</td>
-</tr>
-<tr>
-<td>assets/*</td>
-<td>放圖片或者是建立 application 需要用的到材料</td>
-</tr>
-<tr>
-<td>environments/*</td>
-<td>設定 Angular 程式碼會用到的參數，很像 Web.config 的東西。  預設為 environment.ts ， 要產生不同的 environment 的話，參考命名規則為 environment.xxx.ts，在執行或者 build Angular application 的時候加入 xxx 的參數，則可以指定到該 environmnet ，例如 : <code>ng build -xxx</code>、 <code>ng serve -xxx</code></td>
-</tr>
-<tr>
-<td>favicon.ico</td>
-<td>網頁頁籤的 icon <div class="figure " style="width:;"><a class="fancybox" href="icon.jpg" title="" data-fancybox-group=""><img class="fig-img" src="icon.jpg" alt=""></a></div><div style="clear:both;"></div></td>
-</tr>
-<tr>
-<td>index.html</td>
-<td>網頁進入點，當使用者拜訪網站的時候，是執行到這個頁面。  在大部分的情況，是不需用編輯的， Angular CLI 在 build application 的時候會自動加入 js 和 css</td>
-</tr>
-<tr>
-<td>main.ts</td>
-<td>啟動 application root module(<span class="highlight-text primary">AppModule</span>) 的編譯起始點</td>
-</tr>
-<tr>
-<td>polyfills.ts</td>
-<td>因為不同的瀏覽器會支援不同的 web standards， polyfills 就像補丁的概念，補足些沒有支援的部分。 <a href="https://angular.io/docs/ts/latest/guide/browser-support.html" title="Browser Support" target="_blank" rel="external">Browser Support</a></td>
-</tr>
-<tr>
-<td>styles.css</td>
-<td>放置 global styles 的 CSS</td>
-</tr>
-<tr>
-<td>test.ts</td>
-<td>unit tests 的進入點，有些 unit tests 的設定也寫在這邊</td>
-</tr>
-<tr>
-<td>tsconfig.{app,spec}.json</td>
-<td>TypeScript 編譯設定檔 ，<code>tsconfig.app.json</code> for Angular app、 <code>tsconfig.spec.json</code> for unit tests</td>
-</tr>
-</tbody>
-</table>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular.io/docs/ts/latest/cli-quickstart.html" title="cli-quickstart" target="_blank" rel="external">CLI QUICKSTART</a>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 &lt;a href=&quot;https://github.com/angular/angular-cli&quot; title=&quot;Angular CLI&quot;&gt;Angular CLI&lt;/a&gt; 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
-    
-    
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
-      <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
     
   </entry>
   
