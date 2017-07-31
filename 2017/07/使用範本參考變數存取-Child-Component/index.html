@@ -6,10 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Miles&#39;s Journey">
-    <title>Destructuring assignment - Miles&#39;s Journey</title>
+    <title>使用範本參考變數存取 Child Component - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,javascript">
+        <meta name="keywords" content=".NET,Angular">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,16 +17,16 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="解構賦值是一種優雅的方式能夠將{}與[]的值讀出來">
+    <meta name="description" content="Angular 的架構基本上就是 Component 包 Component，所以常常會有情況存取 Component 底下的 Component 一些資源，而只要用範本參考變數，就能很輕易達到這樣的功能。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Destructuring assignment">
-<meta property="og:url" content="https://mileslin.github.io/2017/06/Destructuring-assignment/index.html">
+<meta property="og:title" content="使用範本參考變數存取 Child Component">
+<meta property="og:url" content="https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="解構賦值是一種優雅的方式能夠將{}與[]的值讀出來">
-<meta property="og:updated_time" content="2017-06-28T16:22:23.450Z">
+<meta property="og:description" content="Angular 的架構基本上就是 Component 包 Component，所以常常會有情況存取 Component 底下的 Component 一些資源，而只要用範本參考變數，就能很輕易達到這樣的功能。">
+<meta property="og:updated_time" content="2017-07-31T15:52:27.776Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Destructuring assignment">
-<meta name="twitter:description" content="解構賦值是一種優雅的方式能夠將{}與[]的值讀出來">
+<meta name="twitter:title" content="使用範本參考變數存取 Child Component">
+<meta name="twitter:description" content="Angular 的架構基本上就是 Component 包 Component，所以常常會有情況存取 Component 底下的 Component 一些資源，而只要用範本參考變數，就能很輕易達到這樣的功能。">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -252,19 +252,19 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title" itemprop="headline">
-            Destructuring assignment
+            使用範本參考變數存取 Child Component
         </h1>
     
     <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-06-28T23:52:51+08:00">
+    <time itemprop="datePublished" datetime="2017-07-31T23:33:20+08:00">
 	
-		    Jun 28, 2017
+		    Jul 31, 2017
     	
     </time>
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/javascript/">javascript</a>
+    <a class="category-link" href="/categories/Angular/">Angular</a>
 
 
     
@@ -274,13 +274,14 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <p>解構賦值是一種優雅的方式能夠將<code>{}</code>與<code>[]</code>的值讀出來<br><a id="more"></a></p>
-<h2 id="讀取陣列並-assign-到變數上"><a href="#讀取陣列並-assign-到變數上" class="headerlink" title="讀取陣列並 assign 到變數上"></a>讀取陣列並 assign 到變數上</h2><p><em>陣列的解構賦值用陣列去接</em><br><figure class="codeblock codeblock--tabbed"><figcaption><span>JavaScript</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> foo = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">let</span> [one, two, three] = foo;</span><br><span class="line"><span class="built_in">console</span>.log(one); <span class="comment">// 'one'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="物件的解構賦值"><a href="#物件的解構賦值" class="headerlink" title="物件的解構賦值"></a>物件的解構賦值</h2><p>在ES6有支援物件的解構賦值，這就能用在更多的用途上。  例如這有點像 import module 的用法。<br><em>物件的解構賦值用物件去接</em><br><figure class="codeblock codeblock--tabbed"><figcaption><span>js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> myModule = {</span><br><span class="line">  <span class="attr">drawSquare</span>: <span class="function"><span class="keyword">function</span> <span class="title">drawSquare</span>(<span class="params">length</span>) </span>{ <span class="comment">/* implementation */</span> },</span><br><span class="line">  <span class="attr">drawCircle</span>: <span class="function"><span class="keyword">function</span> <span class="title">drawCircle</span>(<span class="params">radius</span>) </span>{ <span class="comment">/* implementation */</span> },</span><br><span class="line">  <span class="attr">drawText</span>: <span class="function"><span class="keyword">function</span> <span class="title">drawText</span>(<span class="params">text</span>) </span>{ <span class="comment">/* implementation */</span> },</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> {drawSquare, drawText} = myModule;</span><br><span class="line"></span><br><span class="line">drawSquare(<span class="number">5</span>);</span><br><span class="line">drawText(<span class="string">'hello'</span>);</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="傳入-function-的解構賦值"><a href="#傳入-function-的解構賦值" class="headerlink" title="傳入 function 的解構賦值"></a>傳入 function 的解構賦值</h2><p>解構賦值也允許你傳入 function ，並且 function’s parameter 指定要讀取哪一個 properties。<br><!-- classes : info success warning danger no-icon --><br><div class="alert info no-icon"><p>function 參數的 property 名稱要與傳入物件的 property 名稱一致，否額會 undefined</p>
-</div><br><figure class="codeblock codeblock--tabbed"><figcaption><span>js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> jane = { <span class="attr">firstName</span>: <span class="string">'Jane'</span>, <span class="attr">lastName</span>: <span class="string">'Doe'</span>};</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sayName</span>(<span class="params">{firstName, lastName, middleName = <span class="string">'N/A'</span>}</span>) </span>{</span><br><span class="line">  <span class="built_in">console</span>.log(firstName);  <span class="comment">// Jane</span></span><br><span class="line">  <span class="built_in">console</span>.log(lastName);   <span class="comment">// Doe</span></span><br><span class="line">  <span class="built_in">console</span>.log(middleName); <span class="comment">// N/A</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">sayName(jane)</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h2 id="陣列變數交換的用法"><a href="#陣列變數交換的用法" class="headerlink" title="陣列變數交換的用法"></a>陣列變數交換的用法</h2><p>陣列可以用解構賦值的方式，交換陣列的值<br><figure class="codeblock codeblock--tabbed"><figcaption><span>js</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">let</span> b = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">[a, b] = [b, a];</span><br><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// 3</span></span><br><span class="line"><span class="built_in">console</span>.log(b); <span class="comment">// 1</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular-2-training-book.rangle.io/handout/features/destructuring.html" title="angular-2-training-book" target="_blank" rel="external">angular-2-training-book</a> <a href="https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment" title="MDN" target="_blank" rel="external">MDN</a>
+            <p>Angular 的架構基本上就是 Component 包 Component，所以常常會有情況存取 Component 底下的 Component 一些資源，而只要用範本參考變數，就能很輕易達到這樣的功能。</p>
+<a id="more"></a>
+<h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><p>首先我有一個 <code>ProfileComponent</code> ，程式碼如下</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>ProfileComponent</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span>({</span><br><span class="line">  selector: <span class="string">'profile'</span>,</span><br><span class="line">  templateUrl: <span class="string">'app/profile.component.html'</span></span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProfileComponent {</span><br><span class="line">  name = <span class="string">'Miles'</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>而我的 <code>app.component.html</code> 會加入 <code>ProfileComponent</code>，且 <code>ProfileComponent</code> 加入範本參考變數 <span class="highlight-text primary">#profile</span> </p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>AppComponentHtml</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">profile</span> #<span class="attr">profile</span>&gt;</span><span class="tag">&lt;/<span class="name">profile</span>&gt;</span></span><br><span class="line"></span><br><span class="line">My name is {{profile.name}}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>用這種方式就能把 <code>Child Component</code> 當作一個實體來使用，直接呼叫 Property 或方法。</p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://angular-2-training-book.rangle.io/handout/components/app_structure/access_child_components_from_template.html" title="Access Child Components From the Template" target="_blank" rel="external">Access Child Components From the Template</a>]</strong></p>
 
             
         </div>
@@ -290,7 +291,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="/tags/javascript/">javascript</a>
+    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a>
 
             </div>
         
@@ -299,7 +300,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/單元測試Model驗證/"  data-tooltip="單元測試 Model 驗證">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -307,7 +308,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/擴充套件屬性，以sweetalert為例/" data-tooltip="擴充套件屬性，以sweetalert為例">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/泛型轉型的小技巧/" data-tooltip="泛型轉型的小技巧">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -322,17 +323,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/Destructuring-assignment/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/Destructuring-assignment/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/Destructuring-assignment/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -380,7 +381,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/單元測試Model驗證/"  data-tooltip="單元測試 Model 驗證">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -388,7 +389,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/擴充套件屬性，以sweetalert為例/" data-tooltip="擴充套件屬性，以sweetalert為例">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/泛型轉型的小技巧/" data-tooltip="泛型轉型的小技巧">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -403,17 +404,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/Destructuring-assignment/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/Destructuring-assignment/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/Destructuring-assignment/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -439,17 +440,17 @@
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
     <ul class="share-options">
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/Destructuring-assignment/">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/">
                 <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/Destructuring-assignment/">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/">
                 <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/Destructuring-assignment/">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/">
                 <i class="fa fa-twitter"></i><span>Share on Twitter</span>
             </a>
         </li>
@@ -763,9 +764,9 @@
     
         <script>
              var disqus_config = function () {
-                 this.page.url = 'https://mileslin.github.io/2017/06/Destructuring-assignment/';
+                 this.page.url = 'https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/';
                  
-                    this.page.identifier = '2017/06/Destructuring-assignment/';
+                    this.page.identifier = '2017/07/使用範本參考變數存取-Child-Component/';
                  
              };
             (function() {

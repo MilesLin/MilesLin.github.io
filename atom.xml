@@ -41,6 +41,36 @@
   </entry>
   
   <entry>
+    <title>使用範本參考變數存取 Child Component</title>
+    <link href="https://mileslin.github.io/2017/07/%E4%BD%BF%E7%94%A8%E7%AF%84%E6%9C%AC%E5%8F%83%E8%80%83%E8%AE%8A%E6%95%B8%E5%AD%98%E5%8F%96-Child-Component/"/>
+    <id>https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/</id>
+    <published>2017-07-31T15:33:20.000Z</published>
+    <updated>2017-07-31T15:52:27.776Z</updated>
+    
+    <content type="html"><![CDATA[<p>Angular 的架構基本上就是 Component 包 Component，所以常常會有情況存取 Component 底下的 Component 一些資源，而只要用範本參考變數，就能很輕易達到這樣的功能。</p>
+<a id="more"></a>
+<h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><p>首先我有一個 <code>ProfileComponent</code> ，程式碼如下</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>ProfileComponent</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { Component } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span>({</span><br><span class="line">  selector: <span class="string">'profile'</span>,</span><br><span class="line">  templateUrl: <span class="string">'app/profile.component.html'</span></span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProfileComponent {</span><br><span class="line">  name = <span class="string">'Miles'</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>而我的 <code>app.component.html</code> 會加入 <code>ProfileComponent</code>，且 <code>ProfileComponent</code> 加入範本參考變數 <span class="highlight-text primary">#profile</span> </p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>AppComponentHtml</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">profile</span> #<span class="attr">profile</span>&gt;</span><span class="tag">&lt;/<span class="name">profile</span>&gt;</span></span><br><span class="line"></span><br><span class="line">My name is {{profile.name}}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>用這種方式就能把 <code>Child Component</code> 當作一個實體來使用，直接呼叫 Property 或方法。</p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://angular-2-training-book.rangle.io/handout/components/app_structure/access_child_components_from_template.html" title="Access Child Components From the Template" target="_blank" rel="external">Access Child Components From the Template</a>]</strong></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Angular 的架構基本上就是 Component 包 Component，所以常常會有情況存取 Component 底下的 Component 一些資源，而只要用範本參考變數，就能很輕易達到這樣的功能。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
+    
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+  </entry>
+  
+  <entry>
     <title>泛型轉型的小技巧</title>
     <link href="https://mileslin.github.io/2017/07/%E6%B3%9B%E5%9E%8B%E8%BD%89%E5%9E%8B%E7%9A%84%E5%B0%8F%E6%8A%80%E5%B7%A7/"/>
     <id>https://mileslin.github.io/2017/07/泛型轉型的小技巧/</id>
@@ -1160,41 +1190,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
       <category term="trigger" scheme="https://mileslin.github.io/tags/trigger/"/>
     
       <category term="suggestion" scheme="https://mileslin.github.io/tags/suggestion/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Two way data binding event 的寫法</title>
-    <link href="https://mileslin.github.io/2017/05/Two-way-data-binding-event-%E7%9A%84%E5%AF%AB%E6%B3%95/"/>
-    <id>https://mileslin.github.io/2017/05/Two-way-data-binding-event-的寫法/</id>
-    <published>2017-05-06T08:26:25.000Z</published>
-    <updated>2017-05-09T12:53:24.643Z</updated>
-    
-    <content type="html"><![CDATA[<p>之前學的 two way binding 的寫法如下</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [(<span class="attr">ngModel</span>)]=<span class="string">"firstName"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>今天要說明的是，如何把<code>( )</code>與<code>[ ]</code>分開寫，這樣就可以在使用者輸入的時候加入一些邏輯進入</p>
-<a id="more"></a>
-<h2 id="將小括號-另外寫"><a href="#將小括號-另外寫" class="headerlink" title="將小括號( )另外寫"></a>將小括號<code>( )</code>另外寫</h2><figure class="codeblock codeblock--tabbed"><figcaption><span>[(ngModel)]</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [<span class="attr">ngModel</span>]=<span class="string">"firstName"</span>(<span class="attr">ngModelChange</span>)= <span class="string">"firstName=$event"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>那這樣寫有什麼好處呢?  就是當我們想要在使用者輸入的時候增加一些邏輯，我們就可以這樣寫。</p>
-<p>例如:強制使用者第一個字輸入大寫，我們就可以改寫成這樣</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>ToUpperCase</span><ul class="tabs"><li class="tab active">html</li><li class="tab">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"firstName"</span> [<span class="attr">ngModel</span>]=<span class="string">"firstName"</span> (<span class="attr">ngModelChange</span>)= <span class="string">"firstLetterToUpperCase($event)"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure><figure class="highlight ts" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppComponent {</span><br><span class="line"></span><br><span class="line">  firstName = <span class="string">''</span>;</span><br><span class="line">  firstLetterToUpperCase(value: <span class="built_in">string</span>){</span><br><span class="line">    <span class="keyword">if</span> (value.length &gt;<span class="number">0</span>) {</span><br><span class="line">      <span class="keyword">this</span>.firstName = value.charAt(<span class="number">0</span>).toUpperCase() + value.slice(<span class="number">1</span>);</span><br><span class="line">    }<span class="keyword">else</span>{</span><br><span class="line">      <span class="keyword">this</span>.firstName = value;</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<p>我覺得這個小技巧還蠻不錯的，甚至可以拿來更改使用者的輸入內容，防止使用者打錯格式之類的</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;之前學的 two way binding 的寫法如下&lt;/p&gt;
-&lt;figure class=&quot;codeblock codeblock--tabbed&quot;&gt;&lt;figcaption&gt;&lt;span&gt;[(ngModel)]&lt;/span&gt;&lt;ul class=&quot;tabs&quot;&gt;&lt;li class=&quot;tab active&quot;&gt;html&lt;/li&gt;&lt;/ul&gt;&lt;/figcaption&gt;&lt;div class=&quot;tabs-content&quot;&gt;&lt;figure class=&quot;highlight html&quot; style=&quot;display: block;&quot;&gt;&lt;table&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;&lt;span class=&quot;name&quot;&gt;input&lt;/span&gt; &lt;span class=&quot;attr&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;string&quot;&gt;&quot;text&quot;&lt;/span&gt; &lt;span class=&quot;attr&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;string&quot;&gt;&quot;firstName&quot;&lt;/span&gt; [(&lt;span class=&quot;attr&quot;&gt;ngModel&lt;/span&gt;)]=&lt;span class=&quot;string&quot;&gt;&quot;firstName&quot;&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/div&gt;&lt;/figure&gt;
-&lt;p&gt;今天要說明的是，如何把&lt;code&gt;( )&lt;/code&gt;與&lt;code&gt;[ ]&lt;/code&gt;分開寫，這樣就可以在使用者輸入的時候加入一些邏輯進入&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
-    
-    
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
-      <category term="binding" scheme="https://mileslin.github.io/tags/binding/"/>
     
   </entry>
   
