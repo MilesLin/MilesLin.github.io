@@ -6,10 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Miles&#39;s Journey">
-    <title>javascript array methods practice VI - Miles&#39;s Journey</title>
+    <title>Angular 單元測試起手式 - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,javascript">
+        <meta name="keywords" content=".NET,Angular">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,25 +17,16 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce()
-與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight()
-反向 Array 本身的值 Array.prototype.reverse()
-移除 Array 的第一個元素 Array.prototype">
+    <meta name="description" content="jasmine 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 karma 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  angular cli 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="javascript array methods practice VI">
-<meta property="og:url" content="https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/index.html">
+<meta property="og:title" content="Angular 單元測試起手式">
+<meta property="og:url" content="https://mileslin.github.io/2017/08/Angular-單元測試起手式/index.html">
 <meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce()
-與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight()
-反向 Array 本身的值 Array.prototype.reverse()
-移除 Array 的第一個元素 Array.prototype">
-<meta property="og:updated_time" content="2017-04-20T17:21:08.856Z">
+<meta property="og:description" content="jasmine 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 karma 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  angular cli 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。">
+<meta property="og:updated_time" content="2017-08-07T15:35:16.408Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="javascript array methods practice VI">
-<meta name="twitter:description" content="可累加 Array 的元素，也可以用來操作元素的值然後回傳 Array.prototype.reduce()
-與 Array.prototype.reduce() 相似，差別在於是從右邊開始執行 Array.prototype.reduceRight()
-反向 Array 本身的值 Array.prototype.reverse()
-移除 Array 的第一個元素 Array.prototype">
+<meta name="twitter:title" content="Angular 單元測試起手式">
+<meta name="twitter:description" content="jasmine 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 karma 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  angular cli 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -261,19 +252,19 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title" itemprop="headline">
-            javascript array methods practice VI
+            Angular 單元測試起手式
         </h1>
     
     <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-04-20T23:55:24+08:00">
+    <time itemprop="datePublished" datetime="2017-08-07T21:50:54+08:00">
 	
-		    Apr 20, 2017
+		    Aug 07, 2017
     	
     </time>
     
         <span>in </span>
         
-    <a class="category-link" href="/categories/javascript/">javascript</a>
+    <a class="category-link" href="/categories/Angular/">Angular</a>
 
 
     
@@ -283,39 +274,24 @@
     
     <div class="post-content markdown" itemprop="articleBody">
         <div class="main-content-wrap">
-            <ul>
-<li>可累加 Array 的元素，也可以用來操作元素的值然後回傳 <code>Array.prototype.reduce()</code></li>
-<li>與 <code>Array.prototype.reduce()</code> 相似，差別在於是從右邊開始執行 <code>Array.prototype.reduceRight()</code></li>
-<li>反向 Array 本身的值 <code>Array.prototype.reverse()</code></li>
-<li>移除 Array 的第一個元素 <code>Array.prototype.shift()</code></li>
+            <a href="https://jasmine.github.io/index.html" title="jasmine" target="_blank" rel="external">jasmine</a> 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 <a href="https://karma-runner.github.io/1.0/index.html" title="karma" target="_blank" rel="external">karma</a> 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  <a href="https://github.com/angular/angular-cli" title="angular cli" target="_blank" rel="external">angular cli</a> 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。<br><br><a id="more"></a>
+<h2 id="建立-spy-object"><a href="#建立-spy-object" class="headerlink" title="建立 spy object"></a>建立 spy object</h2><p>在這邊我有一個 VoterService ，且有一個 deleteVoter 的方法，可以執行刪除的動作，而為了能發 Http 到 Server，Angular 都是用 <a href="https://angular.io/api/http/Http" title="HTTP" target="_blank" rel="external">HTTP</a> 這類別來發送 http request，所以我建構式注入了 HTTP，而我在單元測試的時候，也就可以注入假的 HTTP 物件。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>delete voter</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Injectable</span>()</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> VoterService {</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params"><span class="keyword">private</span> http: Http</span>) {}</span><br><span class="line"></span><br><span class="line">  deleteVoter(session: ISession, voterName: <span class="built_in">string</span>) {</span><br><span class="line">    session.voters = session.voters.filter(voter =&gt; voter !== voterName);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.http.delete(<span class="string">`<span class="subst">${environment.host}</span>/api/sessions/<span class="subst">${session.id}</span>`</span>).catch(<span class="keyword">this</span>.handleError).subscribe();</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> handleError(error: Response) {</span><br><span class="line">    <span class="keyword">return</span> Observable.throw(error.statusText);</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="使用-建立假的-HTTP-物件。"><a href="#使用-建立假的-HTTP-物件。" class="headerlink" title="使用   建立假的 HTTP 物件。"></a>使用  <a href="https://jasmine.github.io/api/edge/jasmine.html#.createSpyObj" title="createSpyObj" target="_blank" rel="external">createSpyObj</a> 建立假的 HTTP 物件。</h3><p>參數說明:</p>
+<ul>
+<li>mockHttp : base name, 可隨意輸入</li>
+<li>[‘delete’] : Spy 物件有 delete 這個方法<figure class="codeblock codeblock--tabbed"><figcaption><span>Spy</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> mockHttp = jasmine.createSpyObj(<span class="string">'mockHttp'</span>, [<span class="string">'delete'</span>]);</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
 </ul>
-<a id="more"></a>
-<h2 id="Array-prototype-reduce"><a href="#Array-prototype-reduce" class="headerlink" title="Array.prototype.reduce()"></a>Array.prototype.reduce()</h2><p>可累加 Array 的元素，累加元素的方式</p>
-<h4 id="參數說明"><a href="#參數說明" class="headerlink" title="參數說明"></a>參數說明</h4><ul>
-<li>initialValue : 給 accumulator 的初始值，如果沒有給此參數的話，accumulator 會取 Array 第一個元素的值，且會少跑 index = 0 的第一個迴圈</li>
-<li>accumulator : 累加過後的值</li>
-<li>currentValue : 現在的 value</li>
-<li>array : 整個 Array 的值</li>
+<p>撰寫完整的單元測試，而這裡我們要確切的指定 delete 方法回傳 <code>Observable</code> 物件，否則 <code>.catch</code> 與 <code>.subscribe</code> 則會錯誤。</p>
+<ul>
+<li><code>mockHttp.delete.and.returnValue(Observable.of(false));</code> : Spy 物件的 delete 方法回傳 <code>Observable</code> ， 因為要測試的 deleteVoter 方法，並沒有在 subscribe 裡面執行任何程式碼，所以使用 <code>Observable.of(false)</code> 建立一個 <code>Observable</code> 物件。<figure class="codeblock codeblock--tabbed"><figcaption><span>unit test</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">describe(<span class="string">'VoterService'</span>, () =&gt; {</span><br><span class="line">  <span class="keyword">let</span> voterService: VoterService,</span><br><span class="line">    mockHttp;</span><br><span class="line"></span><br><span class="line">  beforeEach(() =&gt; {</span><br><span class="line">    mockHttp = jasmine.createSpyObj(<span class="string">'mockHttp'</span>, [<span class="string">'delete'</span>])</span><br><span class="line">    voterService = <span class="keyword">new</span> VoterService(mockHttp);</span><br><span class="line">  });</span><br><span class="line"></span><br><span class="line">  describe(<span class="string">'deleteVoter'</span>, () =&gt; {</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'should remove the session from the list of sessions'</span>, () =&gt; {</span><br><span class="line">      <span class="keyword">var</span> session = { id: <span class="number">6</span>, voters: [<span class="string">"joe"</span>, <span class="string">"john"</span>]};      </span><br><span class="line">      mockHttp.delete.and.returnValue(Observable.of(<span class="literal">false</span>));</span><br><span class="line"></span><br><span class="line">      voterService.deleteVoter2(&lt;ISession&gt;session, <span class="string">"joe"</span>);</span><br><span class="line"></span><br><span class="line">      expect(session.voters.length).toBe(<span class="number">1</span>);</span><br><span class="line">      expect(session.voters[<span class="number">0</span>]).toBe(<span class="string">"john"</span>);</span><br><span class="line">    })</span><br><span class="line"></span><br><span class="line">  })</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
 </ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>reduce int</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> initialValue = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">var</span> result = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].reduce(</span><br><span class="line">  <span class="function">(<span class="params">accumulator, currentValue, currentIndex, array</span>) =&gt;</span> {</span><br><span class="line">    <span class="keyword">return</span> accumulator + currentValue;</span><br><span class="line">  },</span><br><span class="line">  initialValue</span><br><span class="line">);</span><br><span class="line">  <span class="comment">// result = 20</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>用來攤平 Array</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Flatten an array of arrays</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> flattened = [[<span class="number">0</span>, <span class="number">1</span>], [<span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>]].reduce(</span><br><span class="line">  <span class="function">(<span class="params"> acc, cur </span>) =&gt;</span> acc.concat(cur),</span><br><span class="line">  []</span><br><span class="line">);</span><br><span class="line"><span class="comment">// flattened is [0, 1, 2, 3, 4, 5]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>用來計算 Array 裡面相同元素有幾個</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Counting instances of values in an object</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> names = [<span class="string">'Alice'</span>, <span class="string">'Bob'</span>, <span class="string">'Tiff'</span>, <span class="string">'Bruce'</span>, <span class="string">'Alice'</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> countedNames = names.reduce(<span class="function"><span class="keyword">function</span> (<span class="params">allNames, name</span>) </span>{ </span><br><span class="line">  <span class="keyword">if</span> (name <span class="keyword">in</span> allNames) {</span><br><span class="line">    allNames[name]++;</span><br><span class="line">  }</span><br><span class="line">  <span class="keyword">else</span> {</span><br><span class="line">    allNames[name] = <span class="number">1</span>;</span><br><span class="line">  }</span><br><span class="line">  <span class="keyword">return</span> allNames;</span><br><span class="line">}, {});</span><br><span class="line"><span class="comment">// countedNames is:</span></span><br><span class="line"><span class="comment">// { 'Alice': 2, 'Bob': 1, 'Tiff': 1, 'Bruce': 1 }</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<div class="alert info"><p>與 spread operator 混用，取得某一個欄位的所有值</p>
-</div>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Bonding arrays contained in an array</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// friends - an array of objects </span></span><br><span class="line"><span class="comment">// where object field "books" - list of favorite books </span></span><br><span class="line"><span class="keyword">var</span> friends = [{</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Anna'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'Bible'</span>, <span class="string">'Harry Potter'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">21</span></span><br><span class="line">}, {</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Bob'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'War and peace'</span>, <span class="string">'Romeo and Juliet'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">26</span></span><br><span class="line">}, {</span><br><span class="line">  <span class="attr">name</span>: <span class="string">'Alice'</span>,</span><br><span class="line">  <span class="attr">books</span>: [<span class="string">'The Lord of the Rings'</span>, <span class="string">'The Shining'</span>],</span><br><span class="line">  <span class="attr">age</span>: <span class="number">18</span></span><br><span class="line">}];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果 initialValue 沒有傳會造成 undefined is not a function 的 Exception</span></span><br><span class="line"><span class="comment">// allbooks - list which will contain all friends' books +  </span></span><br><span class="line"><span class="comment">// additional list contained in initialValue</span></span><br><span class="line"><span class="keyword">var</span> allbooks = friends.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">prev, curr</span>) </span>{</span><br><span class="line">  <span class="keyword">return</span> [...prev, ...curr.books];</span><br><span class="line">}, []);</span><br><span class="line"></span><br><span class="line"><span class="comment">// allbooks = [</span></span><br><span class="line"><span class="comment">//   'Bible', 'Harry Potter', 'War and peace', </span></span><br><span class="line"><span class="comment">//   'Romeo and Juliet', 'The Lord of the Rings',</span></span><br><span class="line"><span class="comment">//   'The Shining'</span></span><br><span class="line"><span class="comment">// ]</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-reduceRight"><a href="#Array-prototype-reduceRight" class="headerlink" title="Array.prototype.reduceRight()"></a>Array.prototype.reduceRight()</h2><ul>
-<li>與 <code>Array.prototype.reduce()</code> 的差別，是從右邊開始執行。</li>
-</ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>reduceRight</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="string">'1'</span>, <span class="string">'2'</span>, <span class="string">'3'</span>, <span class="string">'4'</span>, <span class="string">'5'</span>]; </span><br><span class="line"><span class="keyword">var</span> left  = a.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">prev, cur</span>)      </span>{ <span class="keyword">return</span> prev + cur; }); </span><br><span class="line"><span class="keyword">var</span> right = a.reduceRight(<span class="function"><span class="keyword">function</span>(<span class="params">prev, cur</span>) </span>{ <span class="keyword">return</span> prev + cur; }); </span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(left);  <span class="comment">// "12345"</span></span><br><span class="line"><span class="built_in">console</span>.log(right); <span class="comment">// "54321"</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-reverse"><a href="#Array-prototype-reverse" class="headerlink" title="Array.prototype.reverse()"></a>Array.prototype.reverse()</h2><p>反向 Array 的值</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>reverse</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">var</span> reversed = a.reverse(); </span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a);        <span class="comment">// ['three', 'two', 'one']</span></span><br><span class="line"><span class="built_in">console</span>.log(reversed); <span class="comment">// ['three', 'two', 'one']</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="Array-prototype-shift"><a href="#Array-prototype-shift" class="headerlink" title="Array.prototype.shift()"></a>Array.prototype.shift()</h2><p>pop() 是移除 Array 最後一個元素，而 shift 是移除 Array 的第一個元素，</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>shift</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myFish = [<span class="string">'angel'</span>, <span class="string">'clown'</span>, <span class="string">'mandarin'</span>, <span class="string">'surgeon'</span>];</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'myFish before:'</span>, myFish);</span><br><span class="line"><span class="comment">// myFish before: ['angel', 'clown', 'mandarin', 'surgeon']</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> shifted = myFish.shift(); </span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'myFish after:'</span>, myFish); </span><br><span class="line"><span class="comment">// myFish after: ['clown', 'mandarin', 'surgeon']</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'Removed this element:'</span>, shifted); </span><br><span class="line"><span class="comment">// Removed this element: angel</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" title="參考連結" target="_blank" rel="external">參考連結</a>
+<h2 id="驗證傳入參數"><a href="#驗證傳入參數" class="headerlink" title="驗證傳入參數"></a>驗證傳入參數</h2><p>新增另一個 addVoter 的方法，執行 http.post 發送資料到 <code>http://localhost:3000/api/sessions/voters/joe</code> API 位址<br><figure class="codeblock codeblock--tabbed"><figcaption><span>addVoter</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">addVoter(session: ISession, voterName: <span class="built_in">string</span>) {</span><br><span class="line">  session.voters.push(voterName);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> headers = <span class="keyword">new</span> Headers({ <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>});</span><br><span class="line">  <span class="keyword">let</span> options = <span class="keyword">new</span> RequestOptions({headers: headers});</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> url = <span class="string">`<span class="subst">${environment.host}</span>/api/sessions/voters/<span class="subst">${voterName}</span>`</span>;</span><br><span class="line">  <span class="keyword">this</span>.http.post(url, <span class="built_in">JSON</span>.stringify({}), options).catch(<span class="keyword">this</span>.handleError).subscribe();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>使用 <strong>toHaveBeenCalledWith</strong> 驗證 post 傳入的網址是否如預期，以及使用 <strong>jasmine.any</strong> 驗證傳入的物件型別是否如預期。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>unit test</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">describe(<span class="string">'VoterService'</span>, () =&gt; {</span><br><span class="line">  <span class="keyword">let</span> voterService: VoterService,</span><br><span class="line">    mockHttp;</span><br><span class="line"></span><br><span class="line">  beforeEach(() =&gt; {</span><br><span class="line">    mockHttp = jasmine.createSpyObj(<span class="string">'mockHttp'</span>, [<span class="string">'delete'</span>, <span class="string">'post'</span>])</span><br><span class="line">    voterService = <span class="keyword">new</span> VoterService(mockHttp);</span><br><span class="line">  });</span><br><span class="line"></span><br><span class="line">  describe(<span class="string">'addVoter'</span>, () =&gt; {</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'should call http.post with the right URL'</span>, () =&gt; {</span><br><span class="line">      <span class="keyword">var</span> session = { id: <span class="number">6</span>, voters: [<span class="string">"john"</span>]};</span><br><span class="line">      mockHttp.post.and.returnValue(Observable.of(<span class="literal">false</span>));</span><br><span class="line"></span><br><span class="line">      voterService.addVoter(&lt;ISession&gt;session, <span class="string">"joe"</span>);</span><br><span class="line"></span><br><span class="line">      expect(mockHttp.post).toHaveBeenCalledWith(<span class="string">'http://localhost:3000/api/sessions/voters/joe'</span>, <span class="string">"{}"</span>, jasmine.any(RequestOptions));</span><br><span class="line">    })</span><br><span class="line"></span><br><span class="line">  })</span><br><span class="line"></span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://jasmine.github.io/2.0/introduction.html" title="jasmine sample" target="_blank" rel="external">jasmine sample</a>]</strong><br><strong>[<a href="https://karma-runner.github.io/1.0/index.html" title="karma" target="_blank" rel="external">karma</a>]</strong><br><strong>[<a href="https://app.pluralsight.com/library/courses/angular-fundamentals/table-of-contents" title="angular-fundamentals" target="_blank" rel="external">angular-fundamentals</a>]</strong></p>
+
             
         </div>
     </div>
@@ -324,7 +300,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="/tags/array/">array</a> <a class="tag tag--primary tag--small t-link" href="/tags/javascript/">javascript</a>
+    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a>
 
             </div>
         
@@ -333,7 +309,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-VII/"  data-tooltip="javascript array methods practice VII">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -341,7 +317,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-V/" data-tooltip="javascript array methods practice V">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/使用範本參考變數存取-Child-Component/" data-tooltip="使用範本參考變數存取 Child Component">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -356,17 +332,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -414,7 +390,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-VII/"  data-tooltip="javascript array methods practice VII">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2100/12/Welecome-to-Miles-s-Journey/"  data-tooltip="Welecome to Miles&#39;s Journey">
                 
                     <i class="fa fa-angle-left"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -422,7 +398,7 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-V/" data-tooltip="javascript array methods practice V">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/使用範本參考變數存取-Child-Component/" data-tooltip="使用範本參考變數存取 Child Component">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right"></i>
@@ -437,17 +413,17 @@
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
                 <i class="fa fa-google-plus"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
                 <i class="fa fa-facebook-official"></i>
             </a>
         </li>
         <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
                 <i class="fa fa-twitter"></i>
             </a>
         </li>
@@ -473,17 +449,17 @@
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
     <ul class="share-options">
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
                 <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
                 <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
             </a>
         </li>
         <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
                 <i class="fa fa-twitter"></i><span>Share on Twitter</span>
             </a>
         </li>
@@ -797,9 +773,9 @@
     
         <script>
              var disqus_config = function () {
-                 this.page.url = 'https://mileslin.github.io/2017/04/javascript-array-methods-practice-VI/';
+                 this.page.url = 'https://mileslin.github.io/2017/08/Angular-單元測試起手式/';
                  
-                    this.page.identifier = '2017/04/javascript-array-methods-practice-VI/';
+                    this.page.identifier = '2017/08/Angular-單元測試起手式/';
                  
              };
             (function() {

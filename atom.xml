@@ -41,6 +41,45 @@
   </entry>
   
   <entry>
+    <title>Angular 單元測試起手式</title>
+    <link href="https://mileslin.github.io/2017/08/Angular-%E5%96%AE%E5%85%83%E6%B8%AC%E8%A9%A6%E8%B5%B7%E6%89%8B%E5%BC%8F/"/>
+    <id>https://mileslin.github.io/2017/08/Angular-單元測試起手式/</id>
+    <published>2017-08-07T13:50:54.000Z</published>
+    <updated>2017-08-07T15:35:16.408Z</updated>
+    
+    <content type="html"><![CDATA[<a href="https://jasmine.github.io/index.html" title="jasmine" target="_blank" rel="external">jasmine</a> 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 <a href="https://karma-runner.github.io/1.0/index.html" title="karma" target="_blank" rel="external">karma</a> 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  <a href="https://github.com/angular/angular-cli" title="angular cli" target="_blank" rel="external">angular cli</a> 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。<br><br><a id="more"></a>
+<h2 id="建立-spy-object"><a href="#建立-spy-object" class="headerlink" title="建立 spy object"></a>建立 spy object</h2><p>在這邊我有一個 VoterService ，且有一個 deleteVoter 的方法，可以執行刪除的動作，而為了能發 Http 到 Server，Angular 都是用 <a href="https://angular.io/api/http/Http" title="HTTP" target="_blank" rel="external">HTTP</a> 這類別來發送 http request，所以我建構式注入了 HTTP，而我在單元測試的時候，也就可以注入假的 HTTP 物件。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>delete voter</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Injectable</span>()</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> VoterService {</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params"><span class="keyword">private</span> http: Http</span>) {}</span><br><span class="line"></span><br><span class="line">  deleteVoter(session: ISession, voterName: <span class="built_in">string</span>) {</span><br><span class="line">    session.voters = session.voters.filter(voter =&gt; voter !== voterName);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.http.delete(<span class="string">`<span class="subst">${environment.host}</span>/api/sessions/<span class="subst">${session.id}</span>`</span>).catch(<span class="keyword">this</span>.handleError).subscribe();</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> handleError(error: Response) {</span><br><span class="line">    <span class="keyword">return</span> Observable.throw(error.statusText);</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="使用-建立假的-HTTP-物件。"><a href="#使用-建立假的-HTTP-物件。" class="headerlink" title="使用   建立假的 HTTP 物件。"></a>使用  <a href="https://jasmine.github.io/api/edge/jasmine.html#.createSpyObj" title="createSpyObj" target="_blank" rel="external">createSpyObj</a> 建立假的 HTTP 物件。</h3><p>參數說明:</p>
+<ul>
+<li>mockHttp : base name, 可隨意輸入</li>
+<li>[‘delete’] : Spy 物件有 delete 這個方法<figure class="codeblock codeblock--tabbed"><figcaption><span>Spy</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> mockHttp = jasmine.createSpyObj(<span class="string">'mockHttp'</span>, [<span class="string">'delete'</span>]);</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
+</ul>
+<p>撰寫完整的單元測試，而這裡我們要確切的指定 delete 方法回傳 <code>Observable</code> 物件，否則 <code>.catch</code> 與 <code>.subscribe</code> 則會錯誤。</p>
+<ul>
+<li><code>mockHttp.delete.and.returnValue(Observable.of(false));</code> : Spy 物件的 delete 方法回傳 <code>Observable</code> ， 因為要測試的 deleteVoter 方法，並沒有在 subscribe 裡面執行任何程式碼，所以使用 <code>Observable.of(false)</code> 建立一個 <code>Observable</code> 物件。<figure class="codeblock codeblock--tabbed"><figcaption><span>unit test</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">describe(<span class="string">'VoterService'</span>, () =&gt; {</span><br><span class="line">  <span class="keyword">let</span> voterService: VoterService,</span><br><span class="line">    mockHttp;</span><br><span class="line"></span><br><span class="line">  beforeEach(() =&gt; {</span><br><span class="line">    mockHttp = jasmine.createSpyObj(<span class="string">'mockHttp'</span>, [<span class="string">'delete'</span>])</span><br><span class="line">    voterService = <span class="keyword">new</span> VoterService(mockHttp);</span><br><span class="line">  });</span><br><span class="line"></span><br><span class="line">  describe(<span class="string">'deleteVoter'</span>, () =&gt; {</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'should remove the session from the list of sessions'</span>, () =&gt; {</span><br><span class="line">      <span class="keyword">var</span> session = { id: <span class="number">6</span>, voters: [<span class="string">"joe"</span>, <span class="string">"john"</span>]};      </span><br><span class="line">      mockHttp.delete.and.returnValue(Observable.of(<span class="literal">false</span>));</span><br><span class="line"></span><br><span class="line">      voterService.deleteVoter2(&lt;ISession&gt;session, <span class="string">"joe"</span>);</span><br><span class="line"></span><br><span class="line">      expect(session.voters.length).toBe(<span class="number">1</span>);</span><br><span class="line">      expect(session.voters[<span class="number">0</span>]).toBe(<span class="string">"john"</span>);</span><br><span class="line">    })</span><br><span class="line"></span><br><span class="line">  })</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
+</ul>
+<h2 id="驗證傳入參數"><a href="#驗證傳入參數" class="headerlink" title="驗證傳入參數"></a>驗證傳入參數</h2><p>新增另一個 addVoter 的方法，執行 http.post 發送資料到 <code>http://localhost:3000/api/sessions/voters/joe</code> API 位址<br><figure class="codeblock codeblock--tabbed"><figcaption><span>addVoter</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">addVoter(session: ISession, voterName: <span class="built_in">string</span>) {</span><br><span class="line">  session.voters.push(voterName);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> headers = <span class="keyword">new</span> Headers({ <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>});</span><br><span class="line">  <span class="keyword">let</span> options = <span class="keyword">new</span> RequestOptions({headers: headers});</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> url = <span class="string">`<span class="subst">${environment.host}</span>/api/sessions/voters/<span class="subst">${voterName}</span>`</span>;</span><br><span class="line">  <span class="keyword">this</span>.http.post(url, <span class="built_in">JSON</span>.stringify({}), options).catch(<span class="keyword">this</span>.handleError).subscribe();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>使用 <strong>toHaveBeenCalledWith</strong> 驗證 post 傳入的網址是否如預期，以及使用 <strong>jasmine.any</strong> 驗證傳入的物件型別是否如預期。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>unit test</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">describe(<span class="string">'VoterService'</span>, () =&gt; {</span><br><span class="line">  <span class="keyword">let</span> voterService: VoterService,</span><br><span class="line">    mockHttp;</span><br><span class="line"></span><br><span class="line">  beforeEach(() =&gt; {</span><br><span class="line">    mockHttp = jasmine.createSpyObj(<span class="string">'mockHttp'</span>, [<span class="string">'delete'</span>, <span class="string">'post'</span>])</span><br><span class="line">    voterService = <span class="keyword">new</span> VoterService(mockHttp);</span><br><span class="line">  });</span><br><span class="line"></span><br><span class="line">  describe(<span class="string">'addVoter'</span>, () =&gt; {</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'should call http.post with the right URL'</span>, () =&gt; {</span><br><span class="line">      <span class="keyword">var</span> session = { id: <span class="number">6</span>, voters: [<span class="string">"john"</span>]};</span><br><span class="line">      mockHttp.post.and.returnValue(Observable.of(<span class="literal">false</span>));</span><br><span class="line"></span><br><span class="line">      voterService.addVoter(&lt;ISession&gt;session, <span class="string">"joe"</span>);</span><br><span class="line"></span><br><span class="line">      expect(mockHttp.post).toHaveBeenCalledWith(<span class="string">'http://localhost:3000/api/sessions/voters/joe'</span>, <span class="string">"{}"</span>, jasmine.any(RequestOptions));</span><br><span class="line">    })</span><br><span class="line"></span><br><span class="line">  })</span><br><span class="line"></span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://jasmine.github.io/2.0/introduction.html" title="jasmine sample" target="_blank" rel="external">jasmine sample</a>]</strong><br><strong>[<a href="https://karma-runner.github.io/1.0/index.html" title="karma" target="_blank" rel="external">karma</a>]</strong><br><strong>[<a href="https://app.pluralsight.com/library/courses/angular-fundamentals/table-of-contents" title="angular-fundamentals" target="_blank" rel="external">angular-fundamentals</a>]</strong></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;a href=&quot;https://jasmine.github.io/index.html&quot; title=&quot;jasmine&quot;&gt;jasmine&lt;/a&gt; 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 &lt;a href=&quot;https://karma-runner.github.io/1.0/index.html&quot; title=&quot;karma&quot;&gt;karma&lt;/a&gt; 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  &lt;a href=&quot;https://github.com/angular/angular-cli&quot; title=&quot;angular cli&quot;&gt;angular cli&lt;/a&gt; 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。&lt;br&gt;&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
+    
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+  </entry>
+  
+  <entry>
     <title>使用範本參考變數存取 Child Component</title>
     <link href="https://mileslin.github.io/2017/07/%E4%BD%BF%E7%94%A8%E7%AF%84%E6%9C%AC%E5%8F%83%E8%80%83%E8%AE%8A%E6%95%B8%E5%AD%98%E5%8F%96-Child-Component/"/>
     <id>https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/</id>
@@ -455,9 +494,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -589,9 +628,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -778,9 +817,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -864,9 +903,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -918,9 +957,9 @@
       <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
     
     
-      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
-    
       <category term="Angular CLI" scheme="https://mileslin.github.io/tags/Angular-CLI/"/>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
   </entry>
   
@@ -1146,50 +1185,6 @@ DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠�
     
     
       <category term="Domain-Driven Design" scheme="https://mileslin.github.io/tags/Domain-Driven-Design/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>vscode 設定自動觸發 suggestions</title>
-    <link href="https://mileslin.github.io/2017/05/vscode-%E8%A8%AD%E5%AE%9A%E8%87%AA%E5%8B%95%E8%A7%B8%E7%99%BC-suggestions/"/>
-    <id>https://mileslin.github.io/2017/05/vscode-設定自動觸發-suggestions/</id>
-    <published>2017-05-09T11:07:21.000Z</published>
-    <updated>2017-07-24T14:48:34.245Z</updated>
-    
-    <content type="html"><![CDATA[<p>某一版 vscode 更新後，寫 markdown 文件時不會自動跑出小視窗提醒能輸入的 snippet，需要點 <span class="highlight-text primary">ctrl + space</span>
-才會出現視窗，可是中文輸入法的 <span class="highlight-text primary">ctrl + space</span> 有自己的預設行為啊 !! 。</p>
-<a id="more"></a>
-<p>於是乎，我上 github 上去詢問是否有解決的方案，感謝官方的大神們有回我，結論是只要設定 markdown 的 quickSuggestions 就好了。  <a href="https://github.com/Microsoft/vscode/issues/26108#issuecomment-299738939" title="github回應" target="_blank" rel="external">github回應</a></p>
-<h2 id="解法"><a href="#解法" class="headerlink" title="解法"></a>解法</h2><p>首先開啟 Command Palette (<code>Ctrl+Shift+P</code>)，輸入 <code>Configure language specific settings</code> 後按enter， 然後選擇 <code>markdown</code>。</p>
-<p>在設定檔加入這段就可以了</p>
-<div class="alert info"><p>“[markdown]”: {<br>    “editor.quickSuggestions”: true<br>}</p>
-</div>
-<p>完整片段<br><div class="figure " style="width:;"><a class="fancybox" href="setting.jpg" title="" data-fancybox-group=""><img class="fig-img" src="setting.jpg" alt=""></a></div><div style="clear:both;"></div></p>
-<p>詳細設定說明: <a href="https://code.visualstudio.com/updates/v1_9#_language-specific-settings" title="language-specific-settings" target="_blank" rel="external">language-specific-settings</a></p>
-<p>能解決這問題，太令人感動了&gt;&lt;”</p>
-<h2 id="附上實用小技巧"><a href="#附上實用小技巧" class="headerlink" title="附上實用小技巧"></a>附上實用小技巧</h2><p>把 code snippet 顯示在 quickSuggestions 最上面的方式。</p>
-<ol>
-<li><code>ctrl + p</code></li>
-<li>輸入 setting.json</li>
-<li>加入 <code>&quot;editor.snippetSuggestions&quot;: &quot;top&quot;</code></li>
-</ol>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;某一版 vscode 更新後，寫 markdown 文件時不會自動跑出小視窗提醒能輸入的 snippet，需要點 &lt;span class=&quot;highlight-text primary&quot;&gt;ctrl + space&lt;/span&gt;
-才會出現視窗，可是中文輸入法的 &lt;span class=&quot;highlight-text primary&quot;&gt;ctrl + space&lt;/span&gt; 有自己的預設行為啊 !! 。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="vscode" scheme="https://mileslin.github.io/categories/vscode/"/>
-    
-    
-      <category term="vscode" scheme="https://mileslin.github.io/tags/vscode/"/>
-    
-      <category term="trigger" scheme="https://mileslin.github.io/tags/trigger/"/>
-    
-      <category term="suggestion" scheme="https://mileslin.github.io/tags/suggestion/"/>
     
   </entry>
   
