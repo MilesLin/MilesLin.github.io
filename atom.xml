@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-02-13T04:30:04.000Z</updated>
+  <updated>2017-02-13T04:30:02.183Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-02-13T04:30:04.000Z</updated>
+    <updated>2017-02-13T04:30:02.183Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -41,11 +41,99 @@
   </entry>
   
   <entry>
+    <title>Template-Driven 動態加入驗證屬性注意事項</title>
+    <link href="https://mileslin.github.io/2017/08/Template-Driven-%E5%8B%95%E6%85%8B%E5%8A%A0%E5%85%A5%E9%A9%97%E8%AD%89%E5%B1%AC%E6%80%A7%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85/"/>
+    <id>https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/</id>
+    <published>2017-08-13T14:19:00.000Z</published>
+    <updated>2017-08-13T18:06:23.123Z</updated>
+    
+    <content type="html"><![CDATA[<p>在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。<br><div class="figure center" style="width:;"><a class="fancybox" href="Binding_Required.jpg" title="Binding Required" data-fancybox-group=""><img class="fig-img" src="Binding_Required.jpg" alt="Binding Required"></a><span class="caption">Binding Required</span></div><div style="clear:both;"></div></p>
+<p>此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?<br><div class="alert danger no-icon"><p>ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’</p>
+</div></p>
+<a id="more"></a>
+<div class="figure center" style="width:;"><a class="fancybox" href="Error_Message.jpg" title="Expression Changed After It Has Been Checked Error" data-fancybox-group=""><img class="fig-img" src="Error_Message.jpg" alt="Expression Changed After It Has Been Checked Error"></a><span class="caption">Expression Changed After It Has Been Checked Error</span></div><div style="clear:both;"></div>
+<h2 id="案例說明"><a href="#案例說明" class="headerlink" title="案例說明"></a>案例說明</h2><p>在解答這個問題之前，先敘述一下將要展示的簡單案例。</p>
+<ul>
+<li>畫面有 Age 與 Married 兩個下拉選單</li>
+<li>Age 必填，可選擇 Child 與 Adult</li>
+<li>Married ，可選擇 Married 與 Not Yet <ul>
+<li><span class="highlight-text danger">當 Age 選擇 Adult 時， Married 一定要選擇，並顯示 Required 文字 
+  </span>
+</li>
+</ul>
+</li>
+</ul>
+<p>了解案例後，讀者可以到 <a href="https://stackblitz.com/edit/angular-expressionchangedafterithasbeencheckederror?file=app%2Fapp.component.html" title="Angular-Expression Changed After It Has Been Checked Error Demo" target="_blank" rel="external">Angular-Expression Changed After It Has Been Checked Error Demo</a> 按照步驟操作，即可出現錯誤訊息。  <em>(記得看一下程式碼喔~)</em></p>
+<h2 id="Development-Mode"><a href="#Development-Mode" class="headerlink" title="Development Mode"></a>Development Mode</h2><p>如果讀者有操作上敘案例的話，按下 F12 開啟開發者模式的時候，會看到這段訊息。<br><div class="figure " style="width:;"><a class="fancybox" href="Development_Mode_Message.jpg" title="Development_Mode_Message" data-fancybox-group=""><img class="fig-img" src="Development_Mode_Message.jpg" alt="Development_Mode_Message"></a><span class="caption">Development_Mode_Message</span></div></p>
+<p>什麼是 Development Mode? Development Mode 會有什麼機制? <strong>這是本篇的 Key Point 啊!!!</strong></p>
+<p>引用 Angular #6005 的說明<br><blockquote><p>In short, after every round of change detection, dev mode immediately performs a second round to verify that no bindings have changed since the end of the first, as this would indicate that changes are being caused by change detection itself</p>
+<footer><strong>drew-moore</strong><cite><a href="https://github.com/angular/angular/issues/6005#issuecomment-165905348" target="_blank" rel="external">EXCEPTION: Expression has changed after it was checked. #6005</a></cite></footer></blockquote></p>
+<p>意思是說，在 Development Mode 的情況下，變更偵測觸發後，會立即執行第二次變更偵測，確保 status 的值沒有被變更。  如果 status 的值被變更了，則會出現該錯誤訊息，而這情形稱之為 <strong> <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#avoidingchangedetectionloopsproductionvsdevelopmentmode" title="change detection loops" target="_blank" rel="external">change detection loops</a> </strong>。</p>
+<h4 id="不建議執行-enableProdMode-解決這個問題"><a href="#不建議執行-enableProdMode-解決這個問題" class="headerlink" title="不建議執行 enableProdMode() 解決這個問題"></a>不建議執行 enableProdMode() 解決這個問題</h4><p>剛剛那篇 issue 的說明，有提到一個解決方式，就是 <code>enableProdMode()</code> 啟用 Production Mode，恩….沒錯，啟用 Production Mode ，這個問題就不會再出現了。  但是這樣只是把問題隱藏而已，因為 Development Mode 會有這機制，是有原因的 !!!</p>
+<p>如 stackoverflow 有人說明，第二次變更偵測的時候，變更偵測自行變更 status ，或者是在執行一個方法時，每次執行都回傳不同的值，這樣會造成 status 非常不穩定。<br><blockquote><p>If the model has changed between the regular and the additional change detection turn, this indicates that either</p>
+<ul>
+<li>change detection itself has caused a change</li>
+<li>a method or getter returns a different value every time it is called<br>which are both bad, because it is not clear how to proceed because the model might never stabilize.</li>
+</ul>
+<footer><strong>Günter Zöchbauer</strong><cite><a href="https://stackoverflow.com/questions/43375532/expressionchangedafterithasbeencheckederror-explained#answer-43375600" target="_blank" rel="external">ExpressionChangedAfterItHasBeenCheckedError Explained</a></cite></footer></blockquote></p>
+<p>再來是根據 <a href="https://angular-university.io/" title="Angular University" target="_blank" rel="external">Angular University</a> 的建議， <span class="highlight-text primary">最好在開發時期啟用 Development Mode，那將會避免問題發生</span>。<br><blockquote><p>We really have to go out of our way to trigger a change detection loop, but just in case its better to always use development mode during the development phase, as that will avoid the problem.</p>
+<footer><strong>Angular University</strong><cite><a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#arechangedetectionissuesfrequent" target="_blank" rel="external">Are change detection issues frequent?</a></cite></footer></blockquote></p>
+<h2 id="Lifecycle-Hooks"><a href="#Lifecycle-Hooks" class="headerlink" title="Lifecycle Hooks"></a>Lifecycle Hooks</h2><p>好了!! 接下來就是要找出問題的發生點，在這之前會建議讀者稍微了解一下生命週期的概念。 =&gt; <a href="https://angular.io/guide/lifecycle-hooks" title="Lifecycle Hooks" target="_blank" rel="external">Lifecycle Hooks</a>，</p>
+<p>根據 <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#howtotriggerachangedetectionloopinangular" title="Angular University - How to trigger a change detection loop in Angular?" target="_blank" rel="external">Angular University - How to trigger a change detection loop in Angular?</a> 的說明，這錯誤訊息是發生在 <a href="https://angular.io/guide/lifecycle-hooks#lifecycle-sequence" title="Angular Lifecycle Hooks - ngAfterViewChecked" target="_blank" rel="external">Angular Lifecycle Hooks - ngAfterViewChecked</a> 這個階段。</p>
+<p>接下來請到線上範例 <a href="https://stackblitz.com/edit/angular-expressionchangedafterithasbeencheckederror-lifehook?file=app%2Fapp.component.html" title="Angular-Expression Changed After It Has Been Checked Error Demo With Lifecycle Hooks" target="_blank" rel="external">Angular-Expression Changed After It Has Been Checked Error Demo With Lifecycle Hooks</a> 看一下生命週期 ngAfterContentChecked 與 ngAfterViewChecked 執行的情形。  <em>(記得看一下程式碼喔~)</em></p>
+<p>可以看到 <code>married invalid:true</code> 在 ngAfterViewChecked 的階段，值改變了!!!<br><div class="figure center" style="width:;"><a class="fancybox" href="Lifecycle_Hooks_Error_Message.jpg" title="Lifecycle_Hooks_Error_Message" data-fancybox-group=""><img class="fig-img" src="Lifecycle_Hooks_Error_Message.jpg" alt="Lifecycle_Hooks_Error_Message"></a><span class="caption">Lifecycle_Hooks_Error_Message</span></div><div style="clear:both;"></div></p>
+<p>至於為什麼會這樣，請讀者看著這張圖，讓我按照順序說明<br><div class="figure center" style="width:;"><a class="fancybox" href="View_Note.jpg" title="畫面說明" data-fancybox-group=""><img class="fig-img" src="View_Note.jpg" alt="畫面說明"></a><span class="caption">畫面說明</span></div><div style="clear:both;"></div></p>
+<ol>
+<li>在 Age 還沒選擇時，<code>2.[required]=&quot;age.value === &#39;2&#39;&quot;</code>，不會成立，所以 <code>married.invalid === false</code></li>
+<li>Age 選擇 Adult 時， view render 會先 render 到 <code>1.&lt;em *ngIf=&quot;married.invalid&quot;&gt;Required&lt;/em&gt;</code> 的位置，此時<code>married.invalid 還是 === false</code></li>
+<li>接下來 view render 到 married 下拉選單，發現 <code>2.[required]=&quot;age.value === &#39;2&#39;&quot;</code>成立了，則 <code>married.invalid === true</code>， <span class="highlight-text danger">married.invalid 在這時候 status 改變了 !!!</span> 。<em>(這也是為什麼最一開始的程式範例，要執行步驟四，Required的訊息才會出現的原因)</em></li>
+<li>在 ngAfterViewChecked<em>(view render 結束)</em> 階段修改 status ，蹦 !! 錯誤訊息發生</li>
+</ol>
+<p><strong>雙重驗證上述流程!!</strong>  根據上述流程，所以只要將 Required 訊息移到 married 下拉選單後面，讓 married 下拉選單先 render ，之後再 render Required 訊息，就不會有 view render 結束後又改變 status 的情形發生?<br><strong>A: 沒錯!!!</strong></p>
+<p>讀者可以試試看，把 Required 訊息換位置<em>(如下圖)</em>。  讀者可以發現 <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#avoidingchangedetectionloopsproductionvsdevelopmentmode" title="change detection loops" target="_blank" rel="external">change detection loops</a> 的情形不再發生 !!</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="Change_Position.jpg" title="更改 Required 訊息位置" data-fancybox-group=""><img class="fig-img" src="Change_Position.jpg" alt="更改 Required 訊息位置"></a><span class="caption">更改 Required 訊息位置</span></div><div style="clear:both;"></div>
+<ol>
+<li>在 Age 還沒選擇時，<code>2.[required]=&quot;age.value === &#39;2&#39;&quot;</code>，不會成立，所以 <code>married.invalid === false</code></li>
+<li>Age 選擇 Adult 時， view render 會先 render 到 married 下拉選單，發現 <code>[required]=&quot;age.value === &#39;2&#39;&quot;</code>成立了，則 <code>married.invalid === true</code>。</li>
+<li>接下來 view render 到 <code>&lt;em *ngIf=&quot;married.invalid&quot;&gt;Required&lt;/em&gt;</code>，因為 <code>married.invalid</code> 在流程 2 的時候已經是 true ，所以則顯示 Required 訊息。</li>
+<li>結束。  完全<span class="highlight-text success">沒有</span>在 ngAfterViewChecked<em>(view render 結束)</em> 階段修改 status</li>
+</ol>
+<h2 id="最終解法"><a href="#最終解法" class="headerlink" title="最終解法 !!"></a>最終解法 !!</h2><p>雖然上面有提到，只要移動 Required 訊息，問題就解決了，可是 <span class="highlight-text primary">版型就是這樣定的，錯誤訊息就是要擺那裏阿</span>。  那如果錯誤訊息真的要放那邊怎麼辦?  而 Angular 生命週期的機制就是那樣，我們能做的是<strong>改變寫法</strong>。 </p>
+<p>請參考下圖，Age 下拉選單增加 chagne 事件，取代 <code>[required]=&quot;age.value === &#39;2&#39;&quot;</code> 寫法<br><div class="figure center" style="width:;"><a class="fancybox" href="Change_Event.jpg" title="使用 change 事件" data-fancybox-group=""><img class="fig-img" src="Change_Event.jpg" alt="使用 change 事件"></a><span class="caption">使用 change 事件</span></div><div style="clear:both;"></div></p>
+<ul>
+<li>使用 <code>@ViewChild(&#39;form&#39;) form: NgForm;</code> 取得 NgForm 物件</li>
+<li>在 markMarriedAsRequiredOrOptional 方法，設定 married 為 required<div class="figure center" style="width:;"><a class="fancybox" href="Mark_Married_As_Required_Or_Optional.jpg" title="用 NgForm 取得 FormControl 設定 married 為 Required" data-fancybox-group=""><img class="fig-img" src="Mark_Married_As_Required_Or_Optional.jpg" alt="用 NgForm 取得 FormControl 設定 married 為 Required"></a><span class="caption">用 NgForm 取得 FormControl 設定 married 為 Required</span></div><div style="clear:both;"></div>
+</li>
+</ul>
+<p>最後當然還是有提供線上範例啦，讀者可以自行點連結去看看喔。 =&gt; <strong><a href="https://stackblitz.com/edit/angular-expressionchangedafterithasbeencheckederror-solution?file=app%2Fapp.component.html" title="Solution" target="_blank" rel="external">Solution</a></strong></p>
+<h2 id="題外話"><a href="#題外話" class="headerlink" title="題外話"></a>題外話</h2><p>好吧，其實這也是很重要的一個觀念，但是我不知道擺在文章的哪一段XD。  在這篇 <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work" title="how-does-angular-2-change-detection-really-work" target="_blank" rel="external">how-does-angular-2-change-detection-really-work</a> 的留言，有人認為說是 <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#avoidingchangedetectionloopsproductionvsdevelopmentmode" title="change detection loops" target="_blank" rel="external">change detection loops</a> 是 bug ，而 Angular University 則回應這是 feature 不是 bug ，其理由就讀者自行閱讀了。</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="Argument.jpg" title="題外話XD" data-fancybox-group=""><img class="fig-img" src="Argument.jpg" alt="題外話XD"></a><span class="caption">題外話XD</span></div><div style="clear:both;"></div>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>想不到一個簡單的小功能造成的一個錯誤訊息，牽扯到的觀念那麼多，剛好也趁這時候認識了 Angular 生命週期與變更偵測的機制。  另外，讀者可以參考下方延伸閱讀的文章，其中有提到 <strong>onpush-change-detection</strong> ，使用這個方式，也可以解決 <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#avoidingchangedetectionloopsproductionvsdevelopmentmode" title="change detection loops" target="_blank" rel="external">change detection loops</a> 的問題，但是原因為何，目前還沒研究出來XD。</p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/" title="angular-university-how-does-angular-2-change-detection-really-work" target="_blank" rel="external">angular-university-how-does-angular-2-change-detection-really-work</a>]</strong>,<strong>[<a href="https://angular.io/guide/lifecycle-hooks" title="lifecycle-hooks" target="_blank" rel="external">lifecycle-hooks</a>]</strong>,<strong>[<a href="https://stackoverflow.com/questions/43375532/expressionchangedafterithasbeencheckederror-explained" title="TitleAttribute" target="_blank" rel="external">stackoverflow-expressionchangedafterithasbeencheckederror-explained</a>]</strong>,<strong>[<a href="https://github.com/angular/angular/issues/6005" title="angular/issues/600" target="_blank" rel="external">angular/issues/6005</a>]</strong>,<strong>[<a href="https://blog.thoughtram.io/angular/2016/02/22/angular-2-change-detection-explained.html" title="thoughtram-angular-2-change-detection-explained" target="_blank" rel="external">thoughtram-angular-2-change-detection-explained</a>]</strong>  </p>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p><strong>[<a href="http://blog.angular-university.io/onpush-change-detection-how-it-works/" title="onpush-change-detection-how-it-works" target="_blank" rel="external">onpush-change-detection-how-it-works</a>]</strong>,<strong>[<a href="https://angular-2-training-book.rangle.io/handout/change-detection/" title="training-book-change-detection" target="_blank" rel="external">training-book-change-detection</a>]</strong>,<strong>[<a href="https://alligator.io/angular/change-detection-strategy/" title="change-detection-strategy" target="_blank" rel="external">change-detection-strategy</a>]</strong>,<strong>[<a href="https://angular.io/api/forms/AbstractControl#setValidators" title="AbstractControl" target="_blank" rel="external">AbstractControl</a>]</strong></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。&lt;br&gt;&lt;div class=&quot;figure center&quot; style=&quot;width:;&quot;&gt;&lt;a class=&quot;fancybox&quot; href=&quot;Binding_Required.jpg&quot; title=&quot;Binding Required&quot; data-fancybox-group=&quot;&quot;&gt;&lt;img class=&quot;fig-img&quot; src=&quot;Binding_Required.jpg&quot; alt=&quot;Binding Required&quot;&gt;&lt;/a&gt;&lt;span class=&quot;caption&quot;&gt;Binding Required&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;clear:both;&quot;&gt;&lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?&lt;br&gt;&lt;div class=&quot;alert danger no-icon&quot;&gt;&lt;p&gt;ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’&lt;/p&gt;
+&lt;/div&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Angular" scheme="https://mileslin.github.io/categories/Angular/"/>
+    
+    
+      <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Angular 單元測試起手式</title>
     <link href="https://mileslin.github.io/2017/08/Angular-%E5%96%AE%E5%85%83%E6%B8%AC%E8%A9%A6%E8%B5%B7%E6%89%8B%E5%BC%8F/"/>
     <id>https://mileslin.github.io/2017/08/Angular-單元測試起手式/</id>
     <published>2017-08-07T13:50:54.000Z</published>
-    <updated>2017-08-08T10:09:17.149Z</updated>
+    <updated>2017-08-13T14:02:51.999Z</updated>
     
     <content type="html"><![CDATA[<a href="https://jasmine.github.io/index.html" title="jasmine" target="_blank" rel="external">jasmine</a> 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 <a href="https://karma-runner.github.io/1.0/index.html" title="karma" target="_blank" rel="external">karma</a> 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  <a href="https://github.com/angular/angular-cli" title="angular cli" target="_blank" rel="external">angular cli</a> 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。<br><br><a id="more"></a>
 <h2 id="建立-spy-object"><a href="#建立-spy-object" class="headerlink" title="建立 spy object"></a>建立 spy object</h2><p>在這邊我有一個 VoterService ，且有一個 deleteVoter 的方法，可以執行刪除的動作，而為了能發 Http 到 Server，Angular 都是用 <a href="https://angular.io/api/http/Http" title="HTTP" target="_blank" rel="external">HTTP</a> 這類別來發送 http request，所以我建構式注入了 HTTP，而我在單元測試的時候，也就可以注入假的 HTTP 物件。</p>
@@ -84,7 +172,7 @@
     <link href="https://mileslin.github.io/2017/07/%E4%BD%BF%E7%94%A8%E7%AF%84%E6%9C%AC%E5%8F%83%E8%80%83%E8%AE%8A%E6%95%B8%E5%AD%98%E5%8F%96-Child-Component/"/>
     <id>https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/</id>
     <published>2017-07-31T15:33:20.000Z</published>
-    <updated>2017-08-08T10:09:17.152Z</updated>
+    <updated>2017-08-13T14:02:52.015Z</updated>
     
     <content type="html"><![CDATA[<p>Angular 的架構基本上就是 Component 包 Component，所以常常會有情況存取 Component 底下的 Component 一些資源，而只要用範本參考變數，就能很輕易達到這樣的功能。</p>
 <a id="more"></a>
@@ -114,7 +202,7 @@
     <link href="https://mileslin.github.io/2017/07/%E6%B3%9B%E5%9E%8B%E8%BD%89%E5%9E%8B%E7%9A%84%E5%B0%8F%E6%8A%80%E5%B7%A7/"/>
     <id>https://mileslin.github.io/2017/07/泛型轉型的小技巧/</id>
     <published>2017-07-29T13:39:41.000Z</published>
-    <updated>2017-08-08T10:09:17.155Z</updated>
+    <updated>2017-08-13T14:02:52.077Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li><p>有時候在寫一些泛型程式的時候，難免會有一些轉型上的需求。  而在設計上，總不能當有需要轉型的時候就寫一個 if 來判斷此情況需要轉型成什麼類別，這樣就有點失去泛型的意義。  所以今天就分享一些小技巧，怎麼處理這些轉型的情況。</p>
@@ -168,7 +256,7 @@
     <link href="https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/"/>
     <id>https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/</id>
     <published>2017-07-24T15:49:42.000Z</published>
-    <updated>2017-07-26T08:36:27.690Z</updated>
+    <updated>2017-07-25T06:18:58.088Z</updated>
     
     <content type="html"><![CDATA[<p>Type Keyword 是 typescript 能將型別取一個別名的方式，例如我將型別 <code>string</code> assign 給 myType，之後就可以用 myType 來定義變數的型別。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>type keyword</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> myType = <span class="built_in">string</span>;</span><br><span class="line"><span class="keyword">let</span> a: myType = <span class="string">'hello'</span>;</span><br><span class="line"><span class="keyword">let</span> b: myType = <span class="number">10</span>; <span class="comment">// Type 'number' is not assignable to type 'string'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
 <a id="more"></a>
@@ -198,7 +286,7 @@
     <link href="https://mileslin.github.io/2017/07/%E8%87%AA%E8%A8%82-AuthorizeFilter/"/>
     <id>https://mileslin.github.io/2017/07/自訂-AuthorizeFilter/</id>
     <published>2017-07-24T15:16:40.000Z</published>
-    <updated>2017-07-26T08:36:27.936Z</updated>
+    <updated>2017-07-23T15:47:52.452Z</updated>
     
     <content type="html"><![CDATA[<p>自行 AuthorizeFilter</p>
 <a id="more"></a>
@@ -239,7 +327,7 @@
     <link href="https://mileslin.github.io/2017/07/ASP-NET-%E8%A1%A8%E5%96%AE%E9%A9%97%E8%AD%89/"/>
     <id>https://mileslin.github.io/2017/07/ASP-NET-表單驗證/</id>
     <published>2017-07-23T06:49:29.000Z</published>
-    <updated>2017-07-26T08:36:27.682Z</updated>
+    <updated>2017-07-23T15:48:42.948Z</updated>
     
     <content type="html"><![CDATA[<p>ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。</p>
 <a id="more"></a>
@@ -276,11 +364,11 @@
       <category term="Authentication" scheme="https://mileslin.github.io/categories/Authentication/"/>
     
     
-      <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
-    
       <category term="Authentication" scheme="https://mileslin.github.io/tags/Authentication/"/>
     
       <category term="FormsAuthentication" scheme="https://mileslin.github.io/tags/FormsAuthentication/"/>
+    
+      <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
     
   </entry>
   
@@ -289,7 +377,7 @@
     <link href="https://mileslin.github.io/2017/07/%E5%95%9F%E7%94%A8-Action-Filter-Property-Injection-%E8%88%87-%E8%A8%BB%E5%86%8A-Web-Abstractions/"/>
     <id>https://mileslin.github.io/2017/07/啟用-Action-Filter-Property-Injection-與-註冊-Web-Abstractions/</id>
     <published>2017-07-22T15:02:16.000Z</published>
-    <updated>2017-08-08T10:14:11.839Z</updated>
+    <updated>2017-08-13T14:02:52.077Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>通常使用 Action Filter 的時候常常會用到一些資料庫的讀取，為了防止耦合性過高，所以建立取得 DBContext 實體的時候，可以用 DI 的方式注入。</li>
@@ -322,9 +410,9 @@
       <category term="Autofac" scheme="https://mileslin.github.io/categories/Autofac/"/>
     
     
-      <category term="C#" scheme="https://mileslin.github.io/tags/C/"/>
-    
       <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
+    
+      <category term="C#" scheme="https://mileslin.github.io/tags/C/"/>
     
       <category term="Autofac" scheme="https://mileslin.github.io/tags/Autofac/"/>
     
@@ -335,7 +423,7 @@
     <link href="https://mileslin.github.io/2017/07/%E5%AE%89%E8%A3%9D-SQL-Server-2014-Express-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/07/安裝-SQL-Server-2014-Express-筆記/</id>
     <published>2017-07-15T05:45:36.000Z</published>
-    <updated>2017-07-26T08:36:27.754Z</updated>
+    <updated>2017-07-15T06:50:15.436Z</updated>
     
     <content type="html"><![CDATA[<p>今天文章會說明，安裝 SQL Server Express 後，使用 Microsoft SQL Server Management Studio 的 sa 帳號登入。</p>
 <a id="more"></a>
@@ -400,7 +488,7 @@
     <link href="https://mileslin.github.io/2017/07/Command-Line-%E7%AD%86%E8%A8%98-%E9%81%A0%E7%AB%AF%E8%A4%87%E8%A3%BD%E8%88%87%E5%A3%93%E7%B8%AE/"/>
     <id>https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/</id>
     <published>2017-07-11T09:34:08.000Z</published>
-    <updated>2017-07-11T10:02:00.014Z</updated>
+    <updated>2017-07-15T05:44:43.738Z</updated>
     
     <content type="html"><![CDATA[<p>最近為了將的壓縮、解壓縮、遠端連線硬碟、複製貼上等等的繁瑣的事情寫成 bat 檔案，花了很多時間。  所以就來記錄一下，用 command line 自動化的功能。</p>
 <ul>
@@ -451,7 +539,7 @@
     <link href="https://mileslin.github.io/2017/07/ng-build-%E4%B8%A6%E5%A3%93%E7%B8%AE%E6%AA%94%E6%A1%88/"/>
     <id>https://mileslin.github.io/2017/07/ng-build-並壓縮檔案/</id>
     <published>2017-07-10T11:19:27.000Z</published>
-    <updated>2017-07-10T11:46:05.141Z</updated>
+    <updated>2017-07-15T05:44:43.740Z</updated>
     
     <content type="html"><![CDATA[<p>在佈署 Angular 專案的時候為了能夠快速複製到遠端主機上，所以通常會 <code>ng build</code> 後，將 build 出來的檔案壓縮，要完成這一連串的流程，通常都是寫 cmd 來處理。</p>
 <a id="more"></a>
@@ -507,7 +595,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-4/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-4/</id>
     <published>2017-07-09T04:26:50.000Z</published>
-    <updated>2017-07-10T11:15:49.686Z</updated>
+    <updated>2017-07-09T08:15:21.605Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>unit tests<ul>
@@ -641,7 +729,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-3/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/</id>
     <published>2017-07-08T15:07:00.000Z</published>
-    <updated>2017-07-11T07:44:07.677Z</updated>
+    <updated>2017-07-15T05:44:43.703Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建置專案與環境參數設定</li>
@@ -830,7 +918,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-2/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/</id>
     <published>2017-07-04T15:26:07.000Z</published>
-    <updated>2017-07-10T11:15:49.664Z</updated>
+    <updated>2017-07-09T08:15:30.192Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立元件與檔案 <em>(service,class,interface ….)</em></li>
@@ -916,7 +1004,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-1/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/</id>
     <published>2017-07-02T14:47:41.000Z</published>
-    <updated>2017-07-10T11:15:49.661Z</updated>
+    <updated>2017-07-09T08:15:34.565Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立專案與元件</li>
@@ -970,7 +1058,7 @@
     <link href="https://mileslin.github.io/2017/06/DI-%E5%9C%B0%E9%9B%B7%E4%B9%8B%E7%94%9F%E5%91%BD%E9%80%B1%E6%9C%9F%E5%BE%88%E9%87%8D%E8%A6%81/"/>
     <id>https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/</id>
     <published>2017-06-30T10:50:44.000Z</published>
-    <updated>2017-06-30T11:45:31.320Z</updated>
+    <updated>2017-07-05T03:09:49.189Z</updated>
     
     <content type="html"><![CDATA[<p>目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:</p>
 <div class="alert warning"><p>DI 的三種生命週期很重要!!  不要亂設定!!</p>
@@ -1021,9 +1109,9 @@
       <category term="Autofac" scheme="https://mileslin.github.io/categories/Autofac/"/>
     
     
-      <category term="C#" scheme="https://mileslin.github.io/tags/C/"/>
-    
       <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
+    
+      <category term="C#" scheme="https://mileslin.github.io/tags/C/"/>
     
       <category term="Autofac" scheme="https://mileslin.github.io/tags/Autofac/"/>
     
@@ -1034,7 +1122,7 @@
     <link href="https://mileslin.github.io/2017/06/%E5%96%AE%E5%85%83%E6%B8%AC%E8%A9%A6Model%E9%A9%97%E8%AD%89/"/>
     <id>https://mileslin.github.io/2017/06/單元測試Model驗證/</id>
     <published>2017-06-30T04:17:39.000Z</published>
-    <updated>2017-06-30T04:33:11.263Z</updated>
+    <updated>2017-07-05T03:09:49.227Z</updated>
     
     <content type="html"><![CDATA[<p>MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。</p>
 <a id="more"></a>
@@ -1068,7 +1156,7 @@
     <link href="https://mileslin.github.io/2017/06/Destructuring-assignment/"/>
     <id>https://mileslin.github.io/2017/06/Destructuring-assignment/</id>
     <published>2017-06-28T15:52:51.000Z</published>
-    <updated>2017-06-30T04:12:37.529Z</updated>
+    <updated>2017-07-05T03:09:49.225Z</updated>
     
     <content type="html"><![CDATA[<p>解構賦值是一種優雅的方式能夠將<code>{}</code>與<code>[]</code>的值讀出來<br><a id="more"></a></p>
 <h2 id="讀取陣列並-assign-到變數上"><a href="#讀取陣列並-assign-到變數上" class="headerlink" title="讀取陣列並 assign 到變數上"></a>讀取陣列並 assign 到變數上</h2><p><em>陣列的解構賦值用陣列去接</em><br><figure class="codeblock codeblock--tabbed"><figcaption><span>JavaScript</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> foo = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">let</span> [one, two, three] = foo;</span><br><span class="line"><span class="built_in">console</span>.log(one); <span class="comment">// 'one'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
@@ -1097,7 +1185,7 @@
     <link href="https://mileslin.github.io/2017/06/%E6%93%B4%E5%85%85%E5%A5%97%E4%BB%B6%E5%B1%AC%E6%80%A7%EF%BC%8C%E4%BB%A5sweetalert%E7%82%BA%E4%BE%8B/"/>
     <id>https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/</id>
     <published>2017-06-23T06:25:13.000Z</published>
-    <updated>2017-06-23T06:50:42.476Z</updated>
+    <updated>2017-07-05T03:09:49.228Z</updated>
     
     <content type="html"><![CDATA[<p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>error_input</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">swal({</span><br><span class="line">  title: <span class="string">'Oops !!!'</span>,</span><br><span class="line">  input: <span class="string">'email'</span> <span class="comment">// &lt;- error</span></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
@@ -1123,70 +1211,6 @@
       <category term="Angular" scheme="https://mileslin.github.io/tags/Angular/"/>
     
       <category term="typescript" scheme="https://mileslin.github.io/tags/typescript/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>為什麼需要 Domain-Driven Design</title>
-    <link href="https://mileslin.github.io/2017/05/%E7%82%BA%E4%BB%80%E9%BA%BC%E9%9C%80%E8%A6%81-Domain-Driven-Design/"/>
-    <id>https://mileslin.github.io/2017/05/為什麼需要-Domain-Driven-Design/</id>
-    <published>2017-05-21T15:51:09.000Z</published>
-    <updated>2017-06-08T07:43:30.044Z</updated>
-    
-    <content type="html"><![CDATA[<p>最近開始看 Donmain-Driven Design 的 <a href="https://app.pluralsight.com/library/courses/domain-driven-design-fundamentals/table-of-contents" title="TitleAttribute" target="_blank" rel="external">plurasight 的影片</a> ，其裡面有一句話深深吸引我，而當我開始看 DDD 的教學影片時，發現需要知道的內容，是多麼的廣泛，這句話當之無愧。。<br> <blockquote><p>The more you know, the more you realize you know nothing</p>
-<footer><strong>Socrates</strong></footer></blockquote></p>
-<a id="more"></a> 
-<h2 id="為什麼需要-DDD"><a href="#為什麼需要-DDD" class="headerlink" title="為什麼需要 DDD?"></a>為什麼需要 DDD?</h2><p>DDD 開發專注在理解使用者的需求，專注在 <span class="highlight-text primary">Domain</span> 上，理解之後才開始寫程式碼。
-t
-DDD 有其準則跟模式，幫助我們解決困難複雜的問題。  能夠幫助我們寫出代表 <span class="highlight-text primary">Domain</span> 乾淨且可測試的程式碼，</p>
-<p>DDD 幫助我們專注在更小、獨立 <span class="highlight-text primary">Domain</span>，讓我們在開發上更為準確。 </p>
-<h2 id="需要一位-Domain-Experts"><a href="#需要一位-Domain-Experts" class="headerlink" title="需要一位 Domain Experts"></a>需要一位 Domain Experts</h2><p>在 DDD 開發上，是非常重視溝通，其需要一位懂專業領域的專家，幫助我們釐清問題，其 Domain Experts 可以是合作的客戶、可以是專案上的 PM 等等….</p>
-<h2 id="用一張大圖來表示-DDD"><a href="#用一張大圖來表示-DDD" class="headerlink" title="用一張大圖來表示 DDD"></a>用一張大圖來表示 DDD</h2><p>Slides 的這張投影片，這就 DDD 需要懂的概念，因為剛開始在學習，目前懂的東西還不多，為了呼應開頭的引言，就先放在這邊嚇嚇大家XD</p>
-<div class="figure " style="width:;"><a class="fancybox" href="DDD_Big_Picture.jpg" title="DDD_Big_Picture" data-fancybox-group=""><img class="fig-img" src="DDD_Big_Picture.jpg" alt="DDD_Big_Picture"></a><span class="caption">DDD_Big_Picture</span></div>
-<h2 id="DDD-的優點"><a href="#DDD-的優點" class="headerlink" title="DDD 的優點"></a>DDD 的優點</h2><ul>
-<li>延展性  </li>
-<li>站在使用者的角度來看問題</li>
-<li>有一套流程處理複雜的問題</li>
-<li>幫助我們寫有組織且可測試的程式碼</li>
-<li>所有的商業邏輯集中在一個地方</li>
-<li>有很多 patterns 可以在專案中使用</li>
-</ul>
-<p>雖然 DDD 提供很優點，像是好維護，並有一套的溝通方式幫助我們理解複雜的商業邏輯，但是這應該是用在有複雜商業邏輯的專案上。</p>
- <blockquote><p>While Domain-Driven Design provides many technical benefits, such as maintainability, it should be applied only to complex domains where the model and the linguistic processes provide clear benefits in the communication of complex information, and in the formulation of a common understanding of the domain.</p>
-<footer><strong>Eric Evans</strong><cite>Domain-Driven Design</cite></footer></blockquote>
-<h2 id="DDD-的缺點"><a href="#DDD-的缺點" class="headerlink" title="DDD 的缺點"></a>DDD 的缺點</h2><ul>
-<li>花時間<ul>
-<li>溝通並理解商業邏輯，理解什麼問題該被解決</li>
-<li>將商業邏從應用程式中獨立出來</li>
-</ul>
-</li>
-<li>學習曲線<ul>
-<li>不同的開發原則</li>
-<li>新的 patterns</li>
-<li>新的開發方式</li>
-</ul>
-</li>
-<li>只用在擁有複雜商業邏輯的專案上<ul>
-<li>不適合用無複雜商業邏輯的專案，只有在做 CRUD 的情境上</li>
-<li>技術複雜但是商業邏輯簡單的情境，也不適用</li>
-</ul>
-</li>
-<li>公司也需要同意執行 DDD 才可以!!!!</li>
-</ul>
-<h3 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h3><p>DDD 真的是一個很大的主題，在看影片上，常常同一個影片也要多看幾次，才稍微理解裡面講的內容。  也因為剛開始學習的關係，若提及的內容與讀者理解稍有不同，也歡迎留言告知。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;最近開始看 Donmain-Driven Design 的 &lt;a href=&quot;https://app.pluralsight.com/library/courses/domain-driven-design-fundamentals/table-of-contents&quot; title=&quot;TitleAttribute&quot;&gt;plurasight 的影片&lt;/a&gt; ，其裡面有一句話深深吸引我，而當我開始看 DDD 的教學影片時，發現需要知道的內容，是多麼的廣泛，這句話當之無愧。。&lt;br&gt; &lt;blockquote&gt;&lt;p&gt;The more you know, the more you realize you know nothing&lt;/p&gt;
-&lt;footer&gt;&lt;strong&gt;Socrates&lt;/strong&gt;&lt;/footer&gt;&lt;/blockquote&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="Domain-Driven Design" scheme="https://mileslin.github.io/categories/Domain-Driven-Design/"/>
-    
-    
-      <category term="Domain-Driven Design" scheme="https://mileslin.github.io/tags/Domain-Driven-Design/"/>
     
   </entry>
   
