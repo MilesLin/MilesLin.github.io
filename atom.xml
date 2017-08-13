@@ -45,9 +45,9 @@
     <link href="https://mileslin.github.io/2017/08/Template-Driven-%E5%8B%95%E6%85%8B%E5%8A%A0%E5%85%A5%E9%A9%97%E8%AD%89%E5%B1%AC%E6%80%A7%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85/"/>
     <id>https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/</id>
     <published>2017-08-13T14:19:00.000Z</published>
-    <updated>2017-08-13T18:06:23.123Z</updated>
+    <updated>2017-08-13T18:16:35.102Z</updated>
     
-    <content type="html"><![CDATA[<p>在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。<br><div class="figure center" style="width:;"><a class="fancybox" href="Binding_Required.jpg" title="Binding Required" data-fancybox-group=""><img class="fig-img" src="Binding_Required.jpg" alt="Binding Required"></a><span class="caption">Binding Required</span></div><div style="clear:both;"></div></p>
+    <content type="html"><![CDATA[<p>在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。<br><div class="figure center" style="width:;"><a class="fancybox" href="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Binding_Required.jpg" title="" data-fancybox-group=""><img class="fig-img" src="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Binding_Required.jpg" alt=""></a></div><div style="clear:both;"></div></p>
 <p>此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?<br><div class="alert danger no-icon"><p>ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’</p>
 </div></p>
 <a id="more"></a>
@@ -115,7 +115,7 @@
     
     <summary type="html">
     
-      &lt;p&gt;在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。&lt;br&gt;&lt;div class=&quot;figure center&quot; style=&quot;width:;&quot;&gt;&lt;a class=&quot;fancybox&quot; href=&quot;Binding_Required.jpg&quot; title=&quot;Binding Required&quot; data-fancybox-group=&quot;&quot;&gt;&lt;img class=&quot;fig-img&quot; src=&quot;Binding_Required.jpg&quot; alt=&quot;Binding Required&quot;&gt;&lt;/a&gt;&lt;span class=&quot;caption&quot;&gt;Binding Required&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;clear:both;&quot;&gt;&lt;/div&gt;&lt;/p&gt;
+      &lt;p&gt;在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。&lt;br&gt;&lt;div class=&quot;figure center&quot; style=&quot;width:;&quot;&gt;&lt;a class=&quot;fancybox&quot; href=&quot;https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Binding_Required.jpg&quot; title=&quot;&quot; data-fancybox-group=&quot;&quot;&gt;&lt;img class=&quot;fig-img&quot; src=&quot;https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Binding_Required.jpg&quot; alt=&quot;&quot;&gt;&lt;/a&gt;&lt;/div&gt;&lt;div style=&quot;clear:both;&quot;&gt;&lt;/div&gt;&lt;/p&gt;
 &lt;p&gt;此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?&lt;br&gt;&lt;div class=&quot;alert danger no-icon&quot;&gt;&lt;p&gt;ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’&lt;/p&gt;
 &lt;/div&gt;&lt;/p&gt;
     
