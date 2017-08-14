@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mileslin.github.io/"/>
-  <updated>2017-02-13T04:30:02.183Z</updated>
+  <updated>2017-02-13T04:30:04.000Z</updated>
   <id>https://mileslin.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/"/>
     <id>https://mileslin.github.io/2100/12/Welecome-to-Miles-s-Journey/</id>
     <published>2100-12-31T15:59:59.000Z</published>
-    <updated>2017-02-13T04:30:02.183Z</updated>
+    <updated>2017-02-13T04:30:04.000Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to my blog.</p>
 <a id="more"></a>
@@ -45,7 +45,7 @@
     <link href="https://mileslin.github.io/2017/08/Template-Driven-%E5%8B%95%E6%85%8B%E5%8A%A0%E5%85%A5%E9%A9%97%E8%AD%89%E5%B1%AC%E6%80%A7%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85/"/>
     <id>https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/</id>
     <published>2017-08-13T14:19:00.000Z</published>
-    <updated>2017-08-13T18:16:35.102Z</updated>
+    <updated>2017-08-14T10:22:42.716Z</updated>
     
     <content type="html"><![CDATA[<p>在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。<br><div class="figure center" style="width:;"><a class="fancybox" href="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Binding_Required.jpg" title="" data-fancybox-group=""><img class="fig-img" src="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Binding_Required.jpg" alt=""></a></div><div style="clear:both;"></div></p>
 <p>此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?<br><div class="alert danger no-icon"><p>ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’</p>
@@ -133,7 +133,7 @@
     <link href="https://mileslin.github.io/2017/08/Angular-%E5%96%AE%E5%85%83%E6%B8%AC%E8%A9%A6%E8%B5%B7%E6%89%8B%E5%BC%8F/"/>
     <id>https://mileslin.github.io/2017/08/Angular-單元測試起手式/</id>
     <published>2017-08-07T13:50:54.000Z</published>
-    <updated>2017-08-13T14:02:51.999Z</updated>
+    <updated>2017-08-08T10:09:17.149Z</updated>
     
     <content type="html"><![CDATA[<a href="https://jasmine.github.io/index.html" title="jasmine" target="_blank" rel="external">jasmine</a> 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 <a href="https://karma-runner.github.io/1.0/index.html" title="karma" target="_blank" rel="external">karma</a> 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  <a href="https://github.com/angular/angular-cli" title="angular cli" target="_blank" rel="external">angular cli</a> 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。<br><br><a id="more"></a>
 <h2 id="建立-spy-object"><a href="#建立-spy-object" class="headerlink" title="建立 spy object"></a>建立 spy object</h2><p>在這邊我有一個 VoterService ，且有一個 deleteVoter 的方法，可以執行刪除的動作，而為了能發 Http 到 Server，Angular 都是用 <a href="https://angular.io/api/http/Http" title="HTTP" target="_blank" rel="external">HTTP</a> 這類別來發送 http request，所以我建構式注入了 HTTP，而我在單元測試的時候，也就可以注入假的 HTTP 物件。</p>
@@ -172,7 +172,7 @@
     <link href="https://mileslin.github.io/2017/07/%E4%BD%BF%E7%94%A8%E7%AF%84%E6%9C%AC%E5%8F%83%E8%80%83%E8%AE%8A%E6%95%B8%E5%AD%98%E5%8F%96-Child-Component/"/>
     <id>https://mileslin.github.io/2017/07/使用範本參考變數存取-Child-Component/</id>
     <published>2017-07-31T15:33:20.000Z</published>
-    <updated>2017-08-13T14:02:52.015Z</updated>
+    <updated>2017-08-08T10:09:17.152Z</updated>
     
     <content type="html"><![CDATA[<p>Angular 的架構基本上就是 Component 包 Component，所以常常會有情況存取 Component 底下的 Component 一些資源，而只要用範本參考變數，就能很輕易達到這樣的功能。</p>
 <a id="more"></a>
@@ -202,7 +202,7 @@
     <link href="https://mileslin.github.io/2017/07/%E6%B3%9B%E5%9E%8B%E8%BD%89%E5%9E%8B%E7%9A%84%E5%B0%8F%E6%8A%80%E5%B7%A7/"/>
     <id>https://mileslin.github.io/2017/07/泛型轉型的小技巧/</id>
     <published>2017-07-29T13:39:41.000Z</published>
-    <updated>2017-08-13T14:02:52.077Z</updated>
+    <updated>2017-08-08T10:09:17.155Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li><p>有時候在寫一些泛型程式的時候，難免會有一些轉型上的需求。  而在設計上，總不能當有需要轉型的時候就寫一個 if 來判斷此情況需要轉型成什麼類別，這樣就有點失去泛型的意義。  所以今天就分享一些小技巧，怎麼處理這些轉型的情況。</p>
@@ -256,7 +256,7 @@
     <link href="https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/"/>
     <id>https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/</id>
     <published>2017-07-24T15:49:42.000Z</published>
-    <updated>2017-07-25T06:18:58.088Z</updated>
+    <updated>2017-07-26T08:36:27.690Z</updated>
     
     <content type="html"><![CDATA[<p>Type Keyword 是 typescript 能將型別取一個別名的方式，例如我將型別 <code>string</code> assign 給 myType，之後就可以用 myType 來定義變數的型別。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>type keyword</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> myType = <span class="built_in">string</span>;</span><br><span class="line"><span class="keyword">let</span> a: myType = <span class="string">'hello'</span>;</span><br><span class="line"><span class="keyword">let</span> b: myType = <span class="number">10</span>; <span class="comment">// Type 'number' is not assignable to type 'string'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
 <a id="more"></a>
@@ -286,7 +286,7 @@
     <link href="https://mileslin.github.io/2017/07/%E8%87%AA%E8%A8%82-AuthorizeFilter/"/>
     <id>https://mileslin.github.io/2017/07/自訂-AuthorizeFilter/</id>
     <published>2017-07-24T15:16:40.000Z</published>
-    <updated>2017-07-23T15:47:52.452Z</updated>
+    <updated>2017-07-26T08:36:27.936Z</updated>
     
     <content type="html"><![CDATA[<p>自行 AuthorizeFilter</p>
 <a id="more"></a>
@@ -327,7 +327,7 @@
     <link href="https://mileslin.github.io/2017/07/ASP-NET-%E8%A1%A8%E5%96%AE%E9%A9%97%E8%AD%89/"/>
     <id>https://mileslin.github.io/2017/07/ASP-NET-表單驗證/</id>
     <published>2017-07-23T06:49:29.000Z</published>
-    <updated>2017-07-23T15:48:42.948Z</updated>
+    <updated>2017-07-26T08:36:27.682Z</updated>
     
     <content type="html"><![CDATA[<p>ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。</p>
 <a id="more"></a>
@@ -364,11 +364,11 @@
       <category term="Authentication" scheme="https://mileslin.github.io/categories/Authentication/"/>
     
     
+      <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
+    
       <category term="Authentication" scheme="https://mileslin.github.io/tags/Authentication/"/>
     
       <category term="FormsAuthentication" scheme="https://mileslin.github.io/tags/FormsAuthentication/"/>
-    
-      <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
     
   </entry>
   
@@ -377,7 +377,7 @@
     <link href="https://mileslin.github.io/2017/07/%E5%95%9F%E7%94%A8-Action-Filter-Property-Injection-%E8%88%87-%E8%A8%BB%E5%86%8A-Web-Abstractions/"/>
     <id>https://mileslin.github.io/2017/07/啟用-Action-Filter-Property-Injection-與-註冊-Web-Abstractions/</id>
     <published>2017-07-22T15:02:16.000Z</published>
-    <updated>2017-08-13T14:02:52.077Z</updated>
+    <updated>2017-08-08T10:14:11.839Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>通常使用 Action Filter 的時候常常會用到一些資料庫的讀取，為了防止耦合性過高，所以建立取得 DBContext 實體的時候，可以用 DI 的方式注入。</li>
@@ -410,9 +410,9 @@
       <category term="Autofac" scheme="https://mileslin.github.io/categories/Autofac/"/>
     
     
-      <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
-    
       <category term="C#" scheme="https://mileslin.github.io/tags/C/"/>
+    
+      <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
     
       <category term="Autofac" scheme="https://mileslin.github.io/tags/Autofac/"/>
     
@@ -423,7 +423,7 @@
     <link href="https://mileslin.github.io/2017/07/%E5%AE%89%E8%A3%9D-SQL-Server-2014-Express-%E7%AD%86%E8%A8%98/"/>
     <id>https://mileslin.github.io/2017/07/安裝-SQL-Server-2014-Express-筆記/</id>
     <published>2017-07-15T05:45:36.000Z</published>
-    <updated>2017-07-15T06:50:15.436Z</updated>
+    <updated>2017-07-26T08:36:27.754Z</updated>
     
     <content type="html"><![CDATA[<p>今天文章會說明，安裝 SQL Server Express 後，使用 Microsoft SQL Server Management Studio 的 sa 帳號登入。</p>
 <a id="more"></a>
@@ -488,7 +488,7 @@
     <link href="https://mileslin.github.io/2017/07/Command-Line-%E7%AD%86%E8%A8%98-%E9%81%A0%E7%AB%AF%E8%A4%87%E8%A3%BD%E8%88%87%E5%A3%93%E7%B8%AE/"/>
     <id>https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/</id>
     <published>2017-07-11T09:34:08.000Z</published>
-    <updated>2017-07-15T05:44:43.738Z</updated>
+    <updated>2017-07-11T10:02:00.014Z</updated>
     
     <content type="html"><![CDATA[<p>最近為了將的壓縮、解壓縮、遠端連線硬碟、複製貼上等等的繁瑣的事情寫成 bat 檔案，花了很多時間。  所以就來記錄一下，用 command line 自動化的功能。</p>
 <ul>
@@ -539,7 +539,7 @@
     <link href="https://mileslin.github.io/2017/07/ng-build-%E4%B8%A6%E5%A3%93%E7%B8%AE%E6%AA%94%E6%A1%88/"/>
     <id>https://mileslin.github.io/2017/07/ng-build-並壓縮檔案/</id>
     <published>2017-07-10T11:19:27.000Z</published>
-    <updated>2017-07-15T05:44:43.740Z</updated>
+    <updated>2017-07-10T11:46:05.141Z</updated>
     
     <content type="html"><![CDATA[<p>在佈署 Angular 專案的時候為了能夠快速複製到遠端主機上，所以通常會 <code>ng build</code> 後，將 build 出來的檔案壓縮，要完成這一連串的流程，通常都是寫 cmd 來處理。</p>
 <a id="more"></a>
@@ -595,7 +595,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-4/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-4/</id>
     <published>2017-07-09T04:26:50.000Z</published>
-    <updated>2017-07-09T08:15:21.605Z</updated>
+    <updated>2017-07-10T11:15:49.686Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>unit tests<ul>
@@ -729,7 +729,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-3/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/</id>
     <published>2017-07-08T15:07:00.000Z</published>
-    <updated>2017-07-15T05:44:43.703Z</updated>
+    <updated>2017-07-11T07:44:07.677Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建置專案與環境參數設定</li>
@@ -918,7 +918,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-2/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/</id>
     <published>2017-07-04T15:26:07.000Z</published>
-    <updated>2017-07-09T08:15:30.192Z</updated>
+    <updated>2017-07-10T11:15:49.664Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立元件與檔案 <em>(service,class,interface ….)</em></li>
@@ -1004,7 +1004,7 @@
     <link href="https://mileslin.github.io/2017/07/Angular-CLI-%E5%AF%A6%E7%94%A8%E5%B0%8F%E6%8A%80%E5%B7%A7-1/"/>
     <id>https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-1/</id>
     <published>2017-07-02T14:47:41.000Z</published>
-    <updated>2017-07-09T08:15:34.565Z</updated>
+    <updated>2017-07-10T11:15:49.661Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>建立專案與元件</li>
@@ -1058,7 +1058,7 @@
     <link href="https://mileslin.github.io/2017/06/DI-%E5%9C%B0%E9%9B%B7%E4%B9%8B%E7%94%9F%E5%91%BD%E9%80%B1%E6%9C%9F%E5%BE%88%E9%87%8D%E8%A6%81/"/>
     <id>https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/</id>
     <published>2017-06-30T10:50:44.000Z</published>
-    <updated>2017-07-05T03:09:49.189Z</updated>
+    <updated>2017-06-30T11:45:31.320Z</updated>
     
     <content type="html"><![CDATA[<p>目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:</p>
 <div class="alert warning"><p>DI 的三種生命週期很重要!!  不要亂設定!!</p>
@@ -1109,9 +1109,9 @@
       <category term="Autofac" scheme="https://mileslin.github.io/categories/Autofac/"/>
     
     
-      <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
-    
       <category term="C#" scheme="https://mileslin.github.io/tags/C/"/>
+    
+      <category term=".NET" scheme="https://mileslin.github.io/tags/NET/"/>
     
       <category term="Autofac" scheme="https://mileslin.github.io/tags/Autofac/"/>
     
@@ -1122,7 +1122,7 @@
     <link href="https://mileslin.github.io/2017/06/%E5%96%AE%E5%85%83%E6%B8%AC%E8%A9%A6Model%E9%A9%97%E8%AD%89/"/>
     <id>https://mileslin.github.io/2017/06/單元測試Model驗證/</id>
     <published>2017-06-30T04:17:39.000Z</published>
-    <updated>2017-07-05T03:09:49.227Z</updated>
+    <updated>2017-06-30T04:33:11.263Z</updated>
     
     <content type="html"><![CDATA[<p>MVC 在寫商業邏輯驗證的時候，通常都會寫在Model裡面，這好處除了統一的寫法之外，單元測試也很好寫，今天就來說明如何單元測試 Model 驗證。</p>
 <a id="more"></a>
@@ -1156,7 +1156,7 @@
     <link href="https://mileslin.github.io/2017/06/Destructuring-assignment/"/>
     <id>https://mileslin.github.io/2017/06/Destructuring-assignment/</id>
     <published>2017-06-28T15:52:51.000Z</published>
-    <updated>2017-07-05T03:09:49.225Z</updated>
+    <updated>2017-06-30T04:12:37.529Z</updated>
     
     <content type="html"><![CDATA[<p>解構賦值是一種優雅的方式能夠將<code>{}</code>與<code>[]</code>的值讀出來<br><a id="more"></a></p>
 <h2 id="讀取陣列並-assign-到變數上"><a href="#讀取陣列並-assign-到變數上" class="headerlink" title="讀取陣列並 assign 到變數上"></a>讀取陣列並 assign 到變數上</h2><p><em>陣列的解構賦值用陣列去接</em><br><figure class="codeblock codeblock--tabbed"><figcaption><span>JavaScript</span><ul class="tabs"><li class="tab active">js</li></ul></figcaption><div class="tabs-content"><figure class="highlight js" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> foo = [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>];</span><br><span class="line"><span class="keyword">let</span> [one, two, three] = foo;</span><br><span class="line"><span class="built_in">console</span>.log(one); <span class="comment">// 'one'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
@@ -1185,7 +1185,7 @@
     <link href="https://mileslin.github.io/2017/06/%E6%93%B4%E5%85%85%E5%A5%97%E4%BB%B6%E5%B1%AC%E6%80%A7%EF%BC%8C%E4%BB%A5sweetalert%E7%82%BA%E4%BE%8B/"/>
     <id>https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/</id>
     <published>2017-06-23T06:25:13.000Z</published>
-    <updated>2017-07-05T03:09:49.228Z</updated>
+    <updated>2017-06-23T06:50:42.476Z</updated>
     
     <content type="html"><![CDATA[<p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>error_input</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">swal({</span><br><span class="line">  title: <span class="string">'Oops !!!'</span>,</span><br><span class="line">  input: <span class="string">'email'</span> <span class="comment">// &lt;- error</span></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
