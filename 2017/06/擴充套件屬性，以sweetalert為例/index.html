@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en,zh-tw,ja,default">
+<html lang="en,zh-tw,default">
     
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
     <title>擴充套件屬性，以sweetalert為例 - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,typescript,Angular,typings">
+        <meta name="keywords" content="typescript,Angular,typings">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,23 +17,23 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。
-error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; // &amp;lt;- error});">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg"},"articleBody":"最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。\nerror_inputts1234swal({  title: 'Oops !!!',  input: 'email' // &lt;- error});\n\n要解決這個問題呢，我們首先要先知道 swal({}) 是傳入什麼型別，這時候就要找 sweetalert typing 定義檔，就可以看到 swal({}) 傳入的型別是什麼。sweetalter_typing\ndeclare namespace SweetAlert 底下的 interface SettingsBase\n\n型別定義在 namespace SweetAlert 底下的 interface ，知道定義型別的地方後，接下就當然不能直接在這邊新增，因為這是 npm 下載下來的 package。  我們要直接去 typescript 的 typing 新增 SettingsBase 的擴充。\n在 Angular 專案底下的 src\\typings.d.ts，新增同樣 namespace 與 interfaceextend_typing\n就可以發現，我們使用 swal({}) 就可以傳入 input 屬性了。success\n","dateCreated":"2017-06-23T14:25:13+08:00","dateModified":"2018-04-11T23:19:56+08:00","datePublished":"2017-06-23T14:25:13+08:00","description":"最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。\nerror_inputts1234swal({  title: 'Oops !!!',  input: 'email' // &lt;- error});","headline":"擴充套件屬性，以sweetalert為例","image":["error_input.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/","keywords":"Angular, typescript","thumbnailUrl":"error_input.jpg"}</script>
+    <meta name="description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。 error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; // &amp;lt;- error});">
+<meta name="keywords" content="typescript,Angular,typings">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="擴充套件屬性，以sweetalert為例">
 <meta property="og:url" content="https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/index.html">
-<meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。
-error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; // &amp;lt;- error});">
-<meta property="og:image" content="https://mileslin.github.io/sweetalter_typing.jpg">
-<meta property="og:image" content="https://mileslin.github.io/extend_typing.jpg">
-<meta property="og:image" content="https://mileslin.github.io/success.jpg">
-<meta property="og:updated_time" content="2017-06-28T15:51:45.274Z">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。 error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; // &amp;lt;- error});">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/sweetalter_typing.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/extend_typing.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/success.jpg">
+<meta property="og:updated_time" content="2018-04-11T15:19:56.144Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="擴充套件屬性，以sweetalert為例">
-<meta name="twitter:description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。
-error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; // &amp;lt;- error});">
-<meta name="twitter:image" content="https://mileslin.github.io/sweetalter_typing.jpg">
+<meta name="twitter:description" content="最近專案上有使用到 Sweetalter2 ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 input   這個屬性。 error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; // &amp;lt;- error});">
+<meta name="twitter:image" content="https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/sweetalter_typing.jpg">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -49,22 +49,19 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="/assets/css/style-1udptkpril81ozu8ifd8zpujn7ipu7lefxsiu5gxx0dpnzntdx6dusvki3ao.min.css">
     <!--STYLES END-->
     
     <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-90394318-1']);
-        _gaq.push(['_trackPageview']);
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-90394318-1', 'auto');
+        ga('send', 'pageview');
     </script>
+
 
     
 </head>
@@ -122,9 +119,10 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
                         <a  class="sidebar-button-link "
                              href="/ "
                             
+                            title="Home"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
@@ -134,9 +132,10 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
                         <a  class="sidebar-button-link "
                              href="/all-categories"
                             
+                            title="Categories"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
@@ -146,9 +145,10 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
                         <a  class="sidebar-button-link "
                              href="/all-tags"
                             
+                            title="Tags"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
@@ -158,9 +158,10 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
                         <a  class="sidebar-button-link "
                              href="/all-archives"
                             
+                            title="Archives"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
                     </a>
             </li>
@@ -170,9 +171,10 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
                         <a  class="sidebar-button-link open-algolia-search"
                              href="#search"
                             
+                            title="Search"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-search"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
                     </a>
             </li>
@@ -182,9 +184,10 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
                         <a  class="sidebar-button-link "
                              href="#about"
                             
+                            title="About"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -195,36 +198,36 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank">
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-linkedin"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank">
+                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank" rel="noopener" title="Mail">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail</span>
                     </a>
             </li>
@@ -238,9 +241,10 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
                         <a  class="sidebar-button-link "
                              href="/atom.xml"
                             
+                            title="RSS"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
@@ -256,17 +260,18 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+<article class="post">
     
     
         <div class="post-header main-content-wrap text-left">
     
-        <h1 class="post-title" itemprop="headline">
+        <h1 class="post-title">
             擴充套件屬性，以sweetalert為例
         </h1>
     
-    <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-06-23T14:25:13+08:00">
+    
+        <div class="post-meta">
+    <time datetime="2017-06-23T14:25:13+08:00">
 	
 		    Jun 23, 2017
     	
@@ -280,21 +285,24 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
     
 </div>
 
-</div>
     
-    <div class="post-content markdown" itemprop="articleBody">
+</div>
+
+    
+    <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="external">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。</p>
+            <p>最近專案上有使用到 <a href="https://limonte.github.io/sweetalert2/" title="Sweetalter2" target="_blank" rel="noopener">Sweetalter2</a> ，可是目前 typescript 的 typing 檔案，只有 Sweetalter 的版本，導致有很多屬性在使用的時候，typescript 看不懂，例如 <span class="highlight-text danger">input </span>  這個屬性。</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>error_input</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">swal({</span><br><span class="line">  title: <span class="string">'Oops !!!'</span>,</span><br><span class="line">  input: <span class="string">'email'</span> <span class="comment">// &lt;- error</span></span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
 <a id="more"></a>
-<p>要解決這個問題呢，我們首先要先知道 <code>swal({})</code> 是傳入什麼型別，這時候就要找 sweetalert typing 定義檔，就可以看到 <code>swal({})</code> 傳入的型別是什麼。<br><div class="figure " style="width:;"><a class="fancybox" href="sweetalter_typing.jpg" title="sweetalter_typing" data-fancybox-group=""><img class="fig-img" src="sweetalter_typing.jpg" alt="sweetalter_typing"></a><span class="caption">sweetalter_typing</span></div></p>
+<p>要解決這個問題呢，我們首先要先知道 <code>swal({})</code> 是傳入什麼型別，這時候就要找 sweetalert typing 定義檔，就可以看到 <code>swal({})</code> 傳入的型別是什麼。<br><div class="figure " style="width:;"><a class="fancybox" href="sweetalter_typing.jpg" title="sweetalter_typing" data-caption="sweetalter_typing" data-fancybox="default"><img class="fig-img" src="sweetalter_typing.jpg" alt="sweetalter_typing"></a><span class="caption">sweetalter_typing</span></div></p>
 <div class="alert info"><p>declare namespace SweetAlert 底下的 interface SettingsBase</p>
 </div>
 <p>型別定義在 namespace SweetAlert 底下的 interface ，知道定義型別的地方後，接下就當然不能直接在這邊新增，因為這是 npm 下載下來的 package。  我們要直接去 typescript 的 typing 新增 SettingsBase 的擴充。</p>
-<p>在 Angular 專案底下的 <code>src\typings.d.ts</code>，新增同樣 namespace 與 interface<br><div class="figure " style="width:;"><a class="fancybox" href="extend_typing.jpg" title="extend_typing" data-fancybox-group=""><img class="fig-img" src="extend_typing.jpg" alt="extend_typing"></a><span class="caption">extend_typing</span></div></p>
-<p>就可以發現，我們使用 <code>swal({})</code> 就可以傳入 input 屬性了。<br><div class="figure " style="width:;"><a class="fancybox" href="success.jpg" title="success" data-fancybox-group=""><img class="fig-img" src="success.jpg" alt="success"></a><span class="caption">success</span></div></p>
+<p>在 Angular 專案底下的 <code>src\typings.d.ts</code>，新增同樣 namespace 與 interface<br><div class="figure " style="width:;"><a class="fancybox" href="extend_typing.jpg" title="extend_typing" data-caption="extend_typing" data-fancybox="default"><img class="fig-img" src="extend_typing.jpg" alt="extend_typing"></a><span class="caption">extend_typing</span></div></p>
+<p>就可以發現，我們使用 <code>swal({})</code> 就可以傳入 input 屬性了。<br><div class="figure " style="width:;"><a class="fancybox" href="success.jpg" title="success" data-caption="success" data-fancybox="default"><img class="fig-img" src="success.jpg" alt="success"></a><span class="caption">success</span></div></p>
 
             
+
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
@@ -306,66 +314,82 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
 
             </div>
         
-        <div class="post-actions-wrap">
+        
+            <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/Destructuring-assignment/"  data-tooltip="Destructuring assignment">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/Destructuring-assignment/" data-tooltip="Destructuring assignment" aria-label="PREVIOUS: Destructuring assignment">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/05/為什麼需要-Domain-Driven-Design/" data-tooltip="為什麼需要 Domain-Driven Design">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/05/為什麼需要-Domain-Driven-Design/" data-tooltip="為什麼需要 Domain-Driven Design" aria-label="NEXT: 為什麼需要 Domain-Driven Design">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
 </div>
 
 
+        
         
             
                 <div id="disqus_thread">
@@ -392,55 +416,69 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/Destructuring-assignment/"  data-tooltip="Destructuring assignment">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/Destructuring-assignment/" data-tooltip="Destructuring assignment" aria-label="PREVIOUS: Destructuring assignment">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/05/為什麼需要-Domain-Driven-Design/" data-tooltip="為什麼需要 Domain-Driven Design">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/05/為什麼需要-Domain-Driven-Design/" data-tooltip="為什麼需要 Domain-Driven Design" aria-label="NEXT: 為什麼需要 Domain-Driven Design">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -449,25 +487,35 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
 
                 </div>
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
     <ul class="share-options">
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
-                <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
-                <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
-                <i class="fa fa-twitter"></i><span>Share on Twitter</span>
-            </a>
-        </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
+                    <i class="fa fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/擴充套件屬性，以sweetalert為例/">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i><span>Share on Google Plus</span>
+                </a>
+            </li>
+        
     </ul>
 </div>
-<div id="share-options-mask" class="share-options-mask"></div>
 
             
         </div>
@@ -507,11 +555,12 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
     </div>
 </div>
 
-        <div id="algolia-search-modal" class="modal-container">
+        
+            <div id="algolia-search-modal" class="modal-container">
     <div class="modal">
         <div class="modal-header">
             <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
                 <span class="searchby-algolia-text text-color-light text-small">by</span>
                 <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
             </a>
@@ -519,7 +568,7 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
             <form id="algolia-search-form">
                 <input type="text" id="algolia-search-input" name="search"
                     class="form-control input--large search-input" placeholder="Search "
-                    autofocus="autofocus"/>
+                    />
             </form>
         </div>
         <div class="modal-body">
@@ -613,7 +662,7 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -763,13 +812,12 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
         </div>
     </div>
 </div>
+
+        
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-yhuo2grt8r7qkqumzgjoglkfbicl1thukjgmla6jopu56zpcowfedi5zjcor.min.js"></script>
 <!--SCRIPTS END-->
 
     
@@ -792,13 +840,13 @@ error_inputts1234swal({  title: &apos;Oops !!!&apos;,  input: &apos;email&apos; 
     
 
 
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
     <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
     <script>
         var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
         var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
     </script>
+
 
     </body>
 </html>

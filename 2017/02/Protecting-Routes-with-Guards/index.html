@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en,zh-tw,ja,default">
+<html lang="en,zh-tw,default">
     
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
     <title>Protecting Routes with Guards - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,Angular">
+        <meta name="keywords" content="Angular">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,13 +17,16 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg"},"articleBody":"前言預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。例如:\n\nuser是不被允許瀏覽到某個component\n此網址需要先登入才能使用\n先事先取得一些資料再顯示component\n在離開component之前先取得改變的資料\n或者在user離開之前詢問是否要不儲存離開\n\n以上情況，都可以在route configuration新增guards達成我們要的目的。\n目前共有五種guards可以使用\nCanActivate: to mediate navigation to a route.\nCanActivateChild: to mediate navigation to a child route.\nCanDeactivate: to mediate navigation away from the current route.\nResolve: to perform route data retrieval before route activation.\nCanLoad: to mediate navigation to a feature module loaded asynchronously.\n\nGuard的回傳值決定router的行為\n回傳 true，則navigation繼續\n回傳 false，則navigation process stops\n\n\n而今天選擇CanActivate來做說明，其他guards的做法都是類似的。\n原文參考:Guards\n範例今天的範例我們要驗證使用者輸入的網址參數(:id)是不是個數字，如果不是數字，則導向到 welcome 頁面。 router設定如下:configurationts1{ path: 'detail/:id', component: DetailComponent }\n我們先用 angular cli 新增一個 service component\nng g s product-guard.service\n\nangular cli 會幫我們新增好一個service component，而且我們要做的就是\n\nimplements CanActivate，實作canActivate方法\n因為要取得網址的資料，所以canActivate傳入ActivatedRouteSnapshot\nimport Router使用router做導向的動作\n驗證是否為數字，是數字回傳true，不是數字導向welcome頁面，回傳false\n\nService Componentts12345678910111213141516171819202122import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';import { Injectable } from '@angular/core';@Injectable()export class ProductGuardService implements CanActivate {  constructor(private _router: Router) { }  canActivate(route: ActivatedRouteSnapshot): boolean {    let id = +route.url[1].path;    if (isNaN(id) || id &lt; 1) {      this._router.navigate(['/welcome']);      return false;    }    return true;  }}\n以上，我們component的程式碼就寫完了。\n接下來開啟app.module\n\nimport ProductGuardService\nprovider加入 ProductGuardService \nrouter設定多傳入 canActivate : ProductGuardService\n\napp.modulets123456789101112131415161718192021...import { ProductGuardService } from './product-guard.service';@NgModule({  declarations: [    ...  ],  imports: [    ...    RouterModule.forRoot([            {        path: 'detail/:id',        canActivate: [ProductGuardService],        component: DetailComponent      }...    ])  ],  providers: [ProductGuardService],  ...})export class AppModule { }\n加入以上程式碼後，就完成了。  這樣當網址像是數字這種非數字的id參數，則網址頁就會自動導向到welcome。\nhttp://localhost:4200/#/detail/abc 導向 =&gt;  http://localhost:4200/#/welcome\n\n參考Guards","dateCreated":"2017-02-11T13:38:15+08:00","dateModified":"2018-04-11T23:19:56+08:00","datePublished":"2017-02-11T13:38:15+08:00","description":"前言預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。","headline":"Protecting Routes with Guards","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/","keywords":"Angular"}</script>
     <meta name="description" content="前言預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。">
+<meta name="keywords" content="Angular">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Protecting Routes with Guards">
 <meta property="og:url" content="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/index.html">
-<meta property="og:site_name" content="Miles's Journey">
+<meta property="og:site_name" content="Miles&#39;s Journey">
 <meta property="og:description" content="前言預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。">
-<meta property="og:updated_time" content="2017-02-11T08:15:15.911Z">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-04-11T15:19:56.080Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Protecting Routes with Guards">
 <meta name="twitter:description" content="前言預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。">
@@ -39,22 +42,19 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="/assets/css/style-1udptkpril81ozu8ifd8zpujn7ipu7lefxsiu5gxx0dpnzntdx6dusvki3ao.min.css">
     <!--STYLES END-->
     
     <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-90394318-1']);
-        _gaq.push(['_trackPageview']);
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-90394318-1', 'auto');
+        ga('send', 'pageview');
     </script>
+
 
     
 </head>
@@ -112,9 +112,10 @@
                         <a  class="sidebar-button-link "
                              href="/ "
                             
+                            title="Home"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
@@ -124,9 +125,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-categories"
                             
+                            title="Categories"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
@@ -136,9 +138,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-tags"
                             
+                            title="Tags"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
@@ -148,9 +151,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-archives"
                             
+                            title="Archives"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
                     </a>
             </li>
@@ -160,9 +164,10 @@
                         <a  class="sidebar-button-link open-algolia-search"
                              href="#search"
                             
+                            title="Search"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-search"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
                     </a>
             </li>
@@ -172,9 +177,10 @@
                         <a  class="sidebar-button-link "
                              href="#about"
                             
+                            title="About"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -185,36 +191,36 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank">
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-linkedin"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank">
+                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank" rel="noopener" title="Mail">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail</span>
                     </a>
             </li>
@@ -228,9 +234,10 @@
                         <a  class="sidebar-button-link "
                              href="/atom.xml"
                             
+                            title="RSS"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
@@ -246,17 +253,18 @@
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+<article class="post">
     
     
         <div class="post-header main-content-wrap text-left">
     
-        <h1 class="post-title" itemprop="headline">
+        <h1 class="post-title">
             Protecting Routes with Guards
         </h1>
     
-    <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-02-11T13:38:15+08:00">
+    
+        <div class="post-meta">
+    <time datetime="2017-02-11T13:38:15+08:00">
 	
 		    Feb 11, 2017
     	
@@ -270,9 +278,11 @@
     
 </div>
 
-</div>
     
-    <div class="post-content markdown" itemprop="articleBody">
+</div>
+
+    
+    <div class="post-content markdown">
         <div class="main-content-wrap">
             <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br><a id="more"></a><br>例如:</p>
 <ul>
@@ -296,7 +306,7 @@
 </ul>
 </div>
 <p>而今天選擇<strong>CanActivate</strong>來做說明，其他guards的做法都是類似的。</p>
-<p>原文參考:<br><a href="https://angular.io/docs/ts/latest/guide/router.html#!#guards" title="Guards" target="_blank" rel="external">Guards</a></p>
+<p>原文參考:<br><a href="https://angular.io/docs/ts/latest/guide/router.html#!#guards" title="Guards" target="_blank" rel="noopener">Guards</a></p>
 <h2 id="範例"><a href="#範例" class="headerlink" title="範例"></a>範例</h2><p>今天的範例我們要驗證使用者輸入的網址參數<em>(:id)</em>是不是個數字，如果不是數字，則導向到 <strong>welcome</strong> 頁面。 router設定如下:<br><figure class="codeblock codeblock--tabbed"><figcaption><span>configuration</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{ path: <span class="string">'detail/:id'</span>, component: DetailComponent }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
 <p>我們先用 <code>angular cli</code> 新增一個 <span class="highlight-text primary">service component</span></p>
 <div class="alert success no-icon"><p>ng g s product-guard.service</p>
@@ -308,7 +318,7 @@
 <li><code>import Router</code>使用router做導向的動作</li>
 <li>驗證是否為數字，是數字回傳true，不是數字導向<strong>welcome</strong>頁面，回傳false</li>
 </ol>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Service Component</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { CanActivate, ActivatedRouteSnapshot, Router } from <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { Injectable } from <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Injectable</span>()</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductGuardService <span class="keyword">implements</span> CanActivate {</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params"><span class="keyword">private</span> _router: Router</span>) { }</span><br><span class="line"></span><br><span class="line">  canActivate(route: ActivatedRouteSnapshot): <span class="built_in">boolean</span> {</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> id = +route.url[<span class="number">1</span>].path;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">isNaN</span>(id) || id &lt; <span class="number">1</span>) {</span><br><span class="line"></span><br><span class="line">      <span class="keyword">this</span>._router.navigate([<span class="string">'/welcome'</span>]);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Service Component</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { CanActivate, ActivatedRouteSnapshot, Router } <span class="keyword">from</span> <span class="string">'@angular/router'</span>;</span><br><span class="line"><span class="keyword">import</span> { Injectable } <span class="keyword">from</span> <span class="string">'@angular/core'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Injectable</span>()</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ProductGuardService <span class="keyword">implements</span> CanActivate {</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params"><span class="keyword">private</span> _router: Router</span>) { }</span><br><span class="line"></span><br><span class="line">  canActivate(route: ActivatedRouteSnapshot): <span class="built_in">boolean</span> {</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> id = +route.url[<span class="number">1</span>].path;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">isNaN</span>(id) || id &lt; <span class="number">1</span>) {</span><br><span class="line"></span><br><span class="line">      <span class="keyword">this</span>._router.navigate([<span class="string">'/welcome'</span>]);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
 <p>以上，我們component的程式碼就寫完了。</p>
 <p>接下來開啟app.module</p>
 <ol>
@@ -316,12 +326,13 @@
 <li><code>provider</code>加入 <span class="highlight-text success">ProductGuardService </span></li>
 <li><code>router</code>設定多傳入 <span class="highlight-text success">canActivate : ProductGuardService</span></li>
 </ol>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>app.module</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">import</span> { ProductGuardService } from <span class="string">'./product-guard.service'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  declarations: [</span><br><span class="line">    ...</span><br><span class="line">  ],</span><br><span class="line">  imports: [</span><br><span class="line">    ...</span><br><span class="line">    RouterModule.forRoot([      </span><br><span class="line">      {</span><br><span class="line">        path: <span class="string">'detail/:id'</span>,</span><br><span class="line">        canActivate: [ProductGuardService],</span><br><span class="line">        component: DetailComponent</span><br><span class="line">      }...</span><br><span class="line">    ])</span><br><span class="line">  ],</span><br><span class="line">  providers: [ProductGuardService],</span><br><span class="line">  ...</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>app.module</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">import</span> { ProductGuardService } <span class="keyword">from</span> <span class="string">'./product-guard.service'</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  declarations: [</span><br><span class="line">    ...</span><br><span class="line">  ],</span><br><span class="line">  imports: [</span><br><span class="line">    ...</span><br><span class="line">    RouterModule.forRoot([      </span><br><span class="line">      {</span><br><span class="line">        path: <span class="string">'detail/:id'</span>,</span><br><span class="line">        canActivate: [ProductGuardService],</span><br><span class="line">        component: DetailComponent</span><br><span class="line">      }...</span><br><span class="line">    ])</span><br><span class="line">  ],</span><br><span class="line">  providers: [ProductGuardService],</span><br><span class="line">  ...</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure>
 <p>加入以上程式碼後，就完成了。  這樣當網址像是數字這種非數字的<strong>id</strong>參數，則網址頁就會自動導向到<strong>welcome</strong>。</p>
-<div class="alert success no-icon"><p><a href="http://localhost:4200/#/detail/abc" target="_blank" rel="external">http://localhost:4200/#/detail/abc</a> 導向 =&gt;  <strong><a href="http://localhost:4200/#/welcome" target="_blank" rel="external">http://localhost:4200/#/welcome</a></strong></p>
+<div class="alert success no-icon"><p><a href="http://localhost:4200/#/detail/abc" target="_blank" rel="noopener">http://localhost:4200/#/detail/abc</a> 導向 =&gt;  <strong><a href="http://localhost:4200/#/welcome" target="_blank" rel="noopener">http://localhost:4200/#/welcome</a></strong></p>
 </div>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular.io/docs/ts/latest/guide/router.html#!#guards" title="Guards" target="_blank" rel="external">Guards</a>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular.io/docs/ts/latest/guide/router.html#!#guards" title="Guards" target="_blank" rel="noopener">Guards</a>
             
+
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
@@ -333,66 +344,82 @@
 
             </div>
         
-        <div class="post-actions-wrap">
+        
+            <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/NgModule-Decorator/"  data-tooltip="NgModule Decorator">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/NgModule-Decorator/" data-tooltip="NgModule Decorator" aria-label="PREVIOUS: NgModule Decorator">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Navigation-and-Routing-Additional-Techniques/" data-tooltip="Navigation and Routing Additional Techniques">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Navigation-and-Routing-Additional-Techniques/" data-tooltip="Navigation and Routing Additional Techniques" aria-label="NEXT: Navigation and Routing Additional Techniques">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
 </div>
 
 
+        
         
             
                 <div id="disqus_thread">
@@ -419,55 +446,69 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/NgModule-Decorator/"  data-tooltip="NgModule Decorator">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/NgModule-Decorator/" data-tooltip="NgModule Decorator" aria-label="PREVIOUS: NgModule Decorator">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Navigation-and-Routing-Additional-Techniques/" data-tooltip="Navigation and Routing Additional Techniques">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Navigation-and-Routing-Additional-Techniques/" data-tooltip="Navigation and Routing Additional Techniques" aria-label="NEXT: Navigation and Routing Additional Techniques">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -476,25 +517,35 @@
 
                 </div>
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
     <ul class="share-options">
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
-                <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
-                <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
-                <i class="fa fa-twitter"></i><span>Share on Twitter</span>
-            </a>
-        </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                    <i class="fa fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i><span>Share on Google Plus</span>
+                </a>
+            </li>
+        
     </ul>
 </div>
-<div id="share-options-mask" class="share-options-mask"></div>
 
             
         </div>
@@ -534,11 +585,12 @@
     </div>
 </div>
 
-        <div id="algolia-search-modal" class="modal-container">
+        
+            <div id="algolia-search-modal" class="modal-container">
     <div class="modal">
         <div class="modal-header">
             <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
                 <span class="searchby-algolia-text text-color-light text-small">by</span>
                 <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
             </a>
@@ -546,7 +598,7 @@
             <form id="algolia-search-form">
                 <input type="text" id="algolia-search-input" name="search"
                     class="form-control input--large search-input" placeholder="Search "
-                    autofocus="autofocus"/>
+                    />
             </form>
         </div>
         <div class="modal-body">
@@ -640,7 +692,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -790,13 +842,12 @@
         </div>
     </div>
 </div>
+
+        
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-yhuo2grt8r7qkqumzgjoglkfbicl1thukjgmla6jopu56zpcowfedi5zjcor.min.js"></script>
 <!--SCRIPTS END-->
 
     
@@ -819,13 +870,13 @@
     
 
 
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
     <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
     <script>
         var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
         var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
     </script>
+
 
     </body>
 </html>

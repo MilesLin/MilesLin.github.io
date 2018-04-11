@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en,zh-tw,ja,default">
+<html lang="en,zh-tw,default">
     
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
     <title>Binding syntax - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,Angular">
+        <meta name="keywords" content="Angular">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,31 +17,19 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="前言要從class將資料繫結到template上面，Angular有四種方式。
-
-內嵌繫結 ( Interpolation )
-屬性繫結 ( Property Binding )
-事件繫結 ( Event Binding )
-雙向繫結 ( Two-way Binding )">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg"},"articleBody":"前言要從class將資料繫結到template上面，Angular有四種方式。\n\n內嵌繫結 ( Interpolation )\n屬性繫結 ( Property Binding )\n事件繫結 ( Event Binding )\n雙向繫結 ( Two-way Binding )\n\n\nInterpolation此種資料繫結方式是屬於單向繫結，使用方法如下\nInterpolationhtmlts123&lt;h1&gt;  {{title}}&lt;/h1&gt;123export class AppComponent {  title = 'app works!';}\nProperty Binding這也是屬於單向繫結，只要是Html內建的tag都可以使用這種繫結方式。這個功能非常強大，還能用在Component之間的傳值。Property Bindinghtmlts1&lt;a [href]=\"googleLink\"&gt;Google Link&lt;/a&gt;123export class AppComponent {   googleLink = 'http://www.google.com';}\nEvent Binding只要是瀏覽器預設的所有事件，都可以用這樣的方式綁定，而且每個一個綁定的事件，都會有特定的型別，例如範例的click事件傳入的是 MouseEvent 型別。\n\nbutton綁定的 (click) = \"MyClick($event) MyClick傳入的一定是 $event。\nEvent Bindinghtmlts1&lt;button (click) = \"MyClick($event)\"&gt;Click&lt;/button&gt;12345678export class AppComponent {  MyClick(evt:MouseEvent) : void  {    console.log(evt);//如果當下不知道型別，可用這種方式檢查型別    console.log(\"Hello\");  }}\nTwo-way Binding此種方式為雙向繫結，通常是用在input或select的原件上，讓使用者輸入的值可以傳回到class的property。  不過此種方式很浪費效能，建議斟酌使用，或者是改用事件的方式來完成類似的功能。\n至於用法就是使用 [(ngModel)] 就可以了。\nTwo-way Bindinghtmlts1&lt;input [(ngModel)]=\"filter\"&gt;123export class AppComponent {  filter : string = '';}\n參考Binding syntax","dateCreated":"2017-02-04T23:25:57+08:00","dateModified":"2018-04-11T23:19:56+08:00","datePublished":"2017-02-04T23:25:57+08:00","description":"前言要從class將資料繫結到template上面，Angular有四種方式。\n\n內嵌繫結 ( Interpolation )\n屬性繫結 ( Property Binding )\n事件繫結 ( Event Binding )\n雙向繫結 ( Two-way Binding )\n","headline":"Binding syntax","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/02/Binding-syntax/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/02/Binding-syntax/","keywords":"Angular"}</script>
+    <meta name="description" content="前言要從class將資料繫結到template上面，Angular有四種方式。  內嵌繫結 ( Interpolation ) 屬性繫結 ( Property Binding ) 事件繫結 ( Event Binding ) 雙向繫結 ( Two-way Binding )">
+<meta name="keywords" content="Angular">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Binding syntax">
 <meta property="og:url" content="https://mileslin.github.io/2017/02/Binding-syntax/index.html">
-<meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="前言要從class將資料繫結到template上面，Angular有四種方式。
-
-內嵌繫結 ( Interpolation )
-屬性繫結 ( Property Binding )
-事件繫結 ( Event Binding )
-雙向繫結 ( Two-way Binding )">
-<meta property="og:updated_time" content="2017-02-04T16:22:22.026Z">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="前言要從class將資料繫結到template上面，Angular有四種方式。  內嵌繫結 ( Interpolation ) 屬性繫結 ( Property Binding ) 事件繫結 ( Event Binding ) 雙向繫結 ( Two-way Binding )">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-04-11T15:19:56.027Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Binding syntax">
-<meta name="twitter:description" content="前言要從class將資料繫結到template上面，Angular有四種方式。
-
-內嵌繫結 ( Interpolation )
-屬性繫結 ( Property Binding )
-事件繫結 ( Event Binding )
-雙向繫結 ( Two-way Binding )">
+<meta name="twitter:description" content="前言要從class將資料繫結到template上面，Angular有四種方式。  內嵌繫結 ( Interpolation ) 屬性繫結 ( Property Binding ) 事件繫結 ( Event Binding ) 雙向繫結 ( Two-way Binding )">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -54,22 +42,19 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="/assets/css/style-1udptkpril81ozu8ifd8zpujn7ipu7lefxsiu5gxx0dpnzntdx6dusvki3ao.min.css">
     <!--STYLES END-->
     
     <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-90394318-1']);
-        _gaq.push(['_trackPageview']);
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-90394318-1', 'auto');
+        ga('send', 'pageview');
     </script>
+
 
     
 </head>
@@ -127,9 +112,10 @@
                         <a  class="sidebar-button-link "
                              href="/ "
                             
+                            title="Home"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
@@ -139,9 +125,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-categories"
                             
+                            title="Categories"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
@@ -151,9 +138,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-tags"
                             
+                            title="Tags"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
@@ -163,9 +151,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-archives"
                             
+                            title="Archives"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
                     </a>
             </li>
@@ -175,9 +164,10 @@
                         <a  class="sidebar-button-link open-algolia-search"
                              href="#search"
                             
+                            title="Search"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-search"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
                     </a>
             </li>
@@ -187,9 +177,10 @@
                         <a  class="sidebar-button-link "
                              href="#about"
                             
+                            title="About"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -200,36 +191,36 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank">
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-linkedin"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank">
+                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank" rel="noopener" title="Mail">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail</span>
                     </a>
             </li>
@@ -243,9 +234,10 @@
                         <a  class="sidebar-button-link "
                              href="/atom.xml"
                             
+                            title="RSS"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
@@ -261,17 +253,18 @@
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+<article class="post">
     
     
         <div class="post-header main-content-wrap text-left">
     
-        <h1 class="post-title" itemprop="headline">
+        <h1 class="post-title">
             Binding syntax
         </h1>
     
-    <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-02-04T23:25:57+08:00">
+    
+        <div class="post-meta">
+    <time datetime="2017-02-04T23:25:57+08:00">
 	
 		    Feb 04, 2017
     	
@@ -285,9 +278,11 @@
     
 </div>
 
-</div>
     
-    <div class="post-content markdown" itemprop="articleBody">
+</div>
+
+    
+    <div class="post-content markdown">
         <div class="main-content-wrap">
             <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
 <ul>
@@ -307,8 +302,9 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
 <h2 id="Two-way-Binding"><a href="#Two-way-Binding" class="headerlink" title="Two-way Binding"></a>Two-way Binding</h2><p>此種方式為雙向繫結，通常是用在input或select的原件上，讓使用者輸入的值可以傳回到class的property。  不過此種方式很浪費效能，建議斟酌使用，或者是改用事件的方式來完成類似的功能。</p>
 <p>至於用法就是使用 <span class="highlight-text primary">[(ngModel)]</span> 就可以了。</p>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>Two-way Binding</span><ul class="tabs"><li class="tab active">html</li><li class="tab">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> [(<span class="attr">ngModel</span>)]=<span class="string">"filter"</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure><figure class="highlight ts" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> AppComponent {</span><br><span class="line">  filter : <span class="built_in">string</span> = <span class="string">''</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular.io/docs/ts/latest/guide/template-syntax.html" title="Binding syntax" target="_blank" rel="external">Binding syntax</a>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://angular.io/docs/ts/latest/guide/template-syntax.html" title="Binding syntax" target="_blank" rel="noopener">Binding syntax</a>
             
+
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
@@ -320,66 +316,82 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
 
             </div>
         
-        <div class="post-actions-wrap">
+        
+            <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Routing-Basics/"  data-tooltip="Routing Basics">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Routing-Basics/" data-tooltip="Routing Basics" aria-label="PREVIOUS: Routing Basics">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Bootstrapping-App-Component/" data-tooltip="Bootstrapping App Component">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Bootstrapping-App-Component/" data-tooltip="Bootstrapping App Component" aria-label="NEXT: Bootstrapping App Component">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Binding-syntax/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Binding-syntax/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Binding-syntax/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Binding-syntax/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Binding-syntax/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Binding-syntax/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
 </div>
 
 
+        
         
             
                 <div id="disqus_thread">
@@ -406,55 +418,69 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Routing-Basics/"  data-tooltip="Routing Basics">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Routing-Basics/" data-tooltip="Routing Basics" aria-label="PREVIOUS: Routing Basics">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Bootstrapping-App-Component/" data-tooltip="Bootstrapping App Component">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Bootstrapping-App-Component/" data-tooltip="Bootstrapping App Component" aria-label="NEXT: Bootstrapping App Component">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Binding-syntax/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Binding-syntax/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Binding-syntax/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Binding-syntax/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Binding-syntax/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Binding-syntax/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -463,25 +489,35 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
 
                 </div>
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
     <ul class="share-options">
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Binding-syntax/">
-                <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Binding-syntax/">
-                <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Binding-syntax/">
-                <i class="fa fa-twitter"></i><span>Share on Twitter</span>
-            </a>
-        </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/Binding-syntax/">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/Binding-syntax/">
+                    <i class="fa fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/Binding-syntax/">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i><span>Share on Google Plus</span>
+                </a>
+            </li>
+        
     </ul>
 </div>
-<div id="share-options-mask" class="share-options-mask"></div>
 
             
         </div>
@@ -521,11 +557,12 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
     </div>
 </div>
 
-        <div id="algolia-search-modal" class="modal-container">
+        
+            <div id="algolia-search-modal" class="modal-container">
     <div class="modal">
         <div class="modal-header">
             <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
                 <span class="searchby-algolia-text text-color-light text-small">by</span>
                 <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
             </a>
@@ -533,7 +570,7 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
             <form id="algolia-search-form">
                 <input type="text" id="algolia-search-input" name="search"
                     class="form-control input--large search-input" placeholder="Search "
-                    autofocus="autofocus"/>
+                    />
             </form>
         </div>
         <div class="modal-body">
@@ -627,7 +664,7 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -777,13 +814,12 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
         </div>
     </div>
 </div>
+
+        
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-yhuo2grt8r7qkqumzgjoglkfbicl1thukjgmla6jopu56zpcowfedi5zjcor.min.js"></script>
 <!--SCRIPTS END-->
 
     
@@ -806,13 +842,13 @@ button綁定的 <span class="highlight-text warning">(click) = "MyClick($event)<
     
 
 
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
     <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
     <script>
         var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
         var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
     </script>
+
 
     </body>
 </html>

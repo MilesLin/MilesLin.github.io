@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en,zh-tw,ja,default">
+<html lang="en,zh-tw,default">
     
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
     <title>NgModule Decorator - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,Angular">
+        <meta name="keywords" content="Angular">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,19 +17,22 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg"},"articleBody":"前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。app_module在建立Angular預設專案的時候，會有一個app.module.ts，這是我們的起始module，這Ng Module有寫了很多的Decorator，這些Decorator都有一些使用原則，要在這邊做說明。\nWhat Is an Angular ModuleAngular module 是一個包含有NgModule decorator的class。 主要目的在於\n\n管理我們的application\n有既定的pattern管理程式碼\n可載入外部libraries，擴展原本的application\n可整合其他Module的程式碼\n\n而Angular module 當application start時候，可以loaded eagerly，或者可以經由router做lazy loaded asynchronously。\nBootstrap Array TruthBootstrap Array定義哪一個是最初的Component，使用上也有些限制。\n\n至少要有一個component，我們稱為root application component\n只能用在root application module, AppModule\n\nDeclarations Array Truth我們建立的每一個建立的component,directive,pipe，都會在Angular module中宣告，這些宣告就是放在declarations，表示這些component,directive,pipe都是屬於這個Angular module。\n\n每一個component,directive,pipe只能被一個Angular module宣告\ndeclarations 只能宣告component,directive,pipe，不能放其他classes或是services\n不重覆宣告 component,directive,pipe 在其他的Angular module  \n所有被宣告的component,directive,pipe預設只能在同一個Angular module使用\n可用export的方式讓其他Angular module使用\n\n\n\nExports Array TruthExports Array可以讓我們share component,directive,pipe 給其他的modules使用，甚至可以re-export 3rd party modules。\n\n如果其他component需要，則Export component,directive,pipe\nRe-export modules to re-export their component,directive,pipe\nNever export a service\n\n因為Services被宣告在root application Provider’s array，讓Services可被inject到其他class，所以不需要export\n\n\n\n用法:shared.modulets123456789101112import { NgModule }            from '@angular/core';import { CommonModule }        from '@angular/common';import { FormsModule }         from '@angular/forms';import { AwesomePipe }         from './awesome.pipe';import { HighlightDirective }  from './highlight.directive';@NgModule({  imports:      [ CommonModule ],  declarations: [ AwesomePipe, HighlightDirective ],  exports:      [ AwesomePipe, HighlightDirective,                  CommonModule, FormsModule ]})export class SharedModule { }\nshared-module\nImports Array TruthAngular module可以藉由importing其他的Angular module來 extend capabilities。\n\nImporting module取得該module exported的component,directive,pipe\nOnly import what this module needs\nImporting a module does NOT provide access to its imported modules 或者說 Imports are not inherited\n\n\n以下圖做說明，就是AppModule可以使用StarComponet但是沒有辦法使用ngModel directive，除非SharedModule re-export FormsModule，AppModule再取得SharedModule re-export的FormsModule才可以使用ngModel directive。imports Array\nProviders Array Truth\nAny service provider added to the providers array is registered at the root of the application\n別在shared module 加入services\n可考慮建立一個CoreModule專門加入services，並只在AppModule importing一次\n\n\nRouting guards 只能被加在 Angular module 的 providers array\n\nproviders\n","dateCreated":"2017-02-13T22:57:17+08:00","dateModified":"2018-04-11T23:19:56+08:00","datePublished":"2017-02-13T22:57:17+08:00","description":"前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。","headline":"NgModule Decorator","image":["2_ImportTruth.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/02/NgModule-Decorator/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/02/NgModule-Decorator/","keywords":"Angular","thumbnailUrl":"2_ImportTruth.jpg"}</script>
     <meta name="description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
+<meta name="keywords" content="Angular">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="NgModule Decorator">
 <meta property="og:url" content="https://mileslin.github.io/2017/02/NgModule-Decorator/index.html">
-<meta property="og:site_name" content="Miles's Journey">
+<meta property="og:site_name" content="Miles&#39;s Journey">
 <meta property="og:description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
-<meta property="og:image" content="https://mileslin.github.io/1_app_module.jpg">
-<meta property="og:image" content="https://mileslin.github.io/2_ImportTruth.jpg">
-<meta property="og:updated_time" content="2017-02-16T17:06:59.614Z">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2017/02/NgModule-Decorator/1_app_module.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg">
+<meta property="og:updated_time" content="2018-04-11T15:19:56.069Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="NgModule Decorator">
 <meta name="twitter:description" content="前言再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。">
-<meta name="twitter:image" content="https://mileslin.github.io/1_app_module.jpg">
+<meta name="twitter:image" content="https://mileslin.github.io/2017/02/NgModule-Decorator/1_app_module.jpg">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -45,22 +48,19 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="/assets/css/style-1udptkpril81ozu8ifd8zpujn7ipu7lefxsiu5gxx0dpnzntdx6dusvki3ao.min.css">
     <!--STYLES END-->
     
     <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-90394318-1']);
-        _gaq.push(['_trackPageview']);
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-90394318-1', 'auto');
+        ga('send', 'pageview');
     </script>
+
 
     
 </head>
@@ -118,9 +118,10 @@
                         <a  class="sidebar-button-link "
                              href="/ "
                             
+                            title="Home"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
@@ -130,9 +131,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-categories"
                             
+                            title="Categories"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
@@ -142,9 +144,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-tags"
                             
+                            title="Tags"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
@@ -154,9 +157,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-archives"
                             
+                            title="Archives"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
                     </a>
             </li>
@@ -166,9 +170,10 @@
                         <a  class="sidebar-button-link open-algolia-search"
                              href="#search"
                             
+                            title="Search"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-search"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
                     </a>
             </li>
@@ -178,9 +183,10 @@
                         <a  class="sidebar-button-link "
                              href="#about"
                             
+                            title="About"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -191,36 +197,36 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank">
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-linkedin"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank">
+                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank" rel="noopener" title="Mail">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail</span>
                     </a>
             </li>
@@ -234,9 +240,10 @@
                         <a  class="sidebar-button-link "
                              href="/atom.xml"
                             
+                            title="RSS"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
@@ -252,17 +259,18 @@
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+<article class="post">
     
     
         <div class="post-header main-content-wrap text-left">
     
-        <h1 class="post-title" itemprop="headline">
+        <h1 class="post-title">
             NgModule Decorator
         </h1>
     
-    <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-02-13T22:57:17+08:00">
+    
+        <div class="post-meta">
+    <time datetime="2017-02-13T22:57:17+08:00">
 	
 		    Feb 13, 2017
     	
@@ -276,11 +284,13 @@
     
 </div>
 
-</div>
     
-    <div class="post-content markdown" itemprop="articleBody">
+</div>
+
+    
+    <div class="post-content markdown">
         <div class="main-content-wrap">
-            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br><a id="more"></a><br><div class="figure right" style="width:;"><a class="fancybox" href="1_app_module.jpg" title="app_module" data-fancybox-group=""><img class="fig-img" src="1_app_module.jpg" alt="app_module"></a><span class="caption">app_module</span></div><br>在建立Angular預設專案的時候，會有一個app.module.ts，這是我們的起始module，這Ng Module有寫了很多的Decorator，這些Decorator都有一些使用原則，要在這邊做說明。</p>
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br><a id="more"></a><br><div class="figure right" style="width:;"><a class="fancybox" href="1_app_module.jpg" title="app_module" data-caption="app_module" data-fancybox="default"><img class="fig-img" src="1_app_module.jpg" alt="app_module"></a><span class="caption">app_module</span></div><br>在建立Angular預設專案的時候，會有一個app.module.ts，這是我們的起始module，這Ng Module有寫了很多的Decorator，這些Decorator都有一些使用原則，要在這邊做說明。</p>
 <h2 id="What-Is-an-Angular-Module"><a href="#What-Is-an-Angular-Module" class="headerlink" title="What Is an Angular Module"></a>What Is an Angular Module</h2><p>Angular module 是一個包含有NgModule decorator的class。 主要目的在於</p>
 <ul>
 <li>管理我們的application</li>
@@ -314,8 +324,8 @@
 </ul>
 </li>
 </ul>
-<p>用法:<br><figure class="codeblock codeblock--tabbed"><figcaption><span>shared.module</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { NgModule }            from <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule }        from <span class="string">'@angular/common'</span>;</span><br><span class="line"><span class="keyword">import</span> { FormsModule }         from <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { AwesomePipe }         from <span class="string">'./awesome.pipe'</span>;</span><br><span class="line"><span class="keyword">import</span> { HighlightDirective }  from <span class="string">'./highlight.directive'</span>;</span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports:      [ CommonModule ],</span><br><span class="line">  declarations: [ AwesomePipe, HighlightDirective ],</span><br><span class="line">  exports:      [ AwesomePipe, HighlightDirective,</span><br><span class="line">                  CommonModule, FormsModule ]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> SharedModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<a href="https://angular.io/docs/ts/latest/guide/ngmodule.html#!#shared-module" title="shared-module" target="_blank" rel="external">shared-module</a>
+<p>用法:<br><figure class="codeblock codeblock--tabbed"><figcaption><span>shared.module</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { NgModule }            <span class="keyword">from</span> <span class="string">'@angular/core'</span>;</span><br><span class="line"><span class="keyword">import</span> { CommonModule }        <span class="keyword">from</span> <span class="string">'@angular/common'</span>;</span><br><span class="line"><span class="keyword">import</span> { FormsModule }         <span class="keyword">from</span> <span class="string">'@angular/forms'</span>;</span><br><span class="line"><span class="keyword">import</span> { AwesomePipe }         <span class="keyword">from</span> <span class="string">'./awesome.pipe'</span>;</span><br><span class="line"><span class="keyword">import</span> { HighlightDirective }  <span class="keyword">from</span> <span class="string">'./highlight.directive'</span>;</span><br><span class="line"><span class="meta">@NgModule</span>({</span><br><span class="line">  imports:      [ CommonModule ],</span><br><span class="line">  declarations: [ AwesomePipe, HighlightDirective ],</span><br><span class="line">  exports:      [ AwesomePipe, HighlightDirective,</span><br><span class="line">                  CommonModule, FormsModule ]</span><br><span class="line">})</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> SharedModule { }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<a href="https://angular.io/docs/ts/latest/guide/ngmodule.html#!#shared-module" title="shared-module" target="_blank" rel="noopener">shared-module</a>
 <h2 id="Imports-Array-Truth"><a href="#Imports-Array-Truth" class="headerlink" title="Imports Array Truth"></a>Imports Array Truth</h2><p>Angular module可以藉由importing其他的Angular module來 extend capabilities。</p>
 <ul>
 <li>Importing module取得該module exported的<em>component,directive,pipe</em></li>
@@ -323,7 +333,7 @@
 <li><span class="highlight-text primary">Importing a module does NOT provide access to its imported modules</span> 或者說 <span class="highlight-text primary">Imports are not inherited</span>
 </li>
 </ul>
-<p>以下圖做說明，就是AppModule可以使用<code>StarComponet</code>但是沒有辦法使用<code>ngModel directive</code>，除非SharedModule re-export FormsModule，AppModule再取得SharedModule re-export的FormsModule才可以使用<code>ngModel directive</code>。<br><div class="figure " style="width:;"><a class="fancybox" href="2_ImportTruth.jpg" title="imports Array" data-fancybox-group=""><img class="fig-img" src="2_ImportTruth.jpg" alt="imports Array"></a><span class="caption">imports Array</span></div></p>
+<p>以下圖做說明，就是AppModule可以使用<code>StarComponet</code>但是沒有辦法使用<code>ngModel directive</code>，除非SharedModule re-export FormsModule，AppModule再取得SharedModule re-export的FormsModule才可以使用<code>ngModel directive</code>。<br><div class="figure " style="width:;"><a class="fancybox" href="2_ImportTruth.jpg" title="imports Array" data-caption="imports Array" data-fancybox="default"><img class="fig-img" src="2_ImportTruth.jpg" alt="imports Array"></a><span class="caption">imports Array</span></div></p>
 <h2 id="Providers-Array-Truth"><a href="#Providers-Array-Truth" class="headerlink" title="Providers Array Truth"></a>Providers Array Truth</h2><ul>
 <li>Any service provider added to the providers array is registered at the root of the application</li>
 <li>別在shared module 加入services<ul>
@@ -332,9 +342,10 @@
 </li>
 <li>Routing guards 只能被加在 Angular module 的 providers array</li>
 </ul>
-<a href="https://angular.io/docs/ts/latest/guide/ngmodule.html#!#providers" title="providers" target="_blank" rel="external">providers</a>
+<a href="https://angular.io/docs/ts/latest/guide/ngmodule.html#!#providers" title="providers" target="_blank" rel="noopener">providers</a>
 
             
+
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
@@ -346,66 +357,82 @@
 
             </div>
         
-        <div class="post-actions-wrap">
+        
+            <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Dive-into-Angular-Modules/"  data-tooltip="Dive into Angular Modules">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Dive-into-Angular-Modules/" data-tooltip="Dive into Angular Modules" aria-label="PREVIOUS: Dive into Angular Modules">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Protecting-Routes-with-Guards/" data-tooltip="Protecting Routes with Guards">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Protecting-Routes-with-Guards/" data-tooltip="Protecting Routes with Guards" aria-label="NEXT: Protecting Routes with Guards">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
 </div>
 
 
+        
         
             
                 <div id="disqus_thread">
@@ -432,55 +459,69 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Dive-into-Angular-Modules/"  data-tooltip="Dive into Angular Modules">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Dive-into-Angular-Modules/" data-tooltip="Dive into Angular Modules" aria-label="PREVIOUS: Dive into Angular Modules">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Protecting-Routes-with-Guards/" data-tooltip="Protecting Routes with Guards">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/02/Protecting-Routes-with-Guards/" data-tooltip="Protecting Routes with Guards" aria-label="NEXT: Protecting Routes with Guards">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -489,25 +530,35 @@
 
                 </div>
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
     <ul class="share-options">
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/">
-                <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/">
-                <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/">
-                <i class="fa fa-twitter"></i><span>Share on Twitter</span>
-            </a>
-        </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                    <i class="fa fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i><span>Share on Google Plus</span>
+                </a>
+            </li>
+        
     </ul>
 </div>
-<div id="share-options-mask" class="share-options-mask"></div>
 
             
         </div>
@@ -547,11 +598,12 @@
     </div>
 </div>
 
-        <div id="algolia-search-modal" class="modal-container">
+        
+            <div id="algolia-search-modal" class="modal-container">
     <div class="modal">
         <div class="modal-header">
             <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
                 <span class="searchby-algolia-text text-color-light text-small">by</span>
                 <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
             </a>
@@ -559,7 +611,7 @@
             <form id="algolia-search-form">
                 <input type="text" id="algolia-search-input" name="search"
                     class="form-control input--large search-input" placeholder="Search "
-                    autofocus="autofocus"/>
+                    />
             </form>
         </div>
         <div class="modal-body">
@@ -653,7 +705,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -803,13 +855,12 @@
         </div>
     </div>
 </div>
+
+        
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-yhuo2grt8r7qkqumzgjoglkfbicl1thukjgmla6jopu56zpcowfedi5zjcor.min.js"></script>
 <!--SCRIPTS END-->
 
     
@@ -832,13 +883,13 @@
     
 
 
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
     <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
     <script>
         var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
         var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
     </script>
+
 
     </body>
 </html>

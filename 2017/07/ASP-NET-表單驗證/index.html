@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en,zh-tw,ja,default">
+<html lang="en,zh-tw,default">
     
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
     <title>ASP.NET 表單驗證 - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,Authentication,FormsAuthentication">
+        <meta name="keywords" content="Authentication,FormsAuthentication">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,18 +17,21 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg"},"articleBody":"ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。\n\n修改 web.config 啟用表單驗證首先我們要在 web.config 的 system.web 區段底下新增設定 。 web.config 官方設定說明\n\nauthentication : 程式啟用 FormsAuthentication，設定登入頁面網址(loginUrl)、timeout 時間(預設30分鐘) 等等….\nauthorization : \n在使用表單驗證的情況下 IIS 預設所有人都可以存取任何網頁\n  ，所以要加入此設定，讓沒登入的使用者自動導向 loginUrl 所設定的網址。\n如果沒有設定，則要自行寫 Authorize Filter 驗證使用者使用有權限存取網頁。(微軟預設提供的 Authorize 無法使用)\n\n\n\nweb configxml123456789101112131415&lt;configuration&gt; &lt;system.web&gt;  &lt;authentication mode=\"Forms\"&gt;    &lt;forms loginUrl=\"Login/Index\"                        timeout=\"30\"           protection=\"All\"           cookieless=\"UseDeviceProfile\"/&gt;  &lt;/authentication&gt;  &lt;authorization&gt;    &lt;deny users=\"?\" /&gt;  &lt;/authorization&gt; &lt;/system.web&gt;&lt;/configuration&gt;\n實作登入程式碼如果對使用者的登入資訊只要使用者姓名，又或者是什麼都保持預設值就好，那其實只要一行程式碼就可以完成登入\nLogincs12345678[HttpPost]public ActionResult Login(string userName){    // 登入    FormsAuthentication.RedirectFromLoginPage(userName, false);    return RedirectToAction(\"Index\", \"Home\");}\n如果你想要設定 timeout 時間、存取一些額外資訊等等…，那就要採用 FormsAuthenticationTicket 加密後放入 Cookie。\nLogincs12345678910111213141516171819202122232425[HttpPost]public ActionResult Login(string userName, string password){    // 1. 建立 ticket    FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(1,        userName,        DateTime.Now,        DateTime.Now.AddMinutes(30), // value of time out property        false, // Value of IsPersistent property        \"Extra Data\",        FormsAuthentication.FormsCookiePath);    // 2. 加密 ticket    string encryptedTicket = FormsAuthentication.Encrypt(ticket);    // 3. 建立 HttpCookie    HttpCookie authCookie = new HttpCookie(                    FormsAuthentication.FormsCookieName,                    encryptedTicket);    // 4. 使用者瀏覽器加入完成驗證的 Cookie    Response.Cookies.Add(authCookie);    return RedirectToAction(\"Index\", \"Home\");}\n取得登入資訊登入成功後，登入的相關資訊可以經由 Controller 的 IPrincipal User 取得IPrincipal\n簡單的取得登入使用者姓名以及是否驗證成功的方式\nAuthenticatedcs123456789public ActionResult Index(){    // 取得登入者姓名    var info = User.Identity.Name;    // 是否驗證通過    bool isAuthenticated = User.Identity.IsAuthenticated;    return View();}\n將 Identity 轉型為 FormsIdentity，取得整個 FormsAuthenticationTicket\nFormsAuthenticationTicketcs12345678910111213141516public ActionResult GetFormsAuthenticationTicket()        {    FormsIdentity id = (FormsIdentity)User.Identity;    FormsAuthenticationTicket ticket = id.Ticket;    string cookiePath = ticket.CookiePath;    DateTime expiration = ticket.Expiration;    bool expired = ticket.Expired;    bool isPersistent = ticket.IsPersistent;    DateTime issueDate = ticket.IssueDate;    string name = ticket.Name;    string userData = ticket.UserData;    int verstion = ticket.Version;    return View();}\n實作登出登出只要簡單一行程式碼就可以了 FormsAuthentication.SignOut();SignOutcs123456public ActionResult SignOut(){    FormsAuthentication.SignOut();    return RedirectToAction(\"Index\", \"Home\");}\n參考[簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式][Explained: Forms Authentication in ASP.NET 2.0][FormsAuthenticationTicket.UserData 屬性][自訂 Authorize Filter]\n","dateCreated":"2017-07-23T14:49:29+08:00","dateModified":"2018-04-11T23:19:55+08:00","datePublished":"2017-07-23T14:49:29+08:00","description":"ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。","headline":"ASP.NET 表單驗證","image":["IPrincipal.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/07/ASP-NET-表單驗證/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/07/ASP-NET-表單驗證/","keywords":"Authentication, FormsAuthentication, .NET","thumbnailUrl":"IPrincipal.jpg"}</script>
     <meta name="description" content="ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。">
+<meta name="keywords" content="Authentication,FormsAuthentication">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="ASP.NET 表單驗證">
 <meta property="og:url" content="https://mileslin.github.io/2017/07/ASP-NET-表單驗證/index.html">
-<meta property="og:site_name" content="Miles's Journey">
+<meta property="og:site_name" content="Miles&#39;s Journey">
 <meta property="og:description" content="ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。">
-<meta property="og:image" content="https://mileslin.github.io/IPrincipal.jpg">
-<meta property="og:updated_time" content="2017-07-24T14:48:34.231Z">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2017/07/ASP-NET-表單驗證/IPrincipal.jpg">
+<meta property="og:updated_time" content="2018-04-11T15:19:55.988Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ASP.NET 表單驗證">
 <meta name="twitter:description" content="ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。">
-<meta name="twitter:image" content="https://mileslin.github.io/IPrincipal.jpg">
+<meta name="twitter:image" content="https://mileslin.github.io/2017/07/ASP-NET-表單驗證/IPrincipal.jpg">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -44,22 +47,19 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="/assets/css/style-1udptkpril81ozu8ifd8zpujn7ipu7lefxsiu5gxx0dpnzntdx6dusvki3ao.min.css">
     <!--STYLES END-->
     
     <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-90394318-1']);
-        _gaq.push(['_trackPageview']);
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-90394318-1', 'auto');
+        ga('send', 'pageview');
     </script>
+
 
     
 </head>
@@ -117,9 +117,10 @@
                         <a  class="sidebar-button-link "
                              href="/ "
                             
+                            title="Home"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
@@ -129,9 +130,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-categories"
                             
+                            title="Categories"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
@@ -141,9 +143,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-tags"
                             
+                            title="Tags"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
@@ -153,9 +156,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-archives"
                             
+                            title="Archives"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
                     </a>
             </li>
@@ -165,9 +169,10 @@
                         <a  class="sidebar-button-link open-algolia-search"
                              href="#search"
                             
+                            title="Search"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-search"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
                     </a>
             </li>
@@ -177,9 +182,10 @@
                         <a  class="sidebar-button-link "
                              href="#about"
                             
+                            title="About"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -190,36 +196,36 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank">
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-linkedin"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank">
+                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank" rel="noopener" title="Mail">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail</span>
                     </a>
             </li>
@@ -233,9 +239,10 @@
                         <a  class="sidebar-button-link "
                              href="/atom.xml"
                             
+                            title="RSS"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
@@ -251,17 +258,18 @@
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+<article class="post">
     
     
         <div class="post-header main-content-wrap text-left">
     
-        <h1 class="post-title" itemprop="headline">
+        <h1 class="post-title">
             ASP.NET 表單驗證
         </h1>
     
-    <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-07-23T14:49:29+08:00">
+    
+        <div class="post-meta">
+    <time datetime="2017-07-23T14:49:29+08:00">
 	
 		    Jul 23, 2017
     	
@@ -275,36 +283,39 @@
     
 </div>
 
-</div>
     
-    <div class="post-content markdown" itemprop="articleBody">
+</div>
+
+    
+    <div class="post-content markdown">
         <div class="main-content-wrap">
             <p>ASP.NET 提供了很方便帳號登入登出的驗證功能，今天就來說明一下，如何使用 ASP.NET 表單驗證(FormsAuthentication)，來完成登入、登出以及驗證功能。</p>
 <a id="more"></a>
-<h2 id="修改-web-config-啟用表單驗證"><a href="#修改-web-config-啟用表單驗證" class="headerlink" title="修改 web.config 啟用表單驗證"></a>修改 web.config 啟用表單驗證</h2><p>首先我們要在 web.config 的 system.web 區段底下新增設定 。 <a href="https://msdn.microsoft.com/en-us/library/aa480476.aspx#pagexplained0002_aspnetforms" title="web.config 官方設定說明" target="_blank" rel="external">web.config 官方設定說明</a></p>
+<h2 id="修改-web-config-啟用表單驗證"><a href="#修改-web-config-啟用表單驗證" class="headerlink" title="修改 web.config 啟用表單驗證"></a>修改 web.config 啟用表單驗證</h2><p>首先我們要在 web.config 的 system.web 區段底下新增設定 。 <a href="https://msdn.microsoft.com/en-us/library/aa480476.aspx#pagexplained0002_aspnetforms" title="web.config 官方設定說明" target="_blank" rel="noopener">web.config 官方設定說明</a></p>
 <ul>
 <li>authentication : 程式啟用 FormsAuthentication，設定登入頁面網址(loginUrl)、timeout 時間(預設30分鐘) 等等….</li>
 <li>authorization : <ul>
 <li>在使用表單驗證的情況下 IIS <span class="highlight-text primary">預設所有人都可以存取任何網頁
  </span> ，所以要加入此設定，讓沒登入的使用者自動導向 loginUrl 所設定的網址。</li>
-<li>如果沒有設定，則要自行寫 <a href="https://app.pluralsight.com/player?course=mvc-applications-10-extension-points-improving&author=alex-wolf&name=mvc-applications-10-extension-points-improving-m10&clip=2&mode=live&start=89.741627&noteid=0c402383-86b5-4606-abc6-a9eea92dc6b5" title="Authorize Filter" target="_blank" rel="external">Authorize Filter</a> 驗證使用者使用有權限存取網頁。<em>(微軟預設提供的 <code>Authorize</code> 無法使用)</em></li>
+<li>如果沒有設定，則要自行寫 <a href="https://app.pluralsight.com/player?course=mvc-applications-10-extension-points-improving&author=alex-wolf&name=mvc-applications-10-extension-points-improving-m10&clip=2&mode=live&start=89.741627&noteid=0c402383-86b5-4606-abc6-a9eea92dc6b5" title="Authorize Filter" target="_blank" rel="noopener">Authorize Filter</a> 驗證使用者使用有權限存取網頁。<em>(微軟預設提供的 <code>Authorize</code> 無法使用)</em></li>
 </ul>
 </li>
 </ul>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>web config</span><ul class="tabs"><li class="tab active">xml</li></ul></figcaption><div class="tabs-content"><figure class="highlight xml" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line"></span><br><span class="line"> <span class="tag">&lt;<span class="name">system.web</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">authentication</span> <span class="attr">mode</span>=<span class="string">"Forms"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">forms</span> <span class="attr">loginUrl</span>=<span class="string">"Login/Index"</span>             </span><br><span class="line">           <span class="attr">timeout</span>=<span class="string">"30"</span></span><br><span class="line">           <span class="attr">protection</span>=<span class="string">"All"</span></span><br><span class="line">           <span class="attr">cookieless</span>=<span class="string">"UseDeviceProfile"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">authentication</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">authorization</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">deny</span> <span class="attr">users</span>=<span class="string">"?"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">authorization</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">system.web</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>web config</span><ul class="tabs"><li class="tab active">xml</li></ul></figcaption><div class="tabs-content"><figure class="highlight xml" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line"></span><br><span class="line"> <span class="tag">&lt;<span class="name">system.web</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">authentication</span> <span class="attr">mode</span>=<span class="string">"Forms"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">forms</span> <span class="attr">loginUrl</span>=<span class="string">"Login/Index"</span>             </span></span><br><span class="line"><span class="tag">           <span class="attr">timeout</span>=<span class="string">"30"</span></span></span><br><span class="line"><span class="tag">           <span class="attr">protection</span>=<span class="string">"All"</span></span></span><br><span class="line"><span class="tag">           <span class="attr">cookieless</span>=<span class="string">"UseDeviceProfile"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">authentication</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">authorization</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">deny</span> <span class="attr">users</span>=<span class="string">"?"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">authorization</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">system.web</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
 <h2 id="實作登入程式碼"><a href="#實作登入程式碼" class="headerlink" title="實作登入程式碼"></a>實作登入程式碼</h2><p>如果對使用者的登入資訊只要使用者姓名，又或者是什麼都保持預設值就好，那其實只要一行程式碼就可以完成登入</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Login</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[HttpPost]</span><br><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">Login</span>(<span class="params"><span class="keyword">string</span> userName</span>)</span><br><span class="line"></span>{</span><br><span class="line">    <span class="comment">// 登入</span></span><br><span class="line">    FormsAuthentication.RedirectFromLoginPage(userName, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> RedirectToAction(<span class="string">"Index"</span>, <span class="string">"Home"</span>);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Login</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">HttpPost</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">Login</span>(<span class="params"><span class="keyword">string</span> userName</span>)</span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="comment">// 登入</span></span><br><span class="line">    FormsAuthentication.RedirectFromLoginPage(userName, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> RedirectToAction(<span class="string">"Index"</span>, <span class="string">"Home"</span>);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
 <p>如果你想要設定 timeout 時間、存取一些額外資訊等等…，那就要採用 <code>FormsAuthenticationTicket</code> 加密後放入 Cookie。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Login</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[HttpPost]</span><br><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">Login</span>(<span class="params"><span class="keyword">string</span> userName, <span class="keyword">string</span> password</span>)</span><br><span class="line"></span>{</span><br><span class="line">    <span class="comment">// 1. 建立 ticket</span></span><br><span class="line">    FormsAuthenticationTicket ticket = <span class="keyword">new</span> FormsAuthenticationTicket(<span class="number">1</span>,</span><br><span class="line">        userName,</span><br><span class="line">        DateTime.Now,</span><br><span class="line">        DateTime.Now.AddMinutes(<span class="number">30</span>), <span class="comment">// value of time out property</span></span><br><span class="line">        <span class="literal">false</span>, <span class="comment">// Value of IsPersistent property</span></span><br><span class="line">        <span class="string">"Extra Data"</span>,</span><br><span class="line">        FormsAuthentication.FormsCookiePath);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 加密 ticket</span></span><br><span class="line">    <span class="keyword">string</span> encryptedTicket = FormsAuthentication.Encrypt(ticket);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 建立 HttpCookie</span></span><br><span class="line">    HttpCookie authCookie = <span class="keyword">new</span> HttpCookie(</span><br><span class="line">                    FormsAuthentication.FormsCookieName,</span><br><span class="line">                    encryptedTicket);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 使用者瀏覽器加入完成驗證的 Cookie</span></span><br><span class="line">    Response.Cookies.Add(authCookie);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> RedirectToAction(<span class="string">"Index"</span>, <span class="string">"Home"</span>);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="取得登入資訊"><a href="#取得登入資訊" class="headerlink" title="取得登入資訊"></a>取得登入資訊</h2><p>登入成功後，登入的相關資訊可以經由 Controller 的 IPrincipal User 取得<br><div class="figure " style="width:;"><a class="fancybox" href="IPrincipal.jpg" title="IPrincipal" data-fancybox-group=""><img class="fig-img" src="IPrincipal.jpg" alt="IPrincipal"></a><span class="caption">IPrincipal</span></div></p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Login</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">HttpPost</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">Login</span>(<span class="params"><span class="keyword">string</span> userName, <span class="keyword">string</span> password</span>)</span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="comment">// 1. 建立 ticket</span></span><br><span class="line">    FormsAuthenticationTicket ticket = <span class="keyword">new</span> FormsAuthenticationTicket(<span class="number">1</span>,</span><br><span class="line">        userName,</span><br><span class="line">        DateTime.Now,</span><br><span class="line">        DateTime.Now.AddMinutes(<span class="number">30</span>), <span class="comment">// value of time out property</span></span><br><span class="line">        <span class="literal">false</span>, <span class="comment">// Value of IsPersistent property</span></span><br><span class="line">        <span class="string">"Extra Data"</span>,</span><br><span class="line">        FormsAuthentication.FormsCookiePath);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 加密 ticket</span></span><br><span class="line">    <span class="keyword">string</span> encryptedTicket = FormsAuthentication.Encrypt(ticket);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 建立 HttpCookie</span></span><br><span class="line">    HttpCookie authCookie = <span class="keyword">new</span> HttpCookie(</span><br><span class="line">                    FormsAuthentication.FormsCookieName,</span><br><span class="line">                    encryptedTicket);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 使用者瀏覽器加入完成驗證的 Cookie</span></span><br><span class="line">    Response.Cookies.Add(authCookie);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> RedirectToAction(<span class="string">"Index"</span>, <span class="string">"Home"</span>);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="取得登入資訊"><a href="#取得登入資訊" class="headerlink" title="取得登入資訊"></a>取得登入資訊</h2><p>登入成功後，登入的相關資訊可以經由 Controller 的 IPrincipal User 取得<br><div class="figure " style="width:;"><a class="fancybox" href="IPrincipal.jpg" title="IPrincipal" data-caption="IPrincipal" data-fancybox="default"><img class="fig-img" src="IPrincipal.jpg" alt="IPrincipal"></a><span class="caption">IPrincipal</span></div></p>
 <p>簡單的取得登入使用者姓名以及是否驗證成功的方式</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>Authenticated</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">Index</span>(<span class="params"></span>)</span><br><span class="line"></span>{</span><br><span class="line">    <span class="comment">// 取得登入者姓名</span></span><br><span class="line">    <span class="keyword">var</span> info = User.Identity.Name;</span><br><span class="line">    <span class="comment">// 是否驗證通過</span></span><br><span class="line">    <span class="keyword">bool</span> isAuthenticated = User.Identity.IsAuthenticated;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> View();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Authenticated</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">Index</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="comment">// 取得登入者姓名</span></span><br><span class="line">    <span class="keyword">var</span> info = User.Identity.Name;</span><br><span class="line">    <span class="comment">// 是否驗證通過</span></span><br><span class="line">    <span class="keyword">bool</span> isAuthenticated = User.Identity.IsAuthenticated;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> View();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
 <p>將 Identity 轉型為 <code>FormsIdentity</code>，取得整個 <code>FormsAuthenticationTicket</code></p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>FormsAuthenticationTicket</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">GetFormsAuthenticationTicket</span>(<span class="params"></span>)        </span><br><span class="line"></span>{</span><br><span class="line">    FormsIdentity id = (FormsIdentity)User.Identity;</span><br><span class="line">    FormsAuthenticationTicket ticket = id.Ticket;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">string</span> cookiePath = ticket.CookiePath;</span><br><span class="line">    DateTime expiration = ticket.Expiration;</span><br><span class="line">    <span class="keyword">bool</span> expired = ticket.Expired;</span><br><span class="line">    <span class="keyword">bool</span> isPersistent = ticket.IsPersistent;</span><br><span class="line">    DateTime issueDate = ticket.IssueDate;</span><br><span class="line">    <span class="keyword">string</span> name = ticket.Name;</span><br><span class="line">    <span class="keyword">string</span> userData = ticket.UserData;</span><br><span class="line">    <span class="keyword">int</span> verstion = ticket.Version;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> View();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h2 id="實作登出"><a href="#實作登出" class="headerlink" title="實作登出"></a>實作登出</h2><p>登出只要簡單一行程式碼就可以了 <code>FormsAuthentication.SignOut();</code><br><figure class="codeblock codeblock--tabbed"><figcaption><span>SignOut</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">SignOut</span>(<span class="params"></span>)</span><br><span class="line"></span>{</span><br><span class="line">    FormsAuthentication.SignOut();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> RedirectToAction(<span class="string">"Index"</span>, <span class="string">"Home"</span>);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://blog.miniasp.com/post/2008/02/20/Explain-Forms-Authentication-in-ASPNET-20.aspx" title="簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式" target="_blank" rel="external">簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式</a>]</strong><br><strong>[<a href="https://msdn.microsoft.com/en-us/library/aa480476.aspx" title="Explained: Forms Authentication in ASP.NET 2.0" target="_blank" rel="external">Explained: Forms Authentication in ASP.NET 2.0</a>]</strong><br><strong>[<a href="https://msdn.microsoft.com/zh-tw/library/system.web.security.formsauthenticationticket.userdata.aspx" title="FormsAuthenticationTicket.UserData 屬性" target="_blank" rel="external">FormsAuthenticationTicket.UserData 屬性</a>]</strong><br><strong>[<a href="https://app.pluralsight.com/player?course=mvc-applications-10-extension-points-improving&author=alex-wolf&name=mvc-applications-10-extension-points-improving-m10&clip=2&mode=live&start=89.741627&noteid=0c402383-86b5-4606-abc6-a9eea92dc6b5" title="Authorize Filter" target="_blank" rel="external">自訂 Authorize Filter</a>]</strong></p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>FormsAuthenticationTicket</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">GetFormsAuthenticationTicket</span>(<span class="params"></span>)        </span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    FormsIdentity id = (FormsIdentity)User.Identity;</span><br><span class="line">    FormsAuthenticationTicket ticket = id.Ticket;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">string</span> cookiePath = ticket.CookiePath;</span><br><span class="line">    DateTime expiration = ticket.Expiration;</span><br><span class="line">    <span class="keyword">bool</span> expired = ticket.Expired;</span><br><span class="line">    <span class="keyword">bool</span> isPersistent = ticket.IsPersistent;</span><br><span class="line">    DateTime issueDate = ticket.IssueDate;</span><br><span class="line">    <span class="keyword">string</span> name = ticket.Name;</span><br><span class="line">    <span class="keyword">string</span> userData = ticket.UserData;</span><br><span class="line">    <span class="keyword">int</span> verstion = ticket.Version;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> View();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="實作登出"><a href="#實作登出" class="headerlink" title="實作登出"></a>實作登出</h2><p>登出只要簡單一行程式碼就可以了 <code>FormsAuthentication.SignOut();</code><br><figure class="codeblock codeblock--tabbed"><figcaption><span>SignOut</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ActionResult <span class="title">SignOut</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    FormsAuthentication.SignOut();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> RedirectToAction(<span class="string">"Index"</span>, <span class="string">"Home"</span>);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://blog.miniasp.com/post/2008/02/20/Explain-Forms-Authentication-in-ASPNET-20.aspx" title="簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式" target="_blank" rel="noopener">簡介 ASP.NET 表單驗證 (FormsAuthentication) 的運作方式</a>]</strong><br><strong>[<a href="https://msdn.microsoft.com/en-us/library/aa480476.aspx" title="Explained: Forms Authentication in ASP.NET 2.0" target="_blank" rel="noopener">Explained: Forms Authentication in ASP.NET 2.0</a>]</strong><br><strong>[<a href="https://msdn.microsoft.com/zh-tw/library/system.web.security.formsauthenticationticket.userdata.aspx" title="FormsAuthenticationTicket.UserData 屬性" target="_blank" rel="noopener">FormsAuthenticationTicket.UserData 屬性</a>]</strong><br><strong>[<a href="https://app.pluralsight.com/player?course=mvc-applications-10-extension-points-improving&author=alex-wolf&name=mvc-applications-10-extension-points-improving-m10&clip=2&mode=live&start=89.741627&noteid=0c402383-86b5-4606-abc6-a9eea92dc6b5" title="Authorize Filter" target="_blank" rel="noopener">自訂 Authorize Filter</a>]</strong></p>
 
             
+
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
@@ -316,66 +327,82 @@
 
             </div>
         
-        <div class="post-actions-wrap">
+        
+            <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/自訂-AuthorizeFilter/"  data-tooltip="自訂 AuthorizeFilter">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/自訂-AuthorizeFilter/" data-tooltip="自訂 AuthorizeFilter" aria-label="PREVIOUS: 自訂 AuthorizeFilter">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/啟用-Action-Filter-Property-Injection-與-註冊-Web-Abstractions/" data-tooltip="啟用 Action Filter Property Injection 與 註冊 Web Abstractions">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/啟用-Action-Filter-Property-Injection-與-註冊-Web-Abstractions/" data-tooltip="啟用 Action Filter Property Injection 與 註冊 Web Abstractions" aria-label="NEXT: 啟用 Action Filter Property Injection 與 註冊 Web Abstractions">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
 </div>
 
 
+        
         
             
                 <div id="disqus_thread">
@@ -402,55 +429,69 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/自訂-AuthorizeFilter/"  data-tooltip="自訂 AuthorizeFilter">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/自訂-AuthorizeFilter/" data-tooltip="自訂 AuthorizeFilter" aria-label="PREVIOUS: 自訂 AuthorizeFilter">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/啟用-Action-Filter-Property-Injection-與-註冊-Web-Abstractions/" data-tooltip="啟用 Action Filter Property Injection 與 註冊 Web Abstractions">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/啟用-Action-Filter-Property-Injection-與-註冊-Web-Abstractions/" data-tooltip="啟用 Action Filter Property Injection 與 註冊 Web Abstractions" aria-label="NEXT: 啟用 Action Filter Property Injection 與 註冊 Web Abstractions">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -459,25 +500,35 @@
 
                 </div>
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
     <ul class="share-options">
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
-                <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
-                <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
-                <i class="fa fa-twitter"></i><span>Share on Twitter</span>
-            </a>
-        </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
+                    <i class="fa fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/ASP-NET-表單驗證/">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i><span>Share on Google Plus</span>
+                </a>
+            </li>
+        
     </ul>
 </div>
-<div id="share-options-mask" class="share-options-mask"></div>
 
             
         </div>
@@ -517,11 +568,12 @@
     </div>
 </div>
 
-        <div id="algolia-search-modal" class="modal-container">
+        
+            <div id="algolia-search-modal" class="modal-container">
     <div class="modal">
         <div class="modal-header">
             <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
                 <span class="searchby-algolia-text text-color-light text-small">by</span>
                 <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
             </a>
@@ -529,7 +581,7 @@
             <form id="algolia-search-form">
                 <input type="text" id="algolia-search-input" name="search"
                     class="form-control input--large search-input" placeholder="Search "
-                    autofocus="autofocus"/>
+                    />
             </form>
         </div>
         <div class="modal-body">
@@ -623,7 +675,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -773,13 +825,12 @@
         </div>
     </div>
 </div>
+
+        
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-yhuo2grt8r7qkqumzgjoglkfbicl1thukjgmla6jopu56zpcowfedi5zjcor.min.js"></script>
 <!--SCRIPTS END-->
 
     
@@ -802,13 +853,13 @@
     
 
 
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
     <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
     <script>
         var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
         var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
     </script>
+
 
     </body>
 </html>

@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en,zh-tw,ja,default">
+<html lang="en,zh-tw,default">
     
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
     <title>DI 地雷之生命週期很重要 - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,C#,.NET,Autofac">
+        <meta name="keywords" content="C#,.NET,Autofac">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,24 +17,24 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <meta name="description" content="目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:
-DI 的三種生命週期很重要!!  不要亂設定!!">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg"},"articleBody":"目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:\nDI 的三種生命週期很重要!!  不要亂設定!!\n\n\n前提概要因為我最近都在整合 PayPal 的服務，所以很常要寫程式發 http request，而我用的則是 RestSharp 這個套件，他是一個只要設定網址、header、body等等…就能夠很輕易地發送 http request。\n根據 PayPal API 的規範，在使用付款或者建立發票等等的 API ，要先去呼叫 OAuth API 取的 token。\n所以我程式就這樣設計\n\n使用 RestSharp 套件的 RestClient 發送 http request\nPayPalService 使用 RestClient\n  呼叫 OAuth API 取得 token。\nInvoiceService 使用 RestClient\n  呼叫發票相關 API 建立發票，而在呼叫建立發票 request 的時後，要傳入 token。\n\n程式範例為了讓程式能夠更容易了解，我有將原本的程式碼簡化，而這三個類別程式碼如下\n\nPayPalService 與 InvoiceService 都是呼叫 restClient.Url 設定網址，接下來就是發送 request\n\ncodeRestClientPayPalServiceInvoiceService123456789public class RestClient : IRestClient{    public string Url { get; set; }    public string SendRequest(RestRequest request)    {        return $\"I use this url:{Url} send request\";    }}1234567891011121314151617181920public class PayPalService : IPayPalService{    private IRestClient _restClient;    public PayPalService(IRestClient restClient)    {        this._restClient = restClient;    }    public string GetToken()    {        string url = @\"https://api.PayPal/GetToken/xxx\";        _restClient.Url = url;        var request = new RestRequest(Method.POST);                    string result = _restClient.SendRequest(request);        return result;    }}12345678910111213141516171819202122232425public class InvoiceService : IInvoiceService{    private IRestClient _restClient;    private IPayPalService _payPalService;    public InvoiceService(        IRestClient restClient,        IPayPalService payPalService)    {        this._restClient = restClient;        this._payPalService = payPalService;    }    public void CreateInvoice()    {        string url = @\"https://api.PayPal/xxx/invoice\";        _restClient.Url = url;        string token = this._payPalService.GetToken();        var request = new RestRequest(Method.POST);                    request.AddHeader(\"authorization\", $\"{token}\");                                string result = _restClient.SendRequest(request);    }}\n接下來我有一個 ValuesController 建構式注入 IInvoiceService， 並且有一個建立發票的API。\nValuesControllercs12345678910111213141516public class ValuesController : ApiController{    private IInvoiceService _invoiceService;    public ValuesController(IInvoiceService invoiceService)    {        this._invoiceService = invoiceService;    }        [HttpGet]    public IHttpActionResult CreateInvoice()    {        this._invoiceService.CreateInvoice();        return Ok();    }}\n程式碼跑執行之網址改變了Url 改變了 !!\n為什麼會這樣因為我 DI 注入的時候使用 InstancePerLifetimeScope 的生命週期\n\n意思是說，只要是同一個 request 就會使用同一個物件 !!!\nPayPalService 與 InvoiceService 使用的是同一個 RestClient 物件\n所以在取得 Token 的時候，把 InvoiceService 設定好的 Url 覆寫掉了\n\nDI 三種生命週期\nSingleInstance           : 整個應用程式都是使用同一個物件\nInstancePerLifetimeScope : 只要是同一個 request 則使用同一個物件\nInstancePerDependency    : 只要有注入都是一個全新的物件\n\n所以我只要將 RestClient 注入的生命週期改成 InstancePerDependency，問題就會解決了。\n\n執行結果Url 沒有改變 !!\n參考docs.autofac.org","dateCreated":"2017-06-30T18:50:44+08:00","dateModified":"2018-04-11T23:19:56+08:00","datePublished":"2017-06-30T18:50:44+08:00","description":"目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:\nDI 的三種生命週期很重要!!  不要亂設定!!\n","headline":"DI 地雷之生命週期很重要","image":["Inject.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/","keywords":".NET, C#, Autofac","thumbnailUrl":"Inject.jpg"}</script>
+    <meta name="description" content="目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說: DI 的三種生命週期很重要!!  不要亂設定!!">
+<meta name="keywords" content="C#,.NET,Autofac">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="DI 地雷之生命週期很重要">
 <meta property="og:url" content="https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/index.html">
-<meta property="og:site_name" content="Miles's Journey">
-<meta property="og:description" content="目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:
-DI 的三種生命週期很重要!!  不要亂設定!!">
-<meta property="og:image" content="https://mileslin.github.io/UrlChange.gif">
-<meta property="og:image" content="https://mileslin.github.io/Inject.jpg">
-<meta property="og:image" content="https://mileslin.github.io/InstancePerDependency.jpg">
-<meta property="og:image" content="https://mileslin.github.io/UrlNoChange.gif">
-<meta property="og:updated_time" content="2017-07-02T11:35:37.714Z">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說: DI 的三種生命週期很重要!!  不要亂設定!!">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/UrlChange.gif">
+<meta property="og:image" content="https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/Inject.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/InstancePerDependency.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/UrlNoChange.gif">
+<meta property="og:updated_time" content="2018-04-11T15:19:56.046Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="DI 地雷之生命週期很重要">
-<meta name="twitter:description" content="目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:
-DI 的三種生命週期很重要!!  不要亂設定!!">
-<meta name="twitter:image" content="https://mileslin.github.io/UrlChange.gif">
+<meta name="twitter:description" content="目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說: DI 的三種生命週期很重要!!  不要亂設定!!">
+<meta name="twitter:image" content="https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/UrlChange.gif">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -50,22 +50,19 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="/assets/css/style-1udptkpril81ozu8ifd8zpujn7ipu7lefxsiu5gxx0dpnzntdx6dusvki3ao.min.css">
     <!--STYLES END-->
     
     <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-90394318-1']);
-        _gaq.push(['_trackPageview']);
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-90394318-1', 'auto');
+        ga('send', 'pageview');
     </script>
+
 
     
 </head>
@@ -123,9 +120,10 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
                         <a  class="sidebar-button-link "
                              href="/ "
                             
+                            title="Home"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
@@ -135,9 +133,10 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
                         <a  class="sidebar-button-link "
                              href="/all-categories"
                             
+                            title="Categories"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
@@ -147,9 +146,10 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
                         <a  class="sidebar-button-link "
                              href="/all-tags"
                             
+                            title="Tags"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
@@ -159,9 +159,10 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
                         <a  class="sidebar-button-link "
                              href="/all-archives"
                             
+                            title="Archives"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
                     </a>
             </li>
@@ -171,9 +172,10 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
                         <a  class="sidebar-button-link open-algolia-search"
                              href="#search"
                             
+                            title="Search"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-search"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
                     </a>
             </li>
@@ -183,9 +185,10 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
                         <a  class="sidebar-button-link "
                              href="#about"
                             
+                            title="About"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -196,36 +199,36 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank">
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-linkedin"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank">
+                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank" rel="noopener" title="Mail">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail</span>
                     </a>
             </li>
@@ -239,9 +242,10 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
                         <a  class="sidebar-button-link "
                              href="/atom.xml"
                             
+                            title="RSS"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
@@ -257,17 +261,18 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+<article class="post">
     
     
         <div class="post-header main-content-wrap text-left">
     
-        <h1 class="post-title" itemprop="headline">
+        <h1 class="post-title">
             DI 地雷之生命週期很重要
         </h1>
     
-    <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-06-30T18:50:44+08:00">
+    
+        <div class="post-meta">
+    <time datetime="2017-06-30T18:50:44+08:00">
 	
 		    Jun 30, 2017
     	
@@ -281,19 +286,21 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
     
 </div>
 
-</div>
     
-    <div class="post-content markdown" itemprop="articleBody">
+</div>
+
+    
+    <div class="post-content markdown">
         <div class="main-content-wrap">
             <p>目前為止設定 DI 都是按照官方的文件設定一下，就放著不理他了。  結果今天踩到一個超級大雷，所以我要鄭重地說:</p>
 <div class="alert warning"><p>DI 的三種生命週期很重要!!  不要亂設定!!</p>
 </div>
 <a id="more"></a>
-<h2 id="前提概要"><a href="#前提概要" class="headerlink" title="前提概要"></a>前提概要</h2><p>因為我最近都在整合 PayPal 的服務，所以很常要寫程式發 <code>http request</code>，而我用的則是 <a href="http://restsharp.org/" title="RestSharp" target="_blank" rel="external">RestSharp</a> 這個套件，他是一個只要設定網址、header、body等等…就能夠很輕易地發送 <code>http request</code>。</p>
+<h2 id="前提概要"><a href="#前提概要" class="headerlink" title="前提概要"></a>前提概要</h2><p>因為我最近都在整合 PayPal 的服務，所以很常要寫程式發 <code>http request</code>，而我用的則是 <a href="http://restsharp.org/" title="RestSharp" target="_blank" rel="noopener">RestSharp</a> 這個套件，他是一個只要設定網址、header、body等等…就能夠很輕易地發送 <code>http request</code>。</p>
 <p>根據 PayPal API 的規範，在使用付款或者建立發票等等的 API ，要先去呼叫 OAuth API 取的 token。</p>
 <p>所以我程式就這樣設計</p>
 <ul>
-<li>使用 <a href="http://restsharp.org/" title="RestSharp" target="_blank" rel="external">RestSharp</a> 套件的 RestClient 發送 <code>http request</code></li>
+<li>使用 <a href="http://restsharp.org/" title="RestSharp" target="_blank" rel="noopener">RestSharp</a> 套件的 RestClient 發送 <code>http request</code></li>
 <li>PayPalService 使用 <span class="highlight-text success">RestClient
  </span> 呼叫 OAuth API 取得 token。</li>
 <li>InvoiceService 使用 <span class="highlight-text success">RestClient
@@ -305,10 +312,10 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
 </div>
 <figure class="codeblock codeblock--tabbed"><figcaption><span>code</span><ul class="tabs"><li class="tab active">RestClient</li><li class="tab">PayPalService</li><li class="tab">InvoiceService</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class RestClient : IRestClient</span><br><span class="line">{</span><br><span class="line">    public string Url { get; set; }</span><br><span class="line"></span><br><span class="line">    public string SendRequest(RestRequest request)</span><br><span class="line">    {</span><br><span class="line">        return $"I use this url:{Url} send request";</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><figure class="highlight plain" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class PayPalService : IPayPalService</span><br><span class="line">{</span><br><span class="line">    private IRestClient _restClient;</span><br><span class="line"></span><br><span class="line">    public PayPalService(IRestClient restClient)</span><br><span class="line">    {</span><br><span class="line">        this._restClient = restClient;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    public string GetToken()</span><br><span class="line">    {</span><br><span class="line">        string url = @"https://api.PayPal/GetToken/xxx";</span><br><span class="line">        _restClient.Url = url;</span><br><span class="line"></span><br><span class="line">        var request = new RestRequest(Method.POST);            </span><br><span class="line">        string result = _restClient.SendRequest(request);</span><br><span class="line"></span><br><span class="line">        return result;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><figure class="highlight plain" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public class InvoiceService : IInvoiceService</span><br><span class="line">{</span><br><span class="line">    private IRestClient _restClient;</span><br><span class="line">    private IPayPalService _payPalService;</span><br><span class="line">    public InvoiceService(</span><br><span class="line">        IRestClient restClient,</span><br><span class="line">        IPayPalService payPalService)</span><br><span class="line">    {</span><br><span class="line">        this._restClient = restClient;</span><br><span class="line">        this._payPalService = payPalService;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    public void CreateInvoice()</span><br><span class="line">    {</span><br><span class="line">        string url = @"https://api.PayPal/xxx/invoice";</span><br><span class="line">        _restClient.Url = url;</span><br><span class="line"></span><br><span class="line">        string token = this._payPalService.GetToken();</span><br><span class="line"></span><br><span class="line">        var request = new RestRequest(Method.POST);            </span><br><span class="line">        request.AddHeader("authorization", $"{token}");                        </span><br><span class="line">        string result = _restClient.SendRequest(request);</span><br><span class="line"></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
 <p>接下來我有一個 <code>ValuesController</code> 建構式注入 <code>IInvoiceService</code>， 並且有一個建立發票的API。</p>
-<figure class="codeblock codeblock--tabbed"><figcaption><span>ValuesController</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ValuesController</span> : <span class="title">ApiController</span></span><br><span class="line">{</span><br><span class="line">    <span class="keyword">private</span> IInvoiceService _invoiceService;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ValuesController</span>(<span class="params">IInvoiceService invoiceService</span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">this</span>._invoiceService = invoiceService;</span><br><span class="line">    }</span><br><span class="line">    </span><br><span class="line">    [HttpGet]</span><br><span class="line">    <span class="function"><span class="keyword">public</span> IHttpActionResult <span class="title">CreateInvoice</span>(<span class="params"></span>)</span><br><span class="line">    </span>{</span><br><span class="line">        <span class="keyword">this</span>._invoiceService.CreateInvoice();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Ok();</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
-<h4 id="程式碼跑執行之網址改變了"><a href="#程式碼跑執行之網址改變了" class="headerlink" title="程式碼跑執行之網址改變了"></a>程式碼跑執行之網址改變了</h4><div class="figure " style="width:;"><a class="fancybox" href="UrlChange.gif" title="Url 改變了 !!" data-fancybox-group=""><img class="fig-img" src="UrlChange.gif" alt="Url 改變了 !!"></a><span class="caption">Url 改變了 !!</span></div><div style="clear:both;"></div>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>ValuesController</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ValuesController</span> : <span class="title">ApiController</span></span><br><span class="line">{</span><br><span class="line">    <span class="keyword">private</span> IInvoiceService _invoiceService;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ValuesController</span>(<span class="params">IInvoiceService invoiceService</span>)</span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="keyword">this</span>._invoiceService = invoiceService;</span><br><span class="line">    }</span><br><span class="line">    </span><br><span class="line">    [<span class="meta">HttpGet</span>]</span><br><span class="line">    <span class="function"><span class="keyword">public</span> IHttpActionResult <span class="title">CreateInvoice</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="keyword">this</span>._invoiceService.CreateInvoice();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Ok();</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h4 id="程式碼跑執行之網址改變了"><a href="#程式碼跑執行之網址改變了" class="headerlink" title="程式碼跑執行之網址改變了"></a>程式碼跑執行之網址改變了</h4><div class="figure " style="width:;"><a class="fancybox" href="UrlChange.gif" title="Url 改變了 !!" data-caption="Url 改變了 !!" data-fancybox="default"><img class="fig-img" src="UrlChange.gif" alt="Url 改變了 !!"></a><span class="caption">Url 改變了 !!</span></div><div style="clear:both;"></div>
 <h3 id="為什麼會這樣"><a href="#為什麼會這樣" class="headerlink" title="為什麼會這樣"></a>為什麼會這樣</h3><p>因為我 DI 注入的時候使用 <code>InstancePerLifetimeScope</code> 的生命週期</p>
-<div class="figure " style="width:;"><a class="fancybox" href="Inject.jpg" title="" data-fancybox-group=""><img class="fig-img" src="Inject.jpg" alt=""></a></div>
+<div class="figure " style="width:;"><a class="fancybox" href="Inject.jpg" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="Inject.jpg" alt=""></a></div>
 <div class="alert danger no-icon"><p>意思是說，只要是同一個 request 就會使用同一個物件 !!!</p>
 <p>PayPalService 與 InvoiceService 使用的是同一個 RestClient 物件</p>
 <p>所以在取得 Token 的時候，把 InvoiceService 設定好的 Url 覆寫掉了</p>
@@ -319,10 +326,11 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
 <li>InstancePerDependency    : 只要有注入都是一個全新的物件</li>
 </ul>
 <p>所以我只要將 RestClient 注入的生命週期改成 <code>InstancePerDependency</code>，問題就會解決了。</p>
-<div class="figure " style="width:;"><a class="fancybox" href="InstancePerDependency.jpg" title="" data-fancybox-group=""><img class="fig-img" src="InstancePerDependency.jpg" alt=""></a></div>
-<p>執行結果<br><div class="figure " style="width:;"><a class="fancybox" href="UrlNoChange.gif" title="Url 沒有改變 !!" data-fancybox-group=""><img class="fig-img" src="UrlNoChange.gif" alt="Url 沒有改變 !!"></a><span class="caption">Url 沒有改變 !!</span></div><div style="clear:both;"></div></p>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="http://docs.autofac.org/en/latest/lifetime/instance-scope.html#" title="Autofac" target="_blank" rel="external">docs.autofac.org</a>
+<div class="figure " style="width:;"><a class="fancybox" href="InstancePerDependency.jpg" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="InstancePerDependency.jpg" alt=""></a></div>
+<p>執行結果<br><div class="figure " style="width:;"><a class="fancybox" href="UrlNoChange.gif" title="Url 沒有改變 !!" data-caption="Url 沒有改變 !!" data-fancybox="default"><img class="fig-img" src="UrlNoChange.gif" alt="Url 沒有改變 !!"></a><span class="caption">Url 沒有改變 !!</span></div><div style="clear:both;"></div></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="http://docs.autofac.org/en/latest/lifetime/instance-scope.html#" title="Autofac" target="_blank" rel="noopener">docs.autofac.org</a>
             
+
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
@@ -334,66 +342,82 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
 
             </div>
         
-        <div class="post-actions-wrap">
+        
+            <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/Angular-CLI-實用小技巧-1/"  data-tooltip="Angular CLI 實用小技巧 1">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/Angular-CLI-實用小技巧-1/" data-tooltip="Angular CLI 實用小技巧 1" aria-label="PREVIOUS: Angular CLI 實用小技巧 1">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/單元測試Model驗證/" data-tooltip="單元測試 Model 驗證">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/單元測試Model驗證/" data-tooltip="單元測試 Model 驗證" aria-label="NEXT: 單元測試 Model 驗證">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
 </div>
 
 
+        
         
             
                 <div id="disqus_thread">
@@ -420,55 +444,69 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/Angular-CLI-實用小技巧-1/"  data-tooltip="Angular CLI 實用小技巧 1">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/Angular-CLI-實用小技巧-1/" data-tooltip="Angular CLI 實用小技巧 1" aria-label="PREVIOUS: Angular CLI 實用小技巧 1">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/單元測試Model驗證/" data-tooltip="單元測試 Model 驗證">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/06/單元測試Model驗證/" data-tooltip="單元測試 Model 驗證" aria-label="NEXT: 單元測試 Model 驗證">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -477,25 +515,35 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
 
                 </div>
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
     <ul class="share-options">
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
-                <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
-                <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
-                <i class="fa fa-twitter"></i><span>Share on Twitter</span>
-            </a>
-        </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
+                    <i class="fa fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/06/DI-地雷之生命週期很重要/">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i><span>Share on Google Plus</span>
+                </a>
+            </li>
+        
     </ul>
 </div>
-<div id="share-options-mask" class="share-options-mask"></div>
 
             
         </div>
@@ -535,11 +583,12 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
     </div>
 </div>
 
-        <div id="algolia-search-modal" class="modal-container">
+        
+            <div id="algolia-search-modal" class="modal-container">
     <div class="modal">
         <div class="modal-header">
             <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
                 <span class="searchby-algolia-text text-color-light text-small">by</span>
                 <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
             </a>
@@ -547,7 +596,7 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
             <form id="algolia-search-form">
                 <input type="text" id="algolia-search-input" name="search"
                     class="form-control input--large search-input" placeholder="Search "
-                    autofocus="autofocus"/>
+                    />
             </form>
         </div>
         <div class="modal-body">
@@ -641,7 +690,7 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -791,13 +840,12 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
         </div>
     </div>
 </div>
+
+        
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-yhuo2grt8r7qkqumzgjoglkfbicl1thukjgmla6jopu56zpcowfedi5zjcor.min.js"></script>
 <!--SCRIPTS END-->
 
     
@@ -820,13 +868,13 @@ DI 的三種生命週期很重要!!  不要亂設定!!">
     
 
 
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
     <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
     <script>
         var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
         var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
     </script>
+
 
     </body>
 </html>

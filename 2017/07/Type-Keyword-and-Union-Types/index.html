@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en,zh-tw,ja,default">
+<html lang="en,zh-tw,default">
     
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
     <title>Type Keyword and Union Types - Miles&#39;s Journey</title>
     <meta name="author" content="Miles">
     
-        <meta name="keywords" content=".NET,typescript">
+        <meta name="keywords" content="typescript">
     
     
         <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
@@ -17,22 +17,25 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg"},"articleBody":"Type Keyword 是 typescript 能將型別取一個別名的方式，例如我將型別 string assign 給 myType，之後就可以用 myType 來定義變數的型別。type keywordts123type myType = string;let a: myType = 'hello';let b: myType = 10; // Type 'number' is not assignable to type 'string'\n\n限定傳入字串的值其中還有一種用法，就可以限制限定 myType 只能允許是有些特定字串的值，例如我只允許字串只能輸入 &quot;cash&quot; ，輸入其他字串則會顯示錯誤。myType_Cash\n搭配使用 Union Types搭配使用 Union Types ，可以讓傳入字串有更多選擇，例如我允許字串只能輸入 &quot;cash&quot;、&quot;credit&quot;、&quot;paypal&quot;union_type\n可以不要有別名，直接在 function 參數裡面直接定義能傳入那些字串define_in_function\n可用自訂義的型別Union Types 也可以用自訂義的型別或介面use_interface_and_class\n可以自訂義 function typecallback\n參考[type keyword][typescript online]\n","dateCreated":"2017-07-24T23:49:42+08:00","dateModified":"2018-04-11T23:19:56+08:00","datePublished":"2017-07-24T23:49:42+08:00","description":"Type Keyword 是 typescript 能將型別取一個別名的方式，例如我將型別 string assign 給 myType，之後就可以用 myType 來定義變數的型別。type keywordts123type myType = string;let a: myType = 'hello';let b: myType = 10; // Type 'number' is not assignable to type 'string'","headline":"Type Keyword and Union Types","image":["myType_Cash.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/","keywords":"typescript","thumbnailUrl":"myType_Cash.jpg"}</script>
     <meta name="description" content="Type Keyword 是 typescript 能將型別取一個別名的方式，例如我將型別 string assign 給 myType，之後就可以用 myType 來定義變數的型別。type keywordts123type myType = string;let a: myType = &apos;hello&apos;;let b: myType = 10; // Type &apos;number&apos; is not as">
+<meta name="keywords" content="typescript">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Type Keyword and Union Types">
 <meta property="og:url" content="https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/index.html">
-<meta property="og:site_name" content="Miles's Journey">
+<meta property="og:site_name" content="Miles&#39;s Journey">
 <meta property="og:description" content="Type Keyword 是 typescript 能將型別取一個別名的方式，例如我將型別 string assign 給 myType，之後就可以用 myType 來定義變數的型別。type keywordts123type myType = string;let a: myType = &apos;hello&apos;;let b: myType = 10; // Type &apos;number&apos; is not as">
-<meta property="og:image" content="https://mileslin.github.io/myType_Cash.jpg">
-<meta property="og:image" content="https://mileslin.github.io/union_type.jpg">
-<meta property="og:image" content="https://mileslin.github.io/define_in_function.jpg">
-<meta property="og:image" content="https://mileslin.github.io/use_interface_and_class.jpg">
-<meta property="og:image" content="https://mileslin.github.io/callback.jpg">
-<meta property="og:updated_time" content="2017-07-24T16:30:43.456Z">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/myType_Cash.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/union_type.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/define_in_function.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/use_interface_and_class.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/callback.jpg">
+<meta property="og:updated_time" content="2018-04-11T15:19:56.097Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Type Keyword and Union Types">
 <meta name="twitter:description" content="Type Keyword 是 typescript 能將型別取一個別名的方式，例如我將型別 string assign 給 myType，之後就可以用 myType 來定義變數的型別。type keywordts123type myType = string;let a: myType = &apos;hello&apos;;let b: myType = 10; // Type &apos;number&apos; is not as">
-<meta name="twitter:image" content="https://mileslin.github.io/myType_Cash.jpg">
+<meta name="twitter:image" content="https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/myType_Cash.jpg">
 <meta name="twitter:creator" content="@MilesLin2016">
     
     
@@ -48,22 +51,19 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox-thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="/assets/css/style-1udptkpril81ozu8ifd8zpujn7ipu7lefxsiu5gxx0dpnzntdx6dusvki3ao.min.css">
     <!--STYLES END-->
     
     <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-90394318-1']);
-        _gaq.push(['_trackPageview']);
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-90394318-1', 'auto');
+        ga('send', 'pageview');
     </script>
+
 
     
 </head>
@@ -121,9 +121,10 @@
                         <a  class="sidebar-button-link "
                              href="/ "
                             
+                            title="Home"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
@@ -133,9 +134,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-categories"
                             
+                            title="Categories"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
@@ -145,9 +147,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-tags"
                             
+                            title="Tags"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
@@ -157,9 +160,10 @@
                         <a  class="sidebar-button-link "
                              href="/all-archives"
                             
+                            title="Archives"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
                     </a>
             </li>
@@ -169,9 +173,10 @@
                         <a  class="sidebar-button-link open-algolia-search"
                              href="#search"
                             
+                            title="Search"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-search"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
                     </a>
             </li>
@@ -181,9 +186,10 @@
                         <a  class="sidebar-button-link "
                              href="#about"
                             
+                            title="About"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -194,36 +200,36 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank">
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-linkedin"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank">
+                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank">
+                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank" rel="noopener" title="Mail">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail</span>
                     </a>
             </li>
@@ -237,9 +243,10 @@
                         <a  class="sidebar-button-link "
                              href="/atom.xml"
                             
+                            title="RSS"
                         >
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                        <i class="sidebar-button-icon fa fa-lg fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
@@ -255,17 +262,18 @@
                         hasCoverMetaIn
                         ">
                 
-<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+<article class="post">
     
     
         <div class="post-header main-content-wrap text-left">
     
-        <h1 class="post-title" itemprop="headline">
+        <h1 class="post-title">
             Type Keyword and Union Types
         </h1>
     
-    <div class="post-meta">
-    <time itemprop="datePublished" datetime="2017-07-24T23:49:42+08:00">
+    
+        <div class="post-meta">
+    <time datetime="2017-07-24T23:49:42+08:00">
 	
 		    Jul 24, 2017
     	
@@ -279,20 +287,23 @@
     
 </div>
 
-</div>
     
-    <div class="post-content markdown" itemprop="articleBody">
+</div>
+
+    
+    <div class="post-content markdown">
         <div class="main-content-wrap">
             <p>Type Keyword 是 typescript 能將型別取一個別名的方式，例如我將型別 <code>string</code> assign 給 myType，之後就可以用 myType 來定義變數的型別。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>type keyword</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> myType = <span class="built_in">string</span>;</span><br><span class="line"><span class="keyword">let</span> a: myType = <span class="string">'hello'</span>;</span><br><span class="line"><span class="keyword">let</span> b: myType = <span class="number">10</span>; <span class="comment">// Type 'number' is not assignable to type 'string'</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
 <a id="more"></a>
-<h2 id="限定傳入字串的值"><a href="#限定傳入字串的值" class="headerlink" title="限定傳入字串的值"></a>限定傳入字串的值</h2><p>其中還有一種用法，就可以限制限定 myType 只能允許是有些特定字串的值，例如我只允許字串只能輸入 <code>&quot;cash&quot;</code> ，輸入其他字串則會顯示錯誤。<br><div class="figure " style="width:;"><a class="fancybox" href="myType_Cash.jpg" title="myType_Cash" data-fancybox-group=""><img class="fig-img" src="myType_Cash.jpg" alt="myType_Cash"></a><span class="caption">myType_Cash</span></div></p>
-<h2 id="搭配使用-Union-Types"><a href="#搭配使用-Union-Types" class="headerlink" title="搭配使用 Union Types"></a>搭配使用 Union Types</h2><p>搭配使用 Union Types ，可以讓傳入字串有更多選擇，例如我允許字串只能輸入 <code>&quot;cash&quot;</code>、<code>&quot;credit&quot;</code>、<code>&quot;paypal&quot;</code><br><div class="figure " style="width:;"><a class="fancybox" href="union_type.jpg" title="union_type" data-fancybox-group=""><img class="fig-img" src="union_type.jpg" alt="union_type"></a><span class="caption">union_type</span></div></p>
-<p><strong>可以不要有別名，直接在 function 參數裡面直接定義能傳入那些字串</strong><br><div class="figure " style="width:;"><a class="fancybox" href="define_in_function.jpg" title="define_in_function" data-fancybox-group=""><img class="fig-img" src="define_in_function.jpg" alt="define_in_function"></a><span class="caption">define_in_function</span></div></p>
-<h2 id="可用自訂義的型別"><a href="#可用自訂義的型別" class="headerlink" title="可用自訂義的型別"></a>可用自訂義的型別</h2><p>Union Types 也可以用自訂義的型別或介面<br><div class="figure " style="width:;"><a class="fancybox" href="use_interface_and_class.jpg" title="use_interface_and_class" data-fancybox-group=""><img class="fig-img" src="use_interface_and_class.jpg" alt="use_interface_and_class"></a><span class="caption">use_interface_and_class</span></div></p>
-<p><strong>可以自訂義 function type</strong><br><div class="figure " style="width:;"><a class="fancybox" href="callback.jpg" title="callback" data-fancybox-group=""><img class="fig-img" src="callback.jpg" alt="callback"></a><span class="caption">callback</span></div></p>
-<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://angular-2-training-book.rangle.io/handout/features/type_keyword.html" title="type keyword" target="_blank" rel="external">type keyword</a>]</strong><br><strong>[<a href="http://www.typescriptlang.org/play/" title="typescript online" target="_blank" rel="external">typescript online</a>]</strong></p>
+<h2 id="限定傳入字串的值"><a href="#限定傳入字串的值" class="headerlink" title="限定傳入字串的值"></a>限定傳入字串的值</h2><p>其中還有一種用法，就可以限制限定 myType 只能允許是有些特定字串的值，例如我只允許字串只能輸入 <code>&quot;cash&quot;</code> ，輸入其他字串則會顯示錯誤。<br><div class="figure " style="width:;"><a class="fancybox" href="myType_Cash.jpg" title="myType_Cash" data-caption="myType_Cash" data-fancybox="default"><img class="fig-img" src="myType_Cash.jpg" alt="myType_Cash"></a><span class="caption">myType_Cash</span></div></p>
+<h2 id="搭配使用-Union-Types"><a href="#搭配使用-Union-Types" class="headerlink" title="搭配使用 Union Types"></a>搭配使用 Union Types</h2><p>搭配使用 Union Types ，可以讓傳入字串有更多選擇，例如我允許字串只能輸入 <code>&quot;cash&quot;</code>、<code>&quot;credit&quot;</code>、<code>&quot;paypal&quot;</code><br><div class="figure " style="width:;"><a class="fancybox" href="union_type.jpg" title="union_type" data-caption="union_type" data-fancybox="default"><img class="fig-img" src="union_type.jpg" alt="union_type"></a><span class="caption">union_type</span></div></p>
+<p><strong>可以不要有別名，直接在 function 參數裡面直接定義能傳入那些字串</strong><br><div class="figure " style="width:;"><a class="fancybox" href="define_in_function.jpg" title="define_in_function" data-caption="define_in_function" data-fancybox="default"><img class="fig-img" src="define_in_function.jpg" alt="define_in_function"></a><span class="caption">define_in_function</span></div></p>
+<h2 id="可用自訂義的型別"><a href="#可用自訂義的型別" class="headerlink" title="可用自訂義的型別"></a>可用自訂義的型別</h2><p>Union Types 也可以用自訂義的型別或介面<br><div class="figure " style="width:;"><a class="fancybox" href="use_interface_and_class.jpg" title="use_interface_and_class" data-caption="use_interface_and_class" data-fancybox="default"><img class="fig-img" src="use_interface_and_class.jpg" alt="use_interface_and_class"></a><span class="caption">use_interface_and_class</span></div></p>
+<p><strong>可以自訂義 function type</strong><br><div class="figure " style="width:;"><a class="fancybox" href="callback.jpg" title="callback" data-caption="callback" data-fancybox="default"><img class="fig-img" src="callback.jpg" alt="callback"></a><span class="caption">callback</span></div></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://angular-2-training-book.rangle.io/handout/features/type_keyword.html" title="type keyword" target="_blank" rel="noopener">type keyword</a>]</strong><br><strong>[<a href="http://www.typescriptlang.org/play/" title="typescript online" target="_blank" rel="noopener">typescript online</a>]</strong></p>
 
             
+
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
@@ -304,66 +315,82 @@
 
             </div>
         
-        <div class="post-actions-wrap">
+        
+            <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/泛型轉型的小技巧/"  data-tooltip="泛型轉型的小技巧">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/泛型轉型的小技巧/" data-tooltip="泛型轉型的小技巧" aria-label="PREVIOUS: 泛型轉型的小技巧">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/自訂-AuthorizeFilter/" data-tooltip="自訂 AuthorizeFilter">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/自訂-AuthorizeFilter/" data-tooltip="自訂 AuthorizeFilter" aria-label="NEXT: 自訂 AuthorizeFilter">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
 </div>
 
 
+        
         
             
                 <div id="disqus_thread">
@@ -390,55 +417,69 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/泛型轉型的小技巧/"  data-tooltip="泛型轉型的小技巧">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/泛型轉型的小技巧/" data-tooltip="泛型轉型的小技巧" aria-label="PREVIOUS: 泛型轉型的小技巧">
                 
-                    <i class="fa fa-angle-left"></i>
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
                 </a>
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/自訂-AuthorizeFilter/" data-tooltip="自訂 AuthorizeFilter">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/自訂-AuthorizeFilter/" data-tooltip="自訂 AuthorizeFilter" aria-label="NEXT: 自訂 AuthorizeFilter">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
-                    <i class="fa fa-angle-right"></i>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </a>
             </li>
         </ul>
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
-                <i class="fa fa-share-alt"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
-                <i class="fa fa-google-plus"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
-                <i class="fa fa-facebook-official"></i>
-            </a>
-        </li>
-        <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
-                <i class="fa fa-twitter"></i>
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
         
-            <li class="post-action">
-                <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                    <i class="fa fa-comment-o"></i>
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/" title="Share on Facebook">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/" title="Share on Twitter">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/" title="Share on Google Plus">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment-o"></i>
+                    </a>
+                </li>
+            
+        
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
-                <i class="fa fa-list"></i>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -447,25 +488,35 @@
 
                 </div>
                 <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+    <i id="btn-close-shareoptions" class="fa fa-close"></i>
     <ul class="share-options">
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
-                <i class="fa fa-google-plus"></i><span>Share on Google Plus</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
-                <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
-            </a>
-        </li>
-        <li class="share-option">
-            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
-                <i class="fa fa-twitter"></i><span>Share on Twitter</span>
-            </a>
-        </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
+                    <i class="fa fa-facebook-official" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
+                    <i class="fa fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Type-Keyword-and-Union-Types/">
+                    <i class="fa fa-google-plus" aria-hidden="true"></i><span>Share on Google Plus</span>
+                </a>
+            </li>
+        
     </ul>
 </div>
-<div id="share-options-mask" class="share-options-mask"></div>
 
             
         </div>
@@ -505,11 +556,12 @@
     </div>
 </div>
 
-        <div id="algolia-search-modal" class="modal-container">
+        
+            <div id="algolia-search-modal" class="modal-container">
     <div class="modal">
         <div class="modal-header">
             <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" class="searchby-algolia text-color-light link-unstyled">
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
                 <span class="searchby-algolia-text text-color-light text-small">by</span>
                 <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
             </a>
@@ -517,7 +569,7 @@
             <form id="algolia-search-form">
                 <input type="text" id="algolia-search-input" name="search"
                     class="form-control input--large search-input" placeholder="Search "
-                    autofocus="autofocus"/>
+                    />
             </form>
         </div>
         <div class="modal-body">
@@ -611,7 +663,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started">Github範例</a> 做說明。<br></div>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -761,13 +813,12 @@
         </div>
     </div>
 </div>
+
+        
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/jquery.fancybox-thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-yhuo2grt8r7qkqumzgjoglkfbicl1thukjgmla6jopu56zpcowfedi5zjcor.min.js"></script>
 <!--SCRIPTS END-->
 
     
@@ -790,13 +841,13 @@
     
 
 
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
     <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
     <script>
         var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
         var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
     </script>
+
 
     </body>
 </html>
