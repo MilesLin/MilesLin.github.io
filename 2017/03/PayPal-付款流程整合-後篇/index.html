@@ -17,7 +17,7 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg"},"articleBody":"延續前篇 PayPal 付款流程整合 前篇\nClient 端整合單純用 Client 整合的話只需要單純用 HTML 跟 JavaScript 就能完成，不需要寫到 Server 端的程式碼。\n\n建立 PayPal app 取得 credentials，傳入 client ID 。\n\n\n在 payment function 使用 paypal.rest.payment.create() 設定付款選項。參考 : 如何建立帳單\n\n在 onAuthorize call back 顯示成功頁面\n\n\n以下程式碼說明如何在正式環境建立一個 $1.00 USD的帳單，當付款成功後，顯示成功頁面。\nSamplehtml1234567891011121314151617181920212223242526272829303132333435363738394041&lt;div id=\"paypal-button\"&gt;&lt;/div&gt; &lt;script src=\"https://www.paypalobjects.com/api/checkout.js\"&gt;&lt;/script&gt;&lt;script&gt;    paypal.Button.render({            env: 'production', // Optional: specify 'sandbox' environment            client: {            sandbox:    'xxxxxxxxx',            production: 'xxxxxxxxx'        },        payment: function() {                    var env    = this.props.env;            var client = this.props.client;                    return paypal.rest.payment.create(env, client, {                transactions: [                    {                        amount: { total: '1.00', currency: 'USD' }                    }                ]            });        },        commit: true, // Optional: show a 'Pay Now' button in the checkout flow        onAuthorize: function(data, actions) {                    // Optional: display a confirmation page here                    return actions.payment.execute().then(function() {                // Show a success page to the buyer            });        }    }, '#paypal-button');&lt;/script&gt;\n範例來源 :Basic client integration\n調整參數說明 :\n\n\n說明\n修改說明\n\n\n\n\n沙盒整合測試\nenv: sandbox\n\n\n立即執行付款\ncommit: true 會顯示 Pay Now 按鈕，沒設定會顯示 Continue 按鈕\n\n\n付款之前顯示確認頁面\n在 onAuthorize call back 可使用 actions.payment.get() 取得帳單和付款人資訊 必須顯示付款確認頁面，否則 actions.payment.execute() 和 actions.payment.get() 會無法使用。\n\n\n\n\nServer 端整合Server 端整合有更多的彈性，更多的控制權來完成付款流程。\n設置 Client 環境\n載入 checkout.js\n設定 payment function 建立帳單\n呼叫 Server 建立帳單\n從建立帳單的 API 取得 paymentID，呼叫resolve(data.paymentID，開始付款人授權流程。\n\n\n設定 onAuthorize 完成付款\n之後的 REST Payments API 呼叫，都需要用到 data.paymentID 和 data.payerID，\n可選擇是否顯示帳單明細\n呼叫 Server 端 執行付款\n\n\n\nSamplehtml123456789101112131415161718192021222324252627282930313233&lt;div id=\"paypal-button\"&gt;&lt;/div&gt;&lt;script src=\"https://www.paypalobjects.com/api/checkout.js\"&gt;&lt;/script&gt;&lt;script&gt;    paypal.Button.render({            env: 'production', // Optional: specify 'sandbox' environment            payment: function(resolve, reject) {                           var CREATE_PAYMENT_URL = 'https://my-store.com/paypal/create-payment';                            paypal.request.post(CREATE_PAYMENT_URL)                .then(function(data) { resolve(data.paymentID); })                .catch(function(err) { reject(err); });        },        onAuthorize: function(data) {                    // Note: you can display a confirmation page before executing                        var EXECUTE_PAYMENT_URL = 'https://my-store.com/paypal/execute-payment';            paypal.request.post(EXECUTE_PAYMENT_URL,                    { paymentID: data.paymentID, payerID: data.payerID })                                    .then(function(data) { /* Go to a success page */ })                .catch(function(err) { /* Go to an error page  */ });        }    }, '#paypal-button');&lt;/script&gt;\n範例來源 :Advanced server integration\nServer 如何整合付款流程說明\nClient 端的 payment method 呼叫 Server\nServer 呼叫 Payments API 建立帳單\n記得呼叫 create-payment API 時，傳入 redirect_urls，當付款完成後，可以在 onAuthorize function 取得 redirect_urls。\n\n繼步驟2，會取得 JSON 回應\nServer 送出回應到 Client 藉以取得 paymentID\n開始初始化付款流程， 在 client 建立的 payment method 從回傳的 JSON 訊息傳 paymentID 到 checkout.js script\n開啟 lightbox 讓付款人同意付款\n\n執行付款使用者同意付款後， checkout.js 會呼叫 onAuthorize call back。執行付款之前，建議可以顯示付款明細\n\n\nonAuthorize call back 呼叫 Server 並傳入 data.paymentID 和 data.payerID，執行付款\nServer 呼叫付款完成 API 完成付款\n\nServer 呼叫 API 步驟測試整合流程要做 end-to-end 測試，須先建立 merchant(Business) 和 buyer(Personal) 帳號，才可以做沙盒環境測試。  建立帳號說明 。\n小結目前只把 PayPal 付款流程大致了解，有這些概念後，再去參考 API 文件應該會容易許多。\n參考PayPal 和 Braintree Demo (包含程式碼)","dateCreated":"2017-03-19T01:29:33+08:00","dateModified":"2018-04-11T23:19:56+08:00","datePublished":"2017-03-19T01:29:33+08:00","description":"延續前篇 PayPal 付款流程整合 前篇","headline":"PayPal 付款流程整合 後篇","image":["http://softstribe.com/wp-content/uploads/2015/11/paypal_2014_logo_detail-290x290.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","mailto:milesasp@gmail.com"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/","keywords":"PayPal","thumbnailUrl":"http://softstribe.com/wp-content/uploads/2015/11/paypal_2014_logo_detail-290x290.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin"],"image":"selfie.jpg"},"articleBody":"延續前篇 PayPal 付款流程整合 前篇\nClient 端整合單純用 Client 整合的話只需要單純用 HTML 跟 JavaScript 就能完成，不需要寫到 Server 端的程式碼。\n\n建立 PayPal app 取得 credentials，傳入 client ID 。\n\n\n在 payment function 使用 paypal.rest.payment.create() 設定付款選項。參考 : 如何建立帳單\n\n在 onAuthorize call back 顯示成功頁面\n\n\n以下程式碼說明如何在正式環境建立一個 $1.00 USD的帳單，當付款成功後，顯示成功頁面。\nSamplehtml1234567891011121314151617181920212223242526272829303132333435363738394041&lt;div id=\"paypal-button\"&gt;&lt;/div&gt; &lt;script src=\"https://www.paypalobjects.com/api/checkout.js\"&gt;&lt;/script&gt;&lt;script&gt;    paypal.Button.render({            env: 'production', // Optional: specify 'sandbox' environment            client: {            sandbox:    'xxxxxxxxx',            production: 'xxxxxxxxx'        },        payment: function() {                    var env    = this.props.env;            var client = this.props.client;                    return paypal.rest.payment.create(env, client, {                transactions: [                    {                        amount: { total: '1.00', currency: 'USD' }                    }                ]            });        },        commit: true, // Optional: show a 'Pay Now' button in the checkout flow        onAuthorize: function(data, actions) {                    // Optional: display a confirmation page here                    return actions.payment.execute().then(function() {                // Show a success page to the buyer            });        }    }, '#paypal-button');&lt;/script&gt;\n範例來源 :Basic client integration\n調整參數說明 :\n\n\n說明\n修改說明\n\n\n\n\n沙盒整合測試\nenv: sandbox\n\n\n立即執行付款\ncommit: true 會顯示 Pay Now 按鈕，沒設定會顯示 Continue 按鈕\n\n\n付款之前顯示確認頁面\n在 onAuthorize call back 可使用 actions.payment.get() 取得帳單和付款人資訊 必須顯示付款確認頁面，否則 actions.payment.execute() 和 actions.payment.get() 會無法使用。\n\n\n\n\nServer 端整合Server 端整合有更多的彈性，更多的控制權來完成付款流程。\n設置 Client 環境\n載入 checkout.js\n設定 payment function 建立帳單\n呼叫 Server 建立帳單\n從建立帳單的 API 取得 paymentID，呼叫resolve(data.paymentID，開始付款人授權流程。\n\n\n設定 onAuthorize 完成付款\n之後的 REST Payments API 呼叫，都需要用到 data.paymentID 和 data.payerID，\n可選擇是否顯示帳單明細\n呼叫 Server 端 執行付款\n\n\n\nSamplehtml123456789101112131415161718192021222324252627282930313233&lt;div id=\"paypal-button\"&gt;&lt;/div&gt;&lt;script src=\"https://www.paypalobjects.com/api/checkout.js\"&gt;&lt;/script&gt;&lt;script&gt;    paypal.Button.render({            env: 'production', // Optional: specify 'sandbox' environment            payment: function(resolve, reject) {                           var CREATE_PAYMENT_URL = 'https://my-store.com/paypal/create-payment';                            paypal.request.post(CREATE_PAYMENT_URL)                .then(function(data) { resolve(data.paymentID); })                .catch(function(err) { reject(err); });        },        onAuthorize: function(data) {                    // Note: you can display a confirmation page before executing                        var EXECUTE_PAYMENT_URL = 'https://my-store.com/paypal/execute-payment';            paypal.request.post(EXECUTE_PAYMENT_URL,                    { paymentID: data.paymentID, payerID: data.payerID })                                    .then(function(data) { /* Go to a success page */ })                .catch(function(err) { /* Go to an error page  */ });        }    }, '#paypal-button');&lt;/script&gt;\n範例來源 :Advanced server integration\nServer 如何整合付款流程說明\nClient 端的 payment method 呼叫 Server\nServer 呼叫 Payments API 建立帳單\n記得呼叫 create-payment API 時，傳入 redirect_urls，當付款完成後，可以在 onAuthorize function 取得 redirect_urls。\n\n繼步驟2，會取得 JSON 回應\nServer 送出回應到 Client 藉以取得 paymentID\n開始初始化付款流程， 在 client 建立的 payment method 從回傳的 JSON 訊息傳 paymentID 到 checkout.js script\n開啟 lightbox 讓付款人同意付款\n\n執行付款使用者同意付款後， checkout.js 會呼叫 onAuthorize call back。執行付款之前，建議可以顯示付款明細\n\n\nonAuthorize call back 呼叫 Server 並傳入 data.paymentID 和 data.payerID，執行付款\nServer 呼叫付款完成 API 完成付款\n\nServer 呼叫 API 步驟測試整合流程要做 end-to-end 測試，須先建立 merchant(Business) 和 buyer(Personal) 帳號，才可以做沙盒環境測試。  建立帳號說明 。\n小結目前只把 PayPal 付款流程大致了解，有這些概念後，再去參考 API 文件應該會容易許多。\n參考PayPal 和 Braintree Demo (包含程式碼)","dateCreated":"2017-03-19T01:29:33+08:00","dateModified":"2018-04-11T23:19:56+08:00","datePublished":"2017-03-19T01:29:33+08:00","description":"延續前篇 PayPal 付款流程整合 前篇","headline":"PayPal 付款流程整合 後篇","image":["http://softstribe.com/wp-content/uploads/2015/11/paypal_2014_logo_detail-290x290.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/","keywords":"PayPal","thumbnailUrl":"http://softstribe.com/wp-content/uploads/2015/11/paypal_2014_logo_detail-290x290.png"}</script>
     <meta name="description" content="延續前篇 PayPal 付款流程整合 前篇">
 <meta name="keywords" content="PayPal">
 <meta property="og:type" content="blog">
@@ -34,7 +34,6 @@
 <meta name="twitter:title" content="PayPal 付款流程整合 後篇">
 <meta name="twitter:description" content="延續前篇 PayPal 付款流程整合 前篇">
 <meta name="twitter:image" content="https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/SetClientID.jpg">
-<meta name="twitter:creator" content="@MilesLin2016">
     
     
         
@@ -49,17 +48,16 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/style-1udptkpril81ozu8ifd8zpujn7ipu7lefxsiu5gxx0dpnzntdx6dusvki3ao.min.css">
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
     <!--STYLES END-->
     
-    <script type="text/javascript">
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-        ga('create', 'UA-90394318-1', 'auto');
-        ga('send', 'pageview');
+        gtag('config', 'UA-90394318-1');
     </script>
 
 
@@ -82,11 +80,10 @@
     </div>
     
         
-            <a  class="header-right-picture "
-                href="#about">
+            <a class="header-right-picture " href="#about">
         
         
-            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture"/>
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
         
         </a>
     
@@ -102,11 +99,11 @@
         
             <div class="sidebar-profile">
                 <a href="/#about">
-                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture"/>
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
                 <h4 class="sidebar-profile-name">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way’</p>
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
@@ -116,78 +113,45 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/ "
-                            
-                            title="Home"
-                        >
+                        <a class="sidebar-button-link " href="/ " title="Home">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-home" aria-hidden="true"></i>
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-categories"
-                            
-                            title="Categories"
-                        >
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-bookmark" aria-hidden="true"></i>
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-tags"
-                            
-                            title="Tags"
-                        >
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-tags" aria-hidden="true"></i>
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-archives"
-                            
-                            title="Archives"
-                        >
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-archive" aria-hidden="true"></i>
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="Search"
-                        >
+                        <a class="sidebar-button-link " href="#about" title="About">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Search</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="#about"
-                            
-                            title="About"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-lg fa-question" aria-hidden="true"></i>
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
                     </a>
             </li>
@@ -198,37 +162,28 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-github" aria-hidden="true"></i>
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-linkedin" aria-hidden="true"></i>
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-play-circle-o" aria-hidden="true"></i>
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="mailto:milesasp@gmail.com" target="_blank" rel="noopener" title="Mail">
-                    
-                        <i class="sidebar-button-icon fa fa-lg fa-envelope-o" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Mail</span>
                     </a>
             </li>
             
@@ -238,13 +193,9 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
                     
-                        <i class="sidebar-button-icon fa fa-lg fa-rss" aria-hidden="true"></i>
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
                     </a>
             </li>
@@ -295,7 +246,7 @@
 <h2 id="Client-端整合"><a href="#Client-端整合" class="headerlink" title="Client 端整合"></a>Client 端整合</h2><p>單純用 Client 整合的話只需要單純用 HTML 跟 JavaScript 就能完成，不需要寫到 Server 端的程式碼。</p>
 <ul>
 <li><p>建立 <a href="https://developer.paypal.com/docs/integration/direct/make-your-first-call/#create-a-paypal-app" title="PayPal app" target="_blank" rel="noopener">PayPal app</a> 取得 credentials，傳入 client ID 。</p>
-<div class="figure " style="width:;"><a class="fancybox" href="SetClientID.jpg" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="SetClientID.jpg" alt=""></a></div>
+<div class="figure " style="width:;"><a class="fancybox" href="SetClientID.jpg" title data-caption data-fancybox="default"><img class="fig-img" src="SetClientID.jpg" alt></a></div>
 </li>
 <li><p>在 <code>payment</code> function 使用 <code>paypal.rest.payment.create()</code> 設定付款選項。參考 : <a href="https://developer.paypal.com/docs/api/payments/#payment_create_request" title="如何建立帳單" target="_blank" rel="noopener">如何建立帳單</a></p>
 </li>
@@ -350,8 +301,8 @@
 <li>Server 呼叫 Payments API 建立帳單<!-- classes : info success warning danger no-icon -->
 <div class="alert info"><p>記得呼叫 <code>create-payment</code> API 時，傳入 <code>redirect_urls</code>，當付款完成後，可以在 <code>onAuthorize</code> function 取得 <code>redirect_urls</code>。</p>
 </div></li>
-<li>繼步驟2，會取得 JSON 回應<div class="figure " style="width:;"><a class="fancybox" href="CreatedPaymentResponse.jpg" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="CreatedPaymentResponse.jpg" alt=""></a></div></li>
-<li>Server 送出回應到 Client 藉以取得 paymentID<div class="figure " style="width:;"><a class="fancybox" href="PaymentID.jpg" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="PaymentID.jpg" alt=""></a></div></li>
+<li>繼步驟2，會取得 JSON 回應<div class="figure " style="width:;"><a class="fancybox" href="CreatedPaymentResponse.jpg" title data-caption data-fancybox="default"><img class="fig-img" src="CreatedPaymentResponse.jpg" alt></a></div></li>
+<li>Server 送出回應到 Client 藉以取得 paymentID<div class="figure " style="width:;"><a class="fancybox" href="PaymentID.jpg" title data-caption data-fancybox="default"><img class="fig-img" src="PaymentID.jpg" alt></a></div></li>
 <li>開始初始化付款流程， 在 client 建立的 <code>payment</code> method 從回傳的 JSON 訊息傳 <code>paymentID</code> 到 <code>checkout.js</code> script</li>
 <li>開啟 lightbox 讓付款人同意付款</li>
 </ol>
@@ -361,7 +312,7 @@
 <li><code>onAuthorize</code> call back 呼叫 Server 並傳入 <code>data.paymentID</code> 和 <code>data.payerID</code>，執行付款</li>
 <li>Server 呼叫付款完成 API 完成付款</li>
 </ol>
-<h3 id=""><a href="#" class="headerlink" title=""></a><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-payments-api/" title="Server 呼叫 API 步驟" target="_blank" rel="noopener">Server 呼叫 API 步驟</a></h3><h2 id="-1"><a href="#-1" class="headerlink" title=""></a><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程" target="_blank" rel="noopener">測試整合流程</a></h2><p>要做 end-to-end 測試，須先建立 merchant<em>(Business)</em> 和 buyer<em>(Personal)</em> 帳號，才可以做沙盒環境測試。  <a href="https://developer.paypal.com/docs/api/quickstart/sandbox-account/" title="建立帳號說明" target="_blank" rel="noopener">建立帳號說明</a> 。</p>
+<h3 id><a href="#" class="headerlink" title></a><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-payments-api/" title="Server 呼叫 API 步驟" target="_blank" rel="noopener">Server 呼叫 API 步驟</a></h3><h2 id="-1"><a href="#-1" class="headerlink" title></a><a href="https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/test-express-checkout/" title="測試整合流程" target="_blank" rel="noopener">測試整合流程</a></h2><p>要做 end-to-end 測試，須先建立 merchant<em>(Business)</em> 和 buyer<em>(Personal)</em> 帳號，才可以做沙盒環境測試。  <a href="https://developer.paypal.com/docs/api/quickstart/sandbox-account/" title="建立帳號說明" target="_blank" rel="noopener">建立帳號說明</a> 。</p>
 <h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>目前只把 PayPal 付款流程大致了解，有這些概念後，再去參考 API 文件應該會容易許多。</p>
 <h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://demo.paypal.com/us/demo/home" title="Demo" target="_blank" rel="noopener">PayPal 和 Braintree Demo (包含程式碼)</a>
             
@@ -371,7 +322,7 @@
     <div id="post-footer" class="post-footer main-content-wrap">
         
             <div class="post-footer-tags">
-                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                <span class="text-color-light text-small">TAGGED IN</span><br>
                 
     <a class="tag tag--primary tag--small t-link" href="/tags/PayPal/">PayPal</a>
 
@@ -403,7 +354,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -412,23 +363,15 @@
             
             <li class="post-action hide-xs">
                 <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/" title="Share on Facebook">
-                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
+                    <i class="fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/" title="Share on Twitter">
-                    <i class="fa fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/" title="Share on Google Plus">
-                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/" title="Share on Google+">
+                    <i class="fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
         
@@ -436,14 +379,14 @@
             
                 <li class="post-action">
                     <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                        <i class="fa fa-comment-o"></i>
+                        <i class="fa fa-comment"></i>
                     </a>
                 </li>
             
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -467,7 +410,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2018 Miles. All Rights Reserved.
+        Copyrights &copy; 2019 Miles. All Rights Reserved.
     </span>
 </footer>
 
@@ -499,7 +442,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -508,23 +451,15 @@
             
             <li class="post-action hide-xs">
                 <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/" title="Share on Facebook">
-                    <i class="fa fa-facebook-official" aria-hidden="true"></i>
+                    <i class="fa-facebook-official" aria-hidden="true"></i>
                 </a>
             </li>
         
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/" title="Share on Twitter">
-                    <i class="fa fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/" title="Share on Google Plus">
-                    <i class="fa fa-google-plus" aria-hidden="true"></i>
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/" title="Share on Google+">
+                    <i class="fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
         
@@ -532,14 +467,14 @@
             
                 <li class="post-action">
                     <a class="post-action-btn btn btn--default" href="#disqus_thread">
-                        <i class="fa fa-comment-o"></i>
+                        <i class="fa fa-comment"></i>
                     </a>
                 </li>
             
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -549,36 +484,30 @@
 
 
                 </div>
-                <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-    <i id="btn-close-shareoptions" class="fa fa-close"></i>
-    <ul class="share-options">
-        
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
             
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/">
+                        <i class="fa-facebook-official" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
             
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/">
-                    <i class="fa fa-facebook-official" aria-hidden="true"></i><span>Share on Facebook</span>
-                </a>
-            </li>
-        
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/">
+                        <i class="fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
             
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/">
-                    <i class="fa fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
-                </a>
-            </li>
-        
-            
-            
-            <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/03/PayPal-付款流程整合-後篇/">
-                    <i class="fa fa-google-plus" aria-hidden="true"></i><span>Share on Google Plus</span>
-                </a>
-            </li>
-        
-    </ul>
-</div>
+        </ul>
+    </div>
+
 
             
         </div>
@@ -590,28 +519,28 @@
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
-            <i class="fa fa-remove"></i>
+            <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
         
             <h4 id="about-card-name">Miles</h4>
         
-            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way’</p>
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </div>
         
         
             <div id="about-card-job">
                 <i class="fa fa-briefcase"></i>
-                <br/>
+                <br>
                 <p>Web Developer</p>
 
             </div>
         
         
             <div id="about-card-location">
-                <i class="fa fa-map-marker"></i>
-                <br/>
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
                 Taiwan
             </div>
         
@@ -619,268 +548,10 @@
 </div>
 
         
-            <div id="algolia-search-modal" class="modal-container">
-    <div class="modal">
-        <div class="modal-header">
-            <span class="close-button"><i class="fa fa-close"></i></span>
-            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
-                <span class="searchby-algolia-text text-color-light text-small">by</span>
-                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
-            </a>
-            <i class="search-icon fa fa-search"></i>
-            <form id="algolia-search-form">
-                <input type="text" id="algolia-search-input" name="search"
-                    class="form-control input--large search-input" placeholder="Search "
-                    />
-            </form>
-        </div>
-        <div class="modal-body">
-            <div class="no-result text-color-light text-center">no post found</div>
-            <div class="results">
-                
-                <div class="media">
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
-                            <h3 class="media-heading">動態指定泛型型別</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Dec 30, 2016
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
-<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
-<p>還是記錄下來，以防忘記<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
-                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
-                            <h3 class="media-heading">Anatomy of an Angular Application</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Jan 28, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
-                            <h3 class="media-heading">Angular Modules</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Jan 30, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
-<!-- classes : info success warning danger no-icon -->
-<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
-</div></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
-                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
-                            <h3 class="media-heading">Bootstrapping App Component</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Feb 2, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
-                            <h3 class="media-heading">Binding syntax</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Feb 4, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
-<ul>
-<li>內嵌繫結 ( Interpolation )</li>
-<li>屬性繫結 ( Property Binding )</li>
-<li>事件繫結 ( Event Binding )</li>
-<li>雙向繫結 ( Two-way Binding )</li>
-</ul></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
-                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
-                            <h3 class="media-heading">Routing Basics</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Feb 8, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
-                            <h3 class="media-heading">Navigation and Routing Additional Techniques</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Feb 9, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
-                            <h3 class="media-heading">Protecting Routes with Guards</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Feb 11, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-left">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
-                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90"/>
-                        </a>
-                    </div>
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
-                            <h3 class="media-heading">NgModule Decorator</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Feb 13, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-                <div class="media">
-                    
-                    <div class="media-body">
-                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
-                            <h3 class="media-heading">Dive into Angular Modules</h3>
-                        </a>
-                        <span class="media-meta">
-                            <span class="media-date text-small">
-                                
-                                    Feb 14, 2017
-                                
-                            </span>
-                        </span>
-                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></div>
-                    </div>
-                    <div style="clear:both;"></div>
-                    <hr>
-                </div>
-                
-            </div>
-        </div>
-        <div class="modal-footer">
-            <p class="results-count text-medium"
-                data-message-zero="no post found"
-                data-message-one="1 post found"
-                data-message-other="{n} posts found">
-                50 posts found
-            </p>
-        </div>
-    </div>
-</div>
-
-        
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="/assets/js/script-yhuo2grt8r7qkqumzgjoglkfbicl1thukjgmla6jopu56zpcowfedi5zjcor.min.js"></script>
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->
 
     
@@ -902,13 +573,6 @@
         </script>
     
 
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
-    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
-    <script>
-        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
-        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
-    </script>
 
 
     </body>
