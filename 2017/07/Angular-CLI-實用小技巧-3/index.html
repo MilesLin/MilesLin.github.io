@@ -1,0 +1,973 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Angular] Angular CLI 實用小技巧 3 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Angular CLI,Angular">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"\n建置專案與環境參數設定\n\n\nBuild 與 Environmentbuild 可將 Angular 專案打包，之後可以佈署到 server 上，而 environment 是用來設定一些 Angular 會用到的參數，例如: 開發時的 host 是 http://dev/ ， production host 是 http://prod/ ，就可以將參數寫在 environment.ts。environment\n比較 Dev Build 與 Prod Build:\n\n\n說明\nng build\nng build --prod\n\n\n\n\n使用的 Environment 檔案 \nenvironment.ts\nenvironment.prod.ts\n\n\n不要讓檔案被 Cache (Cache-busting)\n只有 css 檔案參考到的圖檔\n所有檔案\n\n\nSource maps\n建立\n不建立\n\n\nExtracted CSS\nglobal CSS output to .js\nyes, to css files\n\n\n醜化 (Uglification)\n無\n有\n\n\n移除沒用到的程式碼 (Tree-Shaking)\n無\n有\n\n\nAhead of time compilation AOT\n無\n有\n\n\nBundling\n有\n有\n\n\n\ndev ng build 參數設定小技巧這四行執行結果都一樣ng build --target=development --environment=devng build --dev -e=devng build --devng build\n\nprod ng build 參數設定小技巧這三行執行結果都一樣ng build --target=production --environment=prodng build --prod -e=prodng build --prod\n\nng build 其他參數設定\n\n\n參數\n別名\n說明\n\n\n\n\n--sourcemap\n-sm\n建立 source map\n\n\n--aot\n\nAhead of Time compilation\n\n\n--watch\n-w\n監控程式碼變成，並重新 build\n\n\n\n輸出 Build Bundles 說明專案 build 之後，會將專案用到的 js bundle  起來，每一個 bundle js 都有自己的職責。\n\n\n\njs 檔案\n說明\n\n\n\n\ninline.bundle.js\nWebPack runtime，應用程式拿來用來讀取 module 用\n\n\nmain.bundle.js\n我們寫的程式碼\n\n\npolyfills.bundle.js\n用來支援不同的瀏覽器\n\n\nstyles.bundle.js\n紀錄 styles 被放在哪裡\n\n\nvendor.bundle.js\n包含 Angular 和其他 third-party 檔案\n\n\n\n啟動 webpack-dev-serverng serve\n\n設定參數說明:\n\n\n參數\n別名\n說明\n\n\n\n\n--open\n-o\nng serve 後，開啟網頁\n\n\n--port\n-p\n指定 port 號\n\n\n--live-reload\n-lr\n檔案發生變更後，是否直接重新整理瀏覽器 (-lr true or false)\n\n\n--ssl\n\n使用 https\n\n\n--proxy-config\n-pc\nProxy configuration file\n\n\n--prod\n\n啟動時 server，使用 --prod 的設定\n\n\n\n停掉 Angular CLI ， 使用 webpack 控制專案這個功能可讓懂前端開發工具的人，能夠有更多靈活的應用。ng eject\n執行指令後 Angular CLI 的功能都將會無法使用，例如 ng build, ng serve 等等…。\nwebpack.config.js會被加入專案中，必且可以比較 package.json 改變的內容，會看到所有控制都交由原生的前端工具來執行。\npackage","dateCreated":"2017-07-08T23:07:00+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-07-08T23:07:00+08:00","description":"\n建置專案與環境參數設定\n","headline":"[Angular] Angular CLI 實用小技巧 3","image":["environments_folder.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/","keywords":"Angular, Angular CLI","thumbnailUrl":"environments_folder.jpg"}</script>
+    <meta name="description" content="建置專案與環境參數設定">
+<meta name="keywords" content="Angular CLI,Angular">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Angular] Angular CLI 實用小技巧 3">
+<meta property="og:url" content="https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="建置專案與環境參數設定">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/environments_setting.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/environments_folder.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/package.jpg">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.467Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Angular] Angular CLI 實用小技巧 3">
+<meta name="twitter:description" content="建置專案與環境參數設定">
+<meta name="twitter:image" content="https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/environments_setting.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+        <meta property="og:image" content="https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/environments_folder.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/environments_folder.jpg" />
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Angular] Angular CLI 實用小技巧 3
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2017-07-08T23:07:00+08:00">
+	
+		    Jul 08, 2017
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Angular/">Angular</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <ul>
+<li>建置專案與環境參數設定</li>
+</ul>
+<a id="more"></a>
+<h2 id="Build-與-Environment"><a href="#Build-與-Environment" class="headerlink" title="Build 與 Environment"></a>Build 與 Environment</h2><p><code>build</code> 可將 Angular 專案打包，之後可以佈署到 server 上，而 <code>environment</code> 是用來設定一些 Angular 會用到的參數，例如: 開發時的 host 是 <a href="http://dev/" target="_blank" rel="noopener">http://dev/</a> ， production host 是 <a href="http://prod/" target="_blank" rel="noopener">http://prod/</a> ，就可以將參數寫在 environment.ts。<br><div class="figure " style="width:;"><a class="fancybox" href="environments_setting.jpg" title="environment" data-caption="environment" data-fancybox="default"><img class="fig-img" src="environments_setting.jpg" alt="environment"></a><span class="caption">environment</span></div></p>
+<h3 id="比較-Dev-Build-與-Prod-Build"><a href="#比較-Dev-Build-與-Prod-Build" class="headerlink" title="比較 Dev Build 與 Prod Build:"></a>比較 Dev Build 與 Prod Build:</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">說明</th>
+<th style="text-align:left">ng build</th>
+<th style="text-align:left">ng build --prod</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">使用的 Environment 檔案 <div class="figure " style="width:;"><a class="fancybox" href="environments_folder.jpg" title data-caption data-fancybox="default"><img class="fig-img" src="environments_folder.jpg" alt></a></div></td>
+<td style="text-align:left">environment.ts</td>
+<td style="text-align:left">environment.prod.ts</td>
+</tr>
+<tr>
+<td style="text-align:left">不要讓檔案被 Cache <em>(Cache-busting)</em></td>
+<td style="text-align:left">只有 css 檔案參考到的圖檔</td>
+<td style="text-align:left">所有檔案</td>
+</tr>
+<tr>
+<td style="text-align:left">Source maps</td>
+<td style="text-align:left">建立</td>
+<td style="text-align:left">不建立</td>
+</tr>
+<tr>
+<td style="text-align:left">Extracted CSS</td>
+<td style="text-align:left">global CSS output to .js</td>
+<td style="text-align:left">yes, to css files</td>
+</tr>
+<tr>
+<td style="text-align:left">醜化 <em>(Uglification)</em></td>
+<td style="text-align:left">無</td>
+<td style="text-align:left">有</td>
+</tr>
+<tr>
+<td style="text-align:left">移除沒用到的程式碼 <em>(Tree-Shaking)</em></td>
+<td style="text-align:left">無</td>
+<td style="text-align:left">有</td>
+</tr>
+<tr>
+<td style="text-align:left">Ahead of time compilation <em>AOT</em></td>
+<td style="text-align:left">無</td>
+<td style="text-align:left">有</td>
+</tr>
+<tr>
+<td style="text-align:left">Bundling</td>
+<td style="text-align:left">有</td>
+<td style="text-align:left">有</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dev-ng-build-參數設定小技巧"><a href="#dev-ng-build-參數設定小技巧" class="headerlink" title="dev ng build 參數設定小技巧"></a>dev ng build 參數設定小技巧</h3><p><em>這四行執行結果都一樣</em><br><div class="alert info no-icon"><p>ng build --target=development --environment=dev<br>ng build --dev -e=dev<br>ng build --dev<br>ng build</p>
+</div></p>
+<h3 id="prod-ng-build-參數設定小技巧"><a href="#prod-ng-build-參數設定小技巧" class="headerlink" title="prod ng build 參數設定小技巧"></a>prod ng build 參數設定小技巧</h3><p><em>這三行執行結果都一樣</em><br><div class="alert info no-icon"><p>ng build --target=production --environment=prod<br>ng build --prod -e=prod<br>ng build --prod</p>
+</div></p>
+<h3 id="ng-build-其他參數設定"><a href="#ng-build-其他參數設定" class="headerlink" title="ng build 其他參數設定"></a>ng build 其他參數設定</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">參數</th>
+<th style="text-align:left">別名</th>
+<th style="text-align:left">說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">--sourcemap</td>
+<td style="text-align:left">-sm</td>
+<td style="text-align:left">建立 source map</td>
+</tr>
+<tr>
+<td style="text-align:left">--aot</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">Ahead of Time compilation</td>
+</tr>
+<tr>
+<td style="text-align:left">--watch</td>
+<td style="text-align:left">-w</td>
+<td style="text-align:left">監控程式碼變成，並重新 build</td>
+</tr>
+</tbody>
+</table>
+<h4 id="輸出-Build-Bundles-說明"><a href="#輸出-Build-Bundles-說明" class="headerlink" title="輸出 Build Bundles 說明"></a>輸出 Build Bundles 說明</h4><p>專案 build 之後，會將專案用到的 js bundle  起來，每一個 bundle js 都有自己的職責。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">js 檔案</th>
+<th style="text-align:left">說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">inline.bundle.js</td>
+<td style="text-align:left">WebPack runtime，應用程式拿來用來讀取 module 用</td>
+</tr>
+<tr>
+<td style="text-align:left">main.bundle.js</td>
+<td style="text-align:left">我們寫的程式碼</td>
+</tr>
+<tr>
+<td style="text-align:left">polyfills.bundle.js</td>
+<td style="text-align:left">用來支援不同的瀏覽器</td>
+</tr>
+<tr>
+<td style="text-align:left">styles.bundle.js</td>
+<td style="text-align:left">紀錄 styles 被放在哪裡</td>
+</tr>
+<tr>
+<td style="text-align:left">vendor.bundle.js</td>
+<td style="text-align:left">包含 Angular 和其他 third-party 檔案</td>
+</tr>
+</tbody>
+</table>
+<h2 id="啟動-webpack-dev-server"><a href="#啟動-webpack-dev-server" class="headerlink" title="啟動 webpack-dev-server"></a>啟動 webpack-dev-server</h2><div class="alert info no-icon"><p>ng serve</p>
+</div>
+<h3 id="設定參數說明"><a href="#設定參數說明" class="headerlink" title="設定參數說明:"></a>設定參數說明:</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">參數</th>
+<th style="text-align:left">別名</th>
+<th style="text-align:left">說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">--open</td>
+<td style="text-align:left">-o</td>
+<td style="text-align:left">ng serve 後，開啟網頁</td>
+</tr>
+<tr>
+<td style="text-align:left">--port</td>
+<td style="text-align:left">-p</td>
+<td style="text-align:left">指定 port 號</td>
+</tr>
+<tr>
+<td style="text-align:left">--live-reload</td>
+<td style="text-align:left">-lr</td>
+<td style="text-align:left">檔案發生變更後，是否直接重新整理瀏覽器 <em>(-lr true or false)</em></td>
+</tr>
+<tr>
+<td style="text-align:left">--ssl</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">使用 https</td>
+</tr>
+<tr>
+<td style="text-align:left">--proxy-config</td>
+<td style="text-align:left">-pc</td>
+<td style="text-align:left">Proxy configuration file</td>
+</tr>
+<tr>
+<td style="text-align:left">--prod</td>
+<td style="text-align:left"></td>
+<td style="text-align:left">啟動時 server，使用 --prod 的設定</td>
+</tr>
+</tbody>
+</table>
+<h2 id="停掉-Angular-CLI-，-使用-webpack-控制專案"><a href="#停掉-Angular-CLI-，-使用-webpack-控制專案" class="headerlink" title="停掉 Angular CLI ， 使用 webpack 控制專案"></a>停掉 Angular CLI ， 使用 webpack 控制專案</h2><p>這個功能可讓懂前端開發工具的人，能夠有更多靈活的應用。<br><div class="alert info no-icon"><p>ng eject</p>
+</div><br>執行指令後 Angular CLI 的功能都將會無法使用，例如 <code>ng build</code>, <code>ng serve</code> 等等…。</p>
+<p><code>webpack.config.js</code>會被加入專案中，必且可以比較 <code>package.json</code> 改變的內容，會看到所有控制都交由原生的前端工具來執行。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="package.jpg" title="package" data-caption="package" data-fancybox="default"><img class="fig-img" src="package.jpg" alt="package"></a><span class="caption">package</span></div>
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a> <a class="tag tag--primary tag--small t-link" href="/tags/Angular-CLI/">Angular CLI</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/Angular-CLI-實用小技巧-4/" data-tooltip="[Angular] Angular CLI 實用小技巧 4" aria-label="PREVIOUS: [Angular] Angular CLI 實用小技巧 4">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/Angular-CLI-實用小技巧-2/" data-tooltip="[Angular] Angular CLI 實用小技巧 2" aria-label="NEXT: [Angular] Angular CLI 實用小技巧 2">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/Angular-CLI-實用小技巧-4/" data-tooltip="[Angular] Angular CLI 實用小技巧 4" aria-label="PREVIOUS: [Angular] Angular CLI 實用小技巧 4">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/Angular-CLI-實用小技巧-2/" data-tooltip="[Angular] Angular CLI 實用小技巧 2" aria-label="NEXT: [Angular] Angular CLI 實用小技巧 2">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-3/';
+                 
+                    this.page.identifier = '2017/07/Angular-CLI-實用小技巧-3/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

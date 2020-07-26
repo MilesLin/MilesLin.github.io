@@ -1,0 +1,845 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Go] Go Module 常用指令筆記 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Go">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天要來筆記一下學到的 Go Module 的指令，這篇文章只會紀錄一些我覺得會常用的指令，並不會說明什麼是 Module，如果要了解什麼是 Module 可以參考 Go 1.11 Modules。\n此文章會說明的指令有 $ go mod init &lt;module name&gt;, $ go list, $ go get, $ go mod verify, $ go mod tidy, $ go mod why &lt;package&gt;, $ go mod edit, $ go mod vendor。\n初始化 Module初始化 Module 的指令: $ go mod init &lt;module name&gt;init 範例bash1$ go mod init github.com/mileslin/myproject上述範例 module name github.com/mileslin/myproject 的意義\n\n在 build go 專案的時候，會根據 module name 的最後一路路徑 myproject 當作輸出檔名，會產生 myproject.exe 的檔案\n在 import 自己專案 package 的路徑的時候，github.com/mileslin/myproject 是根目錄，例如我新增一個 pg1 的 package ，則我在 import 的時候要輸入 import &quot;github.com/mileslin/myproject/pg1&quot;。\n\n在初始化完畢後，會產生一個 go.mod 檔案，這是用來紀錄相依套件的檔案。 go.mod 檔案的範例如下\nmodmod123module github.com/mileslin/myprojectgo 1.13\n取得套件跟原本的 go get 取得套件的方式一樣，如: $ go get -u github.com/gorilla/mux (-u 是說明，取得套件的時候不要從 cache 取得)。  取得套件後會產生一個  的檔案，這個檔案裡面有套件的 hash ，用來驗證你下載的套件沒有被經過串改。\n除了會新增一個 go.sum 檔案之外呢， go.mod 也會記錄你下載的套件，如下範例go.modmod12345module github.com/mileslin/myprojectgo 1.13require github.com/gorilla/mux v1.7.3 // indirect// indirect 的意思是說，此套件還沒被用到。 所以只要在程式碼中使用此到件，並且 build 專案後，// indirect 就會消失\n最後提一下，下載的套件會被放在 GOPATH/pkg/mod 底下。 (可以使用 go env 指令查看 GOPATH 路徑)\n列出套件與套件版本使用 $ go list 取得可以使用的套件列表，常用方式如下\n\n$ go list all 會列出所有套件，包含 GOROOT 套件\n$ go list -m all  只列出 module 列出的套件(包含自己的 package)\n$ go list -m -versions github.com/gorilla/mux 列出此套件的所有版本\n\n驗證套件的正確性使用 $ go mod verify 可以驗證套件在下載之後，有沒有在本機上被修改過。 而驗證方式是根據套件 source code 產生的 hash，來做比對，此 hash 是存在 go.sum 裡面。\n注意: $ go build . 的時候並不會驗證。  只有執行 $ go mod verify 指令才驗證套件是否被串改。\n\n補充: 如果不小心改了套件 source code ，只要把套件從 GOPATH/pkg/mod 底下刪除，重新 $ go get 該套件，就可以恢復正常。\n\n清除用不到的套件有些套件已經記錄在 go.mod 裡面，但是實際上此套件在專案裡面沒有用到，則可以使用 $ go mod tidy 指令，來清楚用不到的專案。  執行此指令後，就會 go.mod 裡面沒用到的套件拿掉。\n取得不同版本的套件$ go get 如果沒有特別指定版本的話，預設會抓穩定版第 1 版的套件。  如果要抓其他版本的話，可以先用 $ go list -m -versions github.com/gorilla/mux 指令來查詢有哪些版本可以用，然後在 $ go get 的時候指定版本，如 $ go get github.com/gorilla/mux@v1.6.1\nGo Module 套件的版本說明: Semantic Import Versioning\n檢查套件使用情形使用 $ go mod why github.com/gorilla/mux 他會就列出使套件在哪裡有被用到，這算是在檢查套件的時候，蠻實用的一個指令。\n用指令編輯 go.mod$ go mod edit 是一種可以使用指令的方式來修改 go.mod 檔案，使用情境通常是在整合 CI/CD 的時候使用。  其他一般情況，其實只要手動修改 go.mod 檔案就可以了，不需要用到 $ go mod edit 指令。\n$ go mod edit 一些簡單的用法如下\n\n$ go mod edit -print, $ go mod edit -json 印出 go.mod 檔案\n$ go mod edit -require github.com/gorilla/context@v1.1.1 requrie 其他套件\n\n參考: Edit go.mod from tools or scripts\n使用 vendor directoryVendor Directories 是在 Go Module 還沒有出來之前，一種管理套件的方式。 既然我們現在有 Go Module 的方式管理套件了，這方式還是不太建議。\n但是此方式還是有它的使用情境，例如 IT 部門在 Production 環境不許允連網路，這樣就沒辦法使用 $ go get 來下載套件，這時候我們可以使用 vendor directory 的方式，把套件的檔案都準備好，這樣就不用額外在 $ go get 檔案\n啟用 vendor directory 的指令 $ go mod vendor，執行完畢後，就會看到專案裡面多一個 vendor 的資料夾，該資料夾就是存放第三方套件的地方。\n啟用 vendor directory 後，建置專案的方式如果執行 $ go run . 或 $ go build . 的時候會發現，實際上程式也是會去抓 GOPATH/pkg/mod 的套件，而不是專案底下的 vendor 套件。\n\n如果要使用專案底下 vendor 的檔案來 build 專案的話，必須加入一些參數，使用方法如 $ go run -mod=vendor .,  $ go build -mod=vendor .。\n小結今天的筆記都是從 Exploring Go Modules by pluralsight 這個課程來的，如果有 pluralsight 的訂閱讀者，很推薦此課程。\n延伸閱讀[Go 1.11 Modules][Semantic Versioning][Exploring Go Modules - pluralsight][Go Command]  \n","dateCreated":"2020-01-03T21:57:53+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-01-03T21:57:53+08:00","description":"今天要來筆記一下學到的 Go Module 的指令，這篇文章只會紀錄一些我覺得會常用的指令，並不會說明什麼是 Module，如果要了解什麼是 Module 可以參考 Go 1.11 Modules。\n此文章會說明的指令有 $ go mod init &lt;module name&gt;, $ go list, $ go get, $ go mod verify, $ go mod tidy, $ go mod why &lt;package&gt;, $ go mod edit, $ go mod vendor。","headline":"[Go] Go Module 常用指令筆記","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/","keywords":"Go, Go Module"}</script>
+    <meta name="description" content="今天要來筆記一下學到的 Go Module 的指令，這篇文章只會紀錄一些我覺得會常用的指令，並不會說明什麼是 Module，如果要了解什麼是 Module 可以參考 Go 1.11 Modules。 此文章會說明的指令有 $ go mod init &amp;lt;module name&amp;gt;, $ go list, $ go get, $ go mod verify, $ go mod tidy, $">
+<meta name="keywords" content="Go">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Go] Go Module 常用指令筆記">
+<meta property="og:url" content="https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="今天要來筆記一下學到的 Go Module 的指令，這篇文章只會紀錄一些我覺得會常用的指令，並不會說明什麼是 Module，如果要了解什麼是 Module 可以參考 Go 1.11 Modules。 此文章會說明的指令有 $ go mod init &amp;lt;module name&amp;gt;, $ go list, $ go get, $ go mod verify, $ go mod tidy, $">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.532Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Go] Go Module 常用指令筆記">
+<meta name="twitter:description" content="今天要來筆記一下學到的 Go Module 的指令，這篇文章只會紀錄一些我覺得會常用的指令，並不會說明什麼是 Module，如果要了解什麼是 Module 可以參考 Go 1.11 Modules。 此文章會說明的指令有 $ go mod init &amp;lt;module name&amp;gt;, $ go list, $ go get, $ go mod verify, $ go mod tidy, $">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Go] Go Module 常用指令筆記
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-01-03T21:57:53+08:00">
+	
+		    Jan 03, 2020
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Go/">Go</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>今天要來筆記一下學到的 Go Module 的指令，這篇文章只會紀錄一些我覺得會常用的指令，並不會說明什麼是 Module，如果要了解什麼是 Module 可以參考 <a href="https://github.com/golang/go/wiki/Modules" title="Go 1.11 Modules" target="_blank" rel="noopener">Go 1.11 Modules</a>。</p>
+<p>此文章會說明的指令有 <code>$ go mod init &lt;module name&gt;</code>, <code>$ go list</code>, <code>$ go get</code>, <code>$ go mod verify</code>, <code>$ go mod tidy</code>, <code>$ go mod why &lt;package&gt;</code>, <code>$ go mod edit</code>, <code>$ go mod vendor</code>。<br><a id="more"></a></p>
+<h2 id="初始化-Module"><a href="#初始化-Module" class="headerlink" title="初始化 Module"></a>初始化 Module</h2><p>初始化 Module 的指令: <code>$ go mod init &lt;module name&gt;</code><br><figure class="codeblock codeblock--tabbed"><figcaption><span>init 範例</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ go mod init github.com/mileslin/myproject</span><br></pre></td></tr></tbody></table></figure></div></figure><br>上述範例 module name <code>github.com/mileslin/myproject</code> 的意義</p>
+<ul>
+<li>在 build go 專案的時候，會根據 module name 的最後一路路徑 <span class="highlight-text primary">myproject</span> 當作輸出檔名，會產生 <span class="highlight-text primary">myproject.exe</span> 的檔案</li>
+<li>在 import 自己專案 package 的路徑的時候，<code>github.com/mileslin/myproject</code> 是根目錄，例如我新增一個 pg1 的 package ，則我在 import 的時候要輸入 <code>import &quot;github.com/mileslin/myproject/pg1&quot;</code>。</li>
+</ul>
+<p>在初始化完畢後，會產生一個 <span class="highlight-text primary">go.mod</span> 檔案，這是用來紀錄相依套件的檔案。 <span class="highlight-text primary">go.mod</span> 檔案的範例如下</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>mod</span><ul class="tabs"><li class="tab active">mod</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">module github.com/mileslin/myproject</span><br><span class="line"></span><br><span class="line">go 1.13</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="取得套件"><a href="#取得套件" class="headerlink" title="取得套件"></a>取得套件</h2><p>跟原本的 <a href="https://golang.org/doc/articles/go_command.html#tmp_3" title="go get" target="_blank" rel="noopener">go get</a> 取得套件的方式一樣，如: <code>$ go get -u github.com/gorilla/mux</code> <em>(-u 是說明，取得套件的時候不要從 cache 取得)</em>。  取得套件後會產生一個  的檔案，這個檔案裡面有套件的 hash ，用來驗證你下載的套件沒有被經過串改。</p>
+<p>除了會新增一個 <span class="highlight-text primary">go.sum</span> 檔案之外呢， <span class="highlight-text primary">go.mod</span> 也會記錄你下載的套件，如下範例<br><figure class="codeblock codeblock--tabbed"><figcaption><span>go.mod</span><ul class="tabs"><li class="tab active">mod</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">module github.com/mileslin/myproject</span><br><span class="line"></span><br><span class="line">go 1.13</span><br><span class="line"></span><br><span class="line">require github.com/gorilla/mux v1.7.3 // indirect</span><br></pre></td></tr></tbody></table></figure></div></figure><br><em><span class="highlight-text warning">// indirect</span> 的意思是說，此套件還沒被用到。 所以只要在程式碼中使用此到件，並且 build 專案後，<span class="highlight-text warning">// indirect</span> 就會消失</em></p>
+<p>最後提一下，下載的套件會被放在 <span class="highlight-text danger">GOPATH/pkg/mod</span> 底下。 <em>(可以使用 go env 指令查看 GOPATH 路徑)</em></p>
+<h2 id="列出套件與套件版本"><a href="#列出套件與套件版本" class="headerlink" title="列出套件與套件版本"></a>列出套件與套件版本</h2><p>使用 <code>$ go list</code> 取得可以使用的套件列表，常用方式如下</p>
+<ul>
+<li><code>$ go list all</code> 會列出所有套件，包含 <a href="https://www.programming-books.io/essential/go/gopath-goroot-gobin-d6da4b8481f94757bae43be1fdfa9e73" title="GOROOT" target="_blank" rel="noopener">GOROOT</a> 套件</li>
+<li><code>$ go list -m all</code>  只列出 module 列出的套件(包含自己的 package)</li>
+<li><code>$ go list -m -versions github.com/gorilla/mux</code> 列出此套件的所有版本</li>
+</ul>
+<h2 id="驗證套件的正確性"><a href="#驗證套件的正確性" class="headerlink" title="驗證套件的正確性"></a>驗證套件的正確性</h2><p>使用 <code>$ go mod verify</code> 可以驗證套件在下載之後，有沒有在本機上被修改過。 而驗證方式是根據套件 source code 產生的 hash，來做比對，此 hash 是存在 <span class="highlight-text primary">go.sum</span> 裡面。</p>
+<div class="alert warning"><p>注意: <code>$ go build .</code> 的時候並不會驗證。  只有執行 <code>$ go mod verify</code> 指令才驗證套件是否被串改。</p>
+</div>
+<div class="alert info"><p>補充: 如果不小心改了套件 source code ，只要把套件從 <code>GOPATH/pkg/mod</code> 底下刪除，重新 <code>$ go get</code> 該套件，就可以恢復正常。</p>
+</div>
+<h2 id="清除用不到的套件"><a href="#清除用不到的套件" class="headerlink" title="清除用不到的套件"></a>清除用不到的套件</h2><p>有些套件已經記錄在 <span class="highlight-text primary">go.mod</span> 裡面，但是實際上此套件在專案裡面沒有用到，則可以使用 <code>$ go mod tidy</code> 指令，來清楚用不到的專案。  執行此指令後，就會 <span class="highlight-text primary">go.mod</span> 裡面沒用到的套件拿掉。</p>
+<h2 id="取得不同版本的套件"><a href="#取得不同版本的套件" class="headerlink" title="取得不同版本的套件"></a>取得不同版本的套件</h2><p><code>$ go get</code> 如果沒有特別指定版本的話，預設會抓穩定版第 1 版的套件。  如果要抓其他版本的話，可以先用 <code>$ go list -m -versions github.com/gorilla/mux</code> 指令來查詢有哪些版本可以用，然後在 <code>$ go get</code> 的時候指定版本，如 <code>$ go get github.com/gorilla/mux@v1.6.1</code></p>
+<p>Go Module 套件的版本說明: <a href="https://github.com/golang/go/wiki/Modules#semantic-import-versioning" title="Semantic Import Versioning" target="_blank" rel="noopener">Semantic Import Versioning</a></p>
+<h2 id="檢查套件使用情形"><a href="#檢查套件使用情形" class="headerlink" title="檢查套件使用情形"></a>檢查套件使用情形</h2><p>使用 <code>$ go mod why github.com/gorilla/mux</code> 他會就列出使套件在哪裡有被用到，這算是在檢查套件的時候，蠻實用的一個指令。</p>
+<h2 id="用指令編輯-go-mod"><a href="#用指令編輯-go-mod" class="headerlink" title="用指令編輯 go.mod"></a>用指令編輯 go.mod</h2><p><code>$ go mod edit</code> 是一種可以使用指令的方式來修改 <span class="highlight-text primary">go.mod</span> 檔案，使用情境通常是在整合 CI/CD 的時候使用。  其他一般情況，其實只要手動修改 <span class="highlight-text primary">go.mod</span> 檔案就可以了，不需要用到 <code>$ go mod edit</code> 指令。</p>
+<p><code>$ go mod edit</code> 一些簡單的用法如下</p>
+<ul>
+<li><code>$ go mod edit -print</code>, <code>$ go mod edit -json</code> 印出 go.mod 檔案</li>
+<li><code>$ go mod edit -require github.com/gorilla/context@v1.1.1</code> requrie 其他套件</li>
+</ul>
+<p>參考: <a href="https://golang.org/cmd/go/#hdr-Edit_go_mod_from_tools_or_scripts" title="Edit go.mod from tools or scripts" target="_blank" rel="noopener">Edit go.mod from tools or scripts</a></p>
+<h2 id="使用-vendor-directory"><a href="#使用-vendor-directory" class="headerlink" title="使用 vendor directory"></a>使用 vendor directory</h2><p><a href="https://golang.org/cmd/go/#hdr-Vendor_Directories" target="_blank" rel="noopener">Vendor Directories</a> 是在 Go Module 還沒有出來之前，一種管理套件的方式。 既然我們現在有 Go Module 的方式管理套件了，這方式還是不太建議。</p>
+<p>但是此方式還是有它的使用情境，例如 IT 部門在 Production 環境不許允連網路，這樣就沒辦法使用 <code>$ go get</code> 來下載套件，這時候我們可以使用 vendor directory 的方式，把套件的檔案都準備好，這樣就不用額外在 <code>$ go get</code> 檔案</p>
+<p>啟用 vendor directory 的指令 <code>$ go mod vendor</code>，執行完畢後，就會看到專案裡面多一個 vendor 的資料夾，該資料夾就是存放第三方套件的地方。</p>
+<h3 id="啟用-vendor-directory-後，建置專案的方式"><a href="#啟用-vendor-directory-後，建置專案的方式" class="headerlink" title="啟用 vendor directory 後，建置專案的方式"></a>啟用 vendor directory 後，建置專案的方式</h3><div class="alert danger"><p>如果執行 <code>$ go run .</code> 或 <code>$ go build .</code> 的時候會發現，實際上程式也是會去抓 <code>GOPATH/pkg/mod</code> 的套件，而不是專案底下的 vendor 套件。</p>
+</div>
+<p>如果要使用專案底下 vendor 的檔案來 build 專案的話，必須加入一些參數，使用方法如 <code>$ go run -mod=vendor .</code>,  <code>$ go build -mod=vendor .</code>。</p>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>今天的筆記都是從 <a href="https://app.pluralsight.com/library/courses/exploring-go-modules/discussion" title="Exploring Go Modules" target="_blank" rel="noopener">Exploring Go Modules by pluralsight</a> 這個課程來的，如果有 pluralsight 的訂閱讀者，很推薦此課程。</p>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p>[<a href="https://github.com/golang/go/wiki/Modules#quick-start" title="Go 1.11 Modules" target="_blank" rel="noopener">Go 1.11 Modules</a>]<br>[<a href="https://semver.org/lang/zh-TW/" title="Semantic Versioning" target="_blank" rel="noopener">Semantic Versioning</a>]<br>[<a href="https://app.pluralsight.com/library/courses/exploring-go-modules/table-of-contents" title="Exploring Go Modules - pluralsight" target="_blank" rel="noopener">Exploring Go Modules - pluralsight</a>]<br>[<a href="https://golang.org/cmd/go" title="Go Command" target="_blank" rel="noopener">Go Command</a>]  </p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Go/">Go</a> <a class="tag tag--primary tag--small t-link" href="/tags/Go-Module/">Go Module</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/Golang/Go-產生不同平台的執行檔/" data-tooltip="[Go] Go 產生不同平台的執行檔" aria-label="PREVIOUS: [Go] Go 產生不同平台的執行檔">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/12/使用-docker-compose-建立多個服務/" data-tooltip="[Docker] 使用 docker-compose 建立多個服務" aria-label="NEXT: [Docker] 使用 docker-compose 建立多個服務">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/Golang/Go-產生不同平台的執行檔/" data-tooltip="[Go] Go 產生不同平台的執行檔" aria-label="PREVIOUS: [Go] Go 產生不同平台的執行檔">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/12/使用-docker-compose-建立多個服務/" data-tooltip="[Docker] 使用 docker-compose 建立多個服務" aria-label="NEXT: [Docker] 使用 docker-compose 建立多個服務">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/';
+                 
+                    this.page.identifier = '2020/01/Golang/Go-Module-快速上手筆記/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

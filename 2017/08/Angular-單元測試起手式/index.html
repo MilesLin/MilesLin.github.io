@@ -1,0 +1,820 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Angular] Angular 單元測試起手式 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Angular">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"jasmine 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 karma 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  angular cli 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。\n建立 spy object在這邊我有一個 VoterService ，且有一個 deleteVoter 的方法，可以執行刪除的動作，而為了能發 Http 到 Server，Angular 都是用 HTTP 這類別來發送 http request，所以我建構式注入了 HTTP，而我在單元測試的時候，也就可以注入假的 HTTP 物件。\ndelete voterts123456789101112131415@Injectable()export class VoterService {  constructor(private http: Http) {}  deleteVoter(session: ISession, voterName: string) {    session.voters = session.voters.filter(voter =&gt; voter !== voterName);    this.http.delete(`${environment.host}/api/sessions/${session.id}`).catch(this.handleError).subscribe();  }  private handleError(error: Response) {    return Observable.throw(error.statusText);  }}\n使用  createSpyObj 建立假的 HTTP 物件。參數說明:\n\nmockHttp : base name, 可隨意輸入\n[‘delete’] : Spy 物件有 delete 這個方法Spyts1let mockHttp = jasmine.createSpyObj('mockHttp', ['delete']);\n\n\n撰寫完整的單元測試，而這裡我們要確切的指定 delete 方法回傳 Observable 物件，否則 .catch 與 .subscribe 則會錯誤。\n\nmockHttp.delete.and.returnValue(Observable.of(false)); : Spy 物件的 delete 方法回傳 Observable ， 因為要測試的 deleteVoter 方法，並沒有在 subscribe 裡面執行任何程式碼，所以使用 Observable.of(false) 建立一個 Observable 物件。unit testts12345678910111213141516171819202122232425describe('VoterService', () =&gt; {  let voterService: VoterService,    mockHttp;  beforeEach(() =&gt; {    mockHttp = jasmine.createSpyObj('mockHttp', ['delete'])    voterService = new VoterService(mockHttp);  });  describe('deleteVoter', () =&gt; {    it('should remove the session from the list of sessions', () =&gt; {      var session = { id: 6, voters: [\"joe\", \"john\"]};            mockHttp.delete.and.returnValue(Observable.of(false));      voterService.deleteVoter2(&lt;ISession&gt;session, \"joe\");      expect(session.voters.length).toBe(1);      expect(session.voters[0]).toBe(\"john\");    })  })})\n\n\n驗證傳入參數新增另一個 addVoter 的方法，執行 http.post 發送資料到 http://localhost:3000/api/sessions/voters/joe API 位址addVoterts123456789addVoter(session: ISession, voterName: string) {  session.voters.push(voterName);  let headers = new Headers({ 'Content-Type': 'application/json'});  let options = new RequestOptions({headers: headers});  let url = `${environment.host}/api/sessions/voters/${voterName}`;  this.http.post(url, JSON.stringify({}), options).catch(this.handleError).subscribe();}\n使用 toHaveBeenCalledWith 驗證 post 傳入的網址是否如預期，以及使用 jasmine.any 驗證傳入的物件型別是否如預期。unit testts1234567891011121314151617181920212223describe('VoterService', () =&gt; {  let voterService: VoterService,    mockHttp;  beforeEach(() =&gt; {    mockHttp = jasmine.createSpyObj('mockHttp', ['delete', 'post'])    voterService = new VoterService(mockHttp);  });  describe('addVoter', () =&gt; {    it('should call http.post with the right URL', () =&gt; {      var session = { id: 6, voters: [\"john\"]};      mockHttp.post.and.returnValue(Observable.of(false));      voterService.addVoter(&lt;ISession&gt;session, \"joe\");      expect(mockHttp.post).toHaveBeenCalledWith('http://localhost:3000/api/sessions/voters/joe', \"{}\", jasmine.any(RequestOptions));    })  })})\n參考[jasmine sample][karma][angular-fundamentals]\n","dateCreated":"2017-08-07T21:50:54+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-08-07T21:50:54+08:00","description":"jasmine 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 karma 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  angular cli 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。","headline":"[Angular] Angular 單元測試起手式","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/08/Angular-單元測試起手式/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/08/Angular-單元測試起手式/","keywords":"Angular"}</script>
+    <meta name="description" content="jasmine 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 karma 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  angular cli 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。">
+<meta name="keywords" content="Angular">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Angular] Angular 單元測試起手式">
+<meta property="og:url" content="https://mileslin.github.io/2017/08/Angular-單元測試起手式/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="jasmine 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 karma 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  angular cli 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.485Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Angular] Angular 單元測試起手式">
+<meta name="twitter:description" content="jasmine 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 karma 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  angular cli 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Angular] Angular 單元測試起手式
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2017-08-07T21:50:54+08:00">
+	
+		    Aug 07, 2017
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Angular/">Angular</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <a href="https://jasmine.github.io/index.html" title="jasmine" target="_blank" rel="noopener">jasmine</a> 是一套 unit testing framework，用起來直覺，也提供一些功能方便我們寫測試，而 <a href="https://karma-runner.github.io/1.0/index.html" title="karma" target="_blank" rel="noopener">karma</a> 是一套 command line test runner, 用來啟動瀏覽器，執行測試程式碼。  <a href="https://github.com/angular/angular-cli" title="angular cli" target="_blank" rel="noopener">angular cli</a> 建立專案時，預設提供這兩樣測試工具，來幫助我們寫單元測試。<br><br><a id="more"></a>
+<h2 id="建立-spy-object"><a href="#建立-spy-object" class="headerlink" title="建立 spy object"></a>建立 spy object</h2><p>在這邊我有一個 VoterService ，且有一個 deleteVoter 的方法，可以執行刪除的動作，而為了能發 Http 到 Server，Angular 都是用 <a href="https://angular.io/api/http/Http" title="HTTP" target="_blank" rel="noopener">HTTP</a> 這類別來發送 http request，所以我建構式注入了 HTTP，而我在單元測試的時候，也就可以注入假的 HTTP 物件。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>delete voter</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Injectable</span>()</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> VoterService {</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params"><span class="keyword">private</span> http: Http</span>) {}</span><br><span class="line"></span><br><span class="line">  deleteVoter(session: ISession, voterName: <span class="built_in">string</span>) {</span><br><span class="line">    session.voters = session.voters.filter(<span class="function"><span class="params">voter</span> =&gt;</span> voter !== voterName);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.http.delete(<span class="string">`<span class="subst">${environment.host}</span>/api/sessions/<span class="subst">${session.id}</span>`</span>).catch(<span class="keyword">this</span>.handleError).subscribe();</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> handleError(error: Response) {</span><br><span class="line">    <span class="keyword">return</span> Observable.throw(error.statusText);</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="使用-建立假的-HTTP-物件。"><a href="#使用-建立假的-HTTP-物件。" class="headerlink" title="使用   建立假的 HTTP 物件。"></a>使用  <a href="https://jasmine.github.io/api/edge/jasmine.html#.createSpyObj" title="createSpyObj" target="_blank" rel="noopener">createSpyObj</a> 建立假的 HTTP 物件。</h3><p>參數說明:</p>
+<ul>
+<li>mockHttp : base name, 可隨意輸入</li>
+<li>[‘delete’] : Spy 物件有 delete 這個方法<figure class="codeblock codeblock--tabbed"><figcaption><span>Spy</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> mockHttp = jasmine.createSpyObj(<span class="string">'mockHttp'</span>, [<span class="string">'delete'</span>]);</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
+</ul>
+<p>撰寫完整的單元測試，而這裡我們要確切的指定 delete 方法回傳 <code>Observable</code> 物件，否則 <code>.catch</code> 與 <code>.subscribe</code> 則會錯誤。</p>
+<ul>
+<li><code>mockHttp.delete.and.returnValue(Observable.of(false));</code> : Spy 物件的 delete 方法回傳 <code>Observable</code> ， 因為要測試的 deleteVoter 方法，並沒有在 subscribe 裡面執行任何程式碼，所以使用 <code>Observable.of(false)</code> 建立一個 <code>Observable</code> 物件。<figure class="codeblock codeblock--tabbed"><figcaption><span>unit test</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">describe(<span class="string">'VoterService'</span>, <span class="function"><span class="params">()</span> =&gt;</span> {</span><br><span class="line">  <span class="keyword">let</span> voterService: VoterService,</span><br><span class="line">    mockHttp;</span><br><span class="line"></span><br><span class="line">  beforeEach(<span class="function"><span class="params">()</span> =&gt;</span> {</span><br><span class="line">    mockHttp = jasmine.createSpyObj(<span class="string">'mockHttp'</span>, [<span class="string">'delete'</span>])</span><br><span class="line">    voterService = <span class="keyword">new</span> VoterService(mockHttp);</span><br><span class="line">  });</span><br><span class="line"></span><br><span class="line">  describe(<span class="string">'deleteVoter'</span>, <span class="function"><span class="params">()</span> =&gt;</span> {</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'should remove the session from the list of sessions'</span>, <span class="function"><span class="params">()</span> =&gt;</span> {</span><br><span class="line">      <span class="keyword">var</span> session = { id: <span class="number">6</span>, voters: [<span class="string">"joe"</span>, <span class="string">"john"</span>]};      </span><br><span class="line">      mockHttp.delete.and.returnValue(Observable.of(<span class="literal">false</span>));</span><br><span class="line"></span><br><span class="line">      voterService.deleteVoter2(&lt;ISession&gt;session, <span class="string">"joe"</span>);</span><br><span class="line"></span><br><span class="line">      expect(session.voters.length).toBe(<span class="number">1</span>);</span><br><span class="line">      expect(session.voters[<span class="number">0</span>]).toBe(<span class="string">"john"</span>);</span><br><span class="line">    })</span><br><span class="line"></span><br><span class="line">  })</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
+</ul>
+<h2 id="驗證傳入參數"><a href="#驗證傳入參數" class="headerlink" title="驗證傳入參數"></a>驗證傳入參數</h2><p>新增另一個 addVoter 的方法，執行 http.post 發送資料到 <code>http://localhost:3000/api/sessions/voters/joe</code> API 位址<br><figure class="codeblock codeblock--tabbed"><figcaption><span>addVoter</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">addVoter(session: ISession, voterName: <span class="built_in">string</span>) {</span><br><span class="line">  session.voters.push(voterName);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> headers = <span class="keyword">new</span> Headers({ <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>});</span><br><span class="line">  <span class="keyword">let</span> options = <span class="keyword">new</span> RequestOptions({headers: headers});</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> url = <span class="string">`<span class="subst">${environment.host}</span>/api/sessions/voters/<span class="subst">${voterName}</span>`</span>;</span><br><span class="line">  <span class="keyword">this</span>.http.post(url, <span class="built_in">JSON</span>.stringify({}), options).catch(<span class="keyword">this</span>.handleError).subscribe();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>使用 <strong>toHaveBeenCalledWith</strong> 驗證 post 傳入的網址是否如預期，以及使用 <strong>jasmine.any</strong> 驗證傳入的物件型別是否如預期。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>unit test</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">describe(<span class="string">'VoterService'</span>, <span class="function"><span class="params">()</span> =&gt;</span> {</span><br><span class="line">  <span class="keyword">let</span> voterService: VoterService,</span><br><span class="line">    mockHttp;</span><br><span class="line"></span><br><span class="line">  beforeEach(<span class="function"><span class="params">()</span> =&gt;</span> {</span><br><span class="line">    mockHttp = jasmine.createSpyObj(<span class="string">'mockHttp'</span>, [<span class="string">'delete'</span>, <span class="string">'post'</span>])</span><br><span class="line">    voterService = <span class="keyword">new</span> VoterService(mockHttp);</span><br><span class="line">  });</span><br><span class="line"></span><br><span class="line">  describe(<span class="string">'addVoter'</span>, <span class="function"><span class="params">()</span> =&gt;</span> {</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'should call http.post with the right URL'</span>, <span class="function"><span class="params">()</span> =&gt;</span> {</span><br><span class="line">      <span class="keyword">var</span> session = { id: <span class="number">6</span>, voters: [<span class="string">"john"</span>]};</span><br><span class="line">      mockHttp.post.and.returnValue(Observable.of(<span class="literal">false</span>));</span><br><span class="line"></span><br><span class="line">      voterService.addVoter(&lt;ISession&gt;session, <span class="string">"joe"</span>);</span><br><span class="line"></span><br><span class="line">      expect(mockHttp.post).toHaveBeenCalledWith(<span class="string">'http://localhost:3000/api/sessions/voters/joe'</span>, <span class="string">"{}"</span>, jasmine.any(RequestOptions));</span><br><span class="line">    })</span><br><span class="line"></span><br><span class="line">  })</span><br><span class="line"></span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="https://jasmine.github.io/2.0/introduction.html" title="jasmine sample" target="_blank" rel="noopener">jasmine sample</a>]</strong><br><strong>[<a href="https://karma-runner.github.io/1.0/index.html" title="karma" target="_blank" rel="noopener">karma</a>]</strong><br><strong>[<a href="https://app.pluralsight.com/library/courses/angular-fundamentals/table-of-contents" title="angular-fundamentals" target="_blank" rel="noopener">angular-fundamentals</a>]</strong></p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/08/Template-Driven-動態加入驗證屬性注意事項/" data-tooltip="[Angular] Template-Driven 動態加入驗證屬性注意事項" aria-label="PREVIOUS: [Angular] Template-Driven 動態加入驗證屬性注意事項">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/使用範本參考變數存取-Child-Component/" data-tooltip="[Angular] 使用範本參考變數存取 Child Component" aria-label="NEXT: [Angular] 使用範本參考變數存取 Child Component">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/08/Angular-單元測試起手式/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/08/Angular-單元測試起手式/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/08/Angular-單元測試起手式/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/08/Template-Driven-動態加入驗證屬性注意事項/" data-tooltip="[Angular] Template-Driven 動態加入驗證屬性注意事項" aria-label="PREVIOUS: [Angular] Template-Driven 動態加入驗證屬性注意事項">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/使用範本參考變數存取-Child-Component/" data-tooltip="[Angular] 使用範本參考變數存取 Child Component" aria-label="NEXT: [Angular] 使用範本參考變數存取 Child Component">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/08/Angular-單元測試起手式/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/08/Angular-單元測試起手式/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/08/Angular-單元測試起手式/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/08/Angular-單元測試起手式/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2017/08/Angular-單元測試起手式/';
+                 
+                    this.page.identifier = '2017/08/Angular-單元測試起手式/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

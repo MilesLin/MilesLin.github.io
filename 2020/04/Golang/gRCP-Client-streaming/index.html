@@ -1,0 +1,829 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Go] gRCP Client streaming - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Go,gRCP,Protocol Buffers">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Client streaming 就是 gRCP Server streaming 的相反行為，client 會發送多個訊息給伺服器，伺服器會回應一個 Response 給 Client。\n\n範例說明今天的範例會模擬使用者上傳一個圖片給伺服器，最主要使用者要提供兩個訊息，一個是要告訴伺服器是哪一個 EmployeeId  上傳的，一個是將 圖片轉成 bytes 格式 送出給伺服器。\n這是這篇的 message type 範例，有一個 Employee Service ，且有 AddPhoto 方法提供上傳圖片。 這邊可以看到 message AddPhotoRequest 只有一個 data 的欄位，為什麼沒有 EmployeeId 的欄位呢?  因為如果放在 message 裡面的話，我們會多傳送好多次 EmployeeId 給 Server ，造成多餘的流量傳送，所以 EmployeeId 我們會採用 metadata 方式來傳送。\nprotoproto12345678910111213141516syntax = \"proto3\";package pb;message AddPhotoRequest {  bytes data = 1;}message AddPhotoResponse {  int32 employeeId = 1;  bool isOk = 2;}service Employee {  rpc AddPhoto (stream AddPhotoRequest) returns (AddPhotoResponse);}\nClient Code我們的 Client 的範例會上傳一個 58k 左右的圖片檔案，並且一次傳 10k 給伺服器，總共會送 6 次訊息給伺服器。 實作此範例 code 的重點如下\n\n在傳送資料給伺服器的時候，使用 google.golang.org/grpc/metadata 建立自訂的 metadata\n讀取圖片，每次讀取 10k 的大小，然後傳送給伺服器\n最後圖片傳送完之後，呼叫 CloseAndRecv() 跟伺服器說資料傳送完畢。\n\nclientgo12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061package mainimport (\t\"context\"\t\"fmt\"\t\"google.golang.org/grpc\"\t\"google.golang.org/grpc/credentials\"\t\"google.golang.org/grpc/metadata\"\t\"io\"\t\"os\"\t\"log\"\t\"trygrpc/pb\")const (\taddress = \"localhost:50051\")func main() {\t// Create tls based credential.\tcreds, _ := credentials.NewClientTLSFromFile(\"../cert.pem\", \"\")\t// Set up a connection to the server.\tconn, _ := grpc.Dial(address, grpc.WithTransportCredentials(creds), grpc.WithBlock())\tdefer conn.Close()\tc := pb.NewEmployeeClient(conn)\t// metadata 加入 employeeid 的資料\tmd := metadata.New(map[string]string{\"employeeid\":\"9527\"})\tctx := metadata.NewOutgoingContext(context.Background(), md)\tstream, _ := c.AddPhoto(ctx)\t\t// 打開圖片\tf, _ := os.Open(\"goteam.jpg\")\tfor {\t\t// 一次讀取 10k\t\tchunk := make([]byte, 10 * 1024)\t\tn, err := f.Read(chunk)\t\tif err == io.EOF {\t\t\tbreak\t\t}    if err != nil {\t\t\t\tlog.Fatal(err)\t\t}\t\t// 最後一個 chunk 不一定剛好 10k ，所以就把不滿10k的 array 去除，防止送出多餘的 byte。\t\tif n &lt; len(chunk) {\t\t\tchunk = chunk[:n]\t\t}\t\tstream.Send(&amp;pb.AddPhotoRequest{Data: chunk})\t}\tres, _ := stream.CloseAndRecv()\tfmt.Println(res)}\n這裡要特別說的是，我在建立 metadata 的時候 key 是用全小寫的英文 md := metadata.New(map[string]string{&quot;employeeid&quot;:&quot;9527&quot;})。 因為當 metadata 在送的時候會全部轉成小寫，這是為了有效率的壓縮 header。 所以就算你是設定大寫，在伺服器端也是要用全小寫的方式取值。\n出處: Practical gRPC - CHAPTER 4: gRPC basics\n\nServer CodeServer code 就是用 buufer 儲存 client 傳過來的 bytes，等傳送完之後，將 buffer 的資料轉換成圖片檔案。 實作重點如下\n\n從 metadata 讀取 client 傳過的 employeeid \n建立 buffer 接收 client 傳過來的圖片\n等 client 結束傳送後，將 buffer 的資料編碼成圖片\n\nservergo12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152package serviceimport (\t\"bytes\"  \"fmt\"\t\"google.golang.org/grpc/metadata\"\t\"image\"\t\"image/jpeg\"\t\"io\"\t\"os\"\t\"strconv\"\t\"trygrpc/pb\")type EmployeeService struct {}func (e EmployeeService) AddPhoto(r pb.Employee_AddPhotoServer) error {\t// 從 Context 讀取 employeeId\tmd, _ := metadata.FromIncomingContext(r.Context())\temployeeId, _ := strconv.Atoi(md[\"employeeid\"][0])\t// 建立 buufer 讀取接收的 bytes\tbuf := new(bytes.Buffer)\tfor {\t\tres, err := r.Recv()\t\tif err == io.EOF {\t\t\t// 將 buffer 的 bytes 寫入檔案\t\t\tout, _  := os.Create(\"./testread.jpeg\")\t\t\timg, _ , _ := image.Decode(buf)\t\t\t// 使用 jpeg Encode\t\t\tjpeg.Encode(out, img, &amp;jpeg.Options{Quality:80})\t\t\tout.Close()\t\t\treturn r.SendAndClose(&amp;pb.AddPhotoResponse{IsOk:true, EmployeeId: int32(employeeId)})\t\t}\t\tif err != nil {\t\t\treturn err\t\t}\t\t// 將傳送的資料寫入 buffer\t\tbuf.Write(res.Data)    // 印出 buffer 的資料長度\t\tfmt.Printf(\"buffer len: %d \\n\", len(buf.Bytes()))\t}}\n執行結果可以看到執行結果，Server 每一次接收到資料的時候， buffer 就增加 10k 的大小。 而 Client 最後會得到一個 Server 的回應。result\n延伸閱讀[Golang : Convert []byte to image][gRPC Basics - Go]\n","dateCreated":"2020-04-02T17:27:49+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-04-02T17:27:49+08:00","description":"Client streaming 就是 gRCP Server streaming 的相反行為，client 會發送多個訊息給伺服器，伺服器會回應一個 Response 給 Client。","headline":"[Go] gRCP Client streaming","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/","keywords":"Go, gRCP, Protocol Buffers"}</script>
+    <meta name="description" content="Client streaming 就是 gRCP Server streaming 的相反行為，client 會發送多個訊息給伺服器，伺服器會回應一個 Response 給 Client。">
+<meta name="keywords" content="Go,gRCP,Protocol Buffers">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Go] gRCP Client streaming">
+<meta property="og:url" content="https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="Client streaming 就是 gRCP Server streaming 的相反行為，client 會發送多個訊息給伺服器，伺服器會回應一個 Response 給 Client。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/result.jpg">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.548Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Go] gRCP Client streaming">
+<meta name="twitter:description" content="Client streaming 就是 gRCP Server streaming 的相反行為，client 會發送多個訊息給伺服器，伺服器會回應一個 Response 給 Client。">
+<meta name="twitter:image" content="https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/result.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Go] gRCP Client streaming
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-04-02T17:27:49+08:00">
+	
+		    Apr 02, 2020
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Go/">Go</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>Client streaming 就是 <a href="https://mileslin.github.io/2020/04/Golang/gRCP-Server-streaming/">gRCP Server streaming</a> 的相反行為，client 會發送多個訊息給伺服器，伺服器會回應一個 Response 給 Client。</p>
+<a id="more"></a>
+<h2 id="範例說明"><a href="#範例說明" class="headerlink" title="範例說明"></a>範例說明</h2><p>今天的範例會模擬使用者上傳一個圖片給伺服器，最主要使用者要提供兩個訊息，一個是要告訴伺服器是哪一個 <span class="highlight-text primary">EmployeeId</span>  上傳的，一個是將 <span class="highlight-text primary">圖片轉成 bytes 格式</span> 送出給伺服器。</p>
+<p>這是這篇的 message type 範例，有一個 Employee Service ，且有 AddPhoto 方法提供上傳圖片。 這邊可以看到 <span class="highlight-text success">message AddPhotoRequest</span> 只有一個 data 的欄位，為什麼沒有 EmployeeId 的欄位呢?  因為如果放在 message 裡面的話，我們會多傳送好多次 EmployeeId 給 Server ，造成多餘的流量傳送，所以 EmployeeId 我們會採用 <a href="https://grpc.io/docs/guides/concepts/#metadata" target="_blank" rel="noopener">metadata</a> 方式來傳送。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>proto</span><ul class="tabs"><li class="tab active">proto</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line"></span><br><span class="line">package pb;</span><br><span class="line"></span><br><span class="line">message AddPhotoRequest {</span><br><span class="line">  bytes data = 1;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">message AddPhotoResponse {</span><br><span class="line">  int32 employeeId = 1;</span><br><span class="line">  bool isOk = 2;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">service Employee {</span><br><span class="line">  rpc AddPhoto (stream AddPhotoRequest) returns (AddPhotoResponse);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="Client-Code"><a href="#Client-Code" class="headerlink" title="Client Code"></a>Client Code</h2><p>我們的 Client 的範例會上傳一個 58k 左右的圖片檔案，並且一次傳 10k 給伺服器，總共會送 6 次訊息給伺服器。 實作此範例 code 的重點如下</p>
+<ol>
+<li>在傳送資料給伺服器的時候，使用 <code>google.golang.org/grpc/metadata</code> 建立自訂的 metadata</li>
+<li>讀取圖片，每次讀取 10k 的大小，然後傳送給伺服器</li>
+<li>最後圖片傳送完之後，呼叫 <code>CloseAndRecv()</code> 跟伺服器說資料傳送完畢。</li>
+</ol>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>client</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"google.golang.org/grpc"</span></span><br><span class="line">	<span class="string">"google.golang.org/grpc/credentials"</span></span><br><span class="line">	<span class="string">"google.golang.org/grpc/metadata"</span></span><br><span class="line">	<span class="string">"io"</span></span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"trygrpc/pb"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	address = <span class="string">"localhost:50051"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	<span class="comment">// Create tls based credential.</span></span><br><span class="line">	creds, _ := credentials.NewClientTLSFromFile(<span class="string">"../cert.pem"</span>, <span class="string">""</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Set up a connection to the server.</span></span><br><span class="line">	conn, _ := grpc.Dial(address, grpc.WithTransportCredentials(creds), grpc.WithBlock())</span><br><span class="line"></span><br><span class="line">	<span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">	c := pb.NewEmployeeClient(conn)</span><br><span class="line">	<span class="comment">// metadata 加入 employeeid 的資料</span></span><br><span class="line">	md := metadata.New(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">string</span>{<span class="string">"employeeid"</span>:<span class="string">"9527"</span>})</span><br><span class="line">	ctx := metadata.NewOutgoingContext(context.Background(), md)</span><br><span class="line">	stream, _ := c.AddPhoto(ctx)</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 打開圖片</span></span><br><span class="line">	f, _ := os.Open(<span class="string">"goteam.jpg"</span>)</span><br><span class="line">	<span class="keyword">for</span> {</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 一次讀取 10k</span></span><br><span class="line">		chunk := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">10</span> * <span class="number">1024</span>)</span><br><span class="line">		n, err := f.Read(chunk)</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> err == io.EOF {</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">		}</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">				log.Fatal(err)</span><br><span class="line">		}</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 最後一個 chunk 不一定剛好 10k ，所以就把不滿10k的 array 去除，防止送出多餘的 byte。</span></span><br><span class="line">		<span class="keyword">if</span> n &lt; <span class="built_in">len</span>(chunk) {</span><br><span class="line">			chunk = chunk[:n]</span><br><span class="line">		}</span><br><span class="line"></span><br><span class="line">		stream.Send(&amp;pb.AddPhotoRequest{Data: chunk})</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	res, _ := stream.CloseAndRecv()</span><br><span class="line"></span><br><span class="line">	fmt.Println(res)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<div class="alert warning no-icon"><p>這裡要特別說的是，我在建立 metadata 的時候 key 是用全小寫的英文 <code>md := metadata.New(map[string]string{&quot;employeeid&quot;:&quot;9527&quot;})</code>。 因為當 metadata 在送的時候會全部轉成小寫，這是為了有效率的壓縮 header。 所以就算你是設定大寫，在伺服器端也是要用全小寫的方式取值。</p>
+<p>出處: <a href="https://www.packtpub.com/web-development/practical-grpc" target="_blank" rel="noopener">Practical gRPC - CHAPTER 4: gRPC basics</a></p>
+</div>
+<h2 id="Server-Code"><a href="#Server-Code" class="headerlink" title="Server Code"></a>Server Code</h2><p>Server code 就是用 buufer 儲存 client 傳過來的 bytes，等傳送完之後，將 buffer 的資料轉換成圖片檔案。 實作重點如下</p>
+<ol>
+<li>從 metadata 讀取 client 傳過的 employeeid </li>
+<li>建立 buffer 接收 client 傳過來的圖片</li>
+<li>等 client 結束傳送後，將 buffer 的資料編碼成圖片</li>
+</ol>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>server</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> service</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"bytes"</span></span><br><span class="line">  <span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"google.golang.org/grpc/metadata"</span></span><br><span class="line">	<span class="string">"image"</span></span><br><span class="line">	<span class="string">"image/jpeg"</span></span><br><span class="line">	<span class="string">"io"</span></span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"strconv"</span></span><br><span class="line">	<span class="string">"trygrpc/pb"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> EmployeeService <span class="keyword">struct</span> {}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e EmployeeService)</span> <span class="title">AddPhoto</span><span class="params">(r pb.Employee_AddPhotoServer)</span> <span class="title">error</span></span> {</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 從 Context 讀取 employeeId</span></span><br><span class="line">	md, _ := metadata.FromIncomingContext(r.Context())</span><br><span class="line">	employeeId, _ := strconv.Atoi(md[<span class="string">"employeeid"</span>][<span class="number">0</span>])</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 建立 buufer 讀取接收的 bytes</span></span><br><span class="line">	buf := <span class="built_in">new</span>(bytes.Buffer)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> {</span><br><span class="line">		res, err := r.Recv()</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> err == io.EOF {</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 將 buffer 的 bytes 寫入檔案</span></span><br><span class="line">			out, _  := os.Create(<span class="string">"./testread.jpeg"</span>)</span><br><span class="line">			img, _ , _ := image.Decode(buf)</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 使用 jpeg Encode</span></span><br><span class="line">			jpeg.Encode(out, img, &amp;jpeg.Options{Quality:<span class="number">80</span>})</span><br><span class="line"></span><br><span class="line">			out.Close()</span><br><span class="line">			<span class="keyword">return</span> r.SendAndClose(&amp;pb.AddPhotoResponse{IsOk:<span class="literal">true</span>, EmployeeId: <span class="keyword">int32</span>(employeeId)})</span><br><span class="line">		}</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		}</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 將傳送的資料寫入 buffer</span></span><br><span class="line">		buf.Write(res.Data)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 印出 buffer 的資料長度</span></span><br><span class="line">		fmt.Printf(<span class="string">"buffer len: %d \n"</span>, <span class="built_in">len</span>(buf.Bytes()))</span><br><span class="line">	}</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="執行結果"><a href="#執行結果" class="headerlink" title="執行結果"></a>執行結果</h2><p>可以看到執行結果，Server 每一次接收到資料的時候， buffer 就增加 10k 的大小。 而 Client 最後會得到一個 Server 的回應。<br><div class="figure center" style="width:;"><a class="fancybox" href="result.jpg" title="result" data-caption="result" data-fancybox="default"><img class="fig-img" src="result.jpg" alt="result"></a><span class="caption">result</span></div></p>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p>[<a href="https://www.socketloop.com/tutorials/golang-convert-byte-to-image" title="Golang : Convert []byte to image" target="_blank" rel="noopener">Golang : Convert []byte to image</a>]<br>[<a href="https://grpc.io/docs/tutorials/basic/go/" title="gRPC Basics - Go" target="_blank" rel="noopener">gRPC Basics - Go</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Go/">Go</a> <a class="tag tag--primary tag--small t-link" href="/tags/Protocol-Buffers/">Protocol Buffers</a> <a class="tag tag--primary tag--small t-link" href="/tags/gRCP/">gRCP</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/04/Golang/gRCP-Bidirectional-streaming/" data-tooltip="[Go] gRCP Bidirectional streaming" aria-label="PREVIOUS: [Go] gRCP Bidirectional streaming">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/04/Golang/gRCP-Server-streaming/" data-tooltip="[Go] gRCP Server streaming" aria-label="NEXT: [Go] gRCP Server streaming">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/04/Golang/gRCP-Bidirectional-streaming/" data-tooltip="[Go] gRCP Bidirectional streaming" aria-label="PREVIOUS: [Go] gRCP Bidirectional streaming">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/04/Golang/gRCP-Server-streaming/" data-tooltip="[Go] gRCP Server streaming" aria-label="NEXT: [Go] gRCP Server streaming">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/';
+                 
+                    this.page.identifier = '2020/04/Golang/gRCP-Client-streaming/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

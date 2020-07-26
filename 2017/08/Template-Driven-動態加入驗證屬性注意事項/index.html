@@ -1,0 +1,880 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Angular] Template-Driven 動態加入驗證屬性注意事項 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Angular">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。\n此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’\n\n\nExpression Changed After It Has Been Checked Error\n案例說明在解答這個問題之前，先敘述一下將要展示的簡單案例。\n\n畫面有 Age 與 Married 兩個下拉選單\nAge 必填，可選擇 Child 與 Adult\nMarried ，可選擇 Married 與 Not Yet \n當 Age 選擇 Adult 時， Married 一定要選擇，並顯示 Required 文字 \n  \n\n\n\n\n了解案例後，讀者可以到 Angular-Expression Changed After It Has Been Checked Error Demo 按照步驟操作，即可出現錯誤訊息。  (記得看一下程式碼喔~)\nDevelopment Mode如果讀者有操作上敘案例的話，按下 F12 開啟開發者模式的時候，會看到這段訊息。Development_Mode_Message\n什麼是 Development Mode? Development Mode 會有什麼機制? 這是本篇的 Key Point 啊!!!\n引用 Angular #6005 的說明In short, after every round of change detection, dev mode immediately performs a second round to verify that no bindings have changed since the end of the first, as this would indicate that changes are being caused by change detection itself\ndrew-mooreEXCEPTION: Expression has changed after it was checked. #6005\n意思是說，在 Development Mode 的情況下，變更偵測觸發後，會立即執行第二次變更偵測，確保 status 的值沒有被變更。  如果 status 的值被變更了，則會出現該錯誤訊息，而這情形稱之為  change detection loops 。\n不建議執行 enableProdMode() 解決這個問題剛剛那篇 issue 的說明，有提到一個解決方式，就是 enableProdMode() 啟用 Production Mode，恩….沒錯，啟用 Production Mode ，這個問題就不會再出現了。  但是這樣只是把問題隱藏而已，因為 Development Mode 會有這機制，是有原因的 !!!\n如 stackoverflow 有人說明，第二次變更偵測的時候，變更偵測自行變更 status ，或者是在執行一個方法時，每次執行都回傳不同的值，這樣會造成 status 非常不穩定。If the model has changed between the regular and the additional change detection turn, this indicates that either\n\nchange detection itself has caused a change\na method or getter returns a different value every time it is calledwhich are both bad, because it is not clear how to proceed because the model might never stabilize.\n\nGünter ZöchbauerExpressionChangedAfterItHasBeenCheckedError Explained\n再來是根據 Angular University 的建議， 最好在開發時期啟用 Development Mode，那將會避免問題發生。We really have to go out of our way to trigger a change detection loop, but just in case its better to always use development mode during the development phase, as that will avoid the problem.\nAngular UniversityAre change detection issues frequent?\nLifecycle Hooks好了!! 接下來就是要找出問題的發生點，在這之前會建議讀者稍微了解一下生命週期的概念。 =&gt; Lifecycle Hooks，\n根據 Angular University - How to trigger a change detection loop in Angular? 的說明，這錯誤訊息是發生在 Angular Lifecycle Hooks - ngAfterViewChecked 這個階段。\n接下來請到線上範例 Angular-Expression Changed After It Has Been Checked Error Demo With Lifecycle Hooks 看一下生命週期 ngAfterContentChecked 與 ngAfterViewChecked 執行的情形。  (記得看一下程式碼喔~)\n可以看到 married invalid:true 在 ngAfterViewChecked 的階段，值改變了!!!Lifecycle_Hooks_Error_Message\n至於為什麼會這樣，請讀者看著這張圖，讓我按照順序說明畫面說明\n\n在 Age 還沒選擇時，2.[required]=&quot;age.value === &#39;2&#39;&quot;，不會成立，所以 married.invalid === false\nAge 選擇 Adult 時， view render 會先 render 到 1.&lt;em *ngIf=&quot;married.invalid&quot;&gt;Required&lt;/em&gt; 的位置，此時married.invalid 還是 === false\n接下來 view render 到 married 下拉選單，發現 2.[required]=&quot;age.value === &#39;2&#39;&quot;成立了，則 married.invalid === true， married.invalid 在這時候 status 改變了 !!! 。(這也是為什麼最一開始的程式範例，要執行步驟四，Required的訊息才會出現的原因)\n在 ngAfterViewChecked(view render 結束) 階段修改 status ，蹦 !! 錯誤訊息發生\n\n雙重驗證上述流程!!  根據上述流程，所以只要將 Required 訊息移到 married 下拉選單後面，讓 married 下拉選單先 render ，之後再 render Required 訊息，就不會有 view render 結束後又改變 status 的情形發生?A: 沒錯!!!\n讀者可以試試看，把 Required 訊息換位置(如下圖)。  讀者可以發現 change detection loops 的情形不再發生 !!\n更改 Required 訊息位置\n\n在 Age 還沒選擇時，2.[required]=&quot;age.value === &#39;2&#39;&quot;，不會成立，所以 married.invalid === false\nAge 選擇 Adult 時， view render 會先 render 到 married 下拉選單，發現 [required]=&quot;age.value === &#39;2&#39;&quot;成立了，則 married.invalid === true。\n接下來 view render 到 &lt;em *ngIf=&quot;married.invalid&quot;&gt;Required&lt;/em&gt;，因為 married.invalid 在流程 2 的時候已經是 true ，所以則顯示 Required 訊息。\n結束。  完全沒有在 ngAfterViewChecked(view render 結束) 階段修改 status\n\n最終解法 !!雖然上面有提到，只要移動 Required 訊息，問題就解決了，可是 版型就是這樣定的，錯誤訊息就是要擺那裏阿。  那如果錯誤訊息真的要放那邊怎麼辦?  而 Angular 生命週期的機制就是那樣，我們能做的是改變寫法。 \n請參考下圖，Age 下拉選單增加 chagne 事件，取代 [required]=&quot;age.value === &#39;2&#39;&quot; 寫法使用 change 事件\n\n使用 @ViewChild(&#39;form&#39;) form: NgForm; 取得 NgForm 物件\n在 markMarriedAsRequiredOrOptional 方法，設定 married 為 required用 NgForm 取得 FormControl 設定 married 為 Required\n\n\n最後當然還是有提供線上範例啦，讀者可以自行點連結去看看喔。 =&gt; Solution\n題外話好吧，其實這也是很重要的一個觀念，但是我不知道擺在文章的哪一段XD。  在這篇 how-does-angular-2-change-detection-really-work 的留言，有人認為說是 change detection loops 是 bug ，而 Angular University 則回應這是 feature 不是 bug ，其理由就讀者自行閱讀了。\n題外話XD\n小結想不到一個簡單的小功能造成的一個錯誤訊息，牽扯到的觀念那麼多，剛好也趁這時候認識了 Angular 生命週期與變更偵測的機制。  另外，讀者可以參考下方延伸閱讀的文章，其中有提到 onpush-change-detection ，使用這個方式，也可以解決 change detection loops 的問題，但是原因為何，目前還沒研究出來XD。\n參考[angular-university-how-does-angular-2-change-detection-really-work],[lifecycle-hooks],[stackoverflow-expressionchangedafterithasbeencheckederror-explained],[angular/issues/6005],[thoughtram-angular-2-change-detection-explained]  \n延伸閱讀[onpush-change-detection-how-it-works],[training-book-change-detection],[change-detection-strategy],[AbstractControl]\n","dateCreated":"2017-08-13T22:19:00+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-08-13T22:19:00+08:00","description":"在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。\n此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’\n","headline":"[Angular] Template-Driven 動態加入驗證屬性注意事項","image":["hooks-in-sequence.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/","keywords":"Angular","thumbnailUrl":"hooks-in-sequence.png"}</script>
+    <meta name="description" content="在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。 此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?ERROR Error: ExpressionChangedAfterItHasBeenCheckedError:">
+<meta name="keywords" content="Angular">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Angular] Template-Driven 動態加入驗證屬性注意事項">
+<meta property="og:url" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。 此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?ERROR Error: ExpressionChangedAfterItHasBeenCheckedError:">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Binding_Required.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Error_Message.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Development_Mode_Message.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Lifecycle_Hooks_Error_Message.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/View_Note.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Change_Position.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Change_Event.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Mark_Married_As_Required_Or_Optional.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Argument.jpg">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.595Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Angular] Template-Driven 動態加入驗證屬性注意事項">
+<meta name="twitter:description" content="在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。 此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?ERROR Error: ExpressionChangedAfterItHasBeenCheckedError:">
+<meta name="twitter:image" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Binding_Required.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+        <meta property="og:image" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/hooks-in-sequence.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/hooks-in-sequence.png" />
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Angular] Template-Driven 動態加入驗證屬性注意事項
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2017-08-13T22:19:00+08:00">
+	
+		    Aug 13, 2017
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Angular/">Angular</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。<br><div class="figure center" style="width:;"><a class="fancybox" href="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Binding_Required.jpg" title data-caption data-fancybox="default"><img class="fig-img" src="https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/Binding_Required.jpg" alt></a></div><div style="clear:both;"></div></p>
+<p>此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?<br><div class="alert danger no-icon"><p>ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’</p>
+</div></p>
+<a id="more"></a>
+<div class="figure center" style="width:;"><a class="fancybox" href="Error_Message.jpg" title="Expression Changed After It Has Been Checked Error" data-caption="Expression Changed After It Has Been Checked Error" data-fancybox="default"><img class="fig-img" src="Error_Message.jpg" alt="Expression Changed After It Has Been Checked Error"></a><span class="caption">Expression Changed After It Has Been Checked Error</span></div><div style="clear:both;"></div>
+<h2 id="案例說明"><a href="#案例說明" class="headerlink" title="案例說明"></a>案例說明</h2><p>在解答這個問題之前，先敘述一下將要展示的簡單案例。</p>
+<ul>
+<li>畫面有 Age 與 Married 兩個下拉選單</li>
+<li>Age 必填，可選擇 Child 與 Adult</li>
+<li>Married ，可選擇 Married 與 Not Yet <ul>
+<li><span class="highlight-text danger">當 Age 選擇 Adult 時， Married 一定要選擇，並顯示 Required 文字 
+  </span>
+</li>
+</ul>
+</li>
+</ul>
+<p>了解案例後，讀者可以到 <a href="https://stackblitz.com/edit/angular-expressionchangedafterithasbeencheckederror?file=app%2Fapp.component.html" title="Angular-Expression Changed After It Has Been Checked Error Demo" target="_blank" rel="noopener">Angular-Expression Changed After It Has Been Checked Error Demo</a> 按照步驟操作，即可出現錯誤訊息。  <em>(記得看一下程式碼喔~)</em></p>
+<h2 id="Development-Mode"><a href="#Development-Mode" class="headerlink" title="Development Mode"></a>Development Mode</h2><p>如果讀者有操作上敘案例的話，按下 F12 開啟開發者模式的時候，會看到這段訊息。<br><div class="figure " style="width:;"><a class="fancybox" href="Development_Mode_Message.jpg" title="Development_Mode_Message" data-caption="Development_Mode_Message" data-fancybox="default"><img class="fig-img" src="Development_Mode_Message.jpg" alt="Development_Mode_Message"></a><span class="caption">Development_Mode_Message</span></div></p>
+<p>什麼是 Development Mode? Development Mode 會有什麼機制? <strong>這是本篇的 Key Point 啊!!!</strong></p>
+<p>引用 Angular #6005 的說明<br><blockquote><p>In short, after every round of change detection, dev mode immediately performs a second round to verify that no bindings have changed since the end of the first, as this would indicate that changes are being caused by change detection itself</p>
+<footer><strong>drew-moore</strong><cite><a href="https://github.com/angular/angular/issues/6005#issuecomment-165905348" target="_blank" rel="noopener">EXCEPTION: Expression has changed after it was checked. #6005</a></cite></footer></blockquote></p>
+<p>意思是說，在 Development Mode 的情況下，變更偵測觸發後，會立即執行第二次變更偵測，確保 status 的值沒有被變更。  如果 status 的值被變更了，則會出現該錯誤訊息，而這情形稱之為 <strong> <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#avoidingchangedetectionloopsproductionvsdevelopmentmode" title="change detection loops" target="_blank" rel="noopener">change detection loops</a> </strong>。</p>
+<h4 id="不建議執行-enableProdMode-解決這個問題"><a href="#不建議執行-enableProdMode-解決這個問題" class="headerlink" title="不建議執行 enableProdMode() 解決這個問題"></a>不建議執行 enableProdMode() 解決這個問題</h4><p>剛剛那篇 issue 的說明，有提到一個解決方式，就是 <code>enableProdMode()</code> 啟用 Production Mode，恩….沒錯，啟用 Production Mode ，這個問題就不會再出現了。  但是這樣只是把問題隱藏而已，因為 Development Mode 會有這機制，是有原因的 !!!</p>
+<p>如 stackoverflow 有人說明，第二次變更偵測的時候，變更偵測自行變更 status ，或者是在執行一個方法時，每次執行都回傳不同的值，這樣會造成 status 非常不穩定。<br><blockquote><p>If the model has changed between the regular and the additional change detection turn, this indicates that either</p>
+<ul>
+<li>change detection itself has caused a change</li>
+<li>a method or getter returns a different value every time it is called<br>which are both bad, because it is not clear how to proceed because the model might never stabilize.</li>
+</ul>
+<footer><strong>Günter Zöchbauer</strong><cite><a href="https://stackoverflow.com/questions/43375532/expressionchangedafterithasbeencheckederror-explained#answer-43375600" target="_blank" rel="noopener">ExpressionChangedAfterItHasBeenCheckedError Explained</a></cite></footer></blockquote></p>
+<p>再來是根據 <a href="https://angular-university.io/" title="Angular University" target="_blank" rel="noopener">Angular University</a> 的建議， <span class="highlight-text primary">最好在開發時期啟用 Development Mode，那將會避免問題發生</span>。<br><blockquote><p>We really have to go out of our way to trigger a change detection loop, but just in case its better to always use development mode during the development phase, as that will avoid the problem.</p>
+<footer><strong>Angular University</strong><cite><a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#arechangedetectionissuesfrequent" target="_blank" rel="noopener">Are change detection issues frequent?</a></cite></footer></blockquote></p>
+<h2 id="Lifecycle-Hooks"><a href="#Lifecycle-Hooks" class="headerlink" title="Lifecycle Hooks"></a>Lifecycle Hooks</h2><p>好了!! 接下來就是要找出問題的發生點，在這之前會建議讀者稍微了解一下生命週期的概念。 =&gt; <a href="https://angular.io/guide/lifecycle-hooks" title="Lifecycle Hooks" target="_blank" rel="noopener">Lifecycle Hooks</a>，</p>
+<p>根據 <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#howtotriggerachangedetectionloopinangular" title="Angular University - How to trigger a change detection loop in Angular?" target="_blank" rel="noopener">Angular University - How to trigger a change detection loop in Angular?</a> 的說明，這錯誤訊息是發生在 <a href="https://angular.io/guide/lifecycle-hooks#lifecycle-sequence" title="Angular Lifecycle Hooks - ngAfterViewChecked" target="_blank" rel="noopener">Angular Lifecycle Hooks - ngAfterViewChecked</a> 這個階段。</p>
+<p>接下來請到線上範例 <a href="https://stackblitz.com/edit/angular-expressionchangedafterithasbeencheckederror-lifehook?file=app%2Fapp.component.html" title="Angular-Expression Changed After It Has Been Checked Error Demo With Lifecycle Hooks" target="_blank" rel="noopener">Angular-Expression Changed After It Has Been Checked Error Demo With Lifecycle Hooks</a> 看一下生命週期 ngAfterContentChecked 與 ngAfterViewChecked 執行的情形。  <em>(記得看一下程式碼喔~)</em></p>
+<p>可以看到 <code>married invalid:true</code> 在 ngAfterViewChecked 的階段，值改變了!!!<br><div class="figure center" style="width:;"><a class="fancybox" href="Lifecycle_Hooks_Error_Message.jpg" title="Lifecycle_Hooks_Error_Message" data-caption="Lifecycle_Hooks_Error_Message" data-fancybox="default"><img class="fig-img" src="Lifecycle_Hooks_Error_Message.jpg" alt="Lifecycle_Hooks_Error_Message"></a><span class="caption">Lifecycle_Hooks_Error_Message</span></div><div style="clear:both;"></div></p>
+<p>至於為什麼會這樣，請讀者看著這張圖，讓我按照順序說明<br><div class="figure center" style="width:;"><a class="fancybox" href="View_Note.jpg" title="畫面說明" data-caption="畫面說明" data-fancybox="default"><img class="fig-img" src="View_Note.jpg" alt="畫面說明"></a><span class="caption">畫面說明</span></div><div style="clear:both;"></div></p>
+<ol>
+<li>在 Age 還沒選擇時，<code>2.[required]=&quot;age.value === &#39;2&#39;&quot;</code>，不會成立，所以 <code>married.invalid === false</code></li>
+<li>Age 選擇 Adult 時， view render 會先 render 到 <code>1.&lt;em *ngIf=&quot;married.invalid&quot;&gt;Required&lt;/em&gt;</code> 的位置，此時<code>married.invalid 還是 === false</code></li>
+<li>接下來 view render 到 married 下拉選單，發現 <code>2.[required]=&quot;age.value === &#39;2&#39;&quot;</code>成立了，則 <code>married.invalid === true</code>， <span class="highlight-text danger">married.invalid 在這時候 status 改變了 !!!</span> 。<em>(這也是為什麼最一開始的程式範例，要執行步驟四，Required的訊息才會出現的原因)</em></li>
+<li>在 ngAfterViewChecked<em>(view render 結束)</em> 階段修改 status ，蹦 !! 錯誤訊息發生</li>
+</ol>
+<p><strong>雙重驗證上述流程!!</strong>  根據上述流程，所以只要將 Required 訊息移到 married 下拉選單後面，讓 married 下拉選單先 render ，之後再 render Required 訊息，就不會有 view render 結束後又改變 status 的情形發生?<br><strong>A: 沒錯!!!</strong></p>
+<p>讀者可以試試看，把 Required 訊息換位置<em>(如下圖)</em>。  讀者可以發現 <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#avoidingchangedetectionloopsproductionvsdevelopmentmode" title="change detection loops" target="_blank" rel="noopener">change detection loops</a> 的情形不再發生 !!</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="Change_Position.jpg" title="更改 Required 訊息位置" data-caption="更改 Required 訊息位置" data-fancybox="default"><img class="fig-img" src="Change_Position.jpg" alt="更改 Required 訊息位置"></a><span class="caption">更改 Required 訊息位置</span></div><div style="clear:both;"></div>
+<ol>
+<li>在 Age 還沒選擇時，<code>2.[required]=&quot;age.value === &#39;2&#39;&quot;</code>，不會成立，所以 <code>married.invalid === false</code></li>
+<li>Age 選擇 Adult 時， view render 會先 render 到 married 下拉選單，發現 <code>[required]=&quot;age.value === &#39;2&#39;&quot;</code>成立了，則 <code>married.invalid === true</code>。</li>
+<li>接下來 view render 到 <code>&lt;em *ngIf=&quot;married.invalid&quot;&gt;Required&lt;/em&gt;</code>，因為 <code>married.invalid</code> 在流程 2 的時候已經是 true ，所以則顯示 Required 訊息。</li>
+<li>結束。  完全<span class="highlight-text success">沒有</span>在 ngAfterViewChecked<em>(view render 結束)</em> 階段修改 status</li>
+</ol>
+<h2 id="最終解法"><a href="#最終解法" class="headerlink" title="最終解法 !!"></a>最終解法 !!</h2><p>雖然上面有提到，只要移動 Required 訊息，問題就解決了，可是 <span class="highlight-text primary">版型就是這樣定的，錯誤訊息就是要擺那裏阿</span>。  那如果錯誤訊息真的要放那邊怎麼辦?  而 Angular 生命週期的機制就是那樣，我們能做的是<strong>改變寫法</strong>。 </p>
+<p>請參考下圖，Age 下拉選單增加 chagne 事件，取代 <code>[required]=&quot;age.value === &#39;2&#39;&quot;</code> 寫法<br><div class="figure center" style="width:;"><a class="fancybox" href="Change_Event.jpg" title="使用 change 事件" data-caption="使用 change 事件" data-fancybox="default"><img class="fig-img" src="Change_Event.jpg" alt="使用 change 事件"></a><span class="caption">使用 change 事件</span></div><div style="clear:both;"></div></p>
+<ul>
+<li>使用 <code>@ViewChild(&#39;form&#39;) form: NgForm;</code> 取得 NgForm 物件</li>
+<li>在 markMarriedAsRequiredOrOptional 方法，設定 married 為 required<div class="figure center" style="width:;"><a class="fancybox" href="Mark_Married_As_Required_Or_Optional.jpg" title="用 NgForm 取得 FormControl 設定 married 為 Required" data-caption="用 NgForm 取得 FormControl 設定 married 為 Required" data-fancybox="default"><img class="fig-img" src="Mark_Married_As_Required_Or_Optional.jpg" alt="用 NgForm 取得 FormControl 設定 married 為 Required"></a><span class="caption">用 NgForm 取得 FormControl 設定 married 為 Required</span></div><div style="clear:both;"></div>
+</li>
+</ul>
+<p>最後當然還是有提供線上範例啦，讀者可以自行點連結去看看喔。 =&gt; <strong><a href="https://stackblitz.com/edit/angular-expressionchangedafterithasbeencheckederror-solution?file=app%2Fapp.component.html" title="Solution" target="_blank" rel="noopener">Solution</a></strong></p>
+<h2 id="題外話"><a href="#題外話" class="headerlink" title="題外話"></a>題外話</h2><p>好吧，其實這也是很重要的一個觀念，但是我不知道擺在文章的哪一段XD。  在這篇 <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work" title="how-does-angular-2-change-detection-really-work" target="_blank" rel="noopener">how-does-angular-2-change-detection-really-work</a> 的留言，有人認為說是 <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#avoidingchangedetectionloopsproductionvsdevelopmentmode" title="change detection loops" target="_blank" rel="noopener">change detection loops</a> 是 bug ，而 Angular University 則回應這是 feature 不是 bug ，其理由就讀者自行閱讀了。</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="Argument.jpg" title="題外話XD" data-caption="題外話XD" data-fancybox="default"><img class="fig-img" src="Argument.jpg" alt="題外話XD"></a><span class="caption">題外話XD</span></div><div style="clear:both;"></div>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>想不到一個簡單的小功能造成的一個錯誤訊息，牽扯到的觀念那麼多，剛好也趁這時候認識了 Angular 生命週期與變更偵測的機制。  另外，讀者可以參考下方延伸閱讀的文章，其中有提到 <strong>onpush-change-detection</strong> ，使用這個方式，也可以解決 <a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/#avoidingchangedetectionloopsproductionvsdevelopmentmode" title="change detection loops" target="_blank" rel="noopener">change detection loops</a> 的問題，但是原因為何，目前還沒研究出來XD。</p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p><strong>[<a href="http://blog.angular-university.io/how-does-angular-2-change-detection-really-work/" title="angular-university-how-does-angular-2-change-detection-really-work" target="_blank" rel="noopener">angular-university-how-does-angular-2-change-detection-really-work</a>]</strong>,<strong>[<a href="https://angular.io/guide/lifecycle-hooks" title="lifecycle-hooks" target="_blank" rel="noopener">lifecycle-hooks</a>]</strong>,<strong>[<a href="https://stackoverflow.com/questions/43375532/expressionchangedafterithasbeencheckederror-explained" title="TitleAttribute" target="_blank" rel="noopener">stackoverflow-expressionchangedafterithasbeencheckederror-explained</a>]</strong>,<strong>[<a href="https://github.com/angular/angular/issues/6005" title="angular/issues/600" target="_blank" rel="noopener">angular/issues/6005</a>]</strong>,<strong>[<a href="https://blog.thoughtram.io/angular/2016/02/22/angular-2-change-detection-explained.html" title="thoughtram-angular-2-change-detection-explained" target="_blank" rel="noopener">thoughtram-angular-2-change-detection-explained</a>]</strong>  </p>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p><strong>[<a href="http://blog.angular-university.io/onpush-change-detection-how-it-works/" title="onpush-change-detection-how-it-works" target="_blank" rel="noopener">onpush-change-detection-how-it-works</a>]</strong>,<strong>[<a href="https://angular-2-training-book.rangle.io/handout/change-detection/" title="training-book-change-detection" target="_blank" rel="noopener">training-book-change-detection</a>]</strong>,<strong>[<a href="https://alligator.io/angular/change-detection-strategy/" title="change-detection-strategy" target="_blank" rel="noopener">change-detection-strategy</a>]</strong>,<strong>[<a href="https://angular.io/api/forms/AbstractControl#setValidators" title="AbstractControl" target="_blank" rel="noopener">AbstractControl</a>]</strong></p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Angular/">Angular</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/03/Protractor-element-click-注意事項/" data-tooltip="[自動化測試] Protractor element.click() 注意事項" aria-label="PREVIOUS: [自動化測試] Protractor element.click() 注意事項">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/08/Angular-單元測試起手式/" data-tooltip="[Angular] Angular 單元測試起手式" aria-label="NEXT: [Angular] Angular 單元測試起手式">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/03/Protractor-element-click-注意事項/" data-tooltip="[自動化測試] Protractor element.click() 注意事項" aria-label="PREVIOUS: [自動化測試] Protractor element.click() 注意事項">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/08/Angular-單元測試起手式/" data-tooltip="[Angular] Angular 單元測試起手式" aria-label="NEXT: [Angular] Angular 單元測試起手式">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/';
+                 
+                    this.page.identifier = '2017/08/Template-Driven-動態加入驗證屬性注意事項/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

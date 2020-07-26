@@ -1,0 +1,844 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[NLog] NLog 建置筆記 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="C#,.NET,Nlog">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。\n\n使用 NuGet 安裝 NLog至少要安裝紅色圈起來的 package:\n\nNLog\nNLog.Config\nNLog.Extended\nNLog.Web\n\nNLogInstall\n新增 Table在使用 NLog 將 Log 新增到資料庫裡面之前，一定要先有 Table ，我參考官方給的範例，直接新增。官方文件SQLsql123456789101112131415161718192021CREATE TABLE [dbo].[NLog] (   [ID] [int] IDENTITY(1,1) NOT NULL,   [MachineName] [nvarchar](200) NULL,   [SiteName] [nvarchar](200) NOT NULL,   [Logged] [datetime] NOT NULL,   [Level] [varchar](5) NOT NULL,   [UserName] [nvarchar](200) NULL,   [Message] [nvarchar](max) NOT NULL,   [Logger] [nvarchar](300) NULL,   [Properties] [nvarchar](max) NULL,   [ServerName] [nvarchar](200) NULL,   [Port] [nvarchar](100) NULL,   [Url] [nvarchar](2000) NULL,   [Https] [bit] NULL,   [ServerAddress] [nvarchar](100) NULL,   [RemoteAddress] [nvarchar](100) NULL,   [Callsite] [nvarchar](300) NULL,   [Exception] [nvarchar](max) NULL, CONSTRAINT [PK_dbo.Log] PRIMARY KEY CLUSTERED ([ID] ASC)    WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY];\n設定 NLog.config這個步驟最重要，因為設定錯也不知道怎麼 debug XDXML Elements 說明\n\nextensions : 經由擴充功能，來取得一些特定欄位，例如: Web.config的值，或者是 IP 等等….\ntargets : 就是我們 NLog 要寫 Log 的目標，這邊我設定是資料庫\ntarget : 資料庫設定的說明，請參考:  資料庫 target 設定\nrule : 說明什麼層級的訊息要存入 database 這個 target，(共有 6 各層級)\nTrace\nDebug\nInfo\nWarn\nError\nFatal\n\n\n\nNLog.configxml123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566&lt;?xml version=\"1.0\" encoding=\"utf-8\" ?&gt;&lt;nlog xmlns=\"http://www.nlog-project.org/schemas/NLog.xsd\"      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"      xsi:schemaLocation=\"http://www.nlog-project.org/schemas/NLog.xsd NLog.xsd\"      autoReload=\"true\"      throwExceptions=\"false\"      internalLogLevel=\"Off\" internalLogFile=\"c:\\temp\\nlog-internal.log\"&gt;    &lt;extensions&gt;    &lt;!-- load NLog.Extended to enable ASP.NET-specific functionality --&gt;    &lt;add assembly=\"NLog.Extended\" /&gt;    &lt;add assembly=\"NLog.Web\" /&gt;  &lt;/extensions&gt;    &lt;targets&gt;    &lt;!-- write log message to database --&gt;    &lt;target name=\"database\" xsi:type=\"Database\"&gt;      &lt;dbProvider&gt;System.Data.SqlClient&lt;/dbProvider&gt;      &lt;!--帳密驗證--&gt;      &lt;!--&lt;connectionString&gt;server=192.168.0.1;database=TetNlog;user id = abc;password=xxxx&lt;/connectionString&gt;--&gt;      &lt;!--Windows驗證--&gt;      &lt;connectionString&gt;(localdb)\\ProjectsV12;database=TetNlog;integrated security=True&lt;/connectionString&gt;            &lt;commandText&gt;        insert into dbo.Log (        Application, Logged, Level, Message,        Username,        ServerName, Port, Url, Https,        ServerAddress, RemoteAddress,        Logger, CallSite, Exception        ) values (        @Application, @Logged, @Level, @Message,        @Username,        @ServerName, @Port, @Url, @Https,        @ServerAddress, @RemoteAddress,        @Logger, @Callsite, @Exception        );      &lt;/commandText&gt;      &lt;parameter name=\"@application\" layout=\"${appsetting:name=AppName:default=Unknown\\: set AppName in appSettings}\" /&gt;      &lt;parameter name=\"@logged\" layout=\"${date}\" /&gt;      &lt;parameter name=\"@level\" layout=\"${level}\" /&gt;      &lt;parameter name=\"@message\" layout=\"${message}\" /&gt;      &lt;parameter name=\"@username\" layout=\"${identity}\" /&gt;      &lt;parameter name=\"@serverName\" layout=\"${aspnet-request:serverVariable=SERVER_NAME}\" /&gt;      &lt;parameter name=\"@port\" layout=\"${aspnet-request:serverVariable=SERVER_PORT}\" /&gt;      &lt;parameter name=\"@url\" layout=\"${aspnet-request:serverVariable=HTTP_URL}\" /&gt;      &lt;parameter name=\"@https\" layout=\"${when:inner=1:when='${aspnet-request:serverVariable=HTTPS}' == 'on'}${when:inner=0:when='${aspnet-request:serverVariable=HTTPS}' != 'on'}\" /&gt;      &lt;parameter name=\"@serverAddress\" layout=\"${aspnet-request:serverVariable=LOCAL_ADDR}\" /&gt;      &lt;parameter name=\"@remoteAddress\" layout=\"${aspnet-request:serverVariable=REMOTE_ADDR}:${aspnet-request:serverVariable=REMOTE_PORT}\" /&gt;      &lt;parameter name=\"@logger\" layout=\"${logger}\" /&gt;      &lt;parameter name=\"@callSite\" layout=\"${callsite}\" /&gt;      &lt;parameter name=\"@exception\" layout=\"${exception:tostring}\" /&gt;    &lt;/target&gt;  &lt;/targets&gt;  &lt;rules&gt;    &lt;logger name=\"*\" minlevel=\"Trace\" writeTo=\"database\" /&gt;  &lt;/rules&gt;&lt;/nlog&gt;\n紀錄 Log 使用方式一般的使用方式 LogManager.GetCurrentClassLogger()，這個會取得當下 class 的類別存到資料庫\n\nLog 一般使用方式cs123456789101112131415161718public class MyClass{  private static Logger logger = LogManager.GetCurrentClassLogger();  public void MyMethod1()  {    logger.Trace(\"Sample trace message\");    logger.Debug(\"Sample debug message\");    logger.Info(\"Sample informational message\");    logger.Warn(\"Sample warning message\");    logger.Error(\"Sample error message\");    logger.Fatal(\"Sample fatal error message\");    // alternatively you can call the Log() method    // and pass log level as the parameter.    logger.Log(LogLevel.Info, \"Sample informational message\");  }}\n如果是在 BaseClass 的話，則只要呼叫這個方法，則可以取得當下的 class 。\n\nLog BaseClass 使用方式cs123456789public class BaseApiController  : ApiController{    public BaseApiController()    {        Logger = LogManager.GetLogger(GetType().FullName);    }    protected Logger Logger { get; private set; }}\n使用 autofac 注入的方式\n\n完成 ILog 介面跟 Logger 實體 classILogger 和 Loggercs123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778public interface ILog{    void Trace(string format, params object[] args);    void Debug(string format, params object[] args);    void Info(string format, params object[] args);    void Warn(string format, params object[] args);    void Error(string format, params object[] args);    void Error(Exception ex);    void Error(Exception ex, string format, params object[] args);    void Fatal(Exception ex, string format, params object[] args);}public class Logger : ILog{    private readonly Logger _log;    public NLogLogger(Type type)    {        _log = LogManager.GetLogger(type.FullName);    }    public void Trace(string format, params object[] args)    {        Log(LogLevel.Trace, format, args);    }    public void Debug(string format, params object[] args)    {        Log(LogLevel.Debug, format, args);    }    public void Info(string format, params object[] args)    {        Log(LogLevel.Info, format, args);    }    public void Warn(string format, params object[] args)    {        Log(LogLevel.Warn, format, args);    }    public void Error(string format, params object[] args)    {        Log(LogLevel.Error, format, args);    }    public void Error(Exception ex)    {        Log(LogLevel.Error, null, null, ex);    }    public void Error(Exception ex, string format, params object[] args)    {        Log(LogLevel.Error, format, args, ex);    }    public void Fatal(Exception ex, string format, params object[] args)    {        Log(LogLevel.Fatal, format, args, ex);    }    private void Log(LogLevel level, string format, object[] args)    {        _log.Log(typeof(NLogLogger), new LogEventInfo(level, _log.Name, null, format, args));    }    private void Log(LogLevel level, string format, object[] args, Exception ex)    {        _log.Log(typeof(NLogLogger), new LogEventInfo(level, _log.Name, null, format, args, ex));    }}\n新增有 Autofac.Module，註冊 ILog 與 logger ，然後加入 Autofac builder 裡面\nAutofac.Modulecs1234567891011121314151617181920212223242526272829303132333435363738394041424344public static void Bootstrapper()      {        // web api 的 autofac 設定方式          var builder = new ContainerBuilder();          // Get your HttpConfiguration.          var config = GlobalConfiguration.Configuration;          // Register your Web API controllers.          builder.RegisterApiControllers(Assembly.GetExecutingAssembly());          // OPTIONAL: Register the Autofac filter provider.          builder.RegisterWebApiFilterProvider(config);          builder.RegisterModule(new LoggingModule());          var container = builder.Build();          config.DependencyResolver = new AutofacWebApiDependencyResolver(container);      }      public class LoggingModule : Autofac.Module  {      protected override void Load(ContainerBuilder builder)      {          builder              .Register((c, p) =&gt; new NLogLogger(p.TypedAs&lt;Type&gt;()))              .AsImplementedInterfaces();      }      protected override void AttachToComponentRegistration(IComponentRegistry componentRegistry, IComponentRegistration registration)      {          registration.Preparing +=              (sender, args) =&gt;              {                  var forType = args.Component.Activator.LimitType;                  var logParameter = new ResolvedParameter(                      (p, c) =&gt; p.ParameterType == typeof(ILog),                      (p, c) =&gt; c.Resolve&lt;ILog&gt;(TypedParameter.From(forType)));                  args.Parameters = args.Parameters.Union(new[] { logParameter });              };      }  }\n這樣就可以在 Controller 注入，並且還可以取得當下 class 的資訊\n參考官方文件","dateCreated":"2017-04-26T21:54:29+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-04-26T21:54:29+08:00","description":"最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。","headline":"[NLog] NLog 建置筆記","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/04/NLog-建置筆記/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/04/NLog-建置筆記/","keywords":".NET, C#, Nlog"}</script>
+    <meta name="description" content="最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。">
+<meta name="keywords" content="C#,.NET,Nlog">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[NLog] NLog 建置筆記">
+<meta property="og:url" content="https://mileslin.github.io/2017/04/NLog-建置筆記/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2017/04/NLog-建置筆記/NLogInstall.jpg">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.563Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[NLog] NLog 建置筆記">
+<meta name="twitter:description" content="最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。">
+<meta name="twitter:image" content="https://mileslin.github.io/2017/04/NLog-建置筆記/NLogInstall.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [NLog] NLog 建置筆記
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2017-04-26T21:54:29+08:00">
+	
+		    Apr 26, 2017
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/NLog/">NLog</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。</p>
+<a id="more"></a>
+<h2 id="使用-NuGet-安裝-NLog"><a href="#使用-NuGet-安裝-NLog" class="headerlink" title="使用 NuGet 安裝 NLog"></a>使用 NuGet 安裝 NLog</h2><p>至少要安裝紅色圈起來的 package:</p>
+<ul>
+<li>NLog</li>
+<li>NLog.Config</li>
+<li>NLog.Extended</li>
+<li>NLog.Web</li>
+</ul>
+<div class="figure " style="width:;"><a class="fancybox" href="NLogInstall.jpg" title="NLogInstall" data-caption="NLogInstall" data-fancybox="default"><img class="fig-img" src="NLogInstall.jpg" alt="NLogInstall"></a><span class="caption">NLogInstall</span></div>
+<h2 id="新增-Table"><a href="#新增-Table" class="headerlink" title="新增 Table"></a>新增 Table</h2><p>在使用 NLog 將 Log 新增到資料庫裡面之前，一定要先有 Table ，我參考官方給的範例，直接新增。<br><a href="https://github.com/nlog/nlog/wiki/Database-Target" title="官方文件" target="_blank" rel="noopener">官方文件</a><br><figure class="codeblock codeblock--tabbed"><figcaption><span>SQL</span><ul class="tabs"><li class="tab active">sql</li></ul></figcaption><div class="tabs-content"><figure class="highlight sql" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> [dbo].[NLog] (</span><br><span class="line">   [<span class="keyword">ID</span>] [<span class="built_in">int</span>] <span class="keyword">IDENTITY</span>(<span class="number">1</span>,<span class="number">1</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">   [MachineName] [<span class="keyword">nvarchar</span>](<span class="number">200</span>) <span class="literal">NULL</span>,</span><br><span class="line">   [SiteName] [<span class="keyword">nvarchar</span>](<span class="number">200</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">   [Logged] [datetime] <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">   [<span class="keyword">Level</span>] [<span class="built_in">varchar</span>](<span class="number">5</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">   [UserName] [<span class="keyword">nvarchar</span>](<span class="number">200</span>) <span class="literal">NULL</span>,</span><br><span class="line">   [Message] [<span class="keyword">nvarchar</span>](<span class="keyword">max</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">   [Logger] [<span class="keyword">nvarchar</span>](<span class="number">300</span>) <span class="literal">NULL</span>,</span><br><span class="line">   [Properties] [<span class="keyword">nvarchar</span>](<span class="keyword">max</span>) <span class="literal">NULL</span>,</span><br><span class="line">   [ServerName] [<span class="keyword">nvarchar</span>](<span class="number">200</span>) <span class="literal">NULL</span>,</span><br><span class="line">   [Port] [<span class="keyword">nvarchar</span>](<span class="number">100</span>) <span class="literal">NULL</span>,</span><br><span class="line">   [<span class="keyword">Url</span>] [<span class="keyword">nvarchar</span>](<span class="number">2000</span>) <span class="literal">NULL</span>,</span><br><span class="line">   [Https] [<span class="built_in">bit</span>] <span class="literal">NULL</span>,</span><br><span class="line">   [ServerAddress] [<span class="keyword">nvarchar</span>](<span class="number">100</span>) <span class="literal">NULL</span>,</span><br><span class="line">   [RemoteAddress] [<span class="keyword">nvarchar</span>](<span class="number">100</span>) <span class="literal">NULL</span>,</span><br><span class="line">   [Callsite] [<span class="keyword">nvarchar</span>](<span class="number">300</span>) <span class="literal">NULL</span>,</span><br><span class="line">   [<span class="keyword">Exception</span>] [<span class="keyword">nvarchar</span>](<span class="keyword">max</span>) <span class="literal">NULL</span>,</span><br><span class="line"> <span class="keyword">CONSTRAINT</span> [PK_dbo.Log] PRIMARY <span class="keyword">KEY</span> CLUSTERED ([<span class="keyword">ID</span>] <span class="keyword">ASC</span>) </span><br><span class="line">   <span class="keyword">WITH</span> (PAD_INDEX = <span class="keyword">OFF</span>, STATISTICS_NORECOMPUTE = <span class="keyword">OFF</span>, IGNORE_DUP_KEY = <span class="keyword">OFF</span>, ALLOW_ROW_LOCKS = <span class="keyword">ON</span>, ALLOW_PAGE_LOCKS = <span class="keyword">ON</span>) <span class="keyword">ON</span> [PRIMARY]</span><br><span class="line">) <span class="keyword">ON</span> [PRIMARY] TEXTIMAGE_ON [PRIMARY];</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="設定-NLog-config"><a href="#設定-NLog-config" class="headerlink" title="設定 NLog.config"></a>設定 NLog.config</h2><p>這個步驟最重要，因為設定錯也不知道怎麼 debug XD<br>XML Elements 說明</p>
+<ul>
+<li>extensions : 經由擴充功能，來取得一些特定欄位，例如: Web.config的值，或者是 IP 等等….</li>
+<li>targets : 就是我們 NLog 要寫 Log 的目標，這邊我設定是資料庫</li>
+<li>target : 資料庫設定的說明，請參考:  <a href="https://github.com/nlog/nlog/wiki/Database-Target" title="資料庫設定" target="_blank" rel="noopener">資料庫 target 設定</a></li>
+<li>rule : 說明什麼層級的訊息要存入 database 這個 target，(共有 6 各層級)<ul>
+<li>Trace</li>
+<li>Debug</li>
+<li>Info</li>
+<li>Warn</li>
+<li>Error</li>
+<li>Fatal</li>
+</ul>
+</li>
+</ul>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>NLog.config</span><ul class="tabs"><li class="tab active">xml</li></ul></figcaption><div class="tabs-content"><figure class="highlight xml" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8" ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">nlog</span> <span class="attr">xmlns</span>=<span class="string">"http://www.nlog-project.org/schemas/NLog.xsd"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.nlog-project.org/schemas/NLog.xsd NLog.xsd"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">autoReload</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">throwExceptions</span>=<span class="string">"false"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">internalLogLevel</span>=<span class="string">"Off"</span> <span class="attr">internalLogFile</span>=<span class="string">"c:\temp\nlog-internal.log"</span>&gt;</span></span><br><span class="line">  </span><br><span class="line">  <span class="tag">&lt;<span class="name">extensions</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- load NLog.Extended to enable ASP.NET-specific functionality --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">add</span> <span class="attr">assembly</span>=<span class="string">"NLog.Extended"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">add</span> <span class="attr">assembly</span>=<span class="string">"NLog.Web"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">extensions</span>&gt;</span></span><br><span class="line">  </span><br><span class="line">  <span class="tag">&lt;<span class="name">targets</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- write log message to database --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">target</span> <span class="attr">name</span>=<span class="string">"database"</span> <span class="attr">xsi:type</span>=<span class="string">"Database"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">dbProvider</span>&gt;</span>System.Data.SqlClient<span class="tag">&lt;/<span class="name">dbProvider</span>&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">&lt;!--帳密驗證--&gt;</span></span><br><span class="line">      <span class="comment">&lt;!--&lt;connectionString&gt;server=192.168.0.1;database=TetNlog;user id = abc;password=xxxx&lt;/connectionString&gt;--&gt;</span></span><br><span class="line">      <span class="comment">&lt;!--Windows驗證--&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">connectionString</span>&gt;</span>(localdb)\ProjectsV12;database=TetNlog;integrated security=True<span class="tag">&lt;/<span class="name">connectionString</span>&gt;</span></span><br><span class="line">      </span><br><span class="line">      <span class="tag">&lt;<span class="name">commandText</span>&gt;</span></span><br><span class="line">        insert into dbo.Log (</span><br><span class="line">        Application, Logged, Level, Message,</span><br><span class="line">        Username,</span><br><span class="line">        ServerName, Port, Url, Https,</span><br><span class="line">        ServerAddress, RemoteAddress,</span><br><span class="line">        Logger, CallSite, Exception</span><br><span class="line">        ) values (</span><br><span class="line">        @Application, @Logged, @Level, @Message,</span><br><span class="line">        @Username,</span><br><span class="line">        @ServerName, @Port, @Url, @Https,</span><br><span class="line">        @ServerAddress, @RemoteAddress,</span><br><span class="line">        @Logger, @Callsite, @Exception</span><br><span class="line">        );</span><br><span class="line">      <span class="tag">&lt;/<span class="name">commandText</span>&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@application"</span> <span class="attr">layout</span>=<span class="string">"${appsetting:name=AppName:default=Unknown\: set AppName in appSettings}"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@logged"</span> <span class="attr">layout</span>=<span class="string">"${date}"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@level"</span> <span class="attr">layout</span>=<span class="string">"${level}"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@message"</span> <span class="attr">layout</span>=<span class="string">"${message}"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@username"</span> <span class="attr">layout</span>=<span class="string">"${identity}"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@serverName"</span> <span class="attr">layout</span>=<span class="string">"${aspnet-request:serverVariable=SERVER_NAME}"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@port"</span> <span class="attr">layout</span>=<span class="string">"${aspnet-request:serverVariable=SERVER_PORT}"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@url"</span> <span class="attr">layout</span>=<span class="string">"${aspnet-request:serverVariable=HTTP_URL}"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@https"</span> <span class="attr">layout</span>=<span class="string">"${when:inner=1:when='${aspnet-request:serverVariable=HTTPS}' == 'on'}${when:inner=0:when='${aspnet-request:serverVariable=HTTPS}' != 'on'}"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@serverAddress"</span> <span class="attr">layout</span>=<span class="string">"${aspnet-request:serverVariable=LOCAL_ADDR}"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@remoteAddress"</span> <span class="attr">layout</span>=<span class="string">"${aspnet-request:serverVariable=REMOTE_ADDR}:${aspnet-request:serverVariable=REMOTE_PORT}"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@logger"</span> <span class="attr">layout</span>=<span class="string">"${logger}"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@callSite"</span> <span class="attr">layout</span>=<span class="string">"${callsite}"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">"@exception"</span> <span class="attr">layout</span>=<span class="string">"${exception:tostring}"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">targets</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">rules</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">logger</span> <span class="attr">name</span>=<span class="string">"*"</span> <span class="attr">minlevel</span>=<span class="string">"Trace"</span> <span class="attr">writeTo</span>=<span class="string">"database"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">rules</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">nlog</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="紀錄-Log-使用方式"><a href="#紀錄-Log-使用方式" class="headerlink" title="紀錄 Log 使用方式"></a>紀錄 Log 使用方式</h2><div class="alert info"><p>一般的使用方式 <code>LogManager.GetCurrentClassLogger()</code>，這個會取得當下 class 的類別存到資料庫</p>
+</div>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Log 一般使用方式</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MyClass</span></span><br><span class="line">{</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> Logger logger = LogManager.GetCurrentClassLogger();</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MyMethod1</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>  {</span><br><span class="line">    logger.Trace(<span class="string">"Sample trace message"</span>);</span><br><span class="line">    logger.Debug(<span class="string">"Sample debug message"</span>);</span><br><span class="line">    logger.Info(<span class="string">"Sample informational message"</span>);</span><br><span class="line">    logger.Warn(<span class="string">"Sample warning message"</span>);</span><br><span class="line">    logger.Error(<span class="string">"Sample error message"</span>);</span><br><span class="line">    logger.Fatal(<span class="string">"Sample fatal error message"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// alternatively you can call the Log() method</span></span><br><span class="line">    <span class="comment">// and pass log level as the parameter.</span></span><br><span class="line">    logger.Log(LogLevel.Info, <span class="string">"Sample informational message"</span>);</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<div class="alert info"><p>如果是在 BaseClass 的話，則只要呼叫這個方法，則可以取得當下的 class 。</p>
+</div>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Log BaseClass 使用方式</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">BaseApiController</span>  : <span class="title">ApiController</span></span><br><span class="line">{</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BaseApiController</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        Logger = LogManager.GetLogger(GetType().FullName);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> Logger Logger { <span class="keyword">get</span>; <span class="keyword">private</span> <span class="keyword">set</span>; }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<div class="alert info"><p>使用 autofac 注入的方式</p>
+</div>
+<p>完成 ILog 介面跟 Logger 實體 class<br><figure class="codeblock codeblock--tabbed"><figcaption><span>ILogger 和 Logger</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">ILog</span></span><br><span class="line">{</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Trace</span>(<span class="params"><span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Debug</span>(<span class="params"><span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Info</span>(<span class="params"><span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Warn</span>(<span class="params"><span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Error</span>(<span class="params"><span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Error</span>(<span class="params">Exception ex</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Error</span>(<span class="params">Exception ex, <span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Fatal</span>(<span class="params">Exception ex, <span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Logger</span> : <span class="title">ILog</span></span><br><span class="line">{</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">readonly</span> Logger _log;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NLogLogger</span>(<span class="params">Type type</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        _log = LogManager.GetLogger(type.FullName);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Trace</span>(<span class="params"><span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        Log(LogLevel.Trace, format, args);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Debug</span>(<span class="params"><span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        Log(LogLevel.Debug, format, args);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Info</span>(<span class="params"><span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        Log(LogLevel.Info, format, args);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Warn</span>(<span class="params"><span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        Log(LogLevel.Warn, format, args);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Error</span>(<span class="params"><span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        Log(LogLevel.Error, format, args);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Error</span>(<span class="params">Exception ex</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        Log(LogLevel.Error, <span class="literal">null</span>, <span class="literal">null</span>, ex);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Error</span>(<span class="params">Exception ex, <span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        Log(LogLevel.Error, format, args, ex);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Fatal</span>(<span class="params">Exception ex, <span class="keyword">string</span> format, <span class="keyword">params</span> <span class="keyword">object</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        Log(LogLevel.Fatal, format, args, ex);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Log</span>(<span class="params">LogLevel level, <span class="keyword">string</span> format, <span class="keyword">object</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        _log.Log(<span class="keyword">typeof</span>(NLogLogger), <span class="keyword">new</span> LogEventInfo(level, _log.Name, <span class="literal">null</span>, format, args));</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Log</span>(<span class="params">LogLevel level, <span class="keyword">string</span> format, <span class="keyword">object</span>[] args, Exception ex</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        _log.Log(<span class="keyword">typeof</span>(NLogLogger), <span class="keyword">new</span> LogEventInfo(level, _log.Name, <span class="literal">null</span>, format, args, ex));</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>新增有 Autofac.Module，註冊 ILog 與 logger ，然後加入 Autofac builder 裡面</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Autofac.Module</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Bootstrapper</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>      {</span><br><span class="line">        <span class="comment">// web api 的 autofac 設定方式</span></span><br><span class="line">          <span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line"></span><br><span class="line">          <span class="comment">// Get your HttpConfiguration.</span></span><br><span class="line">          <span class="keyword">var</span> config = GlobalConfiguration.Configuration;</span><br><span class="line"></span><br><span class="line">          <span class="comment">// Register your Web API controllers.</span></span><br><span class="line">          builder.RegisterApiControllers(Assembly.GetExecutingAssembly());</span><br><span class="line"></span><br><span class="line">          <span class="comment">// OPTIONAL: Register the Autofac filter provider.</span></span><br><span class="line">          builder.RegisterWebApiFilterProvider(config);</span><br><span class="line"></span><br><span class="line">          builder.RegisterModule(<span class="keyword">new</span> LoggingModule());</span><br><span class="line"></span><br><span class="line">          <span class="keyword">var</span> container = builder.Build();</span><br><span class="line"></span><br><span class="line">          config.DependencyResolver = <span class="keyword">new</span> AutofacWebApiDependencyResolver(container);</span><br><span class="line">      }</span><br><span class="line">      public class LoggingModule : Autofac.Module</span><br><span class="line">  {</span><br><span class="line">      <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Load</span>(<span class="params">ContainerBuilder builder</span>)</span></span><br><span class="line"><span class="function"></span>      {</span><br><span class="line">          builder</span><br><span class="line">              .Register((c, p) =&gt; <span class="keyword">new</span> NLogLogger(p.TypedAs&lt;Type&gt;()))</span><br><span class="line">              .AsImplementedInterfaces();</span><br><span class="line">      }</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">AttachToComponentRegistration</span>(<span class="params">IComponentRegistry componentRegistry, IComponentRegistration registration</span>)</span></span><br><span class="line"><span class="function"></span>      {</span><br><span class="line">          registration.Preparing +=</span><br><span class="line">              (sender, args) =&gt;</span><br><span class="line">              {</span><br><span class="line">                  <span class="keyword">var</span> forType = args.Component.Activator.LimitType;</span><br><span class="line"></span><br><span class="line">                  <span class="keyword">var</span> logParameter = <span class="keyword">new</span> ResolvedParameter(</span><br><span class="line">                      (p, c) =&gt; p.ParameterType == <span class="keyword">typeof</span>(ILog),</span><br><span class="line">                      (p, c) =&gt; c.Resolve&lt;ILog&gt;(TypedParameter.From(forType)));</span><br><span class="line"></span><br><span class="line">                  args.Parameters = args.Parameters.Union(<span class="keyword">new</span>[] { logParameter });</span><br><span class="line">              };</span><br><span class="line">      }</span><br><span class="line">  }</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>這樣就可以在 Controller 注入，並且還可以取得當下 class 的資訊</p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="https://github.com/NLog/NLog/wiki" title="官方文件" target="_blank" rel="noopener">官方文件</a>
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/NET/">.NET</a> <a class="tag tag--primary tag--small t-link" href="/tags/C/">C#</a> <a class="tag tag--primary tag--small t-link" href="/tags/Nlog/">Nlog</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/" data-tooltip="[Autofac] 設定 Web API Register Controller 筆記" aria-label="PREVIOUS: [Autofac] 設定 Web API Register Controller 筆記">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-summary/" data-tooltip="[javascript] javascript array methods practice summary" aria-label="NEXT: [javascript] javascript array methods practice summary">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/NLog-建置筆記/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/NLog-建置筆記/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/NLog-建置筆記/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/" data-tooltip="[Autofac] 設定 Web API Register Controller 筆記" aria-label="PREVIOUS: [Autofac] 設定 Web API Register Controller 筆記">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/javascript-array-methods-practice-summary/" data-tooltip="[javascript] javascript array methods practice summary" aria-label="NEXT: [javascript] javascript array methods practice summary">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/NLog-建置筆記/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/NLog-建置筆記/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/NLog-建置筆記/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/NLog-建置筆記/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/NLog-建置筆記/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/NLog-建置筆記/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2017/04/NLog-建置筆記/';
+                 
+                    this.page.identifier = '2017/04/NLog-建置筆記/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

@@ -1,0 +1,821 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[cmd] Command Line 筆記-遠端複製與壓縮 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="cmd,PowerShell,msbuild">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"最近為了將的壓縮、解壓縮、遠端連線硬碟、複製貼上等等的繁瑣的事情寫成 bat 檔案，花了很多時間。  所以就來記錄一下，用 command line 自動化的功能。\n\n刪除整個資料夾、刪除單一檔案\n使用 msbuild 建立佈署檔案\n複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案\n使用 PowerShell 壓縮與解壓縮檔案\n檢查檔案是否存在，並且執行不同指令\n\n\n刪除整個資料夾、刪除單一檔案刪除整個資料夾Delete Entire Folderbat123del /q \"D:\\Projects\\Publish\\Today_Deploy\\*\"FOR /D %%p IN (\"D:\\Projects\\Publish\\Today_Deploy\\*.*\") DO rmdir \"%%p\" /s /qrmdir \"D:\\Projects\\Publish\\Today_Deploy\"\n刪除單一檔案Delete a filebat1del D:\\Projects\\Publish\\Today_Deploy\\WebAPI\\Web.config\n使用 msbuild 建立佈署檔案Web Deploybat1234567\"C:\\Program Files (x86)\\MSBuild\\14.0\\Bin\\MSBuild.exe\" \"D:\\Projects\\WebAPI\\Project.WebAPI.sln\" /p:Configuration=Release /p:DeployOnBuild=True /p:DeployDefaultTarget=WebPublish  /p:WebPublishMethod=FileSystem /p:DeleteExistingFiles=True  /p:publishUrl=D:\\Projects\\Publish\\Today_Deploy\\WebAPI\n複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案因為佈署都會連到廠商的VM主機，而且桌面遠端連線那邊的設定，我 D 磁碟有開分享，所以可以從廠商的 VM 直接連到我這邊的 D 磁碟。  因為可以直接連到 D 磁碟，所以也可以用 command line 的方式來複製我要的檔案，只要使用 \\\\tsclient\\d 就可以指定到我電腦的路徑 ， \\tsclient 是指我這邊的電腦，而 \\d 表示我的 D 磁碟。tsclient copybat1XCOPY \\\\tsclient\\d\\Projects\\Publish\\Today_Deploy.zip D:\\Project\\ /Y\n將我要佈署的整個資料夾含檔案，貼到主機上 server 的資料夾tsclient copybat1XCOPY D:\\Project\\Today_Deploy\\WebAPI\\* D:\\Project\\WebAPI /s /i /Y\n使用 PowerShell 壓縮與解壓縮檔案使用 PowerShell 壓縮或解壓縮檔案的話要先把 PowerShell 要執行的 script 先寫好，然後 command 呼叫 Powershell.exe 指定要執行的 script ，在設定一些執行參數就可以了。\n壓縮zipps1bat12345$source = \"D:\\Projects\\Publish\\Today_Deploy\"$destination = \"D:\\Projects\\Publish\\Today_Deploy.zip\"If(Test-path $destination) {Remove-item $destination}Add-Type -assembly \"system.io.compression.filesystem\"[io.compression.zipfile]::CreateFromDirectory($source,$destination)1Powershell.exe -executionpolicy remotesigned -File  D:\\Projects\\zip.ps1\n解壓縮unzipps1bat123456789Add-Type -AssemblyName System.IO.Compression.FileSystemfunction Unzip{    param([string]$zipfile, [string]$outpath)    [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)}Unzip \"D:\\TraPacWebPayment\\Today_Deploy.zip\" \"D:\\TraPacWebPayment\\Today_Deploy\"1Powershell.exe -executionpolicy remotesigned -File  D:\\Project\\unzip.ps1\n檢查檔案是否存在，並且執行不同指令command line 有檢查檔案是否存在的指令，若檔案不存在，可以用 goto: 的方式直接跳到要指定執行的指令。如以下指令，會判斷 D:\\Project\\Today_Deploy.zip 是否存在，若不存在則跳到 :exit 的點去執行，所以  do something… 就不會執行到。check file existbat12345678@rem check file exits or notif not exist D:\\Project\\Today_Deploy.zip goto :exitdo something...:exitecho deployment file: D:\\Project\\Today_Deploy.zip not exists\n","dateCreated":"2017-07-11T17:34:08+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-07-11T17:34:08+08:00","description":"最近為了將的壓縮、解壓縮、遠端連線硬碟、複製貼上等等的繁瑣的事情寫成 bat 檔案，花了很多時間。  所以就來記錄一下，用 command line 自動化的功能。\n\n刪除整個資料夾、刪除單一檔案\n使用 msbuild 建立佈署檔案\n複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案\n使用 PowerShell 壓縮與解壓縮檔案\n檢查檔案是否存在，並且執行不同指令\n","headline":"[cmd] Command Line 筆記-遠端複製與壓縮","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/","keywords":"cmd, PowerShell, msbuild"}</script>
+    <meta name="description" content="最近為了將的壓縮、解壓縮、遠端連線硬碟、複製貼上等等的繁瑣的事情寫成 bat 檔案，花了很多時間。  所以就來記錄一下，用 command line 自動化的功能。  刪除整個資料夾、刪除單一檔案 使用 msbuild 建立佈署檔案 複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案 使用 PowerShell 壓縮與解壓縮檔案 檢查檔案是否存在，並且執行不同指令">
+<meta name="keywords" content="cmd,PowerShell,msbuild">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[cmd] Command Line 筆記-遠端複製與壓縮">
+<meta property="og:url" content="https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="最近為了將的壓縮、解壓縮、遠端連線硬碟、複製貼上等等的繁瑣的事情寫成 bat 檔案，花了很多時間。  所以就來記錄一下，用 command line 自動化的功能。  刪除整個資料夾、刪除單一檔案 使用 msbuild 建立佈署檔案 複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案 使用 PowerShell 壓縮與解壓縮檔案 檢查檔案是否存在，並且執行不同指令">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.485Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[cmd] Command Line 筆記-遠端複製與壓縮">
+<meta name="twitter:description" content="最近為了將的壓縮、解壓縮、遠端連線硬碟、複製貼上等等的繁瑣的事情寫成 bat 檔案，花了很多時間。  所以就來記錄一下，用 command line 自動化的功能。  刪除整個資料夾、刪除單一檔案 使用 msbuild 建立佈署檔案 複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案 使用 PowerShell 壓縮與解壓縮檔案 檢查檔案是否存在，並且執行不同指令">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [cmd] Command Line 筆記-遠端複製與壓縮
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2017-07-11T17:34:08+08:00">
+	
+		    Jul 11, 2017
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/cmd/">cmd</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>最近為了將的壓縮、解壓縮、遠端連線硬碟、複製貼上等等的繁瑣的事情寫成 bat 檔案，花了很多時間。  所以就來記錄一下，用 command line 自動化的功能。</p>
+<ul>
+<li>刪除整個資料夾、刪除單一檔案</li>
+<li>使用 msbuild 建立佈署檔案</li>
+<li>複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案</li>
+<li>使用 PowerShell 壓縮與解壓縮檔案</li>
+<li>檢查檔案是否存在，並且執行不同指令</li>
+</ul>
+<a id="more"></a>
+<h2 id="刪除整個資料夾、刪除單一檔案"><a href="#刪除整個資料夾、刪除單一檔案" class="headerlink" title="刪除整個資料夾、刪除單一檔案"></a>刪除整個資料夾、刪除單一檔案</h2><p>刪除整個資料夾<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Delete Entire Folder</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">del</span> /q "D:\Projects\Publish\Today_Deploy\*"</span><br><span class="line"><span class="keyword">FOR</span> /D <span class="variable">%%p</span> <span class="keyword">IN</span> ("D:\Projects\Publish\Today_Deploy\*.*") <span class="keyword">DO</span> <span class="built_in">rmdir</span> "<span class="variable">%%p</span>" /s /q</span><br><span class="line"><span class="built_in">rmdir</span> "D:\Projects\Publish\Today_Deploy"</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>刪除單一檔案<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Delete a file</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">del</span> D:\Projects\Publish\Today_Deploy\WebAPI\Web.config</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="使用-msbuild-建立佈署檔案"><a href="#使用-msbuild-建立佈署檔案" class="headerlink" title="使用 msbuild 建立佈署檔案"></a>使用 msbuild 建立佈署檔案</h2><figure class="codeblock codeblock--tabbed"><figcaption><span>Web Deploy</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">"C:\Program Files (x86)\MSBuild\<span class="number">14</span>.<span class="number">0</span>\Bin\MSBuild.exe" "D:\Projects\WebAPI\Project.WebAPI.sln" </span><br><span class="line">/p:Configuration=Release </span><br><span class="line">/p:DeployOnBuild=True </span><br><span class="line">/p:DeployDefaultTarget=WebPublish  </span><br><span class="line">/p:WebPublishMethod=FileSystem </span><br><span class="line">/p:DeleteExistingFiles=True  </span><br><span class="line">/p:publishUrl=D:\Projects\Publish\Today_Deploy\WebAPI</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案"><a href="#複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案" class="headerlink" title="複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案"></a>複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案</h2><p>因為佈署都會連到廠商的VM主機，而且桌面遠端連線那邊的設定，我 D 磁碟有開分享，所以可以從廠商的 VM 直接連到我這邊的 D 磁碟。  因為可以直接連到 D 磁碟，所以也可以用 command line 的方式來複製我要的檔案，只要使用 <code>\\tsclient\d</code> 就可以指定到我電腦的路徑 ， \tsclient 是指我這邊的電腦，而 \d 表示我的 D 磁碟。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>tsclient copy</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">XCOPY</span> \\tsclient\d\Projects\Publish\Today_Deploy.zip D:\Project\ /Y</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>將我要佈署的整個資料夾含檔案，貼到主機上 server 的資料夾<br><figure class="codeblock codeblock--tabbed"><figcaption><span>tsclient copy</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">XCOPY</span> D:\Project\Today_Deploy\WebAPI\* D:\Project\WebAPI /s /i /Y</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="使用-PowerShell-壓縮與解壓縮檔案"><a href="#使用-PowerShell-壓縮與解壓縮檔案" class="headerlink" title="使用 PowerShell 壓縮與解壓縮檔案"></a>使用 PowerShell 壓縮與解壓縮檔案</h2><p>使用 PowerShell 壓縮或解壓縮檔案的話要先把 PowerShell 要執行的 script 先寫好，然後 command 呼叫 <code>Powershell.exe</code> 指定要執行的 script ，在設定一些執行參數就可以了。</p>
+<h3 id="壓縮"><a href="#壓縮" class="headerlink" title="壓縮"></a>壓縮</h3><figure class="codeblock codeblock--tabbed"><figcaption><span>zip</span><ul class="tabs"><li class="tab active">ps1</li><li class="tab">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$source = "D:\Projects\Publish\Today_Deploy"</span><br><span class="line">$destination = "D:\Projects\Publish\Today_Deploy.zip"</span><br><span class="line">If(Test-path $destination) {Remove-item $destination}</span><br><span class="line">Add-Type -assembly "system.io.compression.filesystem"</span><br><span class="line">[io.compression.zipfile]::CreateFromDirectory($source,$destination)</span><br></pre></td></tr></tbody></table></figure><figure class="highlight bat" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Powershell.exe -executionpolicy remotesigned -File  D:\Projects\zip.ps1</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="解壓縮"><a href="#解壓縮" class="headerlink" title="解壓縮"></a>解壓縮</h3><figure class="codeblock codeblock--tabbed"><figcaption><span>unzip</span><ul class="tabs"><li class="tab active">ps1</li><li class="tab">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Add-Type -AssemblyName System.IO.Compression.FileSystem</span><br><span class="line">function Unzip</span><br><span class="line">{</span><br><span class="line">    param([string]$zipfile, [string]$outpath)</span><br><span class="line"></span><br><span class="line">    [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">Unzip "D:\TraPacWebPayment\Today_Deploy.zip" "D:\TraPacWebPayment\Today_Deploy"</span><br></pre></td></tr></tbody></table></figure><figure class="highlight bat" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Powershell.exe -executionpolicy remotesigned -File  D:\Project\unzip.ps1</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="檢查檔案是否存在，並且執行不同指令"><a href="#檢查檔案是否存在，並且執行不同指令" class="headerlink" title="檢查檔案是否存在，並且執行不同指令"></a>檢查檔案是否存在，並且執行不同指令</h2><p>command line 有檢查檔案是否存在的指令，若檔案不存在，可以用 goto: 的方式直接跳到要指定執行的指令。<br>如以下指令，會判斷 <code>D:\Project\Today_Deploy.zip</code> 是否存在，若不存在則跳到 <code>:exit</code> 的點去執行，所以  do something… 就不會執行到。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>check file exist</span><ul class="tabs"><li class="tab active">bat</li></ul></figcaption><div class="tabs-content"><figure class="highlight bat" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">@rem check file exits or not</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> <span class="keyword">exist</span> D:\Project\Today_Deploy.zip <span class="keyword">goto</span> :<span class="keyword">exit</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">do</span> something...</span><br><span class="line"></span><br><span class="line">:<span class="keyword">exit</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> deployment file: D:\Project\Today_Deploy.zip <span class="keyword">not</span> exists</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/PowerShell/">PowerShell</a> <a class="tag tag--primary tag--small t-link" href="/tags/cmd/">cmd</a> <a class="tag tag--primary tag--small t-link" href="/tags/msbuild/">msbuild</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/安裝-SQL-Server-2014-Express-筆記/" data-tooltip="[SQL] 安裝 SQL Server 2014 Express 筆記" aria-label="PREVIOUS: [SQL] 安裝 SQL Server 2014 Express 筆記">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/ng-build-並壓縮檔案/" data-tooltip="[Angular] ng build 並壓縮檔案" aria-label="NEXT: [Angular] ng build 並壓縮檔案">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/安裝-SQL-Server-2014-Express-筆記/" data-tooltip="[SQL] 安裝 SQL Server 2014 Express 筆記" aria-label="PREVIOUS: [SQL] 安裝 SQL Server 2014 Express 筆記">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/ng-build-並壓縮檔案/" data-tooltip="[Angular] ng build 並壓縮檔案" aria-label="NEXT: [Angular] ng build 並壓縮檔案">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2017/07/Command-Line-筆記-遠端複製與壓縮/';
+                 
+                    this.page.identifier = '2017/07/Command-Line-筆記-遠端複製與壓縮/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

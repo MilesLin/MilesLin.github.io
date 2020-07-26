@@ -1,0 +1,822 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Go] Go 產生不同平台的執行檔 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Go">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Go 本身就是一個跨平台的程式語言，所以將專案編譯成其他作業系統能夠執行的檔案也是有支援的，今天就來筆記一下，如何在 Windows 作業系統編譯 Mac 的執行檔案。\n\n說明在執行 go build . 的時候，會讀取讀 GO 的環境變數 GOOS 和 GOARCH 來決定要產生什麼樣平台的執行檔案。  如下圖所示，我執行 go env 來查看環境變數， 可以看到 GOARCH=amd64,GOOS=windows，這表示我執行 go build . 的時候會產生 windows 64位元 作業系統的執行檔案。go-env\n產生其他作業系統的執行檔我這邊會以在 windows 作業系統上，產生 macOS 執行檔為範例。 根據 Cross compile Go on OSX? 此篇的說明，要編譯成 macOS 的話，要設定 GOOS=linux, GOARCH=arm64，請參考下方暫時性調整 GO 環境變數的方式產生 macOS 的執行檔。\nbashbash1$ SET GOOS=linux&amp;SET GOARCH=arm64&amp;go build .\n產生結果如下圖:macOS-build\n使用 $ SET GOOS=linux 的方式不會真的寫回 GO 環境變數，關掉 cmd 後此設定就會消失，如果真的要長久調整 GO 環境變數的話，需使用 $ go env -w GOOS=linux 的方式才可以。\n\nGOOS, GOARCH 參考列表 =&gt; Optional environment variables\ncmd/go: unsupported GOOS/GOARCH pair windows/arm64我在使用 $ go env -w GOOS=linux 寫環境變數的時候，不小心造成 cmd/go: unsupported GOOS/GOARCH pair linux SET GOARCH=arm64/arm64 錯誤，我只要使用 $ go env 命令就會出現錯誤，導致我無法把環境變數改回來，錯誤圖如下:unsupported-pair-error\n而這個原因是 GOOS, GOARCH 沒有匹配造成的。 匹配列表請參考 Optional environment variables。\n\n處理方法很簡單，先用 $ SET 方式把環境變數設定好，再使用 $ go env -w 的方式寫回去就可以了，如下方以我 windows 環境為範例，解決匹配錯誤的指令。\nbashbash1234$ set GOOS=windows$ set GOARCH=amd64$ go env -w GOOS=windows$ go env -w GOARCH=amd64\n延伸閱讀[Cross compilation with Go 1.5][Building GoLang Package for Linux (or any) from Windows][SettingGOPATH][Optional environment variables for $GOOS and $GOARCH][Setting environment variables for Windows cmd temporarily, to run a program, in a single line?]\n","dateCreated":"2020-01-19T21:19:45+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-01-19T21:19:45+08:00","description":"Go 本身就是一個跨平台的程式語言，所以將專案編譯成其他作業系統能夠執行的檔案也是有支援的，今天就來筆記一下，如何在 Windows 作業系統編譯 Mac 的執行檔案。","headline":"[Go] Go 產生不同平台的執行檔","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/","keywords":"Go"}</script>
+    <meta name="description" content="Go 本身就是一個跨平台的程式語言，所以將專案編譯成其他作業系統能夠執行的檔案也是有支援的，今天就來筆記一下，如何在 Windows 作業系統編譯 Mac 的執行檔案。">
+<meta name="keywords" content="Go">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Go] Go 產生不同平台的執行檔">
+<meta property="og:url" content="https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="Go 本身就是一個跨平台的程式語言，所以將專案編譯成其他作業系統能夠執行的檔案也是有支援的，今天就來筆記一下，如何在 Windows 作業系統編譯 Mac 的執行檔案。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/go-env.png">
+<meta property="og:image" content="https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/macOS-build.png">
+<meta property="og:image" content="https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/unsupported-pair-error.png">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.532Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Go] Go 產生不同平台的執行檔">
+<meta name="twitter:description" content="Go 本身就是一個跨平台的程式語言，所以將專案編譯成其他作業系統能夠執行的檔案也是有支援的，今天就來筆記一下，如何在 Windows 作業系統編譯 Mac 的執行檔案。">
+<meta name="twitter:image" content="https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/go-env.png">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Go] Go 產生不同平台的執行檔
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-01-19T21:19:45+08:00">
+	
+		    Jan 19, 2020
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Go/">Go</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>Go 本身就是一個跨平台的程式語言，所以將專案編譯成其他作業系統能夠執行的檔案也是有支援的，今天就來筆記一下，如何在 Windows 作業系統編譯 Mac 的執行檔案。</p>
+<a id="more"></a>
+<h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><p>在執行 <code>go build .</code> 的時候，會讀取讀 GO 的環境變數 <code>GOOS</code> 和 <code>GOARCH</code> 來決定要產生什麼樣平台的執行檔案。  如下圖所示，我執行 <code>go env</code> 來查看環境變數， 可以看到 <code>GOARCH=amd64</code>,<code>GOOS=windows</code>，這表示我執行 <code>go build .</code> 的時候會產生 <span class="highlight-text primary">windows 64位元</span> 作業系統的執行檔案。<br><div class="figure center" style="width:;"><a class="fancybox" href="go-env.png" title="go-env" data-caption="go-env" data-fancybox="default"><img class="fig-img" src="go-env.png" alt="go-env"></a><span class="caption">go-env</span></div></p>
+<h2 id="產生其他作業系統的執行檔"><a href="#產生其他作業系統的執行檔" class="headerlink" title="產生其他作業系統的執行檔"></a>產生其他作業系統的執行檔</h2><p>我這邊會以在 <span class="highlight-text primary">windows</span> 作業系統上，產生 macOS 執行檔為範例。 根據 <a href="https://stackoverflow.com/questions/12168873/cross-compile-go-on-osx#answer-35878611" title="Cross compile Go on OSX?" target="_blank" rel="noopener">Cross compile Go on OSX?</a> 此篇的說明，要編譯成 macOS 的話，要設定 <code>GOOS=linux</code>, <code>GOARCH=arm64</code>，請參考下方<span class="highlight-text warning">暫時性</span>調整 GO 環境變數的方式產生 macOS 的執行檔。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>bash</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ SET GOOS=linux&amp;SET GOARCH=arm64&amp;go build .</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>產生結果如下圖:<br><div class="figure center" style="width:;"><a class="fancybox" href="macOS-build.png" title="macOS-build" data-caption="macOS-build" data-fancybox="default"><img class="fig-img" src="macOS-build.png" alt="macOS-build"></a><span class="caption">macOS-build</span></div></p>
+<div class="alert info"><p>使用 <code>$ SET GOOS=linux</code> 的方式不會真的寫回 GO 環境變數，關掉 cmd 後此設定就會消失，如果真的要長久調整 GO 環境變數的話，需使用 <code>$ go env -w GOOS=linux</code> 的方式才可以。</p>
+</div>
+<p><strong>GOOS, GOARCH 參考列表</strong> =&gt; <a href="https://golang.org/doc/install/source#environment" title="Optional environment variables" target="_blank" rel="noopener">Optional environment variables</a></p>
+<h2 id="cmd-go"><a href="#cmd-go" class="headerlink" title="cmd/go: "></a>cmd/go: <span class="highlight-text danger">unsupported GOOS/GOARCH pair windows/arm64</span></h2><p>我在使用 <code>$ go env -w GOOS=linux</code> 寫環境變數的時候，不小心造成 <span class="highlight-text danger">cmd/go: unsupported GOOS/GOARCH pair linux SET GOARCH=arm64/arm64</span> 錯誤，我只要使用 <code>$ go env</code> 命令就會出現錯誤，導致我無法把環境變數改回來，錯誤圖如下:<br><div class="figure center" style="width:;"><a class="fancybox" href="unsupported-pair-error.png" title="unsupported-pair-error" data-caption="unsupported-pair-error" data-fancybox="default"><img class="fig-img" src="unsupported-pair-error.png" alt="unsupported-pair-error"></a><span class="caption">unsupported-pair-error</span></div></p>
+<div class="alert warning"><p>而這個原因是 <code>GOOS</code>, <code>GOARCH</code> 沒有匹配造成的。 匹配列表請參考 <a href="https://golang.org/doc/install/source#environment" target="_blank" rel="noopener">Optional environment variables</a>。</p>
+</div>
+<p>處理方法很簡單，先用 <code>$ SET</code> 方式把環境變數設定好，再使用 <code>$ go env -w</code> 的方式寫回去就可以了，如下方以我 windows 環境為範例，解決匹配錯誤的指令。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>bash</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">set</span> GOOS=windows</span><br><span class="line">$ <span class="built_in">set</span> GOARCH=amd64</span><br><span class="line">$ go env -w GOOS=windows</span><br><span class="line">$ go env -w GOARCH=amd64</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p>[<a href="https://dave.cheney.net/2015/08/22/cross-compilation-with-go-1-5" title="Cross compilation with Go 1.5" target="_blank" rel="noopener">Cross compilation with Go 1.5</a>]<br>[<a href="https://medium.com/@utranand/building-golang-package-for-linux-from-windows-22fa23764808" title="Building GoLang Package for Linux (or any) from Windows" target="_blank" rel="noopener">Building GoLang Package for Linux (or any) from Windows</a>]<br>[<a href="https://github.com/golang/go/wiki/SettingGOPATH#windows" title="SettingGOPATH" target="_blank" rel="noopener">SettingGOPATH</a>]<br>[<a href="https://golang.org/doc/install/source#environment" title="Optional environment variables for $GOOS and $GOARCH" target="_blank" rel="noopener">Optional environment variables for $GOOS and $GOARCH</a>]<br>[<a href="https://superuser.com/questions/1405650/setting-environment-variables-for-windows-cmd-temporarily-to-run-a-program-in" title="Setting environment variables for Windows cmd temporarily, to run a program, in a single line?" target="_blank" rel="noopener">Setting environment variables for Windows cmd temporarily, to run a program, in a single line?</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Go/">Go</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/Golang/Goroutines-使用-Channel-交換資料/" data-tooltip="[Go] Goroutines 使用 Channel 交換資料" aria-label="PREVIOUS: [Go] Goroutines 使用 Channel 交換資料">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/Golang/Go-Module-快速上手筆記/" data-tooltip="[Go] Go Module 常用指令筆記" aria-label="NEXT: [Go] Go Module 常用指令筆記">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/Golang/Goroutines-使用-Channel-交換資料/" data-tooltip="[Go] Goroutines 使用 Channel 交換資料" aria-label="PREVIOUS: [Go] Goroutines 使用 Channel 交換資料">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/Golang/Go-Module-快速上手筆記/" data-tooltip="[Go] Go Module 常用指令筆記" aria-label="NEXT: [Go] Go Module 常用指令筆記">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2020/01/Golang/Go-產生不同平台的執行檔/';
+                 
+                    this.page.identifier = '2020/01/Golang/Go-產生不同平台的執行檔/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

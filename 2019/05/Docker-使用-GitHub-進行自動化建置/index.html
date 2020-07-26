@@ -1,0 +1,864 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Docker] 使用 GitHub 進行自動化建置 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Docker">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Docker Hub 與 GitHub 的 CI/CD 整合做的非常的好，所以在設定上也非常的直覺，今天就要來介紹怎麼在 Docker Hub 與 GitHub 之間完成 CI/CD 的工作。\n\n前提概要在文章開始之前一定要有 Docker Hub 帳號與 GitHub 帳號，並且準備好一個 GitHub Repository 裡面，且原始碼裡 一定要有 Dockerfile，這篇文章的 GitHub Repository 是以我的 GitHub - Docker.Lab 為範例，是一個 ASP.NET Core 專案，且原始碼裡面已經有一個可以建置的 Dockerfile。\n如果不知道怎麼在 CI/CD 建立可以建置的 Dockerfile，請先閱讀這篇文章 Docker 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例 。\n那麼，就讓我們開始吧。\n設定 GitHub 連結第一步驟我們要先讓 Docker Hub 與 GitHub 連結。\n\n請先到 https://cloud.docker.com 登入後，點選 Account Settings 。account_setting_menu\n\n\n\n到 Linked Accounts 頁籤， 點選 GitHub 的 Connect。\nLinked_Accounts \n\n授權 Docker Hub Builder\nAuthorize_Docker\n\n授權成功後，就會看到底下畫面。\nGitHub_Connected\n\n\n建立新的 Docker Hub Repository 並設定好 CI/CD\n接下來到 Repositories 頁面，建立新的 Docker Hub Repository \nCreate_Repository\n\n輸入 Repository 資訊，並且選擇剛剛連結的 GitHub 帳號，和選擇要整合的 GitHub Repository，然後點選 Create &amp; Build。\nCreate_and_Build\n\n接下來到 Repositories 頁面，會看到新的 Repository 建立好了 \ndockerlab_created \n\n點進去後就會到該 Repository 的頁面\ndockerlab_general\n\n來到 build 頁籤，就可以看到關於自動化建置的訊息 \ndocker_build_tab\n\n\n到這個步驟後，通常就設定好了。\nPush 新版本到 GitHub ，觸發 Docker Hub CI/CD為了實驗，我隨便做一個 push 一個 commit 到 GitHub - Docker.Lab 上，來確定是否有觸發 CI/CD。當我推上去後，在 build 頁籤裡就會看到一個新的 CI/CD 建置，如下圖。the_latest_build\n再點進去看，就會看到該建置的過程auto-build_success\n當建置成功後，就會把建置好的映像檔 Push 到 Docker Hub Repository 去了。\n進階設定簡單說明如果要做一些其他的進階設定，可以到 build 頁籤，點選 Configure_Automated_Builds\nConfigure_Automated_Builds\n這裡可以設定觸發規則，Dockerfile 位置，和 設定建置的環境變數， 相當實用。build_configuration\n小結Docker Hub 跟 GitHub 在 CI/CD 上整合真的做得很好，而且又很直覺，讓我在研究上不用花過多的時間，就完成了!!!\n延伸閱讀[Docker - Set up Automated builds][Docker - Configure Automated Builds from GitHub and BitBucket]\n","dateCreated":"2019-05-20T22:55:18+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-05-20T22:55:18+08:00","description":"Docker Hub 與 GitHub 的 CI/CD 整合做的非常的好，所以在設定上也非常的直覺，今天就要來介紹怎麼在 Docker Hub 與 GitHub 之間完成 CI/CD 的工作。","headline":"[Docker] 使用 GitHub 進行自動化建置","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/","keywords":"Docker, GitHub, CI/CD"}</script>
+    <meta name="description" content="Docker Hub 與 GitHub 的 CI/CD 整合做的非常的好，所以在設定上也非常的直覺，今天就要來介紹怎麼在 Docker Hub 與 GitHub 之間完成 CI/CD 的工作。">
+<meta name="keywords" content="Docker">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Docker] 使用 GitHub 進行自動化建置">
+<meta property="og:url" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="Docker Hub 與 GitHub 的 CI/CD 整合做的非常的好，所以在設定上也非常的直覺，今天就要來介紹怎麼在 Docker Hub 與 GitHub 之間完成 CI/CD 的工作。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/account_setting_menu.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/Linked_Accounts.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/Authorize_Docker.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/GitHub_Connected.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/Create_Repository.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/Create_and_Build.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/dockerlab_created.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/dockerlab_general.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/docker_build_tab.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/the_latest_build.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/auto-build_success.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/Configure_Automated_Builds.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/build_configuration.jpg">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.501Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Docker] 使用 GitHub 進行自動化建置">
+<meta name="twitter:description" content="Docker Hub 與 GitHub 的 CI/CD 整合做的非常的好，所以在設定上也非常的直覺，今天就要來介紹怎麼在 Docker Hub 與 GitHub 之間完成 CI/CD 的工作。">
+<meta name="twitter:image" content="https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/account_setting_menu.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Docker] 使用 GitHub 進行自動化建置
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-05-20T22:55:18+08:00">
+	
+		    May 20, 2019
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Docker/">Docker</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>Docker Hub 與 GitHub 的 CI/CD 整合做的非常的好，所以在設定上也非常的直覺，今天就要來介紹怎麼在 Docker Hub 與 GitHub 之間完成 CI/CD 的工作。</p>
+<a id="more"></a>
+<h2 id="前提概要"><a href="#前提概要" class="headerlink" title="前提概要"></a>前提概要</h2><p>在文章開始之前一定要有 Docker Hub 帳號與 GitHub 帳號，並且準備好一個 GitHub Repository 裡面，且原始碼裡 <span class="highlight-text success">一定要有 Dockerfile</span>，這篇文章的 GitHub Repository 是以我的 <a href="https://github.com/MilesLin/docker.lab" title="GitHub - Docker.Lab" target="_blank" rel="noopener">GitHub - Docker.Lab</a> 為範例，是一個 ASP.NET Core 專案，且原始碼裡面已經有一個可以建置的 <a href="https://github.com/MilesLin/docker.lab/blob/master/Dockerfile" title="Dockerfile" target="_blank" rel="noopener">Dockerfile</a>。</p>
+<p>如果不知道怎麼在 CI/CD 建立可以建置的 Dockerfile，請先閱讀這篇文章 <a href="./../Docker-多階段建置映像檔/">Docker 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例</a> 。</p>
+<p>那麼，就讓我們開始吧。</p>
+<h2 id="設定-GitHub-連結"><a href="#設定-GitHub-連結" class="headerlink" title="設定 GitHub 連結"></a>設定 GitHub 連結</h2><p>第一步驟我們要先讓 Docker Hub 與 GitHub 連結。</p>
+<ol>
+<li>請先到 <a href="https://cloud.docker.com" target="_blank" rel="noopener">https://cloud.docker.com</a> 登入後，點選 <a href="https://cloud.docker.com/settings" title="Account Settings" target="_blank" rel="noopener">Account Settings</a> 。<div class="figure " style="width:;"><a class="fancybox" href="account_setting_menu.jpg" title="account_setting_menu" data-caption="account_setting_menu" data-fancybox="default"><img class="fig-img" src="account_setting_menu.jpg" alt="account_setting_menu"></a><span class="caption">account_setting_menu</span></div>
+</li>
+</ol>
+<ol start="2">
+<li><p>到 <span class="highlight-text success">Linked Accounts</span> 頁籤， 點選 GitHub 的 Connect。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="Linked_Accounts.jpg" title="Linked_Accounts" data-caption="Linked_Accounts" data-fancybox="default"><img class="fig-img" src="Linked_Accounts.jpg" alt="Linked_Accounts"></a><span class="caption">Linked_Accounts</span></div> 
+</li>
+<li><p>授權 Docker Hub Builder</p>
+<div class="figure " style="width:;"><a class="fancybox" href="Authorize_Docker.jpg" title="Authorize_Docker" data-caption="Authorize_Docker" data-fancybox="default"><img class="fig-img" src="Authorize_Docker.jpg" alt="Authorize_Docker"></a><span class="caption">Authorize_Docker</span></div>
+</li>
+<li><p>授權成功後，就會看到底下畫面。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="GitHub_Connected.jpg" title="GitHub_Connected" data-caption="GitHub_Connected" data-fancybox="default"><img class="fig-img" src="GitHub_Connected.jpg" alt="GitHub_Connected"></a><span class="caption">GitHub_Connected</span></div>
+</li>
+</ol>
+<h2 id="建立新的-Docker-Hub-Repository-並設定好-CI-CD"><a href="#建立新的-Docker-Hub-Repository-並設定好-CI-CD" class="headerlink" title="建立新的 Docker Hub Repository 並設定好 CI/CD"></a>建立新的 Docker Hub Repository 並設定好 CI/CD</h2><ol>
+<li><p>接下來到 Repositories 頁面，建立新的 Docker Hub Repository </p>
+<div class="figure " style="width:;"><a class="fancybox" href="Create_Repository.jpg" title="Create_Repository" data-caption="Create_Repository" data-fancybox="default"><img class="fig-img" src="Create_Repository.jpg" alt="Create_Repository"></a><span class="caption">Create_Repository</span></div>
+</li>
+<li><p>輸入 Repository 資訊，並且選擇剛剛連結的 GitHub 帳號，和選擇要整合的 GitHub Repository，然後點選 Create &amp; Build。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="Create_and_Build.jpg" title="Create_and_Build" data-caption="Create_and_Build" data-fancybox="default"><img class="fig-img" src="Create_and_Build.jpg" alt="Create_and_Build"></a><span class="caption">Create_and_Build</span></div>
+</li>
+<li><p>接下來到 Repositories 頁面，會看到新的 Repository 建立好了 </p>
+<div class="figure " style="width:;"><a class="fancybox" href="dockerlab_created.jpg" title="dockerlab_created" data-caption="dockerlab_created" data-fancybox="default"><img class="fig-img" src="dockerlab_created.jpg" alt="dockerlab_created"></a><span class="caption">dockerlab_created</span></div> 
+</li>
+<li><p>點進去後就會到該 Repository 的頁面</p>
+<div class="figure " style="width:;"><a class="fancybox" href="dockerlab_general.jpg" title="dockerlab_general" data-caption="dockerlab_general" data-fancybox="default"><img class="fig-img" src="dockerlab_general.jpg" alt="dockerlab_general"></a><span class="caption">dockerlab_general</span></div>
+</li>
+<li><p>來到 build 頁籤，就可以看到關於自動化建置的訊息 </p>
+<div class="figure " style="width:;"><a class="fancybox" href="docker_build_tab.jpg" title="docker_build_tab" data-caption="docker_build_tab" data-fancybox="default"><img class="fig-img" src="docker_build_tab.jpg" alt="docker_build_tab"></a><span class="caption">docker_build_tab</span></div>
+</li>
+</ol>
+<p>到這個步驟後，通常就設定好了。</p>
+<h2 id="Push-新版本到-GitHub-，觸發-Docker-Hub-CI-CD"><a href="#Push-新版本到-GitHub-，觸發-Docker-Hub-CI-CD" class="headerlink" title="Push 新版本到 GitHub ，觸發 Docker Hub CI/CD"></a>Push 新版本到 GitHub ，觸發 Docker Hub CI/CD</h2><p>為了實驗，我隨便做一個 push 一個 commit 到 <a href="https://github.com/MilesLin/docker.lab" title="GitHub - Docker.Lab" target="_blank" rel="noopener">GitHub - Docker.Lab</a> 上，來確定是否有觸發 CI/CD。<br>當我推上去後，在 build 頁籤裡就會看到一個新的 CI/CD 建置，如下圖。<br><div class="figure " style="width:;"><a class="fancybox" href="the_latest_build.jpg" title="the_latest_build" data-caption="the_latest_build" data-fancybox="default"><img class="fig-img" src="the_latest_build.jpg" alt="the_latest_build"></a><span class="caption">the_latest_build</span></div></p>
+<p>再點進去看，就會看到該建置的過程<br><div class="figure " style="width:;"><a class="fancybox" href="auto-build_success.jpg" title="auto-build_success" data-caption="auto-build_success" data-fancybox="default"><img class="fig-img" src="auto-build_success.jpg" alt="auto-build_success"></a><span class="caption">auto-build_success</span></div></p>
+<p>當建置成功後，就會把建置好的映像檔 Push 到 Docker Hub Repository 去了。</p>
+<h2 id="進階設定簡單說明"><a href="#進階設定簡單說明" class="headerlink" title="進階設定簡單說明"></a>進階設定簡單說明</h2><p>如果要做一些其他的進階設定，可以到 build 頁籤，點選 <span class="highlight-text success">Configure_Automated_Builds</span></p>
+<div class="figure " style="width:;"><a class="fancybox" href="Configure_Automated_Builds.jpg" title="Configure_Automated_Builds" data-caption="Configure_Automated_Builds" data-fancybox="default"><img class="fig-img" src="Configure_Automated_Builds.jpg" alt="Configure_Automated_Builds"></a><span class="caption">Configure_Automated_Builds</span></div>
+<p>這裡可以設定觸發規則，Dockerfile 位置，和 <a href="https://docs.docker.com/docker-hub/builds/#environment-variables-for-builds" title="設定建置的環境變數" target="_blank" rel="noopener">設定建置的環境變數</a>， 相當實用。<br><div class="figure " style="width:;"><a class="fancybox" href="build_configuration.jpg" title="build_configuration" data-caption="build_configuration" data-fancybox="default"><img class="fig-img" src="build_configuration.jpg" alt="build_configuration"></a><span class="caption">build_configuration</span></div></p>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>Docker Hub 跟 GitHub 在 CI/CD 上整合真的做得很好，而且又很直覺，讓我在研究上不用花過多的時間，就完成了!!!</p>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p>[<a href="https://docs.docker.com/docker-hub/builds/" title="Docker - Set up Automated builds" target="_blank" rel="noopener">Docker - Set up Automated builds</a>]<br>[<a href="https://docs.docker.com/docker-hub/builds/link-source/" title="Docker - Configure Automated Builds from GitHub and BitBucket" target="_blank" rel="noopener">Docker - Configure Automated Builds from GitHub and BitBucket</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/CI-CD/">CI/CD</a> <a class="tag tag--primary tag--small t-link" href="/tags/Docker/">Docker</a> <a class="tag tag--primary tag--small t-link" href="/tags/GitHub/">GitHub</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/05/瞭解-Docker-的預設網路設置/" data-tooltip="[Docker] 瞭解 Docker 的預設網路設置" aria-label="PREVIOUS: [Docker] 瞭解 Docker 的預設網路設置">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/05/Docker-多階段建置映像檔/" data-tooltip="[Docker] 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例" aria-label="NEXT: [Docker] 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/05/瞭解-Docker-的預設網路設置/" data-tooltip="[Docker] 瞭解 Docker 的預設網路設置" aria-label="PREVIOUS: [Docker] 瞭解 Docker 的預設網路設置">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/05/Docker-多階段建置映像檔/" data-tooltip="[Docker] 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例" aria-label="NEXT: [Docker] 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/';
+                 
+                    this.page.identifier = '2019/05/Docker-使用-GitHub-進行自動化建置/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

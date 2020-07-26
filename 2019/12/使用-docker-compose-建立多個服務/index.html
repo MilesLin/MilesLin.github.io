@@ -1,0 +1,861 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Docker] 使用 docker-compose 建立多個服務 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"公司一直有一個維護的案子，該維護案的開發環境都一直放在雲端上，例如 SQL Server、後端 API 等等…。 但是該維護案又不會常常使用到開發環境，但是沒有開發環境偶爾要維護又很麻煩，所以為了節省成本，就決定把該開發環境容器化，並且把放在雲端的服務關掉。\n該維護案是前後端分離，前端是 Angular 後端是 ASP.NET Core API 與 SQL Server，所以要容器化的是 後端 的部分，只要將後端容器化後，前端開發就不用煩惱後端環境怎麼建立。\n所以今天要介紹如何用 docker-compose 建立 ASP.NET Core API 與 SQL Server 服務，並且該 API 會連 SQL Server 當作資料來源。  讓前端的開發工程師在開發的時候，不用為了後端的環境而煩惱。\n\n環境說明這次的 demo 我建立了一個 ASP.NET Core 的專案，且該專案用 EF Core 對資料庫做操作，以及建立了一個含有 northwnd 資料庫的 SQL Server 映像檔。\nASP.NET Core 專案說明我有將專案放到 Github 上供參考 ASP.NET Core API 專案 。\n該專案就是一個非常簡單的 API ，只有一個 Controller ，一個 API ，該 API 就是讀取資料庫，撈出一筆資料後丟出來。 如下方程式碼\nValueControllercs12345678910111213141516171819[Route(\"api/[controller]\")][ApiController]public class ValuesController : ControllerBase{    private readonly NORTHWNDContext _db;    public ValuesController(NORTHWNDContext db)    {        this._db = db;    }    // GET api/values    [HttpGet]    public ActionResult&lt;Customers&gt; Get()    {        var customer = _db.Customers.First();        return customer;    }}\n而該專案的資料夾，請參考下圖，會專注在 docker-compose.yml 上。 其中 Dockerfile 是用來建置後端 API ，可以參考這篇 [Docker] 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例backend project \n範例資料庫說明我有將範例的資料庫推上我的 docker hub - docker/mileslin/northwnd ，直接 docker run -e &quot;ACCEPT_EULA=Y&quot; -p 1433:1433 -d mileslin/northwnd 就可以把 northwnd 資料庫執行起來。 (但是我們今天不是要單獨執行，所以可以先不用執行此指令。)\n資料庫登入資訊\n\nport: 1433\n帳號: sa\n密碼: 2wsx#EDC\n\n若要了解如何從無到有建立 SQL Server 映像檔，可以參考 [Docker] SQL Server Container 快速入門 。 \n看懂 docker-compose.yml環境說明結束了，現在就是來使用 docker-compose 建立服務啦。 如果還不知道什麼是 docker-compose? 可以先看一下官方說明。Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration. To learn more about all the features of Compose, see the list of features.\ndockerOverview of Docker Compose\n簡單來說 docker-compose 就是用來定義一次執行多個容器的工具。\n所以我們現在要做的就是，要寫一個 docker-compose.yml 檔案，該檔案會定義我要建立的 docker 服務，並且使用 docker-compose 來啟動服務。 那接下來我就來帶大家看這份 docker-compose.yml 檔案吧。\n12345678910111213141516171819202122232425262728293031323334353637383940# 使用 Compose file format V3.2 版本version: '3.2'# 定義 services 區塊，以這裡的例子，我定義了 `mydb` 與 `myapi` 這兩個 services。services:  # 定義一個名為 mydb 的 service  mydb:    # 此 service 會使用此 image 執行。(這是我已經上傳好，含有 northwnd 資料庫的 SQL Server)    image: mileslin/northwnd    # 對外 mapping 1433 port。 如果沒有想要從外部連資料庫，則此設定可以不用。    ports:      - \"1433:1433\"    # 將此 service 加入一個自訂義的網路，名為 demonetwork。    networks:      - demonetwork    # 設定此 service 的環境變數，要使用此 SQL Server image ，要設定此環境變數，代表同意 End-User Licensing Agreement.    environment:      ACCEPT_EULA: \"Y\"  # 定義一個名為 myapi 的服務  myapi:    # 此 service 要用建置的方式產生 image ，並且設定 Dockerfile 的路徑位置    build:      context: ./      dockerfile: Dockerfile    # 對外 mapping 8000 port。所以當網站起來的時候，可以用 http://localhost:8000/api/values 取得資料。    ports:      - \"8000:80\"    # 設定此 service 的環境變數，覆寫資料庫的連線字串。 可以注意的是，我的 SQL Server 的位址是 mydb 這個服務的名稱。    environment:      ConnectionStrings__northwnd_db: \"Server=mydb;Database=NORTHWND;User ID=sa;Password=2wsx#EDC;Trusted_Connection=True;Integrated Security=False;\"    # 將此 service 加入一個自訂義的網路，名為 demonetwork。    networks:      - demonetwork    # 當 mydb service 起來後，再執行此 service 的設定    depends_on:      - mydb# 建立一個名為 demonetwork 的自訂義網路，且採用預設的 bridge 類別的網路networks:  demonetwork:    driver: bridge\ndepends_on 設定說明雖然上面有設定 myapi depends_on mydb ，但是請注意，就算 mydb 的 service 先啟動，不代表資料庫服務已經起來，還是需要等一段時間，資料庫的實體才會起來，在這段時間可能會造成 myapi 無法連線的問題。  如果要處理這個問題，需要使用 wait-for-it。\n\nDocker 預設的 DNS這裡要額外補充說明的是，為什麼 SQL Server 的位址是 mydb 這個服務的名稱? \n只要是 docker services 在同一個自訂義網路的情況下，docker 的 DNS 會從 service 的名稱解析到該 service 的位址。  所以以上方的範例，我將 mydb 與 myapi 都加入一個自訂義網路，名為 demonetwork ，所以我的 myapi 服務在設定資料庫連線字串的時候，可以使用 mydb 當作資料庫的位址，docker 的 DNS 就會幫我導到該資料庫去。 參考: Embedded DNS server in user-defined networks\n請注意，如果 service 不是建立在自訂義的網路，而是預設的 bridge 網路，則 docker 的 DNS 服務需要額外做設定。參考:  Configure container DNS\n\n使用 docker-compose 指令啟動服務與移除服務現在萬事都準備好了，只剩下把服務啟動， 執行 docker-compose -f docker-compose.yml up，就會看到下圖的情況，docker-compose 會把在 yml 裡面定義好的服務都啟動。因為 docker-compose.yml 是 docker 預設會找到檔案，所以 -f docker-compose.yml 不一定要設定，也可以使用此指令 docker-compose up 效果是一樣的。\n\ndocker-compose up\n服務起來後，我們來看一下 http://localhost:8000/api/values 是不是真的能夠連到資料result\n上圖可以知道，我們已經成功連到資料，且該資料是從資料庫來的!!\n那接下來，要移除服務也很簡單，只要輸入 docker-compose down 就可以把所以服務移除。docker-compose down\n如果啟動服務要背景執行的話，可以加入 -d 參數，如: docker-compose -f docker-compose.yml up -d 這樣 service 就會在背景執行了\n\n其他 docker-compose 指令docker-compose 也可以對單一 service 做操作，例如，我要停止 myapi service，我就可以使用 docker-compose stop myapi，重新啟動 myapi service，就可以使用 docker-compose start myapi。\n請參考下圖，我使用 docker-compose ps 來觀察停止服務與啟動服務的狀態restart service\n重新建置 myapi 的方式如果 myapi 的程式碼有調整，想要更新的話，是沒辦法直接 docker-compose down + docker-compose up 就更新的，因為有 cache 的問題，所以如果重新建置的話，要用其他方式，我這邊介紹兩種做法。\n方法一把 myapi 的 image 刪除，再重新 docker-compose up請參考下方指令\n\ndocker-compose images 找到要刪除的 image id\ndocker-compose stop myapi, docker-compose rm myapi 停止與刪除 myapi service\ndocker rmi 46ccc 刪除 myapi 的 image ，\ndocker-compose up 重新啟動服務rebuild servicebash12345docker-compose imagesdocker-compose stop myapidocker-compose rm myapidocker rmi 46cccdocker-compose up\n\n\n執行成功後，會看到下圖的樣子rebuild-1\n方法二重新建置該 service ，這方法是參考 How to restart a single container with docker-compose 的說明。\n只要執行下面 4 行指令就可以直接重 build 了。\nrebuild servicebash1234docker-compose stop myapidocker-compose build myapidocker-compose create myapidocker-compose start myapi\n小結如果讀者要直接執行的話，可以到我的專案範例 docker-compose-demo 下載下來後，直接 docker-compose up 就可以把服務執行起來了。 剩下的只要看懂 yml 在寫什麼，就可以很輕易運用到自己的專案上了。\n延伸閱讀[Overview of Docker Compose][Get started with Docker Compose][Overview of docker-compose CLI]\n","dateCreated":"2019-12-14T21:37:33+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-12-14T21:37:33+08:00","description":"公司一直有一個維護的案子，該維護案的開發環境都一直放在雲端上，例如 SQL Server、後端 API 等等…。 但是該維護案又不會常常使用到開發環境，但是沒有開發環境偶爾要維護又很麻煩，所以為了節省成本，就決定把該開發環境容器化，並且把放在雲端的服務關掉。\n該維護案是前後端分離，前端是 Angular 後端是 ASP.NET Core API 與 SQL Server，所以要容器化的是 後端 的部分，只要將後端容器化後，前端開發就不用煩惱後端環境怎麼建立。\n所以今天要介紹如何用 docker-compose 建立 ASP.NET Core API 與 SQL Server 服務，並且該 API 會連 SQL Server 當作資料來源。  讓前端的開發工程師在開發的時候，不用為了後端的環境而煩惱。","headline":"[Docker] 使用 docker-compose 建立多個服務","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/","keywords":"Docker, ASP.NET Core, SQL Server, EF Core"}</script>
+    <meta name="description" content="公司一直有一個維護的案子，該維護案的開發環境都一直放在雲端上，例如 SQL Server、後端 API 等等…。 但是該維護案又不會常常使用到開發環境，但是沒有開發環境偶爾要維護又很麻煩，所以為了節省成本，就決定把該開發環境容器化，並且把放在雲端的服務關掉。 該維護案是前後端分離，前端是 Angular 後端是 ASP.NET Core API 與 SQL Server，所以要容器化的是 後端 的">
+<meta name="keywords" content="Docker,ASP.NET Core,SQL Server,EF Core">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Docker] 使用 docker-compose 建立多個服務">
+<meta property="og:url" content="https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="公司一直有一個維護的案子，該維護案的開發環境都一直放在雲端上，例如 SQL Server、後端 API 等等…。 但是該維護案又不會常常使用到開發環境，但是沒有開發環境偶爾要維護又很麻煩，所以為了節省成本，就決定把該開發環境容器化，並且把放在雲端的服務關掉。 該維護案是前後端分離，前端是 Angular 後端是 ASP.NET Core API 與 SQL Server，所以要容器化的是 後端 的">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/backend_project.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/docker-compose-up.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/result.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/docker-compose-down.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/restart-service.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/rebuild-1.jpg">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.657Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Docker] 使用 docker-compose 建立多個服務">
+<meta name="twitter:description" content="公司一直有一個維護的案子，該維護案的開發環境都一直放在雲端上，例如 SQL Server、後端 API 等等…。 但是該維護案又不會常常使用到開發環境，但是沒有開發環境偶爾要維護又很麻煩，所以為了節省成本，就決定把該開發環境容器化，並且把放在雲端的服務關掉。 該維護案是前後端分離，前端是 Angular 後端是 ASP.NET Core API 與 SQL Server，所以要容器化的是 後端 的">
+<meta name="twitter:image" content="https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/backend_project.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Docker] 使用 docker-compose 建立多個服務
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-12-14T21:37:33+08:00">
+	
+		    Dec 14, 2019
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Docker/">Docker</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>公司一直有一個維護的案子，該維護案的開發環境都一直放在雲端上，例如 SQL Server、後端 API 等等…。 但是該維護案又不會常常使用到開發環境，但是沒有開發環境偶爾要維護又很麻煩，所以為了節省成本，就決定把該開發環境容器化，並且把放在雲端的服務關掉。</p>
+<p>該維護案是前後端分離，前端是 <code>Angular</code> 後端是 <code>ASP.NET Core API</code> 與 <code>SQL Server</code>，所以要容器化的是 <span class="highlight-text primary">後端</span> 的部分，只要將後端容器化後，前端開發就不用煩惱後端環境怎麼建立。</p>
+<p>所以今天要介紹如何用 <code>docker-compose</code> 建立 ASP.NET Core API 與 SQL Server 服務，並且該 API 會連 SQL Server 當作資料來源。  讓前端的開發工程師在開發的時候，不用為了後端的環境而煩惱。</p>
+<a id="more"></a>
+<h2 id="環境說明"><a href="#環境說明" class="headerlink" title="環境說明"></a>環境說明</h2><p>這次的 demo 我建立了一個 ASP.NET Core 的專案，且該專案用 EF Core 對資料庫做操作，以及建立了一個含有 northwnd 資料庫的 SQL Server 映像檔。</p>
+<h3 id="ASP-NET-Core-專案說明"><a href="#ASP-NET-Core-專案說明" class="headerlink" title="ASP.NET Core 專案說明"></a>ASP.NET Core 專案說明</h3><p>我有將專案放到 Github 上供參考 <a href="https://github.com/MilesLin/docker-compose-demo/tree/master/backend.api" title="ASP.NET Core API 專案" target="_blank" rel="noopener">ASP.NET Core API 專案</a> 。</p>
+<p>該專案就是一個非常簡單的 API ，只有一個 Controller ，一個 API ，該 API 就是讀取資料庫，撈出一筆資料後丟出來。 如下方程式碼</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>ValueController</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">Route(<span class="meta-string">"api/[controller]"</span>)</span>]</span><br><span class="line">[<span class="meta">ApiController</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ValuesController</span> : <span class="title">ControllerBase</span></span><br><span class="line">{</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">readonly</span> NORTHWNDContext _db;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ValuesController</span>(<span class="params">NORTHWNDContext db</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        <span class="keyword">this</span>._db = db;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">// GET api/values</span></span><br><span class="line">    [<span class="meta">HttpGet</span>]</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ActionResult&lt;Customers&gt; <span class="title">Get</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        <span class="keyword">var</span> customer = _db.Customers.First();</span><br><span class="line">        <span class="keyword">return</span> customer;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>而該專案的資料夾，請參考下圖，會專注在 <code>docker-compose.yml</code> 上。 <em>其中 Dockerfile 是用來建置後端 API ，可以參考這篇 <a href="https://mileslin.github.io/2019/05/Docker-%E5%A4%9A%E9%9A%8E%E6%AE%B5%E5%BB%BA%E7%BD%AE%E6%98%A0%E5%83%8F%E6%AA%94/" title="[Docker] 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例">[Docker] 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例</a></em><br><div class="figure center" style="width:;"><a class="fancybox" href="backend_project.jpg" title="backend project" data-caption="backend project" data-fancybox="default"><img class="fig-img" src="backend_project.jpg" alt="backend project"></a><span class="caption">backend project</span></div> </p>
+<h3 id="範例資料庫說明"><a href="#範例資料庫說明" class="headerlink" title="範例資料庫說明"></a>範例資料庫說明</h3><p>我有將範例的資料庫推上我的 docker hub - <a href="https://hub.docker.com/repository/docker/mileslin/northwnd" title="docker/mileslin/northwnd" target="_blank" rel="noopener">docker/mileslin/northwnd</a> ，直接 <code>docker run -e &quot;ACCEPT_EULA=Y&quot; -p 1433:1433 -d mileslin/northwnd</code> 就可以把 northwnd 資料庫執行起來。 <em>(但是我們今天不是要單獨執行，所以可以先不用執行此指令。)</em></p>
+<p>資料庫登入資訊</p>
+<ul>
+<li>port: 1433</li>
+<li>帳號: sa</li>
+<li>密碼: 2wsx#EDC</li>
+</ul>
+<p>若要了解如何從無到有建立 SQL Server 映像檔，可以參考 <a href="https://mileslin.github.io/2019/04/SQL-Server-Container-%E5%BF%AB%E9%80%9F%E5%85%A5%E9%96%80/" title="[Docker] SQL Server Container 快速入門">[Docker] SQL Server Container 快速入門</a> 。 </p>
+<h2 id="看懂-docker-compose-yml"><a href="#看懂-docker-compose-yml" class="headerlink" title="看懂 docker-compose.yml"></a>看懂 docker-compose.yml</h2><p>環境說明結束了，現在就是來使用 docker-compose 建立服務啦。 如果還不知道什麼是 docker-compose? 可以先看一下官方說明。<br><blockquote><p>Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration. To learn more about all the features of Compose, see the list of features.</p>
+<footer><strong>docker</strong><cite><a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">Overview of Docker Compose</a></cite></footer></blockquote></p>
+<p>簡單來說 docker-compose 就是用來定義一次執行多個容器的工具。</p>
+<p>所以我們現在要做的就是，要寫一個 docker-compose.yml 檔案，該檔案會定義我要建立的 docker 服務，並且使用 <code>docker-compose</code> 來啟動服務。 那接下來我就來帶大家看這份 docker-compose.yml 檔案吧。</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用 Compose file format V3.2 版本</span></span><br><span class="line"><span class="attr">version:</span> <span class="string">'3.2'</span></span><br><span class="line"><span class="comment"># 定義 services 區塊，以這裡的例子，我定義了 `mydb` 與 `myapi` 這兩個 services。</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="comment"># 定義一個名為 mydb 的 service</span></span><br><span class="line"><span class="attr">  mydb:</span></span><br><span class="line">    <span class="comment"># 此 service 會使用此 image 執行。(這是我已經上傳好，含有 northwnd 資料庫的 SQL Server)</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">mileslin/northwnd</span></span><br><span class="line">    <span class="comment"># 對外 mapping 1433 port。 如果沒有想要從外部連資料庫，則此設定可以不用。</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">"1433:1433"</span></span><br><span class="line">    <span class="comment"># 將此 service 加入一個自訂義的網路，名為 demonetwork。</span></span><br><span class="line"><span class="attr">    networks:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">demonetwork</span></span><br><span class="line">    <span class="comment"># 設定此 service 的環境變數，要使用此 SQL Server image ，要設定此環境變數，代表同意 End-User Licensing Agreement.</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="attr">      ACCEPT_EULA:</span> <span class="string">"Y"</span></span><br><span class="line">  <span class="comment"># 定義一個名為 myapi 的服務</span></span><br><span class="line"><span class="attr">  myapi:</span></span><br><span class="line">    <span class="comment"># 此 service 要用建置的方式產生 image ，並且設定 Dockerfile 的路徑位置</span></span><br><span class="line"><span class="attr">    build:</span></span><br><span class="line"><span class="attr">      context:</span> <span class="string">./</span></span><br><span class="line"><span class="attr">      dockerfile:</span> <span class="string">Dockerfile</span></span><br><span class="line">    <span class="comment"># 對外 mapping 8000 port。所以當網站起來的時候，可以用 http://localhost:8000/api/values 取得資料。</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">"8000:80"</span></span><br><span class="line">    <span class="comment"># 設定此 service 的環境變數，覆寫資料庫的連線字串。 可以注意的是，我的 SQL Server 的位址是 mydb 這個服務的名稱。</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="attr">      ConnectionStrings__northwnd_db:</span> <span class="string">"Server=mydb;Database=NORTHWND;User ID=sa;Password=2wsx#EDC;Trusted_Connection=True;Integrated Security=False;"</span></span><br><span class="line">    <span class="comment"># 將此 service 加入一個自訂義的網路，名為 demonetwork。</span></span><br><span class="line"><span class="attr">    networks:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">demonetwork</span></span><br><span class="line">    <span class="comment"># 當 mydb service 起來後，再執行此 service 的設定</span></span><br><span class="line"><span class="attr">    depends_on:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">mydb</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 建立一個名為 demonetwork 的自訂義網路，且採用預設的 bridge 類別的網路</span></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line"><span class="attr">  demonetwork:</span></span><br><span class="line"><span class="attr">    driver:</span> <span class="string">bridge</span></span><br></pre></td></tr></table></figure>
+<div class="alert warning"><p><strong>depends_on 設定說明</strong><br>雖然上面有設定 myapi depends_on mydb ，但是請注意，就算 mydb 的 service 先啟動，不代表資料庫服務已經起來，還是需要等一段時間，資料庫的實體才會起來，在這段時間可能會造成 myapi 無法連線的問題。  如果要處理這個問題，需要使用 <a href="https://github.com/vishnubob/wait-for-it" title="wait-for-it" target="_blank" rel="noopener">wait-for-it</a>。</p>
+</div>
+<h3 id="Docker-預設的-DNS"><a href="#Docker-預設的-DNS" class="headerlink" title="Docker 預設的 DNS"></a>Docker 預設的 DNS</h3><p>這裡要額外補充說明的是，為什麼 <span class="highlight-text danger">SQL Server 的位址是 mydb 這個服務的名稱</span>? </p>
+<p>只要是 docker services 在同一個自訂義網路的情況下，docker 的 DNS 會從 service 的名稱解析到該 service 的位址。  所以以上方的範例，我將 mydb 與 myapi 都加入一個自訂義網路，名為 demonetwork ，所以我的 myapi 服務在設定資料庫連線字串的時候，可以使用 mydb 當作資料庫的位址，docker 的 DNS 就會幫我導到該資料庫去。 <em>參考: <a href="https://docs.docker.com/v17.09/engine/userguide/networking/configure-dns/" title="Embedded DNS server in user-defined networks" target="_blank" rel="noopener">Embedded DNS server in user-defined networks</a></em></p>
+<div class="alert warning"><p>請注意，如果 service 不是建立在自訂義的網路，而是預設的 bridge 網路，則 docker 的 DNS 服務需要額外做設定。<br>參考:  <a href="https://docs.docker.com/v17.09/engine/userguide/networking/default_network/configure-dns/" target="_blank" rel="noopener">Configure container DNS</a></p>
+</div>
+<h2 id="使用-docker-compose-指令啟動服務與移除服務"><a href="#使用-docker-compose-指令啟動服務與移除服務" class="headerlink" title="使用 docker-compose 指令啟動服務與移除服務"></a>使用 docker-compose 指令啟動服務與移除服務</h2><p>現在萬事都準備好了，只剩下把服務啟動， 執行 <code>docker-compose -f docker-compose.yml up</code>，就會看到下圖的情況，docker-compose 會把在 yml 裡面定義好的服務都啟動。<br><div class="alert info"><p>因為 docker-compose.yml 是 docker 預設會找到檔案，所以 <code>-f docker-compose.yml</code> 不一定要設定，也可以使用此指令 <code>docker-compose up</code> 效果是一樣的。</p>
+</div></p>
+<div class="figure center" style="width:;"><a class="fancybox" href="docker-compose-up.jpg" title="docker-compose up" data-caption="docker-compose up" data-fancybox="default"><img class="fig-img" src="docker-compose-up.jpg" alt="docker-compose up"></a><span class="caption">docker-compose up</span></div>
+<p>服務起來後，我們來看一下 <a href="http://localhost:8000/api/values" target="_blank" rel="noopener">http://localhost:8000/api/values</a> 是不是真的能夠連到資料<br><div class="figure center" style="width:;"><a class="fancybox" href="result.jpg" title="result" data-caption="result" data-fancybox="default"><img class="fig-img" src="result.jpg" alt="result"></a><span class="caption">result</span></div></p>
+<p>上圖可以知道，我們已經成功連到資料，且該資料是從資料庫來的!!</p>
+<p>那接下來，要移除服務也很簡單，只要輸入 <code>docker-compose down</code> 就可以把所以服務移除。<br><div class="figure center" style="width:;"><a class="fancybox" href="docker-compose-down.jpg" title="docker-compose down" data-caption="docker-compose down" data-fancybox="default"><img class="fig-img" src="docker-compose-down.jpg" alt="docker-compose down"></a><span class="caption">docker-compose down</span></div></p>
+<div class="alert info"><p>如果啟動服務要背景執行的話，可以加入 -d 參數，如: <code>docker-compose -f docker-compose.yml up -d</code> 這樣 service 就會在背景執行了</p>
+</div>
+<h2 id="其他-docker-compose-指令"><a href="#其他-docker-compose-指令" class="headerlink" title="其他 docker-compose 指令"></a>其他 docker-compose 指令</h2><p>docker-compose 也可以對單一 service 做操作，例如，我要停止 myapi service，我就可以使用 <code>docker-compose stop myapi</code>，重新啟動 myapi service，就可以使用 <code>docker-compose start myapi</code>。</p>
+<p>請參考下圖，我使用 <code>docker-compose ps</code> 來觀察停止服務與啟動服務的狀態<br><div class="figure center" style="width:;"><a class="fancybox" href="restart-service.jpg" title="restart service" data-caption="restart service" data-fancybox="default"><img class="fig-img" src="restart-service.jpg" alt="restart service"></a><span class="caption">restart service</span></div></p>
+<h3 id="重新建置-myapi-的方式"><a href="#重新建置-myapi-的方式" class="headerlink" title="重新建置 myapi 的方式"></a>重新建置 myapi 的方式</h3><p>如果 myapi 的程式碼有調整，想要更新的話，是沒辦法直接 <code>docker-compose down</code> + <code>docker-compose up</code> 就更新的，因為有 cache 的問題，所以如果重新建置的話，要用其他方式，我這邊介紹兩種做法。</p>
+<p><strong>方法一</strong><br>把 myapi 的 image 刪除，再重新 <code>docker-compose up</code><br>請參考下方指令</p>
+<ol>
+<li><code>docker-compose images</code> 找到要刪除的 image id</li>
+<li><code>docker-compose stop myapi</code>, <code>docker-compose rm myapi</code> 停止與刪除 myapi service</li>
+<li><code>docker rmi 46ccc</code> 刪除 myapi 的 image ，</li>
+<li><code>docker-compose up</code> 重新啟動服務<figure class="codeblock codeblock--tabbed"><figcaption><span>rebuild service</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker-compose images</span><br><span class="line">docker-compose stop myapi</span><br><span class="line">docker-compose rm myapi</span><br><span class="line">docker rmi 46ccc</span><br><span class="line">docker-compose up</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
+</ol>
+<p>執行成功後，會看到下圖的樣子<br><div class="figure center" style="width:;"><a class="fancybox" href="rebuild-1.jpg" title="rebuild-1" data-caption="rebuild-1" data-fancybox="default"><img class="fig-img" src="rebuild-1.jpg" alt="rebuild-1"></a><span class="caption">rebuild-1</span></div></p>
+<p><strong>方法二</strong><br>重新建置該 service ，這方法是參考 <a href="https://stackoverflow.com/questions/31466428/how-to-restart-a-single-container-with-docker-compose" title="How to restart a single container with docker-compose" target="_blank" rel="noopener">How to restart a single container with docker-compose</a> 的說明。</p>
+<p>只要執行下面 4 行指令就可以直接重 build 了。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>rebuild service</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker-compose stop myapi</span><br><span class="line">docker-compose build myapi</span><br><span class="line">docker-compose create myapi</span><br><span class="line">docker-compose start myapi</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>如果讀者要直接執行的話，可以到我的專案範例 <a href="https://github.com/MilesLin/docker-compose-demo" title="docker-compose-demo" target="_blank" rel="noopener">docker-compose-demo</a> 下載下來後，直接 docker-compose up 就可以把服務執行起來了。 剩下的只要看懂 yml 在寫什麼，就可以很輕易運用到自己的專案上了。</p>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p>[<a href="https://docs.docker.com/compose/" title="Overview of Docker Compose" target="_blank" rel="noopener">Overview of Docker Compose</a>]<br>[<a href="https://docs.docker.com/compose/gettingstarted/" title="Get started with Docker Compose" target="_blank" rel="noopener">Get started with Docker Compose</a>]<br>[<a href="https://docs.docker.com/compose/reference/overview/" title="Overview of docker-compose CLI" target="_blank" rel="noopener">Overview of docker-compose CLI</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/ASP-NET-Core/">ASP.NET Core</a> <a class="tag tag--primary tag--small t-link" href="/tags/Docker/">Docker</a> <a class="tag tag--primary tag--small t-link" href="/tags/EF-Core/">EF Core</a> <a class="tag tag--primary tag--small t-link" href="/tags/SQL-Server/">SQL Server</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/Golang/Go-Module-快速上手筆記/" data-tooltip="[Go] Go Module 常用指令筆記" aria-label="PREVIOUS: [Go] Go Module 常用指令筆記">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/12/如何在容器化的-SQL-Server-還原資料庫/" data-tooltip="[Docker] 如何在容器化的 SQL Server 還原資料庫" aria-label="NEXT: [Docker] 如何在容器化的 SQL Server 還原資料庫">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/Golang/Go-Module-快速上手筆記/" data-tooltip="[Go] Go Module 常用指令筆記" aria-label="PREVIOUS: [Go] Go Module 常用指令筆記">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/12/如何在容器化的-SQL-Server-還原資料庫/" data-tooltip="[Docker] 如何在容器化的 SQL Server 還原資料庫" aria-label="NEXT: [Docker] 如何在容器化的 SQL Server 還原資料庫">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/';
+                 
+                    this.page.identifier = '2019/12/使用-docker-compose-建立多個服務/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

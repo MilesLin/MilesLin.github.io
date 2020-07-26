@@ -1,0 +1,864 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Docker] 如何容器化 ASP.NET Core 網站 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Docker">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天會介紹怎麼一步一步的將 ASP.NET Core 網站容器化，主要的步驟為\n\n產生一個 ASP.NET Core MVC 預設專案\n建立 Dockerfile\n從 Dockerfile 建立包含網站的 Image\n建立和執行 Container\n\n\n建立 ASP.NET Core MVC 預設專案這個步驟我們先要產生一個預設的 MVC 專案，並且要產生好佈署檔案，佈署檔案等等會用來複製到 Container。\n先執行下方指令，產生好專案後，確定能執行起來create mvcbash123dotnet new mvc -n CoolWebcd CoolWebdetnet run成功的話，會看類似這樣網站預設 ASP.NET Core MVC 網站\n因為 docker 沒有設定憑證問題，所以 publish 之前，請到 Startup.cs 把 這行 app.UseHttpsRedirection(); 移除。\n\n接下來使用 Ctrl + C 停止執行網站，然後使用 dotnet publish 建立佈署檔案。\npublishbash1dotnet publish -o dist\n接下來你看到一個資料夾 dist，裡面就是我們需要的佈署檔案。佈署檔案\n只要有這些佈署檔案，我們就可以把網站執行起來，你可以嘗試執行 dotnet CoolWeb.dll，就會看到網站執行起來了。\n建立 Dockerfile建立 Dockerfile 的目的是用來執行一連串的動作，從 Pull Image 、把佈署檔案放進 Container 、到建立一個我們自己網站的 Image。\n我們在 dist 資料夾裡面，建立一個 Dockerfile 檔案 (請注意， Dockerfile 沒有副檔名)dockerfile\n並在 Dockerfile 貼上以下指令。dockerfilebash123FROM mcr.microsoft.com/dotnet/core/aspnet:2.1COPY . .ENTRYPOINT [\"dotnet\", \"CoolWeb.dll\"]這三行指令個代表是\n\nPull ASP.NET Core Runtime 的 Image ，且我指定版本是 2.1 版本。\n複製當下資料夾的檔案(這邊是指 dist 資料夾)，貼到 Container\nContainer 建立後會執行 dotent CoolWeb.dll 這段指令，讓網頁跑起來\n這段指令指行完後，會有一個 Process 在 Container 裡面執行，如果沒有這個 Process 表示 Container 已經沒有在執行任何東西。\n\n\n\n從 Dockerfile 建立 Image接下來就要讀取 Dockerfile，建立有我們網站的 Image， 請執行以下指令\nbuild imagebash1docker build . -t myapp -f Dockerfile\n\n參數 . 是指當下目錄\n-t myapp 將產生的 Image 取名為 myapp\n-f Dockerfile 讀取 Dockerfile 這個檔案(預設可省略)\n\n執行成功後，就會看到 myapp 的 Image 被建立了myapp image\n建立和執行 Container終於到了最後一個步驟了，接下來我們就要建立 Container 啦。 請執行以下指令create containerbash1docker create -p 8000:80 --name exampleApp myapp\n\n-p 8000:80 建立 Container 80 port 與 host system 8000 port 的 proxy。\n所以當我輸入 http://localhost:8000/ 的時候，會連到 Container 的 http://localhost:80/\n\n\n--name exampleApp 指定 Container 的別名\nmyapp 從 myapp 這個 Image 建立 Container\n\n建立完後，執行 docker ps -a 就會看到建立好的 Containercontainer\n接下來就是要執行 Container 了，請執行以下指令。 此指令會讓 Container 執行起來，且是在背景執行。start containerbash1docker start exampleApp\n接下來就是打開 chrome 輸入網址 http://localhost:8000/ ，就會看到已經連線到容器化後的 ASP.NET Core MVC 網站了!!!\n將 create 與 start 用一個指令代替另外 dokcer 有提供一個 run 指令，能夠將 create 和 start 兩個指令一起執行。  請看下方指令\nrun containerbash1docker run -d --rm -p 8000:80 myapp\n\n-d 讓 Container 背景執行，如果沒有這個參數，則命令提示字元會停在那邊沒辦法做其他事情\n--rm 當 Container 停止的時候，會自動把 Container 刪除\n\n小結今天只有介紹怎麼把佈署檔案放到 Container 裡面去，其實將 ASP.NET Core 網站容器的方法有很多，例如也可以使用 .NET Core SDK 的 Image ，這個 Image 裡面有提供 dotnet SDK 的功能，所以我能夠在 Container 裡面執行 dotnet restore, dotnet publish 之類的指令，做更多的事情。\n延伸閱讀[Introduction to .NET and Docker][Docker hub - .NET Core SDK][Docker hub - ASP.NET Core Runtime]\n","dateCreated":"2019-04-11T21:30:52+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-04-11T21:30:52+08:00","description":"今天會介紹怎麼一步一步的將 ASP.NET Core 網站容器化，主要的步驟為\n\n產生一個 ASP.NET Core MVC 預設專案\n建立 Dockerfile\n從 Dockerfile 建立包含網站的 Image\n建立和執行 Container\n","headline":"[Docker] 如何容器化 ASP.NET Core 網站","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/","keywords":"Docker, ASP.NET Core"}</script>
+    <meta name="description" content="今天會介紹怎麼一步一步的將 ASP.NET Core 網站容器化，主要的步驟為  產生一個 ASP.NET Core MVC 預設專案 建立 Dockerfile 從 Dockerfile 建立包含網站的 Image 建立和執行 Container">
+<meta name="keywords" content="Docker">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Docker] 如何容器化 ASP.NET Core 網站">
+<meta property="og:url" content="https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="今天會介紹怎麼一步一步的將 ASP.NET Core 網站容器化，主要的步驟為  產生一個 ASP.NET Core MVC 預設專案 建立 Dockerfile 從 Dockerfile 建立包含網站的 Image 建立和執行 Container">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/default_web.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/dist.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/dockerfile.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/image.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/container.jpg">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.704Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Docker] 如何容器化 ASP.NET Core 網站">
+<meta name="twitter:description" content="今天會介紹怎麼一步一步的將 ASP.NET Core 網站容器化，主要的步驟為  產生一個 ASP.NET Core MVC 預設專案 建立 Dockerfile 從 Dockerfile 建立包含網站的 Image 建立和執行 Container">
+<meta name="twitter:image" content="https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/default_web.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Docker] 如何容器化 ASP.NET Core 網站
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-04-11T21:30:52+08:00">
+	
+		    Apr 11, 2019
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Docker/">Docker</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>今天會介紹怎麼一步一步的將 ASP.NET Core 網站容器化，主要的步驟為</p>
+<ul>
+<li>產生一個 ASP.NET Core MVC 預設專案</li>
+<li>建立 Dockerfile</li>
+<li>從 Dockerfile 建立包含網站的 Image</li>
+<li>建立和執行 Container</li>
+</ul>
+<a id="more"></a>
+<h2 id="建立-ASP-NET-Core-MVC-預設專案"><a href="#建立-ASP-NET-Core-MVC-預設專案" class="headerlink" title="建立 ASP.NET Core MVC 預設專案"></a>建立 ASP.NET Core MVC 預設專案</h2><p>這個步驟我們先要產生一個預設的 MVC 專案，並且要產生好佈署檔案，佈署檔案等等會用來複製到 Container。</p>
+<p>先執行下方指令，產生好專案後，確定能執行起來<br><figure class="codeblock codeblock--tabbed"><figcaption><span>create mvc</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dotnet new mvc -n CoolWeb</span><br><span class="line"><span class="built_in">cd</span> CoolWeb</span><br><span class="line">detnet run</span><br></pre></td></tr></tbody></table></figure></div></figure><br>成功的話，會看類似這樣網站<br><div class="figure " style="width:;"><a class="fancybox" href="default_web.jpg" title="預設 ASP.NET Core MVC 網站" data-caption="預設 ASP.NET Core MVC 網站" data-fancybox="default"><img class="fig-img" src="default_web.jpg" alt="預設 ASP.NET Core MVC 網站"></a><span class="caption">預設 ASP.NET Core MVC 網站</span></div></p>
+<div class="alert warning"><p>因為 docker 沒有設定憑證問題，所以 publish 之前，請到 Startup.cs 把 這行 <strong>app.UseHttpsRedirection();</strong> 移除。</p>
+</div>
+<p>接下來使用 <code>Ctrl + C</code> 停止執行網站，然後使用 <a href="https://docs.microsoft.com/zh-tw/dotnet/core/tools/dotnet-publish?tabs=netcore20" title="dotnet publish" target="_blank" rel="noopener">dotnet publish</a> 建立佈署檔案。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>publish</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dotnet publish -o dist</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>接下來你看到一個資料夾 <strong>dist</strong>，裡面就是我們需要的佈署檔案。<br><div class="figure " style="width:;"><a class="fancybox" href="dist.jpg" title="佈署檔案" data-caption="佈署檔案" data-fancybox="default"><img class="fig-img" src="dist.jpg" alt="佈署檔案"></a><span class="caption">佈署檔案</span></div></p>
+<p>只要有這些佈署檔案，我們就可以把網站執行起來，你可以嘗試執行 <code>dotnet CoolWeb.dll</code>，就會看到網站執行起來了。</p>
+<h2 id="建立-Dockerfile"><a href="#建立-Dockerfile" class="headerlink" title="建立 Dockerfile"></a>建立 Dockerfile</h2><p>建立 Dockerfile 的目的是用來執行一連串的動作，從 Pull Image 、把佈署檔案放進 Container 、到建立一個我們自己網站的 Image。</p>
+<p>我們在 <strong>dist</strong> 資料夾裡面，建立一個 <strong>Dockerfile</strong> 檔案 <em>(請注意， Dockerfile 沒有副檔名)</em><br><div class="figure " style="width:;"><a class="fancybox" href="dockerfile.jpg" title="dockerfile" data-caption="dockerfile" data-fancybox="default"><img class="fig-img" src="dockerfile.jpg" alt="dockerfile"></a><span class="caption">dockerfile</span></div></p>
+<p>並在 Dockerfile 貼上以下指令。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>dockerfile</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">FROM mcr.microsoft.com/dotnet/core/aspnet:2.1</span><br><span class="line">COPY . .</span><br><span class="line">ENTRYPOINT [<span class="string">"dotnet"</span>, <span class="string">"CoolWeb.dll"</span>]</span><br></pre></td></tr></tbody></table></figure></div></figure><br>這三行指令個代表是</p>
+<ol>
+<li>Pull <a href="https://hub.docker.com/_/microsoft-dotnet-core-aspnet/" title="ASP.NET Core Runtime" target="_blank" rel="noopener">ASP.NET Core Runtime</a> 的 Image ，且我指定版本是 2.1 版本。</li>
+<li>複製當下資料夾的檔案(這邊是指 dist 資料夾)，貼到 Container</li>
+<li>Container 建立後會執行 <code>dotent CoolWeb.dll</code> 這段指令，讓網頁跑起來<ul>
+<li>這段指令指行完後，會有一個 Process 在 Container 裡面執行，如果沒有這個 Process 表示 Container 已經沒有在執行任何東西。</li>
+</ul>
+</li>
+</ol>
+<h2 id="從-Dockerfile-建立-Image"><a href="#從-Dockerfile-建立-Image" class="headerlink" title="從 Dockerfile 建立 Image"></a>從 Dockerfile 建立 Image</h2><p>接下來就要讀取 Dockerfile，建立有我們網站的 Image， 請執行以下指令</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>build image</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build . -t myapp -f Dockerfile</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<ul>
+<li><em>參數 <code>.</code> 是指當下目錄</em></li>
+<li><em><code>-t myapp</code> 將產生的 Image 取名為 <code>myapp</code></em></li>
+<li><em><code>-f Dockerfile</code> 讀取 Dockerfile 這個檔案(預設可省略)</em></li>
+</ul>
+<p>執行成功後，就會看到 myapp 的 Image 被建立了<br><div class="figure " style="width:;"><a class="fancybox" href="image.jpg" title="myapp image" data-caption="myapp image" data-fancybox="default"><img class="fig-img" src="image.jpg" alt="myapp image"></a><span class="caption">myapp image</span></div></p>
+<h2 id="建立和執行-Container"><a href="#建立和執行-Container" class="headerlink" title="建立和執行 Container"></a>建立和執行 Container</h2><p>終於到了最後一個步驟了，接下來我們就要建立 Container 啦。 請執行以下指令<br><figure class="codeblock codeblock--tabbed"><figcaption><span>create container</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker create -p 8000:80 --name exampleApp myapp</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<ul>
+<li><em><code>-p 8000:80</code> 建立 Container 80 port 與 host system 8000 port 的 proxy。</em><ul>
+<li><em>所以當我輸入 <a href="http://localhost:8000/" target="_blank" rel="noopener">http://localhost:8000/</a> 的時候，會連到 Container 的 <a href="http://localhost:80/" target="_blank" rel="noopener">http://localhost:80/</a></em></li>
+</ul>
+</li>
+<li><em><code>--name exampleApp</code> 指定 Container 的別名</em></li>
+<li><em><code>myapp</code> 從 myapp 這個 Image 建立 Container</em></li>
+</ul>
+<p>建立完後，執行 <code>docker ps -a</code> 就會看到建立好的 Container<br><div class="figure " style="width:;"><a class="fancybox" href="container.jpg" title="container" data-caption="container" data-fancybox="default"><img class="fig-img" src="container.jpg" alt="container"></a><span class="caption">container</span></div></p>
+<p>接下來就是要執行 Container 了，請執行以下指令。 此指令會讓 Container 執行起來，且是在背景執行。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>start container</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker start exampleApp</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>接下來就是打開 chrome 輸入網址 <a href="http://localhost:8000/" target="_blank" rel="noopener">http://localhost:8000/</a> ，就會看到已經連線到容器化後的 ASP.NET Core MVC 網站了!!!</p>
+<h5 id="將-create-與-start-用一個指令代替"><a href="#將-create-與-start-用一個指令代替" class="headerlink" title="將 create 與 start 用一個指令代替"></a>將 create 與 start 用一個指令代替</h5><p>另外 dokcer 有提供一個 <code>run</code> 指令，能夠將 create 和 start 兩個指令一起執行。  請看下方指令</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>run container</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --rm -p 8000:80 myapp</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<ul>
+<li><em><code>-d</code> 讓 Container 背景執行，如果沒有這個參數，則命令提示字元會停在那邊沒辦法做其他事情</em></li>
+<li><em><code>--rm</code> 當 Container 停止的時候，會自動把 Container 刪除</em></li>
+</ul>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>今天只有介紹怎麼把佈署檔案放到 Container 裡面去，其實將 ASP.NET Core 網站容器的方法有很多，例如也可以使用 <a href="https://hub.docker.com/_/microsoft-dotnet-core-sdk/" title=".NET Core SDK" target="_blank" rel="noopener">.NET Core SDK</a> 的 Image ，這個 Image 裡面有提供 dotnet SDK 的功能，所以我能夠在 Container 裡面執行 <code>dotnet restore</code>, <code>dotnet publish</code> 之類的指令，做更多的事情。</p>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p>[<a href="https://docs.microsoft.com/zh-tw/dotnet/core/docker/intro-net-docker" title="Introduction to .NET and Docker" target="_blank" rel="noopener">Introduction to .NET and Docker</a>]<br>[<a href="https://hub.docker.com/_/microsoft-dotnet-core-sdk/" title=".NET Core SDK" target="_blank" rel="noopener">Docker hub - .NET Core SDK</a>]<br>[<a href="https://hub.docker.com/_/microsoft-dotnet-core-aspnet/" title="ASP.NET Core Runtime" target="_blank" rel="noopener">Docker hub - ASP.NET Core Runtime</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/ASP-NET-Core/">ASP.NET Core</a> <a class="tag tag--primary tag--small t-link" href="/tags/Docker/">Docker</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/04/如何使用-Volumes/" data-tooltip="[Docker] 如何使用 Volumes" aria-label="PREVIOUS: [Docker] 如何使用 Volumes">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/04/Docker-指令小抄/" data-tooltip="[Docker] Docker 指令小抄" aria-label="NEXT: [Docker] Docker 指令小抄">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/04/如何使用-Volumes/" data-tooltip="[Docker] 如何使用 Volumes" aria-label="PREVIOUS: [Docker] 如何使用 Volumes">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/04/Docker-指令小抄/" data-tooltip="[Docker] Docker 指令小抄" aria-label="NEXT: [Docker] Docker 指令小抄">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/';
+                 
+                    this.page.identifier = '2019/04/如何容器化-ASP.NET-Core-網站/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

@@ -1,0 +1,837 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Docker] 如何使用 Volumes - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Docker">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Container 本身有他自己的 File System，當有檔案建立的時候，都會放在這個 File System 裡，這個 File System 是跟著 Container 存活的。所以當 Container 在被刪除後， Container 裡面的狀態或者是資料都會消失。 而 Docker 能透過建立 Volumes 來解決這個問題。 \n\nVolumes 介紹Volumes 能夠將資料放在 Container 之外，意思是說你能夠更新 Container 的時候資料不會遺失。  請看下圖， Volumes 是在 Container 之外的一個 File System。from docker document\n應用程式中有兩種需要儲存檔案的方式，第一種是當應用程式執行的時候，該應用程式會產生的檔案，例如 Log 之類的。 第二種是應用程式要執行的條件是一定要有檔案存在，例如執行資料庫。 這兩種情況在使用 Volumes 的時候會不太一樣。 今天主是講第一種使用 Volumes 的方式。\nContainer 本身的 File System範例的 Image 我使用 alpine，這個是由社群開發的  Linux 作業系統。請看下方的 dockerfile，我會在 Container 建立起來的時候檢查 /data/message.txt 這個檔案是否存在，如果存在我會 echo File Exists，反之會 echo Creating File，並且建立檔案。Dockerfiledockerfile12345FROM alpineWORKDIR /dataENTRYPOINT (test -e message.txt &amp;&amp; echo \"File Exists\" \\ || (echo \"Creating File...\" \\ &amp;&amp; echo Hello, Docker $(date '+%X') &gt; message.txt)) &amp;&amp; cat message.txt\n接下來請執行下方兩行指令，把 Container 執行起來\nrun containerbash12docker build . -t apress/vtestdocker run --name vtest apress/vtest\n執行後會看到 Creating File… 的訊息，如下圖。  同時 Container 也會停止執行，因為 ENTRYPOINT 的指令只是要讓 Container 建立檔案而已，建立完檔案後 Container 就會停止執行。\n成功建立檔案\n接下來我們要再一次啟動同一個 Container，請執行下方指令start containerbash1docker start -a vtest-a 是 attach 的意思，是讓 container 的 log 能呈現出來。 (docker start)\n因為 Container 還沒被刪除，所以 Container File System 裡面的檔案還會存在，如下圖所示。檔案已存在\n隨著 Container 移除後，檔案消失了接下來我要把 Container 刪除，再跑一個新的 Container 起來，請執行以下指令\ndelete and run containerbash12docker rm -f vtestdocker run --name vtest apress/vtest\n-f 是 force 的意思，能夠強制刪除執行中的 Container。 (docker rm)\n你會發現，剛剛建立的檔案 Hello, Docker 15:46:43 不見了，而新的檔案被建立 Hello, Docker 16:01:42，如下圖。重新建立同樣的 Container\n使用 Volumes 保存檔案將 Dockerfile 修改一下，只要在在 Dockerfile 加入 VOLUME /data，這個命令是在告訴 Docker 任何檔案只要存在 /data 路徑底下，應該把檔案存在 volume 裡面，放在volume 的檔案，並不會放在原本的 Container File System 裡面。\nDockerfiledockerfile123456FROM alpineVOLUME /dataWORKDIR /dataENTRYPOINT (test -e message.txt &amp;&amp; echo \"File Exists\" \\ || (echo \"Creating File...\" \\ &amp;&amp; echo Hello, Docker $(date '+%X') &gt; message.txt)) &amp;&amp; cat message.txt\n讓我們使用上方的 Dockerfile 更新原本的 apress/vtest 。 請執行下方指令build imagebash1docker build . -t apress/vtest\n第二步驟就是建立 Volume ，等等會讓檔案儲存在該 Volume 裡。 請執行下方指令create volumebash1docker volume create --name testdata\n指令執行完後，可以輸入 docker volume ls 檢查 volume 是否成功建立。 如下圖。建立 volume\n接下來請執行下方指令，把 Container 在次執行起來。run containerbash1docker run --name vtest2 -v testdata:/data apress/vtest-v testdata:/data 是在告訴 Docker 任何檔案只要存在 Container 裡面的 /data 路徑就要被存在 testdata volume 裡面\n因為是全新的 Container，所以你會看檔案再次被建立，如下圖。建立檔案在 Volume\n接下來把 Container 刪除後再執行一次。 請執行下方指令。recreate containerbash12docker rm -f vtest2docker run --name vtest2 -v testdata:/data apress/vtest\n你會發現，檔案還是存在的，因為檔案是存在 Volume 裡面。檔案存在 Volume 裡\n小結在使用 Docker 的時候，懂得使用 Volume 是非常重要的事情。 這能夠讓你的檔案能夠一直保存著，不隨著 Container 消失而檔案也跟著消失。\n延伸閱讀[Docker - use volumes]\n","dateCreated":"2019-04-12T22:45:12+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-04-12T22:45:12+08:00","description":"Container 本身有他自己的 File System，當有檔案建立的時候，都會放在這個 File System 裡，這個 File System 是跟著 Container 存活的。所以當 Container 在被刪除後， Container 裡面的狀態或者是資料都會消失。 而 Docker 能透過建立 Volumes 來解決這個問題。 ","headline":"[Docker] 如何使用 Volumes","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/04/如何使用-Volumes/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/04/如何使用-Volumes/","keywords":"Docker, Volumes"}</script>
+    <meta name="description" content="Container 本身有他自己的 File System，當有檔案建立的時候，都會放在這個 File System 裡，這個 File System 是跟著 Container 存活的。所以當 Container 在被刪除後， Container 裡面的狀態或者是資料都會消失。 而 Docker 能透過建立 Volumes 來解決這個問題。">
+<meta name="keywords" content="Docker">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Docker] 如何使用 Volumes">
+<meta property="og:url" content="https://mileslin.github.io/2019/04/如何使用-Volumes/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="Container 本身有他自己的 File System，當有檔案建立的時候，都會放在這個 File System 裡，這個 File System 是跟著 Container 存活的。所以當 Container 在被刪除後， Container 裡面的狀態或者是資料都會消失。 而 Docker 能透過建立 Volumes 來解決這個問題。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何使用-Volumes/types-of-mounts-volume.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何使用-Volumes/creating-file.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何使用-Volumes/file-exists.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何使用-Volumes/recreate-container.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何使用-Volumes/creating-volume.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何使用-Volumes/Create-file-in-volume.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2019/04/如何使用-Volumes/file-still-exists.jpg">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.688Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Docker] 如何使用 Volumes">
+<meta name="twitter:description" content="Container 本身有他自己的 File System，當有檔案建立的時候，都會放在這個 File System 裡，這個 File System 是跟著 Container 存活的。所以當 Container 在被刪除後， Container 裡面的狀態或者是資料都會消失。 而 Docker 能透過建立 Volumes 來解決這個問題。">
+<meta name="twitter:image" content="https://mileslin.github.io/2019/04/如何使用-Volumes/types-of-mounts-volume.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Docker] 如何使用 Volumes
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-04-12T22:45:12+08:00">
+	
+		    Apr 12, 2019
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Docker/">Docker</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>Container 本身有他自己的 File System，當有檔案建立的時候，都會放在這個 File System 裡，這個 File System 是跟著 Container 存活的。所以當 Container 在被刪除後， Container 裡面的狀態或者是資料都會消失。 而 Docker 能透過建立 <strong>Volumes</strong> 來解決這個問題。 </p>
+<a id="more"></a>
+<h2 id="Volumes-介紹"><a href="#Volumes-介紹" class="headerlink" title="Volumes 介紹"></a>Volumes 介紹</h2><p>Volumes 能夠將資料放在 Container 之外，意思是說你能夠更新 Container 的時候資料不會遺失。  請看下圖， Volumes 是在 Container 之外的一個 File System。<br><div class="figure " style="width:;"><a class="fancybox" href="types-of-mounts-volume.jpg" title="from docker document" data-caption="from docker document" data-fancybox="default"><img class="fig-img" src="types-of-mounts-volume.jpg" alt="from docker document"></a><span class="caption">from docker document</span></div></p>
+<p>應用程式中有兩種需要儲存檔案的方式，第一種是當應用程式執行的時候，該應用程式會產生的檔案，例如 Log 之類的。 第二種是應用程式要執行的條件是一定要有檔案存在，例如執行資料庫。 這兩種情況在使用 Volumes 的時候會不太一樣。 今天主是講第一種使用 Volumes 的方式。</p>
+<h2 id="Container-本身的-File-System"><a href="#Container-本身的-File-System" class="headerlink" title="Container 本身的 File System"></a>Container 本身的 File System</h2><p>範例的 Image 我使用 <a href="https://hub.docker.com/_/alpine" title="alpine" target="_blank" rel="noopener">alpine</a>，這個是由社群開發的  <a href="https://zh.wikipedia.org/wiki/Alpine_Linux" title="Linux 作業系統" target="_blank" rel="noopener">Linux 作業系統</a>。<br>請看下方的 dockerfile，我會在 Container 建立起來的時候檢查 <strong>/data/message.txt</strong> 這個檔案是否存在，如果存在我會 echo File Exists，反之會 echo Creating File，並且建立檔案。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Dockerfile</span><ul class="tabs"><li class="tab active">dockerfile</li></ul></figcaption><div class="tabs-content"><figure class="highlight dockerfile" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> alpine</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /data</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="bash"> (<span class="built_in">test</span> -e message.txt &amp;&amp; <span class="built_in">echo</span> <span class="string">"File Exists"</span> \</span></span><br><span class="line"><span class="bash"> || (<span class="built_in">echo</span> <span class="string">"Creating File..."</span> \</span></span><br><span class="line"><span class="bash"> &amp;&amp; <span class="built_in">echo</span> Hello, Docker $(date <span class="string">'+%X'</span>) &gt; message.txt)) &amp;&amp; cat message.txt</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>接下來請執行下方兩行指令，把 Container 執行起來</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>run container</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker build . -t apress/vtest</span><br><span class="line">docker run --name vtest apress/vtest</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>執行後會看到 Creating File… 的訊息，如下圖。  同時 Container 也會停止執行，因為 ENTRYPOINT 的指令只是要讓 Container 建立檔案而已，建立完檔案後 Container 就會停止執行。</p>
+<div class="figure " style="width:;"><a class="fancybox" href="creating-file.jpg" title="成功建立檔案" data-caption="成功建立檔案" data-fancybox="default"><img class="fig-img" src="creating-file.jpg" alt="成功建立檔案"></a><span class="caption">成功建立檔案</span></div>
+<p>接下來我們要再一次啟動同一個 Container，請執行下方指令<br><figure class="codeblock codeblock--tabbed"><figcaption><span>start container</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker start -a vtest</span><br></pre></td></tr></tbody></table></figure></div></figure><br><em><code>-a</code> 是 attach 的意思，是讓 container 的 log 能呈現出來。 (<a href="https://docs.docker.com/engine/reference/commandline/start/" target="_blank" rel="noopener">docker start</a>)</em></p>
+<p>因為 Container 還沒被刪除，所以 Container File System 裡面的檔案還會存在，如下圖所示。<br><div class="figure " style="width:;"><a class="fancybox" href="file-exists.jpg" title="檔案已存在" data-caption="檔案已存在" data-fancybox="default"><img class="fig-img" src="file-exists.jpg" alt="檔案已存在"></a><span class="caption">檔案已存在</span></div></p>
+<h2 id="隨著-Container-移除後，檔案消失了"><a href="#隨著-Container-移除後，檔案消失了" class="headerlink" title="隨著 Container 移除後，檔案消失了"></a>隨著 Container 移除後，檔案消失了</h2><p>接下來我要把 Container 刪除，再跑一個新的 Container 起來，請執行以下指令</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>delete and run container</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker rm -f vtest</span><br><span class="line">docker run --name vtest apress/vtest</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p><em><code>-f</code> 是 force 的意思，能夠強制刪除執行中的 Container。 (<a href="https://docs.docker.com/engine/reference/commandline/rm/" target="_blank" rel="noopener">docker rm</a>)</em></p>
+<p>你會發現，剛剛建立的檔案 <span class="highlight-text danger">Hello, Docker 15:46:43</span> 不見了，而新的檔案被建立 <span class="highlight-text success">Hello, Docker 16:01:42</span>，如下圖。<br><div class="figure " style="width:;"><a class="fancybox" href="recreate-container.jpg" title="重新建立同樣的 Container" data-caption="重新建立同樣的 Container" data-fancybox="default"><img class="fig-img" src="recreate-container.jpg" alt="重新建立同樣的 Container"></a><span class="caption">重新建立同樣的 Container</span></div></p>
+<h2 id="使用-Volumes-保存檔案"><a href="#使用-Volumes-保存檔案" class="headerlink" title="使用 Volumes 保存檔案"></a>使用 Volumes 保存檔案</h2><p>將 Dockerfile 修改一下，只要在在 Dockerfile 加入 <span class="highlight-text primary">VOLUME /data</span>，這個命令是在告訴 Docker 任何檔案只要存在 <code>/data</code> 路徑底下，應該把檔案存在 <strong>volume</strong> 裡面，放在<br><strong>volume</strong> 的檔案，並不會放在原本的 Container File System 裡面。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Dockerfile</span><ul class="tabs"><li class="tab active">dockerfile</li></ul></figcaption><div class="tabs-content"><figure class="highlight dockerfile" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> alpine</span><br><span class="line"><span class="keyword">VOLUME</span><span class="bash"> /data</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /data</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="bash"> (<span class="built_in">test</span> -e message.txt &amp;&amp; <span class="built_in">echo</span> <span class="string">"File Exists"</span> \</span></span><br><span class="line"><span class="bash"> || (<span class="built_in">echo</span> <span class="string">"Creating File..."</span> \</span></span><br><span class="line"><span class="bash"> &amp;&amp; <span class="built_in">echo</span> Hello, Docker $(date <span class="string">'+%X'</span>) &gt; message.txt)) &amp;&amp; cat message.txt</span></span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>讓我們使用上方的 Dockerfile 更新原本的 apress/vtest 。 請執行下方指令<br><figure class="codeblock codeblock--tabbed"><figcaption><span>build image</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build . -t apress/vtest</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>第二步驟就是建立 Volume ，等等會讓檔案儲存在該 Volume 裡。 請執行下方指令<br><figure class="codeblock codeblock--tabbed"><figcaption><span>create volume</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker volume create --name testdata</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>指令執行完後，可以輸入 <code>docker volume ls</code> 檢查 volume 是否成功建立。 如下圖。<br><div class="figure " style="width:;"><a class="fancybox" href="creating-volume.jpg" title="建立 volume" data-caption="建立 volume" data-fancybox="default"><img class="fig-img" src="creating-volume.jpg" alt="建立 volume"></a><span class="caption">建立 volume</span></div></p>
+<p>接下來請執行下方指令，把 Container 在次執行起來。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>run container</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name vtest2 -v testdata:/data apress/vtest</span><br></pre></td></tr></tbody></table></figure></div></figure><br><em><code>-v testdata:/data</code> 是在告訴 Docker 任何檔案只要存在 Container 裡面的 /data 路徑就要被存在 testdata volume 裡面</em></p>
+<p>因為是全新的 Container，所以你會看檔案再次被建立，如下圖。<br><div class="figure " style="width:;"><a class="fancybox" href="Create-file-in-volume.jpg" title="建立檔案在 Volume" data-caption="建立檔案在 Volume" data-fancybox="default"><img class="fig-img" src="Create-file-in-volume.jpg" alt="建立檔案在 Volume"></a><span class="caption">建立檔案在 Volume</span></div></p>
+<p>接下來把 Container 刪除後再執行一次。 請執行下方指令。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>recreate container</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker rm -f vtest2</span><br><span class="line">docker run --name vtest2 -v testdata:/data apress/vtest</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>你會發現，檔案還是存在的，因為檔案是存在 Volume 裡面。<br><div class="figure " style="width:;"><a class="fancybox" href="file-still-exists.jpg" title="檔案存在 Volume 裡" data-caption="檔案存在 Volume 裡" data-fancybox="default"><img class="fig-img" src="file-still-exists.jpg" alt="檔案存在 Volume 裡"></a><span class="caption">檔案存在 Volume 裡</span></div></p>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>在使用 Docker 的時候，懂得使用 Volume 是非常重要的事情。 這能夠讓你的檔案能夠一直保存著，不隨著 Container 消失而檔案也跟著消失。</p>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p>[<a href="https://docs.docker.com/storage/volumes/" title="Docker - use volumes" target="_blank" rel="noopener">Docker - use volumes</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Docker/">Docker</a> <a class="tag tag--primary tag--small t-link" href="/tags/Volumes/">Volumes</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/04/C-比較-Byte-的方法/" data-tooltip="[C#] 比較 Byte[] 的方法" aria-label="PREVIOUS: [C#] 比較 Byte[] 的方法">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/04/如何容器化-ASP.NET-Core-網站/" data-tooltip="[Docker] 如何容器化 ASP.NET Core 網站" aria-label="NEXT: [Docker] 如何容器化 ASP.NET Core 網站">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/04/如何使用-Volumes/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/04/如何使用-Volumes/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/04/如何使用-Volumes/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/04/C-比較-Byte-的方法/" data-tooltip="[C#] 比較 Byte[] 的方法" aria-label="PREVIOUS: [C#] 比較 Byte[] 的方法">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/04/如何容器化-ASP.NET-Core-網站/" data-tooltip="[Docker] 如何容器化 ASP.NET Core 網站" aria-label="NEXT: [Docker] 如何容器化 ASP.NET Core 網站">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/04/如何使用-Volumes/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/04/如何使用-Volumes/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/04/如何使用-Volumes/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/04/如何使用-Volumes/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/04/如何使用-Volumes/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/04/如何使用-Volumes/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2019/04/如何使用-Volumes/';
+                 
+                    this.page.identifier = '2019/04/如何使用-Volumes/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

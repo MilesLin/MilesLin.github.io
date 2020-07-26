@@ -1,0 +1,818 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Go] 建立下載檔案的 Http Response - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Go">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"從 .NET 轉來 GO 後，很多 API 的用法都要重新學習，今天就來熟悉如何使用 GO 來建立下載檔案的 Response。\n\n設定 Header以檔案下載的來說，我們有 3 個重要的 header 要設定。Content-Type這是用來告訴瀏覽器，回傳的檔案是什麼。  例如，是 jpeg 圖片的話，要設為 Content-Type: image/jpeg。 而 Go 有 http.DetectContentType 可以用來判斷回傳的檔案是哪一種 Content-Type 。這不一定要設定，使用 http.ServeContent 或 http.ServeFile 的話，會自動幫你設定好。\n\nContent-Disposition我們要用這個 Header 來告訴瀏覽器，我回傳的是一個檔案，例如 Content-Disposition: attachment; filename=&quot;filename.pdf。以 Chrome 來說，當 Content-Disposition: attachment 設定之後，瀏覽器才會執行下載，否則他會在新的 tab 開啟檔案。\n\nContent-Length這個 Header 是告訴瀏覽器檔案的大小，例如 content-length: 54138這不一定要設定，使用 http.ServeContent 或 http.ServeFile 的話，會自動幫你設定好。\n\n讀取檔案讀取檔案的話我們要用的是 ioutil.ReadFile，讀取完檔案後，此 API 會回傳 byte[]。\n傳送 Response我們要使用到的是 http.ServeContent 這個 API，這會將我們設定好的 Header 以及 byte[] 的資料寫入 Response 並回應給瀏覽器。 http.ServeContent 適合用在當你只能拿到 byte[] 的資料時候使用，如果你能夠明確指定檔案路徑的話，可以使用 http.ServeFile。\n請參考下方的範例程式碼，當使用者存取 http://localhost:8000/download 的時候，就會下載 test.pdf 的檔案了。\nhttp.ServeContentgo1234567891011121314151617181920212223242526272829303132333435363738package mainimport (\t\"bytes\"\t\"fmt\"\t\"io/ioutil\"\t\"net/http\"\t\"strconv\"\t\"time\")func main() {\thttp.HandleFunc(\"/download\", downloadFile)\tfmt.Println(\"Server run on port 8000\")\thttp.ListenAndServe(\":8000\", nil)}func downloadFile(w http.ResponseWriter, r *http.Request) {\tfile := \"test.pdf\"  // 讀取檔案\tdownloadBytes, err := ioutil.ReadFile(file)\tif err != nil {\t\tfmt.Println(err)\t}\t// 取得檔案的 MIME type\tmime := http.DetectContentType(downloadBytes)\tfileSize := len(string(downloadBytes))\tw.Header().Set(\"Content-Type\", mime)\tw.Header().Set(\"Content-Disposition\", \"attachment; filename=\"+file)\tw.Header().Set(\"Content-Length\", strconv.Itoa(fileSize))\thttp.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))}\n另一種回應檔案的方式Go 還有提供另一個 http.ServeFile API，只要傳入檔案路徑，就會幫我們回傳檔案了，這個 API 比 http.ServeContent 簡單許多。\nhttp.ServeFilego123456789101112131415161718192021package mainimport (\t\"fmt\"\t\"net/http\")func main() {\thttp.HandleFunc(\"/download\", downloadFile)\tfmt.Println(\"Server run on port 8000\")\thttp.ListenAndServe(\":8000\", nil)}func downloadFile(w http.ResponseWriter, r *http.Request) {\tfile := \"test.pdf\"\t// 設定此 Header 告訴瀏覽器下載檔案。 如果沒設定則會在新的 tab 開啟檔案。\t// w.Header().Set(\"Content-Disposition\", \"attachment; filename=\"+file)\thttp.ServeFile(w, r, file)}\n延伸閱讀[HTTP File Upload and Download with Go][Golang : Force download file example][Downloading large files in Go]\n","dateCreated":"2020-03-22T17:22:16+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-03-22T17:22:16+08:00","description":"從 .NET 轉來 GO 後，很多 API 的用法都要重新學習，今天就來熟悉如何使用 GO 來建立下載檔案的 Response。","headline":"[Go] 建立下載檔案的 Http Response","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/","keywords":"Go"}</script>
+    <meta name="description" content="從 .NET 轉來 GO 後，很多 API 的用法都要重新學習，今天就來熟悉如何使用 GO 來建立下載檔案的 Response。">
+<meta name="keywords" content="Go">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Go] 建立下載檔案的 Http Response">
+<meta property="og:url" content="https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="從 .NET 轉來 GO 後，很多 API 的用法都要重新學習，今天就來熟悉如何使用 GO 來建立下載檔案的 Response。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.563Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Go] 建立下載檔案的 Http Response">
+<meta name="twitter:description" content="從 .NET 轉來 GO 後，很多 API 的用法都要重新學習，今天就來熟悉如何使用 GO 來建立下載檔案的 Response。">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Go] 建立下載檔案的 Http Response
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-03-22T17:22:16+08:00">
+	
+		    Mar 22, 2020
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Go/">Go</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>從 .NET 轉來 GO 後，很多 API 的用法都要重新學習，今天就來熟悉如何使用 GO 來建立下載檔案的 Response。</p>
+<a id="more"></a>
+<h2 id="設定-Header"><a href="#設定-Header" class="headerlink" title="設定 Header"></a>設定 Header</h2><p>以檔案下載的來說，我們有 3 個重要的 header 要設定。<br><strong><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type" target="_blank" rel="noopener">Content-Type</a></strong><br>這是用來告訴瀏覽器，回傳的檔案是什麼。  例如，是 jpeg 圖片的話，要設為 <code>Content-Type: image/jpeg</code>。 而 Go 有 <a href="https://golang.org/pkg/net/http/#DetectContentType" target="_blank" rel="noopener">http.DetectContentType</a> 可以用來判斷回傳的檔案是哪一種 Content-Type 。<br><div class="alert info"><p>這不一定要設定，使用 <a href="https://golang.org/pkg/net/http/#ServeContent" target="_blank" rel="noopener">http.ServeContent</a> 或 <a href="https://golang.org/pkg/net/http/#ServeFile" target="_blank" rel="noopener">http.ServeFile</a> 的話，會自動幫你設定好。</p>
+</div></p>
+<p><strong><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition" target="_blank" rel="noopener">Content-Disposition</a></strong><br>我們要用這個 Header 來告訴瀏覽器，我回傳的是一個檔案，例如 <code>Content-Disposition: attachment; filename=&quot;filename.pdf</code>。<br><div class="alert info"><p>以 Chrome 來說，當 <code>Content-Disposition: attachment</code> 設定之後，瀏覽器才會執行下載，否則他會在新的 tab 開啟檔案。</p>
+</div></p>
+<p><strong><a href="https://www.geeksforgeeks.org/http-headers-content-length/" target="_blank" rel="noopener">Content-Length</a></strong><br>這個 Header 是告訴瀏覽器檔案的大小，例如 <code>content-length: 54138</code><br><div class="alert info"><p>這不一定要設定，使用 <a href="https://golang.org/pkg/net/http/#ServeContent" target="_blank" rel="noopener">http.ServeContent</a> 或 <a href="https://golang.org/pkg/net/http/#ServeFile" target="_blank" rel="noopener">http.ServeFile</a> 的話，會自動幫你設定好。</p>
+</div></p>
+<h2 id="讀取檔案"><a href="#讀取檔案" class="headerlink" title="讀取檔案"></a>讀取檔案</h2><p>讀取檔案的話我們要用的是 <a href="https://golang.org/pkg/io/ioutil/#ReadFile" target="_blank" rel="noopener">ioutil.ReadFile</a>，讀取完檔案後，此 API 會回傳 byte[]。</p>
+<h2 id="傳送-Response"><a href="#傳送-Response" class="headerlink" title="傳送 Response"></a>傳送 Response</h2><p>我們要使用到的是 <a href="https://golang.org/pkg/net/http/#ServeContent" target="_blank" rel="noopener">http.ServeContent</a> 這個 API，這會將我們設定好的 Header 以及 byte[] 的資料寫入 Response 並回應給瀏覽器。 <a href="https://golang.org/pkg/net/http/#ServeContent" target="_blank" rel="noopener">http.ServeContent</a> 適合用在當你只能拿到 byte[] 的資料時候使用，如果你能夠明確指定檔案路徑的話，可以使用 <a href="https://golang.org/pkg/net/http/#ServeFile" target="_blank" rel="noopener">http.ServeFile</a>。</p>
+<p>請參考下方的範例程式碼，當使用者存取 <a href="http://localhost:8000/download" target="_blank" rel="noopener">http://localhost:8000/download</a> 的時候，就會下載 test.pdf 的檔案了。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>http.ServeContent</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"bytes"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"io/ioutil"</span></span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line">	<span class="string">"strconv"</span></span><br><span class="line">	<span class="string">"time"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	http.HandleFunc(<span class="string">"/download"</span>, downloadFile)</span><br><span class="line">	fmt.Println(<span class="string">"Server run on port 8000"</span>)</span><br><span class="line">	http.ListenAndServe(<span class="string">":8000"</span>, <span class="literal">nil</span>)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">downloadFile</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> {</span><br><span class="line">	file := <span class="string">"test.pdf"</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 讀取檔案</span></span><br><span class="line">	downloadBytes, err := ioutil.ReadFile(file)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">		fmt.Println(err)</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 取得檔案的 MIME type</span></span><br><span class="line">	mime := http.DetectContentType(downloadBytes)</span><br><span class="line"></span><br><span class="line">	fileSize := <span class="built_in">len</span>(<span class="keyword">string</span>(downloadBytes))</span><br><span class="line"></span><br><span class="line">	w.Header().Set(<span class="string">"Content-Type"</span>, mime)</span><br><span class="line">	w.Header().Set(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment; filename="</span>+file)</span><br><span class="line">	w.Header().Set(<span class="string">"Content-Length"</span>, strconv.Itoa(fileSize))</span><br><span class="line"></span><br><span class="line">	http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="另一種回應檔案的方式"><a href="#另一種回應檔案的方式" class="headerlink" title="另一種回應檔案的方式"></a>另一種回應檔案的方式</h2><p>Go 還有提供另一個 <a href="https://golang.org/pkg/net/http/#ServeFile" target="_blank" rel="noopener">http.ServeFile</a> API，只要傳入檔案路徑，就會幫我們回傳檔案了，這個 API 比 <a href="https://golang.org/pkg/net/http/#ServeContent" target="_blank" rel="noopener">http.ServeContent</a> 簡單許多。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>http.ServeFile</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	http.HandleFunc(<span class="string">"/download"</span>, downloadFile)</span><br><span class="line">	fmt.Println(<span class="string">"Server run on port 8000"</span>)</span><br><span class="line">	http.ListenAndServe(<span class="string">":8000"</span>, <span class="literal">nil</span>)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">downloadFile</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> {</span><br><span class="line">	file := <span class="string">"test.pdf"</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 設定此 Header 告訴瀏覽器下載檔案。 如果沒設定則會在新的 tab 開啟檔案。</span></span><br><span class="line">	<span class="comment">// w.Header().Set("Content-Disposition", "attachment; filename="+file)</span></span><br><span class="line"></span><br><span class="line">	http.ServeFile(w, r, file)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p>[<a href="https://zupzup.org/go-http-file-upload-download/" title="HTTP File Upload and Download with Go" target="_blank" rel="noopener">HTTP File Upload and Download with Go</a>]<br>[<a href="https://www.socketloop.com/tutorials/golang-force-download-file-example" title="Golang : Force download file example" target="_blank" rel="noopener">Golang : Force download file example</a>]<br>[<a href="http://cavaliercoder.com/blog/downloading-large-files-in-go.html" title="Downloading large files in Go" target="_blank" rel="noopener">Downloading large files in Go</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Go/">Go</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/" data-tooltip="[Go] 用 Go 建立 gRPC 的 Server 與 Client" aria-label="PREVIOUS: [Go] 用 Go 建立 gRPC 的 Server 與 Client">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/03/Golang/使用-go-tool-建立-SSL-自簽憑證/" data-tooltip="[Go] 使用 Go Tool 建立 SSL 自簽憑證" aria-label="NEXT: [Go] 使用 Go Tool 建立 SSL 自簽憑證">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/" data-tooltip="[Go] 用 Go 建立 gRPC 的 Server 與 Client" aria-label="PREVIOUS: [Go] 用 Go 建立 gRPC 的 Server 與 Client">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/03/Golang/使用-go-tool-建立-SSL-自簽憑證/" data-tooltip="[Go] 使用 Go Tool 建立 SSL 自簽憑證" aria-label="NEXT: [Go] 使用 Go Tool 建立 SSL 自簽憑證">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/';
+                 
+                    this.page.identifier = '2020/03/Golang/建立下載檔案的-Http-Response/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

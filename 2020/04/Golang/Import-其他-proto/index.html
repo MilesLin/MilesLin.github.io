@@ -1,0 +1,864 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Protocol Buffers] Import 其他 .proto - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Go,Protocol Buffers">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天在 import google 提供的 proto 時候，在使用 protoc 編譯後，出現了下列的訊息。google/protobuf/timestamp.proto: File not found.employee.proto:6:1: Import “google/protobuf/timestamp.proto” was not found or had errors.\n\n因為這件事情，所以就花了一點時間搞懂 protoc 怎麼處理 import 這件事情。\n\nIMPORT_PATH這所有的一切的關鍵是在 IMPORT_PATH 這個參數上!!IMPORT_PATH specifies a directory in which to look for .proto files when resolving import directives. If omitted, the current directory is used. Multiple import directories can be specified by passing the --proto_path option multiple times; they will be searched in order. -I=IMPORT_PATH can be used as a short form of --proto_path.\ngoogle docGenerating Your Classes\n上面的意思是說，如果沒有設定 --proto_path 這個參數，當下執行命令的路徑會當作尋找 import 檔案的根目錄，如果有設定的話，會以設定的路徑當作目錄開始找。 且此參數可以設定多次。\n這是什麼意思呢?  讓我們跟著今天的範例，來了解 IMPORT_PATH 是怎麼運作的吧。\n範例說明這是我今天要展示的目錄結構，首先我們可以看到最上層是 Demo 資料夾，這是我們的根目錄，也是命令提示字元會指向的路徑，接著下面會有兩個資料夾一個是 account 資料夾，裡面會有一個 account.proto，一個是 employee 資料夾，裡面會有 employee.proto, messages.proto。folder structure\n所以根據上面的資料夾結構，如果我要編譯 employee.proto ，我就要輸入 $ protoc --go_out=. employee/employee.proto 來編譯。root path demo\n為了方便展示，我每一個 proto 都是非常的簡單，都幾乎只有一個欄位，如下程式碼。protosemployeemessagesaccount123456syntax = \"proto3\";package employee;message AddEmployee {  string employeeName = 1;}123456syntax = \"proto3\";package employee;message HelloRequest {    string content = 1;}123456syntax = \"proto3\";package account;message AddAccount {  string accountName = 1;}\n同一層資料夾的 import這個範例呢，我們要在 AddEmployee 底下引用 messages.proto 的 HelloRequest。 根據我的直覺，想說在同一個資料夾，所以我 import 就這樣下 import &quot;messages.proto&quot;;\nuse hellorequestemployee123456789syntax = \"proto3\";package employee;import \"messages.proto\";message AddEmployee {  string employeeName = 1;  HelloRequest hello = 2;}\n結果我執行編譯後，出現錯誤的訊息。D:\\demo&gt;protoc –go_out=. employee/employee.proto\nmessages.proto: File not found.employee/employee.proto:5:1: Import “messages.proto” was not found or had errors.employee/employee.proto:9:3: “HelloRequest” is not defined.\n\n這是為什麼呢? 原因有兩個\n\n因為我在 employee.proto 是下 import &quot;messages.proto&quot;\n而且我編譯的時候沒有下 --proto_path=employee 的參數，所以他會在我下指令的那個路徑開始找 messages.proto 。 而他在 Demo 路徑底下當然找不到，因為檔案是在 employee/messages.proto。\n\n為了解決這個問題，我們可以下 --proto_path=employee 告訴編譯器，請在 employee 資料夾底下找檔案。 所以當我指令改成這樣 $ protoc --proto_path=employee --go_out=. employee/employee.proto 他就會編譯成功了。success\n但是，請注意這不是正確的做法，我只是要說明 --proto_path 的用法!!!\n\n比較正確的做法是，每次 import 其他 proto 的時候都是以 IMPORT_PATH 根目錄  開始指定，所以我把 employee.proto 裡面的 import 改成 import &quot;employee/messages.proto&quot;;。\nimport HelloRequestemployee123456789syntax = \"proto3\";package employee;import \"employee/messages.proto\";message AddEmployee {  string employeeName = 1;  HelloRequest hello = 2;}\n並且執行 $ protoc --proto_path=. --go_out=. employee/employee.proto。 這樣就會編譯成功了!!!\n補充說明，這兩個指令是一樣的意思$ protoc --proto_path=. --go_out=. employee/employee.proto$ protoc --go_out=. employee/employee.proto\n\n不同資料夾的 import知道上面講的概念後，要 import account 的方式也很簡單，從我根目錄開始，account 的資料夾是在 account/account.proto，所以只要 import account/account.proto 就可以正確使用了。這邊要注意，因為 account 在 account package 底下，所以在宣告型別的時候要加入 package 的前贅詞 account.AddAccount acct = 3 。\nuse accountemployee123456789101112syntax = \"proto3\";package employee;import \"employee/messages.proto\";import \"account/account.proto\";message AddEmployee {  string employeeName = 1;  HelloRequest hello = 2;  account.AddAccount acct = 3;}\n調整完後，執行 $ protoc --proto_path=. --go_out=. employee/employee.proto，也會成功編譯。\nImport google 提供的 proto基本上我們也很常會用到 google 提供的一些型別，例如 protocol buffers 預設是沒有時間這個型別，所以我們這時候可以使用 google/protobuf/timestamp.proto 提供的 timestamp 的型別。use timestampemployee1234567891011121314syntax = \"proto3\";package employee;import \"employee/messages.proto\";import \"account/account.proto\";import \"google/protobuf/timestamp.proto\";message AddEmployee {  string employeeName = 1;  HelloRequest hello = 2;  account.AddAccount acct = 3;  google.protobuf.Timestamp Date = 4;}\n加入後，就會發現編譯又不會過了。\n因為從 Demo 的根目錄開始，找不到 google/protobuf/timestamp.proto ，所以我們要先做的事情是下載這些 proto 檔案。\n執行 go get github.com/protocolbuffers/protobuf 下載檔案，執行後你可以在 ${GOPATH}\\src\\github.com\\protocolbuffers\\protobuf\\src 找到這些 proto 檔案，以我的例子是 C:\\Users\\Miles\\go\\src\\github.com\\protocolbuffers\\protobuf\\src。\ngoogle-protobuf\n知道 google 提供的 proto 路徑後，只要把路徑 --proto_path 設定好，就可以編譯成功了。\n$ protoc --proto_path=C:\\Users\\Miles\\go\\src\\github.com\\protocolbuffers\\protobuf\\src --proto_path=. --go_out=. employee/employee.proto\n\n如果是使用 git bash 或者是 linux 的 command prompt，可以把 GOPATH 當作變數設定，如: $ protoc --proto_path=$GOPATH/src/github.com/protocolbuffers/protobuf/src --proto_path=. --go_out=. employee/employee.proto\n\n另外還有一種作法是，直接把 google proto 那個目錄整個複製過來。 這樣就不用額外指定 --proto_path 了\n所以我就把 C:\\Users\\Miles\\go\\src\\github.com\\protocolbuffers\\protobuf\\src\\google 這整個資料夾複製過來 Demo 資料夾底下，並使用 $ protoc --proto_path=. --go_out=. employee/employee.proto 指令編譯，這樣是沒問題的。\nImport public最後要說明一個 import public 的功能，這是用來整理 proto 檔案路徑的時候用的。\n這邊舉個以下的例子，我想把 messages.proto 這個檔案改放到 newhello/newMessages.proto 底下，那我要怎麼使用 import public 這個功能呢?move proto\n我們只要在 messages.proto 加入 import public \"newhello/newMessages.proto\" ，這是說，原本參考到 messages.proto ，將會導向新的 newMessages.proto。 只要使用這個方法，我其他地方的 proto 都不用調整，就可以輕鬆地整理 proto 的檔案位置了。  例如下面的例子，我的 employee.proto 是 import \"employee/messages.proto\" 可是實際上他會參考到 \"newhello/newMessages.proto\" 。\nprotosmessagesnewMessagesemployee12syntax = \"proto3\";import public \"newhello/newMessages.proto\";123456syntax = \"proto3\";package employee;message HelloRequest {    string content = 1;}1234567891011121314syntax = \"proto3\";package employee;import \"employee/messages.proto\";import \"account/account.proto\";import \"google/protobuf/timestamp.proto\";message AddEmployee {  string employeeName = 1;  HelloRequest hello = 2;  account.AddAccount acct = 3;  google.protobuf.Timestamp Date = 4;}\n其他補充說明--proto_path 的別名: 相信在其他地方，你們也會看到這樣的指令 $ protoc -I=. --go_out=. employee/employee.proto，那個 -I 其實就是 --proto_path 的別名而已啦。\nprotoc 編譯的限制: 讀者可以發現，我在上敘的 proto 都沒有使用 service ，這是因為 protoc 只能編譯 message type，如果要編譯 service 的話，則一定要使用 plugins 才可以。 例如: $ protoc -I=. --go_out=plugins=grpc:. employee/employee.proto\n延伸閱讀[Go support for Protocol Buffers - Google's data interchange format][Using Other Message Types]\n","dateCreated":"2020-04-04T15:39:43+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-04-04T15:39:43+08:00","description":"今天在 import google 提供的 proto 時候，在使用 protoc 編譯後，出現了下列的訊息。google/protobuf/timestamp.proto: File not found.employee.proto:6:1: Import “google/protobuf/timestamp.proto” was not found or had errors.\n\n因為這件事情，所以就花了一點時間搞懂 protoc 怎麼處理 import 這件事情。","headline":"[Protocol Buffers] Import 其他 .proto","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/04/Golang/Import-其他-proto/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/04/Golang/Import-其他-proto/","keywords":"Go, Protocol Buffers"}</script>
+    <meta name="description" content="今天在 import google 提供的 proto 時候，在使用 protoc 編譯後，出現了下列的訊息。google/protobuf/timestamp.proto: File not found.employee.proto:6:1: Import “google/protobuf/timestamp.proto” was not found or had errors.  因為這件事情">
+<meta name="keywords" content="Go,Protocol Buffers">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Protocol Buffers] Import 其他 .proto">
+<meta property="og:url" content="https://mileslin.github.io/2020/04/Golang/Import-其他-proto/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="今天在 import google 提供的 proto 時候，在使用 protoc 編譯後，出現了下列的訊息。google/protobuf/timestamp.proto: File not found.employee.proto:6:1: Import “google/protobuf/timestamp.proto” was not found or had errors.  因為這件事情">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2020/04/Golang/Import-其他-proto/folder-structure.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/04/Golang/Import-其他-proto/first.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/04/Golang/Import-其他-proto/second.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/04/Golang/Import-其他-proto/third.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/04/Golang/Import-其他-proto/fourth.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/04/Golang/Import-其他-proto/google-protobuf.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/04/Golang/Import-其他-proto/fifth.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/04/Golang/Import-其他-proto/sixth.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/04/Golang/Import-其他-proto/move.jpg">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.532Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Protocol Buffers] Import 其他 .proto">
+<meta name="twitter:description" content="今天在 import google 提供的 proto 時候，在使用 protoc 編譯後，出現了下列的訊息。google/protobuf/timestamp.proto: File not found.employee.proto:6:1: Import “google/protobuf/timestamp.proto” was not found or had errors.  因為這件事情">
+<meta name="twitter:image" content="https://mileslin.github.io/2020/04/Golang/Import-其他-proto/folder-structure.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Protocol Buffers] Import 其他 .proto
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-04-04T15:39:43+08:00">
+	
+		    Apr 04, 2020
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Protocol-Buffers/">Protocol Buffers</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>今天在 <span class="highlight-text primary">import</span> <a href="https://github.com/protocolbuffers/protobuf" target="_blank" rel="noopener">google 提供的 proto</a> 時候，在使用 protoc 編譯後，出現了下列的訊息。<br><div class="alert danger no-icon"><p>google/protobuf/timestamp.proto: File not found.<br>employee.proto:6:1: Import “google/protobuf/timestamp.proto” was not found or had errors.</p>
+</div></p>
+<p>因為這件事情，所以就花了一點時間搞懂 protoc 怎麼處理 <span class="highlight-text primary">import</span> 這件事情。</p>
+<a id="more"></a>
+<h2 id="IMPORT-PATH"><a href="#IMPORT-PATH" class="headerlink" title="IMPORT_PATH"></a>IMPORT_PATH</h2><p>這所有的一切的關鍵是在 <span class="highlight-text danger">IMPORT_PATH</span> 這個參數上!!<br><blockquote><p><code>IMPORT_PATH</code> specifies a directory in which to look for <code>.proto</code> files when resolving import directives. If omitted, the current directory is used. Multiple import directories can be specified by passing the <code>--proto_path</code> option multiple times; they will be searched in order. <code>-I=IMPORT_PATH</code> can be used as a short form of <code>--proto_path</code>.</p>
+<footer><strong>google doc</strong><cite><a href="https://developers.google.com/protocol-buffers/docs/proto3" target="_blank" rel="noopener">Generating Your Classes</a></cite></footer></blockquote></p>
+<p>上面的意思是說，如果沒有設定 <code>--proto_path</code> 這個參數，當下執行命令的路徑會當作尋找 import 檔案的根目錄，如果有設定的話，會以設定的路徑當作目錄開始找。 且此參數可以設定多次。</p>
+<p>這是什麼意思呢?  讓我們跟著今天的範例，來了解 <code>IMPORT_PATH</code> 是怎麼運作的吧。</p>
+<h2 id="範例說明"><a href="#範例說明" class="headerlink" title="範例說明"></a>範例說明</h2><p>這是我今天要展示的目錄結構，首先我們可以看到最上層是 Demo 資料夾，這是我們的根目錄，也是命令提示字元會指向的路徑，接著下面會有兩個資料夾一個是 <span class="highlight-text success">account</span> 資料夾，裡面會有一個 <code>account.proto</code>，一個是 <span class="highlight-text success">employee</span> 資料夾，裡面會有 <code>employee.proto</code>, <code>messages.proto</code>。<br><div class="figure center" style="width:;"><a class="fancybox" href="folder-structure.jpg" title="folder structure" data-caption="folder structure" data-fancybox="default"><img class="fig-img" src="folder-structure.jpg" alt="folder structure"></a><span class="caption">folder structure</span></div></p>
+<p>所以根據上面的資料夾結構，如果我要編譯 employee.proto ，我就要輸入 <code>$ protoc --go_out=. employee/employee.proto</code> 來編譯。<br><div class="figure center" style="width:;"><a class="fancybox" href="first.jpg" title="root path demo" data-caption="root path demo" data-fancybox="default"><img class="fig-img" src="first.jpg" alt="root path demo"></a><span class="caption">root path demo</span></div></p>
+<p>為了方便展示，我每一個 proto 都是非常的簡單，都幾乎只有一個欄位，如下程式碼。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>protos</span><ul class="tabs"><li class="tab active">employee</li><li class="tab">messages</li><li class="tab">account</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line">package employee;</span><br><span class="line"></span><br><span class="line">message AddEmployee {</span><br><span class="line">  string employeeName = 1;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><figure class="highlight plain" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line">package employee;</span><br><span class="line"></span><br><span class="line">message HelloRequest {</span><br><span class="line">    string content = 1;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><figure class="highlight plain" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line">package account;</span><br><span class="line"></span><br><span class="line">message AddAccount {</span><br><span class="line">  string accountName = 1;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="同一層資料夾的-import"><a href="#同一層資料夾的-import" class="headerlink" title="同一層資料夾的 import"></a>同一層資料夾的 import</h2><p>這個範例呢，我們要在 AddEmployee 底下引用 <code>messages.proto</code> 的 <code>HelloRequest</code>。 根據我的直覺，想說在同一個資料夾，所以我 import 就這樣下 <code>import &quot;messages.proto&quot;;</code></p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>use hellorequest</span><ul class="tabs"><li class="tab active">employee</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line">package employee;</span><br><span class="line"></span><br><span class="line">import "messages.proto";</span><br><span class="line"></span><br><span class="line">message AddEmployee {</span><br><span class="line">  string employeeName = 1;</span><br><span class="line">  HelloRequest hello = 2;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>結果我執行編譯後，出現錯誤的訊息。<br><div class="alert danger no-icon"><p>D:\demo&gt;protoc –go_out=. employee/employee.proto</p>
+<p>messages.proto: File not found.<br>employee/employee.proto:5:1: Import “messages.proto” was not found or had errors.<br>employee/employee.proto:9:3: “HelloRequest” is not defined.</p>
+</div></p>
+<p>這是為什麼呢? 原因有兩個</p>
+<ol>
+<li>因為我在 <code>employee.proto</code> 是下 <code>import &quot;messages.proto&quot;</code></li>
+<li>而且我編譯的時候沒有下 <code>--proto_path=employee</code> 的參數，所以他會在我下指令的那個路徑開始找 <code>messages.proto</code> 。 而他在 Demo 路徑底下當然找不到，因為檔案是在 <span class="highlight-text warning">employee/messages.proto</span>。</li>
+</ol>
+<p>為了解決這個問題，我們可以下 <code>--proto_path=employee</code> 告訴編譯器，請在 employee 資料夾底下找檔案。 所以當我指令改成這樣 <code>$ protoc --proto_path=employee --go_out=. employee/employee.proto</code> 他就會編譯成功了。<br><div class="figure center" style="width:;"><a class="fancybox" href="second.jpg" title="success" data-caption="success" data-fancybox="default"><img class="fig-img" src="second.jpg" alt="success"></a><span class="caption">success</span></div></p>
+<div class="alert warning"><p>但是，請注意這不是正確的做法，我只是要說明 <code>--proto_path</code> 的用法!!!</p>
+</div>
+<p>比較正確的做法是，每次 import 其他 proto 的時候都是以 <span class="highlight-text success">IMPORT_PATH 根目錄</span>  開始指定，所以我把 <code>employee.proto</code> 裡面的 import 改成 <code>import &quot;employee/messages.proto&quot;;</code>。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>import HelloRequest</span><ul class="tabs"><li class="tab active">employee</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line">package employee;</span><br><span class="line"></span><br><span class="line">import "employee/messages.proto";</span><br><span class="line"></span><br><span class="line">message AddEmployee {</span><br><span class="line">  string employeeName = 1;</span><br><span class="line">  HelloRequest hello = 2;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>並且執行 <code>$ protoc --proto_path=. --go_out=. employee/employee.proto</code>。 這樣就會編譯成功了!!!</p>
+<div class="alert info"><p>補充說明，這兩個指令是一樣的意思<br><code>$ protoc --proto_path=. --go_out=. employee/employee.proto</code><br><code>$ protoc --go_out=. employee/employee.proto</code></p>
+</div>
+<h2 id="不同資料夾的-import"><a href="#不同資料夾的-import" class="headerlink" title="不同資料夾的 import"></a>不同資料夾的 import</h2><p>知道上面講的概念後，要 <code>import account</code> 的方式也很簡單，從我根目錄開始，account 的資料夾是在 <code>account/account.proto</code>，所以只要 <code>import account/account.proto</code> 就可以正確使用了。<br>這邊要注意，因為 account 在 account package 底下，所以在宣告型別的時候要加入 package 的前贅詞 <code>account.AddAccount acct = 3</code> 。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>use account</span><ul class="tabs"><li class="tab active">employee</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line"></span><br><span class="line">package employee;</span><br><span class="line"></span><br><span class="line">import "employee/messages.proto";</span><br><span class="line">import "account/account.proto";</span><br><span class="line"></span><br><span class="line">message AddEmployee {</span><br><span class="line">  string employeeName = 1;</span><br><span class="line">  HelloRequest hello = 2;</span><br><span class="line">  account.AddAccount acct = 3;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>調整完後，執行 <code>$ protoc --proto_path=. --go_out=. employee/employee.proto</code>，也會成功編譯。<br><div class="figure center" style="width:;"><a class="fancybox" href="third.jpg" title data-caption data-fancybox="default"><img class="fig-img" src="third.jpg" alt></a></div></p>
+<h2 id="Import-google-提供的-proto"><a href="#Import-google-提供的-proto" class="headerlink" title="Import google 提供的 proto"></a>Import google 提供的 proto</h2><p>基本上我們也很常會用到 google 提供的一些型別，例如 protocol buffers 預設是沒有時間這個型別，所以我們這時候可以使用 <code>google/protobuf/timestamp.proto</code> 提供的 timestamp 的型別。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>use timestamp</span><ul class="tabs"><li class="tab active">employee</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line"></span><br><span class="line">package employee;</span><br><span class="line"></span><br><span class="line">import "employee/messages.proto";</span><br><span class="line">import "account/account.proto";</span><br><span class="line">import "google/protobuf/timestamp.proto";</span><br><span class="line"></span><br><span class="line">message AddEmployee {</span><br><span class="line">  string employeeName = 1;</span><br><span class="line">  HelloRequest hello = 2;</span><br><span class="line">  account.AddAccount acct = 3;</span><br><span class="line">  google.protobuf.Timestamp Date = 4;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>加入後，就會發現編譯又不會過了。<br><div class="figure center" style="width:;"><a class="fancybox" href="fourth.jpg" title data-caption data-fancybox="default"><img class="fig-img" src="fourth.jpg" alt></a></div></p>
+<p>因為從 Demo 的根目錄開始，找不到 <span class="highlight-text warning">google/protobuf/timestamp.proto</span> ，所以我們要先做的事情是下載這些 proto 檔案。</p>
+<p>執行 <code>go get github.com/protocolbuffers/protobuf</code> 下載檔案，執行後你可以在 <code>${GOPATH}\src\github.com\protocolbuffers\protobuf\src</code> 找到這些 proto 檔案，以我的例子是 <code>C:\Users\Miles\go\src\github.com\protocolbuffers\protobuf\src</code>。</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="google-protobuf.jpg" title="google-protobuf" data-caption="google-protobuf" data-fancybox="default"><img class="fig-img" src="google-protobuf.jpg" alt="google-protobuf"></a><span class="caption">google-protobuf</span></div>
+<p>知道 google 提供的 proto 路徑後，只要把路徑 <code>--proto_path</code> 設定好，就可以編譯成功了。</p>
+<p><code>$ protoc --proto_path=C:\Users\Miles\go\src\github.com\protocolbuffers\protobuf\src --proto_path=. --go_out=. employee/employee.proto</code></p>
+<div class="figure center" style="width:;"><a class="fancybox" href="fifth.jpg" title data-caption data-fancybox="default"><img class="fig-img" src="fifth.jpg" alt></a></div>
+<div class="alert info"><p>如果是使用 git bash 或者是 linux 的 command prompt，可以把 GOPATH 當作變數設定，如: <code>$ protoc --proto_path=$GOPATH/src/github.com/protocolbuffers/protobuf/src --proto_path=. --go_out=. employee/employee.proto</code></p>
+</div>
+<p><strong>另外還有一種作法是，直接把 google proto 那個目錄整個複製過來。 這樣就不用額外指定 <code>--proto_path</code> 了</strong></p>
+<p>所以我就把 <code>C:\Users\Miles\go\src\github.com\protocolbuffers\protobuf\src\google</code> 這整個資料夾複製過來 Demo 資料夾底下，並使用 <code>$ protoc --proto_path=. --go_out=. employee/employee.proto</code> 指令編譯，這樣是沒問題的。<br><div class="figure center" style="width:;"><a class="fancybox" href="sixth.jpg" title data-caption data-fancybox="default"><img class="fig-img" src="sixth.jpg" alt></a></div></p>
+<h2 id="Import-public"><a href="#Import-public" class="headerlink" title="Import public"></a>Import public</h2><p>最後要說明一個 <a href="https://developers.google.com/protocol-buffers/docs/proto3#other" target="_blank" rel="noopener">import public</a> 的功能，這是用來整理 proto 檔案路徑的時候用的。</p>
+<p>這邊舉個以下的例子，我想把 <code>messages.proto</code> 這個檔案改放到 <span class="highlight-text success">newhello/newMessages.proto</span> 底下，那我要怎麼使用 <code>import public</code> 這個功能呢?<br><div class="figure center" style="width:;"><a class="fancybox" href="move.jpg" title="move proto" data-caption="move proto" data-fancybox="default"><img class="fig-img" src="move.jpg" alt="move proto"></a><span class="caption">move proto</span></div></p>
+<p>我們只要在 <code>messages.proto</code> 加入 <span class="highlight-text primary">import public "newhello/newMessages.proto"</span> ，這是說，原本參考到 <code>messages.proto</code> ，將會導向新的 <code>newMessages.proto</code>。 只要使用這個方法，我其他地方的 proto 都不用調整，就可以輕鬆地整理 proto 的檔案位置了。  例如下面的例子，我的 <code>employee.proto</code> 是 <span class="highlight-text primary">import "employee/messages.proto"</span> 可是實際上他會參考到 <span class="highlight-text success">"newhello/newMessages.proto"</span> 。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>protos</span><ul class="tabs"><li class="tab active">messages</li><li class="tab">newMessages</li><li class="tab">employee</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line">import public "newhello/newMessages.proto";</span><br></pre></td></tr></tbody></table></figure><figure class="highlight plain" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line">package employee;</span><br><span class="line"></span><br><span class="line">message HelloRequest {</span><br><span class="line">    string content = 1;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure><figure class="highlight plain" style="display: none;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line"></span><br><span class="line">package employee;</span><br><span class="line"></span><br><span class="line">import "employee/messages.proto";</span><br><span class="line">import "account/account.proto";</span><br><span class="line">import "google/protobuf/timestamp.proto";</span><br><span class="line"></span><br><span class="line">message AddEmployee {</span><br><span class="line">  string employeeName = 1;</span><br><span class="line">  HelloRequest hello = 2;</span><br><span class="line">  account.AddAccount acct = 3;</span><br><span class="line">  google.protobuf.Timestamp Date = 4;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="其他補充說明"><a href="#其他補充說明" class="headerlink" title="其他補充說明"></a>其他補充說明</h2><p><strong>--proto_path 的別名</strong>: 相信在其他地方，你們也會看到這樣的指令 <code>$ protoc -I=. --go_out=. employee/employee.proto</code>，那個 <code>-I</code> 其實就是 <code>--proto_path</code> 的別名而已啦。</p>
+<p><strong><a href="https://github.com/golang/protobuf#grpc-support" target="_blank" rel="noopener">protoc 編譯的限制</a></strong>: 讀者可以發現，我在上敘的 proto 都沒有使用 service ，這是因為 protoc 只能編譯 message type，如果要編譯 service 的話，則一定要使用 plugins 才可以。 例如: <code>$ protoc -I=. --go_out=plugins=grpc:. employee/employee.proto</code></p>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p>[<a href="https://github.com/golang/protobuf" title="Go support for Protocol Buffers - Google's data interchange format" target="_blank" rel="noopener">Go support for Protocol Buffers - Google's data interchange format</a>]<br>[<a href="https://developers.google.com/protocol-buffers/docs/proto3#other" title="Using Other Message Types" target="_blank" rel="noopener">Using Other Message Types</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Go/">Go</a> <a class="tag tag--primary tag--small t-link" href="/tags/Protocol-Buffers/">Protocol Buffers</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/06/Golang/Unit-testing-HTTP-servers-with-Gin/" data-tooltip="[Go] Unit testing HTTP servers with Gin" aria-label="PREVIOUS: [Go] Unit testing HTTP servers with Gin">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/04/Golang/在編譯時期檢查是否有正確實作介面/" data-tooltip="[Go] 在編譯時期檢查是否有正確實作介面" aria-label="NEXT: [Go] 在編譯時期檢查是否有正確實作介面">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/04/Golang/Import-其他-proto/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/04/Golang/Import-其他-proto/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/04/Golang/Import-其他-proto/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/06/Golang/Unit-testing-HTTP-servers-with-Gin/" data-tooltip="[Go] Unit testing HTTP servers with Gin" aria-label="PREVIOUS: [Go] Unit testing HTTP servers with Gin">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/04/Golang/在編譯時期檢查是否有正確實作介面/" data-tooltip="[Go] 在編譯時期檢查是否有正確實作介面" aria-label="NEXT: [Go] 在編譯時期檢查是否有正確實作介面">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/04/Golang/Import-其他-proto/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/04/Golang/Import-其他-proto/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/04/Golang/Import-其他-proto/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/04/Golang/Import-其他-proto/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/04/Golang/Import-其他-proto/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/04/Golang/Import-其他-proto/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2020/04/Golang/Import-其他-proto/';
+                 
+                    this.page.identifier = '2020/04/Golang/Import-其他-proto/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

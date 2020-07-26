@@ -1,0 +1,870 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Go] 用 Go 建立 gRPC 的 Server 與 Client - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Go,gRPC">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"此篇不會說明有關 gRPC 與 protocol buffers 的詳細概念，如果要瞭解可以到 grpc.io 閱讀相關文件。 今天會筆記，怎麼從無到用 Go 建立好 gRPC 的 Server 與 Client，當作是學習 gRPC 的起點。\n\n安裝開始之前先把環境建立好，在 Compiling your protocol buffers 文件裡面有詳細說明如何安裝。 \n1. 首先要先到 protobuf-github release 下載 protobuf compiler 執行檔案。\n現在最新的版本是 Protocol Buffers v3.11.4 ，而我電腦是 win64，所以我就選擇 protoc-3.11.4-win64.zip 下載。\nProtocol Buffers v3.11.4\nwin64\n2. 將 protobuf compiler 執行檔加入環境變數\n將下載的檔案解壓縮後，有 bin 資料夾，將裡面的 protoc.exe 加入環境變數。protoc\n如果你的電腦有安裝 Go 的話，可以把檔案放在 ${GOROOT}/bin 底下，以我電腦為例，我就把 protoc.exe 放到 C:\\Go\\bin 底下，因為 ${GOROOT}/bin 已經加入環境變數了。  完成後打開命令提示字元輸入 $ protoc --version 就可以看到版本號了。version\n3. 安裝 Go protocol buffers plugin\n這是用來產生 Go Code 的工具，請執行下列指令安裝，install go protocol buffers pluginbash12$ go get google.golang.org/protobuf/cmd/protoc-gen-go$ go install google.golang.org/protobuf/cmd/protoc-gen-go\n安裝好後，就會看到 %{GOPATH}/bin 底下會有 protoc-gen-go.exe 執行檔案。protoc-gen-go\n根據 Go Quick Start 的說明，我以為就這樣安裝結束了。 但發現要使用時，出現了此錯誤\n\n根據 protocolbuffers/protobuf-go release note 的說明，這是因為 v1.20 以後 protoc-gen-go 不再支援產生 gRPC service definitions，未來要改用 protoc-gen-go-grpc。 \n但是我更改使用 protoc-gen-go-grpc 卻又產生 'protoc-gen-go-grpc' is not recognized as an internal or external command 的錯誤訊息。\n根據 google.golang.org/grpc: move protoc-gen-go-grpc into grpc module 的說明，這是因為 google.golang.org/protobuf 還沒有把 protoc-gen-go-grpc 的工具從 github.com/golang/protobuf 移植過來，所以要修正這個的問題，我們改從 github.com/golang/protobuf 取得 protoc-gen-go.exe，安裝方式請執行下面兩行程式。\ninstall go protocol buffers pluginbash12$ go get -u github.com/golang/protobuf/protoc-gen-go$ go install github.com/golang/protobuf/protoc-gen-go\n上敘是我在寫此篇文章當下遇到的問題，我相信過不久 Goolge 會把文件跟這個錯誤修正好。\n\n4. 最後要安裝 Golang 的 grpc package ，這是要用來寫 grpc code 的 package\ngrpc packagebash1$ go get -u google.golang.org/grpc\n這樣我們就把環就都弄好啦。接下來進入簡單的概念說明與開始寫 code 了。\n概念解說我從 Mastering Go - Second Edition 這本書擷取一段 gRPC 的說明。Strictly speaking, gRPC is a protocol built on HTTP/2 that allows you to create serviceseasily. gRPC can use protocol buffers to specify an interface definition language, as well asto specify the format of the interchanged messages. gRPC clients and servers can be writtenin any programming language without the need to have clients written in the sameprogramming language as their servers.\nMihalis Tsoukalos ,Mastering Go - Second EditionMastering Go - Second Edition\n上敘的翻譯為，「gRPC 是建立在 HTTP/2 上的通訊協定，gRPC 可以使用 protocol buffers 定義訊息的格式，gRPC 可以使用任何語言實作。」\n而我從此課程 Enhancing Application Communication with gRPC 擷取一張圖片，說明 Client 與 Server 使用 protocol buffers 的格式來傳送資料。\ngRPC Concepts - Basic Components\n根據上圖的架構就是我們這篇文章要做的事情\n\n使用 protocol buffers 定義 message type 產生程式碼框架。\n實作 Server Code，執行 gRPC Server 。\n實作 Client Code。\n\n定義 Message Type我們用 Define Message Type 範例來看 Message Type 的長相define message typeproto1234567syntax = \"proto3\";message SearchRequest {  string query = 1;  int32 page_number = 2;  int32 result_per_page = 3;}\n這邊要特別說的是為什麼每一個欄位後面會有一個數字呢?  根據 Assigning Field Numbers 的說明\nAssigning Field NumbersAs you can see, each field in the message definition has a unique number. These field numbers are used to identify your fields in the message binary format, and should not be changed once your message type is in use. Note that field numbers in the range 1 through 15 take one byte to encode, including the field number and the field’s type (you can find out more about this in Protocol Buffer Encoding). Field numbers in the range 16 through 2047 take two bytes. So you should reserve the numbers 1 through 15 for very frequently occurring message elements. Remember to leave some room for frequently occurring elements that might be added in the future.\ndevelopers.google.comAssigning Field Numbers\n這是說，當資料傳送的時候是用 message binary format ，該數字是用來 定位 該欄位。 而數字1-15 是只用了 1 byte encode， 16-2047 用了 2 btyes encode ，所以建議常用的欄位可以放在前 15 個欄位，可以多少減少一些資料的傳送量。\n為了今天的 Demo 能夠簡單，我將使用 Message Definition 提供的範例，當作是我們這篇的範例。define messageproto123456789101112131415161718syntax = \"proto3\";option go_package = \"pb\";// The greeting service definition.service Greeter {  // Sends a greeting  rpc SayHello (HelloRequest) returns (HelloReply) {}}// The request message containing the user's name.message HelloRequest {  string name = 1;}// The response message containing the greetingsmessage HelloReply {  string message = 1;}上敘 Message Definition 非常簡單，就定義兩個 Message Type 一個是 HelloRequest 一個是 HelloReply ，然後還有定義一個 RPC 的服務 rpc SayHello (HelloRequest) returns (HelloReply) {}，而等等的實作程式碼，就是要實作 SayHello 這個方法。\n定義好 Message 之後，我們就使用指令 $ protoc -I=$SRC_DIR --go_out=$DST_DIR $SRC_DIR/message.proto 產生程式碼，如下範例，\ngen codebash1$ protoc -I pb/ pb/messages.proto --go_out=plugins=grpc:pb\n也可以使用另一種寫法 $ protoc --go_out=plugins=grpc:$DST_DIR $SRC_DIR，例如  $ protoc --go_out=plugins=grpc:. pb/*.proto，參考:gRPC Support。\n執行完後，就會看到有一份 messages.pb.go 的程式碼被產生，這就是我們定義好的訊息介面，等等會要用到這份程式碼來實作 Server Code 與 Client Code。gen-code\n實作 Server Code我們打開 messages.pb.go ，裡面有一個 interface 如下，這是我們要實作 Server Code 的方法。GreeterServer intefacego12345// GreeterServer is the server API for Greeter service.type GreeterServer interface {\t// Sends a greeting\tSayHello(context.Context, *HelloRequest) (*HelloReply, error)}\n所以這邊我們定義一個 MessageService ，實作 GreeterServer interface 的內容。  我的實作內容只是讀取 HellowRequest 的資訊，加一些訊息後回傳給 Client。MessageServicego123456type MessageService struct{}func (m MessageService) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {\treturn &amp;pb.HelloReply{Message: \"Server say hello to \" + in.GetName()}, nil}\n建立 Server接下來請參考下方的程式碼，我們要把 MessageService 註冊到 gRPC 的 Server ，並且將 gRPC Server 執行起來。gRPC Servergo1234567891011121314151617181920212223242526package mainimport (\t\"google.golang.org/grpc\"\t\"log\"\t\"net\"\t\"trygrpc/pb\"\t\"trygrpc/service\")const (\tport = \":50051\")func main() {\t// Create gRPC Server\tlis, err := net.Listen(\"tcp\", port)\tif err != nil {\t\tlog.Fatalf(\"failed to listen: %v\", err)\t}\ts := grpc.NewServer()\tlog.Println(\"gRPC server is running.\")\tpb.RegisterGreeterServer(s, &amp;service.MessageService{})\tif err := s.Serve(lis); err != nil {\t\tlog.Fatalf(\"failed to serve: %v\", err)\t}}\n這樣我們 Server Code 就定義好了!!!\n實作 Client Code一樣我們打開 messages.pb.go ，尋找下面那段程式碼，就會發現 Client 的程式碼我們不用自己實作，他已經幫我們產生好了!!!  我們只需要直接用。\nMessage Clientgo123456789101112131415161718192021type GreeterClient interface {\t// Sends a greeting\tSayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)}type greeterClient struct {\tcc grpc.ClientConnInterface}func NewGreeterClient(cc grpc.ClientConnInterface) GreeterClient {\treturn &amp;greeterClient{cc}}func (c *greeterClient) SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error) {\tout := new(HelloReply)\terr := c.cc.Invoke(ctx, \"/Greeter/SayHello\", in, out, opts...)\tif err != nil {\t\treturn nil, err\t}\treturn out, nil}\n而使用方式如下Clientgo12345678910111213141516171819202122232425262728293031323334package mainimport (\t\"context\"\t\"google.golang.org/grpc\"\t\"log\"\t\"time\"\t\"trygrpc/pb\")const (\taddress     = \"localhost:50051\")func main() {\t// Set up a connection to the server.\tconn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())\tif err != nil {\t\tlog.Fatalf(\"did not connect: %v\", err)\t}\tdefer conn.Close()\tc := pb.NewGreeterClient(conn)\t// Contact the server and print out its response.\tname := \"Miles\"\tctx, cancel := context.WithTimeout(context.Background(), time.Second)\tdefer cancel()\tr, err := c.SayHello(ctx, &amp;pb.HelloRequest{Name: name})\tif err != nil {\t\tlog.Fatalf(\"could not greet: %v\", err)\t}\tlog.Printf(\"Greeting: %s\", r.GetMessage())}\n這樣 Client Code 也完成了!!!\n執行程式碼接下來就先把 Server 先跑起來，然後再執行 Client。  確定跑起來後，我們就完成最簡單的 gRPC 的範例的!!call-grpc\n最後我有把我的範例程式上傳到 Gihub 上，可以參考 MilesLin/gRPC-helloworld\n官方提供的程式碼範例今天範例是來自官方，可以從這邊找到 grpc-Build the example。 簡單的說我們只要安裝好 go get -u google.golang.org/grpc 的 package，就可以在 $GOPATH/src/google.golang.org/grpc/examples/helloworld 資料夾底下找到各種 grpc 的範例。 而這些範例也有放在 github 上 grpc-go/examples/features/。\n延伸閱讀[grpc.io][What are protocol buffers][Protocol Buffers][Enhancing Application Communication with gRPC][Go Quick Start][gRPC Concepts][grpc-go/examples]\n","dateCreated":"2020-03-28T15:30:22+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-03-28T15:30:22+08:00","description":"此篇不會說明有關 gRPC 與 protocol buffers 的詳細概念，如果要瞭解可以到 grpc.io 閱讀相關文件。 今天會筆記，怎麼從無到用 Go 建立好 gRPC 的 Server 與 Client，當作是學習 gRPC 的起點。","headline":"[Go] 用 Go 建立 gRPC 的 Server 與 Client","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/","keywords":"Go, gRPC"}</script>
+    <meta name="description" content="此篇不會說明有關 gRPC 與 protocol buffers 的詳細概念，如果要瞭解可以到 grpc.io 閱讀相關文件。 今天會筆記，怎麼從無到用 Go 建立好 gRPC 的 Server 與 Client，當作是學習 gRPC 的起點。">
+<meta name="keywords" content="Go,gRPC">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Go] 用 Go 建立 gRPC 的 Server 與 Client">
+<meta property="og:url" content="https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="此篇不會說明有關 gRPC 與 protocol buffers 的詳細概念，如果要瞭解可以到 grpc.io 閱讀相關文件。 今天會筆記，怎麼從無到用 Go 建立好 gRPC 的 Server 與 Client，當作是學習 gRPC 的起點。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/release_3.11.4.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/win64_bin.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/protoc.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/version.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/protoc-gen-go.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/protoc-gen-go-error.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/grpc-structure.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/gen-code.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/call-grpc.jpg">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.563Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Go] 用 Go 建立 gRPC 的 Server 與 Client">
+<meta name="twitter:description" content="此篇不會說明有關 gRPC 與 protocol buffers 的詳細概念，如果要瞭解可以到 grpc.io 閱讀相關文件。 今天會筆記，怎麼從無到用 Go 建立好 gRPC 的 Server 與 Client，當作是學習 gRPC 的起點。">
+<meta name="twitter:image" content="https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/release_3.11.4.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Go] 用 Go 建立 gRPC 的 Server 與 Client
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-03-28T15:30:22+08:00">
+	
+		    Mar 28, 2020
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Go/">Go</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>此篇不會說明有關 gRPC 與 protocol buffers 的詳細概念，如果要瞭解可以到 <a href="https://grpc.io/docs/" target="_blank" rel="noopener">grpc.io</a> 閱讀相關文件。 今天會筆記，怎麼從無到用 Go 建立好 gRPC 的 Server 與 Client，當作是學習 gRPC 的起點。</p>
+<a id="more"></a>
+<h2 id="安裝"><a href="#安裝" class="headerlink" title="安裝"></a>安裝</h2><p>開始之前先把環境建立好，在 <a href="https://developers.google.com/protocol-buffers/docs/gotutorial#compiling-your-protocol-buffers" target="_blank" rel="noopener">Compiling your protocol buffers</a> 文件裡面有詳細說明如何安裝。 </p>
+<p><strong>1. 首先要先到 <a href="https://github.com/protocolbuffers/protobuf/releases" target="_blank" rel="noopener">protobuf-github release</a> 下載 protobuf compiler 執行檔案。</strong></p>
+<p>現在最新的版本是 Protocol Buffers v3.11.4 ，而我電腦是 win64，所以我就選擇 <span class="highlight-text primary">protoc-3.11.4-win64.zip</span> 下載。</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="release_3.11.4.jpg" title="Protocol Buffers v3.11.4" data-caption="Protocol Buffers v3.11.4" data-fancybox="default"><img class="fig-img" src="release_3.11.4.jpg" alt="Protocol Buffers v3.11.4"></a><span class="caption">Protocol Buffers v3.11.4</span></div>
+<div class="figure center" style="width:;"><a class="fancybox" href="win64_bin.jpg" title="win64" data-caption="win64" data-fancybox="default"><img class="fig-img" src="win64_bin.jpg" alt="win64"></a><span class="caption">win64</span></div>
+<p><strong>2. 將 protobuf compiler 執行檔加入環境變數</strong></p>
+<p>將下載的檔案解壓縮後，有 <span class="highlight-text primary">bin</span> 資料夾，將裡面的 <span class="highlight-text primary">protoc.exe</span> 加入環境變數。<br><div class="figure center" style="width:;"><a class="fancybox" href="protoc.jpg" title="protoc" data-caption="protoc" data-fancybox="default"><img class="fig-img" src="protoc.jpg" alt="protoc"></a><span class="caption">protoc</span></div></p>
+<p>如果你的電腦有安裝 Go 的話，可以把檔案放在 <code>${GOROOT}/bin</code> 底下，以我電腦為例，我就把 <span class="highlight-text primary">protoc.exe</span> 放到 <code>C:\Go\bin</code> 底下，因為 <code>${GOROOT}/bin</code> 已經加入環境變數了。  完成後打開命令提示字元輸入 <code>$ protoc --version</code> 就可以看到版本號了。<br><div class="figure center" style="width:;"><a class="fancybox" href="version.jpg" title="version" data-caption="version" data-fancybox="default"><img class="fig-img" src="version.jpg" alt="version"></a><span class="caption">version</span></div></p>
+<p><strong>3. 安裝 Go protocol buffers plugin</strong></p>
+<p>這是用來產生 Go Code 的工具，請執行下列指令安裝，<br><figure class="codeblock codeblock--tabbed"><figcaption><span>install go protocol buffers plugin</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go get google.golang.org/protobuf/cmd/protoc-gen-go</span><br><span class="line">$ go install google.golang.org/protobuf/cmd/protoc-gen-go</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>安裝好後，就會看到 <code>%{GOPATH}/bin</code> 底下會有 <code>protoc-gen-go.exe</code> 執行檔案。<br><div class="figure center" style="width:;"><a class="fancybox" href="protoc-gen-go.jpg" title="protoc-gen-go" data-caption="protoc-gen-go" data-fancybox="default"><img class="fig-img" src="protoc-gen-go.jpg" alt="protoc-gen-go"></a><span class="caption">protoc-gen-go</span></div></p>
+<div class="alert danger no-icon"><p>根據 <a href="https://grpc.io/docs/quickstart/go/" title="Go Quick Start" target="_blank" rel="noopener">Go Quick Start</a> 的說明，我以為就這樣安裝結束了。 但發現要使用時，出現了此錯誤</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="protoc-gen-go-error.jpg" title data-caption data-fancybox="default"><img class="fig-img" src="protoc-gen-go-error.jpg" alt></a></div></div>
+<p>根據 <a href="https://github.com/protocolbuffers/protobuf-go/releases/tag/v1.20.0#user-content-v1.20-grpc-support" target="_blank" rel="noopener">protocolbuffers/protobuf-go release note</a> 的說明，這是因為 v1.20 以後 <code>protoc-gen-go</code> 不再支援產生 gRPC service definitions，未來要改用 <code>protoc-gen-go-grpc</code>。 </p>
+<p>但是我更改使用 <code>protoc-gen-go-grpc</code> 卻又產生 <span class="highlight-text danger">'protoc-gen-go-grpc' is not recognized as an internal or external command</span> 的錯誤訊息。</p>
+<p>根據 <a href="https://github.com/golang/protobuf/issues/903" target="_blank" rel="noopener">google.golang.org/grpc: move protoc-gen-go-grpc into grpc module</a> 的說明，這是因為 <code>google.golang.org/protobuf</code> 還沒有把 <code>protoc-gen-go-grpc</code> 的工具從 <code>github.com/golang/protobuf</code> 移植過來，所以要修正這個的問題，我們改從 <code>github.com/golang/protobuf</code> 取得 <code>protoc-gen-go.exe</code>，安裝方式請執行下面兩行程式。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>install go protocol buffers plugin</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go get -u github.com/golang/protobuf/protoc-gen-go</span><br><span class="line">$ go install github.com/golang/protobuf/protoc-gen-go</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<div class="alert info"><p>上敘是我在寫此篇文章當下遇到的問題，我相信過不久 Goolge 會把文件跟這個錯誤修正好。</p>
+</div>
+<p><strong>4. 最後要安裝 Golang 的 grpc package ，這是要用來寫 grpc code 的 package</strong></p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>grpc package</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ go get -u google.golang.org/grpc</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p><strong>這樣我們就把環就都弄好啦。接下來進入簡單的概念說明與開始寫 code 了。</strong></p>
+<h2 id="概念解說"><a href="#概念解說" class="headerlink" title="概念解說"></a>概念解說</h2><p>我從 <a href="https://www.packtpub.com/programming/mastering-go-second-edition" target="_blank" rel="noopener">Mastering Go - Second Edition</a> 這本書擷取一段 gRPC 的說明。<br><blockquote><p>Strictly speaking, gRPC is a protocol built on HTTP/2 that allows you to create services<br>easily. gRPC can use protocol buffers to specify an interface definition language, as well as<br>to specify the format of the interchanged messages. gRPC clients and servers can be written<br>in any programming language without the need to have clients written in the same<br>programming language as their servers.</p>
+<footer><strong>Mihalis Tsoukalos ,Mastering Go - Second Edition</strong><cite><a href="https://www.packtpub.com/programming/mastering-go-second-edition" target="_blank" rel="noopener">Mastering Go - Second Edition</a></cite></footer></blockquote></p>
+<p>上敘的翻譯為，「gRPC 是建立在 <strong>HTTP/2</strong> 上的通訊協定，gRPC 可以使用 <a href="https://developers.google.com/protocol-buffers" target="_blank" rel="noopener">protocol buffers</a> 定義訊息的格式，gRPC 可以使用任何語言實作。」</p>
+<p>而我從此課程 <a href="https://app.pluralsight.com/library/courses/grpc-enhancing-application-communication/table-of-contents" title="Enhancing Application Communication with gRPC" target="_blank" rel="noopener">Enhancing Application Communication with gRPC</a> 擷取一張圖片，說明 Client 與 Server 使用 <a href="https://developers.google.com/protocol-buffers" target="_blank" rel="noopener">protocol buffers</a> 的格式來傳送資料。</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="grpc-structure.jpg" title="gRPC Concepts - Basic Components" data-caption="gRPC Concepts - Basic Components" data-fancybox="default"><img class="fig-img" src="grpc-structure.jpg" alt="gRPC Concepts - Basic Components"></a><span class="caption">gRPC Concepts - Basic Components</span></div>
+<p>根據上圖的架構就是我們這篇文章要做的事情</p>
+<ol>
+<li>使用 protocol buffers 定義 message type 產生程式碼框架。</li>
+<li>實作 Server Code，執行 gRPC Server 。</li>
+<li>實作 Client Code。</li>
+</ol>
+<h2 id="定義-Message-Type"><a href="#定義-Message-Type" class="headerlink" title="定義 Message Type"></a>定義 Message Type</h2><p>我們用 <a href="https://developers.google.com/protocol-buffers/docs/proto3#simple" target="_blank" rel="noopener">Define Message Type</a> 範例來看 Message Type 的長相<br><figure class="codeblock codeblock--tabbed"><figcaption><span>define message type</span><ul class="tabs"><li class="tab active">proto</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line"></span><br><span class="line">message SearchRequest {</span><br><span class="line">  string query = 1;</span><br><span class="line">  int32 page_number = 2;</span><br><span class="line">  int32 result_per_page = 3;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>這邊要特別說的是為什麼每一個欄位後面會有一個數字呢?  根據 <a href="https://developers.google.com/protocol-buffers/docs/proto3#assigning-field-numbers" target="_blank" rel="noopener">Assigning Field Numbers</a> 的說明</p>
+<blockquote><p><strong>Assigning Field Numbers</strong><br>As you can see, each field in the message definition has a unique number. These field numbers are used to identify your fields in the message binary format, and should not be changed once your message type is in use. Note that field numbers in the range 1 through 15 take one byte to encode, including the field number and the field’s type (you can find out more about this in Protocol Buffer Encoding). Field numbers in the range 16 through 2047 take two bytes. So you should reserve the numbers 1 through 15 for very frequently occurring message elements. Remember to leave some room for frequently occurring elements that might be added in the future.</p>
+<footer><strong>developers.google.com</strong><cite><a href="https://developers.google.com/protocol-buffers/docs/proto3#assigning-field-numbers" target="_blank" rel="noopener">Assigning Field Numbers</a></cite></footer></blockquote>
+<p>這是說，當資料傳送的時候是用 <a href="https://developers.google.com/protocol-buffers/docs/encoding" target="_blank" rel="noopener">message binary format</a> ，該數字是用來 <span class="highlight-text primary">定位</span> 該欄位。 而數字1-15 是只用了 1 byte encode， 16-2047 用了 2 btyes encode ，所以建議常用的欄位可以放在前 15 個欄位，可以多少減少一些資料的傳送量。</p>
+<p>為了今天的 Demo 能夠簡單，我將使用 <a href="https://grpc.io/docs/quickstart/go/#update-a-grpc-service" target="_blank" rel="noopener">Message Definition</a> 提供的範例，當作是我們這篇的範例。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>define message</span><ul class="tabs"><li class="tab active">proto</li></ul></figcaption><div class="tabs-content"><figure class="highlight plain" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">syntax = "proto3";</span><br><span class="line">option go_package = "pb";</span><br><span class="line"></span><br><span class="line">// The greeting service definition.</span><br><span class="line">service Greeter {</span><br><span class="line">  // Sends a greeting</span><br><span class="line">  rpc SayHello (HelloRequest) returns (HelloReply) {}</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">// The request message containing the user's name.</span><br><span class="line">message HelloRequest {</span><br><span class="line">  string name = 1;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">// The response message containing the greetings</span><br><span class="line">message HelloReply {</span><br><span class="line">  string message = 1;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure><br><em>上敘 Message Definition 非常簡單，就定義兩個 Message Type 一個是 <code>HelloRequest</code> 一個是 <code>HelloReply</code> ，然後還有定義一個 RPC 的服務 <code>rpc SayHello (HelloRequest) returns (HelloReply) {}</code>，而等等的實作程式碼，就是要實作 <code>SayHello</code> 這個方法。</em></p>
+<p>定義好 Message 之後，我們就使用指令 <code>$ protoc -I=$SRC_DIR --go_out=$DST_DIR $SRC_DIR/message.proto</code> 產生程式碼，如下範例，</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>gen code</span><ul class="tabs"><li class="tab active">bash</li></ul></figcaption><div class="tabs-content"><figure class="highlight bash" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ protoc -I pb/ pb/messages.proto --go_out=plugins=grpc:pb</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p><em>也可以使用另一種寫法 <code>$ protoc --go_out=plugins=grpc:$DST_DIR $SRC_DIR</code>，例如  <code>$ protoc --go_out=plugins=grpc:. pb/*.proto</code>，參考:<a href="https://github.com/golang/protobuf#grpc-support" target="_blank" rel="noopener">gRPC Support</a>。</em></p>
+<p>執行完後，就會看到有一份 <code>messages.pb.go</code> 的程式碼被產生，這就是我們定義好的訊息介面，等等會要用到這份程式碼來實作 Server Code 與 Client Code。<br><div class="figure center" style="width:;"><a class="fancybox" href="gen-code.jpg" title="gen-code" data-caption="gen-code" data-fancybox="default"><img class="fig-img" src="gen-code.jpg" alt="gen-code"></a><span class="caption">gen-code</span></div></p>
+<h2 id="實作-Server-Code"><a href="#實作-Server-Code" class="headerlink" title="實作 Server Code"></a>實作 Server Code</h2><p>我們打開 <code>messages.pb.go</code> ，裡面有一個 interface 如下，這是我們要實作 Server Code 的方法。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>GreeterServer inteface</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// GreeterServer is the server API for Greeter service.</span></span><br><span class="line"><span class="keyword">type</span> GreeterServer <span class="keyword">interface</span> {</span><br><span class="line">	<span class="comment">// Sends a greeting</span></span><br><span class="line">	SayHello(context.Context, *HelloRequest) (*HelloReply, error)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>所以這邊我們定義一個 MessageService ，實作 GreeterServer interface 的內容。  我的實作內容只是讀取 HellowRequest 的資訊，加一些訊息後回傳給 Client。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>MessageService</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> MessageService <span class="keyword">struct</span>{</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m MessageService)</span> <span class="title">SayHello</span><span class="params">(ctx context.Context, in *pb.HelloRequest)</span> <span class="params">(*pb.HelloReply, error)</span></span> {</span><br><span class="line">	<span class="keyword">return</span> &amp;pb.HelloReply{Message: <span class="string">"Server say hello to "</span> + in.GetName()}, <span class="literal">nil</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h3 id="建立-Server"><a href="#建立-Server" class="headerlink" title="建立 Server"></a>建立 Server</h3><p>接下來請參考下方的程式碼，我們要把 <code>MessageService</code> 註冊到 gRPC 的 Server ，並且將 gRPC Server 執行起來。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>gRPC Server</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"google.golang.org/grpc"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"net"</span></span><br><span class="line">	<span class="string">"trygrpc/pb"</span></span><br><span class="line">	<span class="string">"trygrpc/service"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	port = <span class="string">":50051"</span></span><br><span class="line">)</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	<span class="comment">// Create gRPC Server</span></span><br><span class="line">	lis, err := net.Listen(<span class="string">"tcp"</span>, port)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">		log.Fatalf(<span class="string">"failed to listen: %v"</span>, err)</span><br><span class="line">	}</span><br><span class="line">	s := grpc.NewServer()</span><br><span class="line">	log.Println(<span class="string">"gRPC server is running."</span>)</span><br><span class="line">	pb.RegisterGreeterServer(s, &amp;service.MessageService{})</span><br><span class="line">	<span class="keyword">if</span> err := s.Serve(lis); err != <span class="literal">nil</span> {</span><br><span class="line">		log.Fatalf(<span class="string">"failed to serve: %v"</span>, err)</span><br><span class="line">	}</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>這樣我們 Server Code 就定義好了!!!</p>
+<h2 id="實作-Client-Code"><a href="#實作-Client-Code" class="headerlink" title="實作 Client Code"></a>實作 Client Code</h2><p>一樣我們打開 <code>messages.pb.go</code> ，尋找下面那段程式碼，就會發現 Client 的程式碼我們不用自己實作，他已經幫我們產生好了!!!  我們只需要直接用。</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Message Client</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> GreeterClient <span class="keyword">interface</span> {</span><br><span class="line">	<span class="comment">// Sends a greeting</span></span><br><span class="line">	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> greeterClient <span class="keyword">struct</span> {</span><br><span class="line">	cc grpc.ClientConnInterface</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewGreeterClient</span><span class="params">(cc grpc.ClientConnInterface)</span> <span class="title">GreeterClient</span></span> {</span><br><span class="line">	<span class="keyword">return</span> &amp;greeterClient{cc}</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *greeterClient)</span> <span class="title">SayHello</span><span class="params">(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption)</span> <span class="params">(*HelloReply, error)</span></span> {</span><br><span class="line">	out := <span class="built_in">new</span>(HelloReply)</span><br><span class="line">	err := c.cc.Invoke(ctx, <span class="string">"/Greeter/SayHello"</span>, in, out, opts...)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	}</span><br><span class="line">	<span class="keyword">return</span> out, <span class="literal">nil</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>而使用方式如下<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Client</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"google.golang.org/grpc"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"time"</span></span><br><span class="line">	<span class="string">"trygrpc/pb"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	address     = <span class="string">"localhost:50051"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	<span class="comment">// Set up a connection to the server.</span></span><br><span class="line">	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">		log.Fatalf(<span class="string">"did not connect: %v"</span>, err)</span><br><span class="line">	}</span><br><span class="line">	<span class="keyword">defer</span> conn.Close()</span><br><span class="line">	c := pb.NewGreeterClient(conn)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Contact the server and print out its response.</span></span><br><span class="line">	name := <span class="string">"Miles"</span></span><br><span class="line"></span><br><span class="line">	ctx, cancel := context.WithTimeout(context.Background(), time.Second)</span><br><span class="line">	<span class="keyword">defer</span> cancel()</span><br><span class="line">	r, err := c.SayHello(ctx, &amp;pb.HelloRequest{Name: name})</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">		log.Fatalf(<span class="string">"could not greet: %v"</span>, err)</span><br><span class="line">	}</span><br><span class="line">	log.Printf(<span class="string">"Greeting: %s"</span>, r.GetMessage())</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>這樣 Client Code 也完成了!!!</p>
+<h2 id="執行程式碼"><a href="#執行程式碼" class="headerlink" title="執行程式碼"></a>執行程式碼</h2><p>接下來就先把 Server 先跑起來，然後再執行 Client。  確定跑起來後，我們就完成最簡單的 gRPC 的範例的!!<br><div class="figure center" style="width:;"><a class="fancybox" href="call-grpc.jpg" title="call-grpc" data-caption="call-grpc" data-fancybox="default"><img class="fig-img" src="call-grpc.jpg" alt="call-grpc"></a><span class="caption">call-grpc</span></div></p>
+<p>最後我有把我的範例程式上傳到 Gihub 上，可以參考 <a href="https://github.com/MilesLin/gRPC-helloworld" target="_blank" rel="noopener">MilesLin/gRPC-helloworld</a></p>
+<h2 id="官方提供的程式碼範例"><a href="#官方提供的程式碼範例" class="headerlink" title="官方提供的程式碼範例"></a>官方提供的程式碼範例</h2><p>今天範例是來自官方，可以從這邊找到 <a href="https://grpc.io/docs/quickstart/go/#build-the-example" target="_blank" rel="noopener">grpc-Build the example</a>。 簡單的說我們只要安裝好 <code>go get -u google.golang.org/grpc</code> 的 package，就可以在 <code>$GOPATH/src/google.golang.org/grpc/examples/helloworld</code> 資料夾底下找到各種 grpc 的範例。 而這些範例也有放在 github 上 <a href="https://github.com/grpc/grpc-go/tree/master/examples/features" target="_blank" rel="noopener">grpc-go/examples/features/</a>。</p>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p>[<a href="https://grpc.io/" title="grpc.io" target="_blank" rel="noopener">grpc.io</a>]<br>[<a href="https://developers.google.com/protocol-buffers/docs/overview" title="What are protocol buffers" target="_blank" rel="noopener">What are protocol buffers</a>]<br>[<a href="https://developers.google.com/protocol-buffers" title="Protocol Buffers" target="_blank" rel="noopener">Protocol Buffers</a>]<br>[<a href="https://app.pluralsight.com/library/courses/grpc-enhancing-application-communication/table-of-contents" title="Enhancing Application Communication with gRPC" target="_blank" rel="noopener">Enhancing Application Communication with gRPC</a>]<br>[<a href="https://grpc.io/docs/quickstart/go/" title="Go Quick Start" target="_blank" rel="noopener">Go Quick Start</a>]<br>[<a href="https://grpc.io/docs/guides/concepts/" title="gRPC Concepts" target="_blank" rel="noopener">gRPC Concepts</a>]<br>[<a href="https://github.com/grpc/grpc-go/tree/master/examples" title="grpc-go/examples" target="_blank" rel="noopener">grpc-go/examples</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Go/">Go</a> <a class="tag tag--primary tag--small t-link" href="/tags/gRPC/">gRPC</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/03/Golang/在-gRPC-建立-TLS-加密通道/" data-tooltip="[Go] 在 gRPC 建立 TLS 加密通道" aria-label="PREVIOUS: [Go] 在 gRPC 建立 TLS 加密通道">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/03/Golang/建立下載檔案的-Http-Response/" data-tooltip="[Go] 建立下載檔案的 Http Response" aria-label="NEXT: [Go] 建立下載檔案的 Http Response">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/03/Golang/在-gRPC-建立-TLS-加密通道/" data-tooltip="[Go] 在 gRPC 建立 TLS 加密通道" aria-label="PREVIOUS: [Go] 在 gRPC 建立 TLS 加密通道">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/03/Golang/建立下載檔案的-Http-Response/" data-tooltip="[Go] 建立下載檔案的 Http Response" aria-label="NEXT: [Go] 建立下載檔案的 Http Response">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/';
+                 
+                    this.page.identifier = '2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

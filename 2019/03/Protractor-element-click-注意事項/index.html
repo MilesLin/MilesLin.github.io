@@ -1,0 +1,824 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[自動化測試] Protractor element.click() 注意事項 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Protractor">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"前幾天 Protractor 的課程終於上完了，有學員就馬上在自己的網站上練習 E2E 的自動化測試。  寫了下方的程式碼failed testts123456789it('should click the link', async () =&gt; {  await browser.waitForAngularEnabled(false);  await browser.get('https://xxx.sample.com/#/');  const link = element(by.className('anticon-down'));  const linkIsEnabled = EC.elementToBeClickable(link);  // 點擊連結之前，先確認連結能被點擊!!!  await browser.wait(linkIsEnabled, 10000);  await link.click();});\n這程式碼看起來合情合理，結果在 link.click() 出現錯誤。  錯誤訊息大概是呈現這樣子。 \nFailed: unknown error: Element < i class=\"anticon-down\">< / i > is not clickable at point (165, 720). Other element would receive the click: < div class=\"Loader__foreground\" style=\"display: table; width: 100%; height: 100%; text-align: center; z-index: 20; color: white;\">...< /div>\n\n這段的意思是說，我要點的連結的時候，點到其他 DOM 物件了\n\n說明程式碼看起來很合理，人工操作上也都沒有問題，可是用 Protractor 測試的時候，竟然點到 其他元件，這是什麼情況??首先要先知道， Protractor 會盡量模擬使用者的行為去操作，以 click 動作來說， Protractor 會模擬使用者操作滑鼠，移動到該座標，點下滑鼠左鍵。 其次，無法點擊有 三種可能\n\n連結被 disabled \n連結看不到\n連結被其他 DOM 物件蓋住了\n\n因為我們已經使用 ExpectedConditions.elementToBeClickable 確定連結是可以點的，就剩下一個可能，就是連結被其他DOM 物件蓋住了。\n所以我合理的推測，網頁載入的時候，有一個看不見的 DOM 物件把畫面蓋住了，而且載入結束後，那個 DOM 物件就會消失。  且根據錯誤訊息，那個 DOM 物件用的 class 是 Loader__foreground，為了驗證這件事情，我寫了以下程式碼\nprint out page sourcets1234567it('should print out page source', async () =&gt; {  await browser.waitForAngularEnabled(false);  await browser.get('https://xxx.sample.com/#/');  const loader = element(by.className('Loader__foreground'));  await browser.wait(EC.presenceOf(loader), 10000);  console.log(await browser.getPageSource());});\nBingo ，發現一段神奇的 HTML。  果然有一個 DOM 元件是 z-index: 20 且寬高都 100%。  這表示說，網頁在讀取階段，這個透明的 DOM 元件把畫面都蓋住了。HTML with loaderhtml123456789&lt; div class=\"Loader__background\"      style=\"display: block; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;\"&gt;      &lt; div class=\"Loader__foreground\"        style=\"display: table; width: 100%; height: 100%; text-align: center; z-index: 20; color: white;\"&gt;        &lt; div class=\"Loader__message\"          style=\"display: block; vertical-align: middle; position: fixed; top: 0px; right: 0px; color: rgb(255, 255, 255); background-color: rgb(14, 119, 202); height: 35px; line-height: 35px; font-size: 14px; padding: 0px 30px;\"&gt;          loading ...&lt; /div&gt;      &lt; /div&gt;    &lt; /div&gt;\n可以成功點擊連結的範例所以我調整程式碼，確定讀取畫面消失後，才點擊連結。successts1234567891011121314151617181920it('should click the link', async () =&gt; {  await browser.waitForAngularEnabled(false);  await browser.get('https://xxx.sample.com/#/');  const link = element(by.className('anticon-down'));  const loader = element(by.className('Loader__foreground'));  // 先等 loader 畫面有出來  await browser.wait(EC.presenceOf(loader), 10000);  // 等待 loader 消失，且連結可以被點擊  const loaderIsOff = EC.stalenessOf(loader);  const linkIsEnabled = EC.elementToBeClickable(link);  await browser.wait(EC.and(loaderIsOff, linkIsEnabled), 10000);  // 點擊連結  await link.click();  // 觀察結果  await browser.sleep(5000);});\n打完收工!!\n小結寫 E2E 真的會有很多鬼打強的情況，這時候，更要仔細閱讀錯誤訊息，因為錯誤訊息其實蠻清楚的，只是要思考一下出現這錯誤訊息的可能原因。\n其他小密技(建議不要使用)如果真的都沒辦法點，又找不到原因，只好使用注入 javascript 點擊 !?注入 javascriptts1await browser.executeScript('document.querySelectorAll(\\'.anticon-down\\')[0].click()');\n參考[Random Element is not clickable at point (x, y) errors][WebDriver click() vs JavaScript click()]\n","dateCreated":"2019-03-25T17:44:12+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-03-25T17:44:12+08:00","description":"前幾天 Protractor 的課程終於上完了，有學員就馬上在自己的網站上練習 E2E 的自動化測試。  寫了下方的程式碼failed testts123456789it('should click the link', async () =&gt; {  await browser.waitForAngularEnabled(false);  await browser.get('https://xxx.sample.com/#/');  const link = element(by.className('anticon-down'));  const linkIsEnabled = EC.elementToBeClickable(link);  // 點擊連結之前，先確認連結能被點擊!!!  await browser.wait(linkIsEnabled, 10000);  await link.click();});\n這程式碼看起來合情合理，結果在 link.click() 出現錯誤。  錯誤訊息大概是呈現這樣子。 \nFailed: unknown error: Element < i class=\"anticon-down\">< / i > is not clickable at point (165, 720). Other element would receive the click: < div class=\"Loader__foreground\" style=\"display: table; width: 100%; height: 100%; text-align: center; z-index: 20; color: white;\">...< /div>","headline":"[自動化測試] Protractor element.click() 注意事項","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/","keywords":"Protractor"}</script>
+    <meta name="description" content="前幾天 Protractor 的課程終於上完了，有學員就馬上在自己的網站上練習 E2E 的自動化測試。  寫了下方的程式碼failed testts123456789it(&apos;should click the link&apos;, async () =&amp;gt; {  await browser.waitForAngularEnabled(false);  await browser.get(&apos;https:/">
+<meta name="keywords" content="Protractor">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[自動化測試] Protractor element.click() 注意事項">
+<meta property="og:url" content="https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="前幾天 Protractor 的課程終於上完了，有學員就馬上在自己的網站上練習 E2E 的自動化測試。  寫了下方的程式碼failed testts123456789it(&apos;should click the link&apos;, async () =&amp;gt; {  await browser.waitForAngularEnabled(false);  await browser.get(&apos;https:/">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.579Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[自動化測試] Protractor element.click() 注意事項">
+<meta name="twitter:description" content="前幾天 Protractor 的課程終於上完了，有學員就馬上在自己的網站上練習 E2E 的自動化測試。  寫了下方的程式碼failed testts123456789it(&apos;should click the link&apos;, async () =&amp;gt; {  await browser.waitForAngularEnabled(false);  await browser.get(&apos;https:/">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [自動化測試] Protractor element.click() 注意事項
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-03-25T17:44:12+08:00">
+	
+		    Mar 25, 2019
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/自動化測試/">自動化測試</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>前幾天 Protractor 的課程終於上完了，有學員就馬上在自己的網站上練習 E2E 的自動化測試。  寫了下方的程式碼<br><figure class="codeblock codeblock--tabbed"><figcaption><span>failed test</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">it(<span class="string">'should click the link'</span>, <span class="keyword">async</span> () =&gt; {</span><br><span class="line">  <span class="keyword">await</span> browser.waitForAngularEnabled(<span class="literal">false</span>);</span><br><span class="line">  <span class="keyword">await</span> browser.get(<span class="string">'https://xxx.sample.com/#/'</span>);</span><br><span class="line">  <span class="keyword">const</span> link = element(by.className(<span class="string">'anticon-down'</span>));</span><br><span class="line">  <span class="keyword">const</span> linkIsEnabled = EC.elementToBeClickable(link);</span><br><span class="line">  <span class="comment">// 點擊連結之前，先確認連結能被點擊!!!</span></span><br><span class="line">  <span class="keyword">await</span> browser.wait(linkIsEnabled, <span class="number">10000</span>);</span><br><span class="line">  <span class="keyword">await</span> link.click();</span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>這程式碼看起來合情合理，結果在 <code>link.click()</code> 出現錯誤。  錯誤訊息大概是呈現這樣子。<br><span class="highlight-text danger"> 
+Failed: unknown error: Element < i class="anticon-down">< / i > is not clickable at point (165, 720). Other element would receive the click: < div class="Loader__foreground" style="display: table; width: 100%; height: 100%; text-align: center; z-index: 20; color: white;">...< /div></span></p>
+<a id="more"></a>
+<div class="alert warning"><p>這段的意思是說，我要點的連結的時候，點到<strong>其他 DOM 物件</strong>了</p>
+</div>
+<h2 id="說明"><a href="#說明" class="headerlink" title="說明"></a>說明</h2><p>程式碼看起來很合理，人工操作上也都沒有問題，可是用 Protractor 測試的時候，竟然點到 <strong>其他元件</strong>，這是什麼情況??<br>首先要先知道， Protractor 會盡量模擬使用者的行為去操作，以 click 動作來說， Protractor 會模擬使用者操作滑鼠，移動到該座標，點下滑鼠左鍵。 其次，無法點擊有 <a href="https://github.com/angular/protractor/issues/3093#issuecomment-207237398" title="Possible Reasons" target="_blank" rel="noopener">三種可能</a></p>
+<ul>
+<li>連結被 disabled </li>
+<li>連結看不到</li>
+<li>連結被其他 DOM 物件蓋住了</li>
+</ul>
+<p>因為我們已經使用 <a href="https://www.protractortest.org/#/api?view=ProtractorExpectedConditions.prototype.elementToBeClickable" title="ExpectedConditions.elementToBeClickable" target="_blank" rel="noopener">ExpectedConditions.elementToBeClickable</a> 確定連結是可以點的，就剩下一個可能，就是<strong>連結被其他DOM 物件蓋住了</strong>。</p>
+<p>所以我合理的推測，網頁載入的時候，有一個<strong>看不見的 DOM 物件</strong>把畫面蓋住了，而且載入結束後，那個 DOM 物件就會消失。  且根據錯誤訊息，那個 DOM 物件用的 class 是 <code>Loader__foreground</code>，為了驗證這件事情，我寫了以下程式碼</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>print out page source</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">it(<span class="string">'should print out page source'</span>, <span class="keyword">async</span> () =&gt; {</span><br><span class="line">  <span class="keyword">await</span> browser.waitForAngularEnabled(<span class="literal">false</span>);</span><br><span class="line">  <span class="keyword">await</span> browser.get(<span class="string">'https://xxx.sample.com/#/'</span>);</span><br><span class="line">  <span class="keyword">const</span> loader = element(by.className(<span class="string">'Loader__foreground'</span>));</span><br><span class="line">  <span class="keyword">await</span> browser.wait(EC.presenceOf(loader), <span class="number">10000</span>);</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="keyword">await</span> browser.getPageSource());</span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>Bingo ，發現一段神奇的 HTML。  果然有一個 DOM 元件是 z-index: 20 且寬高都 100%。  這表示說，網頁在讀取階段，這個<strong>透明的 DOM 元件</strong>把畫面都蓋住了。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>HTML with loader</span><ul class="tabs"><li class="tab active">html</li></ul></figcaption><div class="tabs-content"><figure class="highlight html" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt; <span class="attr">div</span> <span class="attr">class</span>=<span class="string">"Loader__background"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">style</span>=<span class="string">"display: block; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10;"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt; <span class="attr">div</span> <span class="attr">class</span>=<span class="string">"Loader__foreground"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">style</span>=<span class="string">"display: table; width: 100%; height: 100%; text-align: center; z-index: 20; color: white;"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt; <span class="attr">div</span> <span class="attr">class</span>=<span class="string">"Loader__message"</span></span></span><br><span class="line"><span class="tag">          <span class="attr">style</span>=<span class="string">"display: block; vertical-align: middle; position: fixed; top: 0px; right: 0px; color: rgb(255, 255, 255); background-color: rgb(14, 119, 202); height: 35px; line-height: 35px; font-size: 14px; padding: 0px 30px;"</span>&gt;</span></span><br><span class="line">          loading ...<span class="tag">&lt; /<span class="attr">div</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt; /<span class="attr">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt; /<span class="attr">div</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="可以成功點擊連結的範例"><a href="#可以成功點擊連結的範例" class="headerlink" title="可以成功點擊連結的範例"></a>可以成功點擊連結的範例</h2><p>所以我調整程式碼，確定讀取畫面消失後，才點擊連結。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>success</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">it(<span class="string">'should click the link'</span>, <span class="keyword">async</span> () =&gt; {</span><br><span class="line">  <span class="keyword">await</span> browser.waitForAngularEnabled(<span class="literal">false</span>);</span><br><span class="line">  <span class="keyword">await</span> browser.get(<span class="string">'https://xxx.sample.com/#/'</span>);</span><br><span class="line">  <span class="keyword">const</span> link = element(by.className(<span class="string">'anticon-down'</span>));</span><br><span class="line">  <span class="keyword">const</span> loader = element(by.className(<span class="string">'Loader__foreground'</span>));</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 先等 loader 畫面有出來</span></span><br><span class="line">  <span class="keyword">await</span> browser.wait(EC.presenceOf(loader), <span class="number">10000</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 等待 loader 消失，且連結可以被點擊</span></span><br><span class="line">  <span class="keyword">const</span> loaderIsOff = EC.stalenessOf(loader);</span><br><span class="line">  <span class="keyword">const</span> linkIsEnabled = EC.elementToBeClickable(link);</span><br><span class="line">  <span class="keyword">await</span> browser.wait(EC.and(loaderIsOff, linkIsEnabled), <span class="number">10000</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 點擊連結</span></span><br><span class="line">  <span class="keyword">await</span> link.click();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 觀察結果</span></span><br><span class="line">  <span class="keyword">await</span> browser.sleep(<span class="number">5000</span>);</span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>打完收工!!</p>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>寫 E2E 真的會有很多鬼打強的情況，這時候，更要仔細閱讀錯誤訊息，因為錯誤訊息其實蠻清楚的，只是要思考一下出現這錯誤訊息的可能原因。</p>
+<h3 id="其他小密技-建議不要使用"><a href="#其他小密技-建議不要使用" class="headerlink" title="其他小密技(建議不要使用)"></a>其他小密技(建議不要使用)</h3><p>如果真的都沒辦法點，又找不到原因，只好使用注入 javascript 點擊 !?<br><figure class="codeblock codeblock--tabbed"><figcaption><span>注入 javascript</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">await</span> browser.executeScript(<span class="string">'document.querySelectorAll(\'.anticon-down\')[0].click()'</span>);</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p>[<a href="https://github.com/angular/protractor/issues/3093" title="[Random Element is not clickable at point (x, y) errors]" target="_blank" rel="noopener">Random Element is not clickable at point (x, y) errors</a>]<br>[<a href="https://stackoverflow.com/questions/34562061/webdriver-click-vs-javascript-click/39751973#39751973" title="[WebDriver click() vs JavaScript click()]" target="_blank" rel="noopener">WebDriver click() vs JavaScript click()</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Protractor/">Protractor</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/03/開發人員必懂的SEO第一集/" data-tooltip="[SEO] 開發人員必懂的 SEO 第一集 - 路由、語系" aria-label="PREVIOUS: [SEO] 開發人員必懂的 SEO 第一集 - 路由、語系">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/08/Template-Driven-動態加入驗證屬性注意事項/" data-tooltip="[Angular] Template-Driven 動態加入驗證屬性注意事項" aria-label="NEXT: [Angular] Template-Driven 動態加入驗證屬性注意事項">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2019/03/開發人員必懂的SEO第一集/" data-tooltip="[SEO] 開發人員必懂的 SEO 第一集 - 路由、語系" aria-label="PREVIOUS: [SEO] 開發人員必懂的 SEO 第一集 - 路由、語系">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/08/Template-Driven-動態加入驗證屬性注意事項/" data-tooltip="[Angular] Template-Driven 動態加入驗證屬性注意事項" aria-label="NEXT: [Angular] Template-Driven 動態加入驗證屬性注意事項">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2019/03/Protractor-element-click-注意事項/';
+                 
+                    this.page.identifier = '2019/03/Protractor-element-click-注意事項/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

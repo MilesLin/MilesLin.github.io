@@ -1,0 +1,822 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Autofac] 設定 Web API Register Controller 筆記 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="C#,.NET,Autofac">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)\n\n使用容器註冊物件為了方便整理，我會先新增 AutofacConfig.cs 放在 App_Start 資料夾裡面， AutofacConfig.cs 則負責註冊。\n\n安裝 Autofac.WebAPi2\n先註冊所有 Web API Controller 到 ContainerBuilder\n註冊所有 Controller 要相依的物件，這邊以 IConfiguration 為例子，表示 Controller 建構式注入 IConfiguration 時會取得 Configuration 物件\n開啟 Global.asax.cs 加入 AutofacConfig.Bootstrapper()AutofacConfigcs12345678910111213141516171819202122232425262728public class AutofacConfig{    public static void Bootstrapper()    {        var builder = new ContainerBuilder();        // Get your HttpConfiguration.        var config = GlobalConfiguration.Configuration;        // Register your Web API controllers.        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());        // OPTIONAL: Register the Autofac filter provider.        builder.RegisterWebApiFilterProvider(config);        builder.RegisterType&lt;Configuration&gt;()           .As&lt;IConfiguration&gt;()           .InstancePerLifetimeScope();        builder.RegisterType&lt;Configuration&gt;()           .As&lt;IConfiguration&gt;()           .InstancePerLifetimeScope();        var container = builder.Build();        config.DependencyResolver = new AutofacWebApiDependencyResolver(container);    }}\n\n\n打開 Global.asax.cs 加入 AutofacConfig.Bootstrapper();Global.asax.cscs123456789101112131415public class WebApiApplication : System.Web.HttpApplication{    protected void Application_Start()    {        AreaRegistration.RegisterAllAreas();        GlobalConfiguration.Configure(WebApiConfig.Register);        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);        RouteConfig.RegisterRoutes(RouteTable.Routes);        BundleConfig.RegisterBundles(BundleTable.Bundles);                // 加入這行        AutofacConfig.Bootstrapper();    }}\n接下來 Controller 就可以建構式注入 IConfiguration 取得 Configuration 物件Controllercs12345678public class ValuesController : ApiController{    IConfiguration _configuration;    public ValuesController(IConfiguration configuration)    {        _configuration = configuration;    }}\n建立 Autofac.Module當註冊物件一多的時候，我們可以建立 Aufofac.Module 把註冊這件事情分散在各個 Module 處理。\n例如我建立一個 EFModule ，註冊 Entities。EFModulecs123456789public class EFModule : Autofac.Module{    protected override void Load(ContainerBuilder builder)    {        builder.RegisterType&lt;WebPaymentEntities&gt;()           .As&lt;WebPaymentEntities&gt;()           .InstancePerLifetimeScope();    }}\n我的 ContainerBuilder 只要註冊 Module 就好Register Modulecs123456789101112131415161718192021222324public static void Bootstrapper()    {        var builder = new ContainerBuilder();        // Get your HttpConfiguration.        var config = GlobalConfiguration.Configuration;        // Register your Web API controllers.        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());        // OPTIONAL: Register the Autofac filter provider.        builder.RegisterWebApiFilterProvider(config);        builder.RegisterType&lt;Configuration&gt;()           .As&lt;IConfiguration&gt;()           .InstancePerLifetimeScope();                // 註冊 Module        builder.RegisterModule(new EFModule());        var container = builder.Build();        config.DependencyResolver = new AutofacWebApiDependencyResolver(container);    }\n一次註冊多個物件在寫 MVC 或 Web API 的時候可以常見到 Repository Pattern 而 Repository Pattern 有一定的命名規格，例如: 介面 IxxxRepository 會對應到一個類別 xxxRepository。Repositorycs12345678910public class ProductRepository : IProductRepository{    private WebPaymentEntities context;    public ImportContainerRepository(WebPaymentEntities context)    {        this.context = context;    }}\n我們就可以用這命名的 Pattern 建立一個 Autofac Module 註冊所有的 Repository\nRespository Modulecs12345678910public class RepositoryModule : Autofac.Module{    protected override void Load(ContainerBuilder builder)    {        builder.RegisterAssemblyTypes(typeof(WebApiApplication).Assembly)               .Where(t =&gt; t.Name.EndsWith(\"Repository\"))               .AsImplementedInterfaces()              .InstancePerLifetimeScope();    }}\n小結通常 Autofac 設定一次就很少再設定了，所以沒有研究很深，就先筆記到這邊，等之後需要其他應用的時候，再來詳細閱讀官方文件。\n參考Autofac 官方文件","dateCreated":"2017-04-28T20:52:13+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-04-28T20:52:13+08:00","description":"Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)","headline":"[Autofac] 設定 Web API Register Controller 筆記","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/","keywords":".NET, C#, Autofac"}</script>
+    <meta name="description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
+<meta name="keywords" content="C#,.NET,Autofac">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Autofac] 設定 Web API Register Controller 筆記">
+<meta property="og:url" content="https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.485Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Autofac] 設定 Web API Register Controller 筆記">
+<meta name="twitter:description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Autofac] 設定 Web API Register Controller 筆記
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2017-04-28T20:52:13+08:00">
+	
+		    Apr 28, 2017
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Autofac/">Autofac</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)</p>
+<a id="more"></a>
+<h2 id="使用容器註冊物件"><a href="#使用容器註冊物件" class="headerlink" title="使用容器註冊物件"></a>使用容器註冊物件</h2><p>為了方便整理，我會先新增 <code>AutofacConfig.cs</code> 放在 App_Start 資料夾裡面， <code>AutofacConfig.cs</code> 則負責註冊。</p>
+<ul>
+<li>安裝 <a href="https://www.nuget.org/packages/Autofac.WebApi2/" title="Autofac.WebAPi2" target="_blank" rel="noopener">Autofac.WebAPi2</a></li>
+<li>先註冊所有 Web API Controller 到 ContainerBuilder</li>
+<li>註冊所有 Controller 要相依的物件，這邊以 IConfiguration 為例子，表示 Controller 建構式注入 IConfiguration 時會取得 Configuration 物件</li>
+<li>開啟 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper()</code><figure class="codeblock codeblock--tabbed"><figcaption><span>AutofacConfig</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AutofacConfig</span></span><br><span class="line">{</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Bootstrapper</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        <span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Get your HttpConfiguration.</span></span><br><span class="line">        <span class="keyword">var</span> config = GlobalConfiguration.Configuration;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Register your Web API controllers.</span></span><br><span class="line">        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// OPTIONAL: Register the Autofac filter provider.</span></span><br><span class="line">        builder.RegisterWebApiFilterProvider(config);</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> container = builder.Build();</span><br><span class="line"></span><br><span class="line">        config.DependencyResolver = <span class="keyword">new</span> AutofacWebApiDependencyResolver(container);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+</li>
+</ul>
+<p>打開 <code>Global.asax.cs</code> 加入 <code>AutofacConfig.Bootstrapper();</code><br><figure class="codeblock codeblock--tabbed"><figcaption><span>Global.asax.cs</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class WebApiApplication : System.Web.HttpApplication</span><br><span class="line">{</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">Application_Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        AreaRegistration.RegisterAllAreas();</span><br><span class="line">        GlobalConfiguration.Configure(WebApiConfig.Register);</span><br><span class="line">        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);</span><br><span class="line">        RouteConfig.RegisterRoutes(RouteTable.Routes);</span><br><span class="line">        BundleConfig.RegisterBundles(BundleTable.Bundles);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 加入這行</span></span><br><span class="line">        AutofacConfig.Bootstrapper();</span><br><span class="line"></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>接下來 Controller 就可以建構式注入 IConfiguration 取得 Configuration 物件<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Controller</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ValuesController</span> : <span class="title">ApiController</span></span><br><span class="line">{</span><br><span class="line">    IConfiguration _configuration;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ValuesController</span>(<span class="params">IConfiguration configuration</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        _configuration = configuration;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="建立-Autofac-Module"><a href="#建立-Autofac-Module" class="headerlink" title="建立 Autofac.Module"></a>建立 Autofac.Module</h2><p>當註冊物件一多的時候，我們可以建立 <code>Aufofac.Module</code> 把註冊這件事情分散在各個 Module 處理。</p>
+<p>例如我建立一個 EFModule ，註冊 Entities。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>EFModule</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class EFModule : Autofac.Module</span><br><span class="line">{</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Load</span>(<span class="params">ContainerBuilder builder</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        builder.RegisterType&lt;WebPaymentEntities&gt;()</span><br><span class="line">           .As&lt;WebPaymentEntities&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>我的 ContainerBuilder 只要註冊 Module 就好<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Register Module</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Bootstrapper</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        <span class="keyword">var</span> builder = <span class="keyword">new</span> ContainerBuilder();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Get your HttpConfiguration.</span></span><br><span class="line">        <span class="keyword">var</span> config = GlobalConfiguration.Configuration;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Register your Web API controllers.</span></span><br><span class="line">        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// OPTIONAL: Register the Autofac filter provider.</span></span><br><span class="line">        builder.RegisterWebApiFilterProvider(config);</span><br><span class="line"></span><br><span class="line">        builder.RegisterType&lt;Configuration&gt;()</span><br><span class="line">           .As&lt;IConfiguration&gt;()</span><br><span class="line">           .InstancePerLifetimeScope();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 註冊 Module</span></span><br><span class="line">        builder.RegisterModule(<span class="keyword">new</span> EFModule());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> container = builder.Build();</span><br><span class="line"></span><br><span class="line">        config.DependencyResolver = <span class="keyword">new</span> AutofacWebApiDependencyResolver(container);</span><br><span class="line">    }</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="一次註冊多個物件"><a href="#一次註冊多個物件" class="headerlink" title="一次註冊多個物件"></a>一次註冊多個物件</h2><p>在寫 MVC 或 Web API 的時候可以常見到 <a href="https://msdn.microsoft.com/en-us/library/ff649690.aspx" title="Repository Pattern" target="_blank" rel="noopener">Repository Pattern</a> 而 Repository Pattern 有一定的命名規格，例如: 介面 <code>IxxxRepository</code> 會對應到一個類別 <code>xxxRepository</code>。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Repository</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ProductRepository</span> : <span class="title">IProductRepository</span></span><br><span class="line">{</span><br><span class="line">    <span class="keyword">private</span> WebPaymentEntities context;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ImportContainerRepository</span>(<span class="params">WebPaymentEntities context</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        <span class="keyword">this</span>.context = context;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>我們就可以用這命名的 Pattern 建立一個 Autofac Module 註冊所有的 Repository</p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Respository Module</span><ul class="tabs"><li class="tab active">cs</li></ul></figcaption><div class="tabs-content"><figure class="highlight cs" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class RepositoryModule : Autofac.Module</span><br><span class="line">{</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Load</span>(<span class="params">ContainerBuilder builder</span>)</span></span><br><span class="line"><span class="function"></span>    {</span><br><span class="line">        builder.RegisterAssemblyTypes(<span class="keyword">typeof</span>(WebApiApplication).Assembly)</span><br><span class="line">               .Where(t =&gt; t.Name.EndsWith(<span class="string">"Repository"</span>))</span><br><span class="line">               .AsImplementedInterfaces()</span><br><span class="line">              .InstancePerLifetimeScope();</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>通常 Autofac 設定一次就很少再設定了，所以沒有研究很深，就先筆記到這邊，等之後需要其他應用的時候，再來詳細閱讀官方文件。</p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><a href="http://autofac.readthedocs.io/en/latest/integration/webapi.html#register-controllers" title="Autofac官方文件" target="_blank" rel="noopener">Autofac 官方文件</a>
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/NET/">.NET</a> <a class="tag tag--primary tag--small t-link" href="/tags/Autofac/">Autofac</a> <a class="tag tag--primary tag--small t-link" href="/tags/C/">C#</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/" data-tooltip="[Angular] 使用 Angular CLI 建立 Angular 專案架構說明" aria-label="PREVIOUS: [Angular] 使用 Angular CLI 建立 Angular 專案架構說明">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/NLog-建置筆記/" data-tooltip="[NLog] NLog 建置筆記" aria-label="NEXT: [NLog] NLog 建置筆記">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/" data-tooltip="[Angular] 使用 Angular CLI 建立 Angular 專案架構說明" aria-label="PREVIOUS: [Angular] 使用 Angular CLI 建立 Angular 專案架構說明">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/NLog-建置筆記/" data-tooltip="[NLog] NLog 建置筆記" aria-label="NEXT: [NLog] NLog 建置筆記">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/';
+                 
+                    this.page.identifier = '2017/04/Autofac-設定-Web-API-Register-Controller-筆記/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

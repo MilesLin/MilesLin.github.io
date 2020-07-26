@@ -1,0 +1,836 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Go] Goroutines 使用 Channel 交換資料 - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Go">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Channel 是能夠讓 goroutines 之間交換資料的機制。 使用 Channel 之前，有兩件事情要先說明，第一是使用 Channel 交換的資料一定有一個型別稱為 element type，第二個則是要有 發送端 以及 接收端。\n\n寫資料到 Channel請參考下方的三點說明與程式碼，介紹如何寫值到 channel\n\n使用 make宣告一個 int 型別的 channel c := make(chan int) \n將 x 的值，寫入到 channel c &lt;- x \n使用 close 關閉 channel ， 這表示 channel 將不能再被寫入。\n\nWrite To Channelgo12345678910111213141516171819package mainimport (\t\"fmt\"\t\"time\")func main() {\tc := make(chan int)\tgo writeToChannel(c, 10)\ttime.Sleep(1 * time.Second)}func writeToChannel(c chan int, x int) {\tfmt.Printf(\"First: %d\", x)\tc &lt;- x\tclose(c)\tfmt.Printf(\"Second: %d\", x)}\n線上範例: https://play.golang.org/p/WAZhKW86_2i\n如果讀者有執行上方程式碼，會發現一件事情，就是只有 First: 10 被列印出來， Second: 10 沒有列印出來。\n這是因為我們使用 c := make(chan int) 宣告 channel ，這表示該 channel 沒有任何暫存區 (Buffered Channels)，所以 channel block c &lt;- x 之後的程式碼，會等待 channel 的值被讀取後才會往下執行。\n\n從 Channel 讀取資料請參考下程式碼，說明如何讀取 channel 的值，而這段程式碼只有一個重點就是，只要把 &lt;- 的位置對調，就可以從 channel 讀值了。Reading from a channelgo12345678910111213141516171819202122package mainimport (\t\"fmt\"\t\"time\")func main() {\tc := make(chan int)\tgo writeToChannel(c, 10)\ttime.Sleep(1 * time.Second)\tv := &lt;- c\tfmt.Println(\"Read:\", v)\ttime.Sleep(1 * time.Second)}func writeToChannel(c chan int, x int) {\tfmt.Println(\"First:\", x)\tc &lt;- x\tclose(c)\tfmt.Println(\"Second:\", x)}線上範例: https://play.golang.org/p/TVzsPsJwBAq\n有執行上方程式碼的會發現，輸出結果的順序是123First: 10Read: 10Second: 10\n這如 從 Channel 讀取資料 段落所說明的，當讀取完值之後，writeToChannel 之後的程式碼才會往下執行。\n讀者可以把 channel 改成有暫存區的 channel，只要在 make chan 後面加上 buffer 的數量 =&gt; c := make(chan int, 1)。 而根據 Buffered Channels 的說明，當 buffer 滿了之後，才會 block 程式碼。 所以改成有暫存區的 channel 之後，因為有 buffer 的關係，程式碼不會 block ，會產生下方順序的輸出。\nFirst: 10Second: 10Read: 10\n\n取得 channel 開關的狀態如下方的程式碼，在取得值的時候，只要宣告第二個參數，就可以得到 channel 是否被 close 的狀態。Get channel statusgo123456v, ok := &lt;-cif ok {\tfmt.Println(\"Channel is open!\")} else {\tfmt.Println(\"Channel is closed!\")}\n讀取 channel 的次數大於寫入 channel 的次數這段落會分成兩種情形來說明，channel 尚未關閉的情形，以及 channel 關閉後的情況。\nChannel 尚未關閉如下方程式碼，只有寫入兩次的值到 channel，但是讀取了三次。Without close channelgo1234567891011121314package mainimport (\t\"fmt\")func main() {\tc := make(chan int, 10)\tc &lt;- 1\tc &lt;- 2\tfmt.Println(&lt;-c)\tfmt.Println(&lt;-c)\tfmt.Println(&lt;-c)}程式範例: https://play.golang.org/p/7wP6R3oo-SS上方的程式碼會出現下方的輸出， deadlock。1234567812fatal error: all goroutines are asleep - deadlock!goroutine 1 [chan receive]:main.main()        D:/Go_Labs/channel_lab/main.go:15 +0x27cexit status 2\n這是因為，第三個接收訊息的程式碼 fmt.Println(&lt;-c) ，一直在等待第三個訊息出現，可是程式碼只有寫入兩次訊息，所以造成 deadlock。\n\nChannel 已關閉這次我在讀取 channel 之前，先把 channel 關閉，如下方程式碼。Close channelgo123456789101112131415package mainimport (\t\"fmt\")func main() {\tc := make(chan int, 10)\tc &lt;- 1\tc &lt;- 2\tclose(c)\tfmt.Println(&lt;-c)\tfmt.Println(&lt;-c)\tfmt.Println(&lt;-c)}範例程式: https://play.golang.org/p/z4kRgs1oHq9上方的程式碼會出現下方的輸出，第三次讀取 channel 的值是 0123120\n這是因為，當 channel 關閉之後，如果讀取次數超過寫入次數，channel 會回傳該型別的預設值，而 int 的預設值就是 0 。\n\n限制 channel 讀取與寫入Channel 可以在 function 傳入的參數指定此 function 只能對 channel 寫入或讀取。\n如下方程式碼的兩個 functions ，writeOnly 與 readOnly，在 function 傳入參數的地方有指定此 function 只能夠有讀取權限或是寫入權限。Read Write onlygo12345678910111213141516171819package mainimport (\t\"fmt\")func main() {\tc := make(chan int, 1)\twriteOnly(c)\treadOnly(c)}func writeOnly(out chan&lt;- int) {\tout &lt;- 10}func readOnly(in &lt;-chan int) {\tfmt.Println(\"Read:\", &lt;-in)}如果在只有讀取權限的 function 裡面寫入 channel 的話，則 GO 編譯會出現錯誤，反之亦然。  錯誤訊息如下方範例:\n123invalid operation: range in (receive from send-only type chan&lt;- int)invalid operation: out &lt;- i (send to receive-only type &lt;-chan int)\n最後要注意的是，close 只能用在有寫入權限的 channel，如果用在只有讀取權限的 channel ，則會造成編譯錯誤 invalid operation: close(out) (cannot close receive-only channel)\n\n資料來源[Mastering Go - Second Edition]\n","dateCreated":"2020-01-25T23:08:34+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-01-25T23:08:34+08:00","description":"Channel 是能夠讓 goroutines 之間交換資料的機制。 使用 Channel 之前，有兩件事情要先說明，第一是使用 Channel 交換的資料一定有一個型別稱為 element type，第二個則是要有 發送端 以及 接收端。","headline":"[Go] Goroutines 使用 Channel 交換資料","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/","keywords":"Go, Goroutine, Channel"}</script>
+    <meta name="description" content="Channel 是能夠讓 goroutines 之間交換資料的機制。 使用 Channel 之前，有兩件事情要先說明，第一是使用 Channel 交換的資料一定有一個型別稱為 element type，第二個則是要有 發送端 以及 接收端。">
+<meta name="keywords" content="Go">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Go] Goroutines 使用 Channel 交換資料">
+<meta property="og:url" content="https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="Channel 是能夠讓 goroutines 之間交換資料的機制。 使用 Channel 之前，有兩件事情要先說明，第一是使用 Channel 交換的資料一定有一個型別稱為 element type，第二個則是要有 發送端 以及 接收端。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-07-23T14:37:19.532Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Go] Goroutines 使用 Channel 交換資料">
+<meta name="twitter:description" content="Channel 是能夠讓 goroutines 之間交換資料的機制。 使用 Channel 之前，有兩件事情要先說明，第一是使用 Channel 交換的資料一定有一個型別稱為 element type，第二個則是要有 發送端 以及 接收端。">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Go] Goroutines 使用 Channel 交換資料
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-01-25T23:08:34+08:00">
+	
+		    Jan 25, 2020
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Go/">Go</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p><a href="https://tour.golang.org/concurrency/2" target="_blank" rel="noopener">Channel</a> 是能夠讓 <a href="https://tour.golang.org/concurrency/1" target="_blank" rel="noopener">goroutines</a> 之間交換資料的機制。 使用 Channel 之前，有兩件事情要先說明，第一是使用 Channel 交換的資料一定有一個型別稱為 <span class="highlight-text primary">element type</span>，第二個則是要有 <span class="highlight-text success">發送端</span> 以及 <span class="highlight-text success">接收端</span>。</p>
+<a id="more"></a>
+<h2 id="寫資料到-Channel"><a href="#寫資料到-Channel" class="headerlink" title="寫資料到 Channel"></a>寫資料到 Channel</h2><p>請參考下方的三點說明與程式碼，介紹如何寫值到 channel</p>
+<ol>
+<li>使用 <code>make</code>宣告一個 int 型別的 channel <code>c := make(chan int)</code> </li>
+<li>將 x 的值，寫入到 channel <code>c &lt;- x</code> </li>
+<li>使用 <code>close</code> 關閉 channel ， 這表示 <span class="highlight-text danger">channel 將不能再被寫入</span>。</li>
+</ol>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>Write To Channel</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"time"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line">	<span class="keyword">go</span> writeToChannel(c, <span class="number">10</span>)</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">writeToChannel</span><span class="params">(c <span class="keyword">chan</span> <span class="keyword">int</span>, x <span class="keyword">int</span>)</span></span> {</span><br><span class="line">	fmt.Printf(<span class="string">"First: %d"</span>, x)</span><br><span class="line">	c &lt;- x</span><br><span class="line">	<span class="built_in">close</span>(c)</span><br><span class="line">	fmt.Printf(<span class="string">"Second: %d"</span>, x)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p><em>線上範例: <a href="https://play.golang.org/p/WAZhKW86_2i" target="_blank" rel="noopener">https://play.golang.org/p/WAZhKW86_2i</a></em></p>
+<p>如果讀者有執行上方程式碼，會發現一件事情，就是只有 <span class="highlight-text primary">First: 10</span> 被列印出來， <span class="highlight-text danger">Second: 10</span> 沒有列印出來。</p>
+<div class="alert danger no-icon"><p>這是因為我們使用 <code>c := make(chan int)</code> 宣告 channel ，這表示該 channel 沒有任何暫存區 <em>(<a href="https://tour.golang.org/concurrency/3" target="_blank" rel="noopener">Buffered Channels</a>)</em>，所以 <a href="https://tour.golang.org/concurrency/2" target="_blank" rel="noopener">channel block</a> <code>c &lt;- x</code> 之後的程式碼，會等待 channel 的值被讀取後才會往下執行。</p>
+</div>
+<h2 id="從-Channel-讀取資料"><a href="#從-Channel-讀取資料" class="headerlink" title="從 Channel 讀取資料"></a>從 Channel 讀取資料</h2><p>請參考下程式碼，說明如何讀取 channel 的值，而這段程式碼只有一個重點就是，只要把 <code>&lt;-</code> 的位置對調，就可以從 channel 讀值了。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Reading from a channel</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"time"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line">	<span class="keyword">go</span> writeToChannel(c, <span class="number">10</span>)</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	v := &lt;- c</span><br><span class="line">	fmt.Println(<span class="string">"Read:"</span>, v)</span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">writeToChannel</span><span class="params">(c <span class="keyword">chan</span> <span class="keyword">int</span>, x <span class="keyword">int</span>)</span></span> {</span><br><span class="line">	fmt.Println(<span class="string">"First:"</span>, x)</span><br><span class="line">	c &lt;- x</span><br><span class="line">	<span class="built_in">close</span>(c)</span><br><span class="line">	fmt.Println(<span class="string">"Second:"</span>, x)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure><br><em>線上範例: <a href="https://play.golang.org/p/TVzsPsJwBAq" target="_blank" rel="noopener">https://play.golang.org/p/TVzsPsJwBAq</a></em></p>
+<p>有執行上方程式碼的會發現，輸出結果的順序是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">First: 10</span><br><span class="line">Read: 10</span><br><span class="line">Second: 10</span><br></pre></td></tr></table></figure></p>
+<p>這如 <a href="#從-Channel-讀取資料">從 Channel 讀取資料</a> 段落所說明的，當讀取完值之後，writeToChannel 之後的程式碼才會往下執行。</p>
+<div class="alert info"><p>讀者可以把 channel 改成有暫存區的 channel，只要在 make chan 後面加上 buffer 的數量 =&gt; <code>c := make(chan int, 1)</code>。 而根據 <a href="https://tour.golang.org/concurrency/3" target="_blank" rel="noopener">Buffered Channels</a> 的說明，<span class="highlight-text warning">當 buffer 滿了之後，才會 block 程式碼</span>。 所以改成有暫存區的 channel 之後，因為有 buffer 的關係，程式碼不會 block ，會產生下方順序的輸出。</p>
+<p>First: 10<br>Second: 10<br>Read: 10</p>
+</div>
+<h2 id="取得-channel-開關的狀態"><a href="#取得-channel-開關的狀態" class="headerlink" title="取得 channel 開關的狀態"></a>取得 channel 開關的狀態</h2><p>如下方的程式碼，在取得值的時候，只要宣告第二個參數，就可以得到 channel 是否被 close 的狀態。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Get channel status</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">v, ok := &lt;-c</span><br><span class="line"><span class="keyword">if</span> ok {</span><br><span class="line">	fmt.Println(<span class="string">"Channel is open!"</span>)</span><br><span class="line">} <span class="keyword">else</span> {</span><br><span class="line">	fmt.Println(<span class="string">"Channel is closed!"</span>)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<h2 id="讀取-channel-的次數大於寫入-channel-的次數"><a href="#讀取-channel-的次數大於寫入-channel-的次數" class="headerlink" title="讀取 channel 的次數大於寫入 channel 的次數"></a>讀取 channel 的次數大於寫入 channel 的次數</h2><p>這段落會分成兩種情形來說明，channel 尚未關閉的情形，以及 channel 關閉後的情況。</p>
+<h4 id="Channel-尚未關閉"><a href="#Channel-尚未關閉" class="headerlink" title="Channel 尚未關閉"></a>Channel 尚未關閉</h4><p>如下方程式碼，只有寫入兩次的值到 channel，但是讀取了三次。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Without close channel</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">10</span>)</span><br><span class="line">	c &lt;- <span class="number">1</span></span><br><span class="line">	c &lt;- <span class="number">2</span></span><br><span class="line">	fmt.Println(&lt;-c)</span><br><span class="line">	fmt.Println(&lt;-c)</span><br><span class="line">	fmt.Println(&lt;-c)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure><br><em>程式範例: <a href="https://play.golang.org/p/7wP6R3oo-SS" target="_blank" rel="noopener">https://play.golang.org/p/7wP6R3oo-SS</a></em><br>上方的程式碼會出現下方的輸出， <span class="highlight-text danger">deadlock</span>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">fatal error: all goroutines are asleep - deadlock!</span><br><span class="line"></span><br><span class="line">goroutine 1 [chan receive]:</span><br><span class="line">main.main()</span><br><span class="line">        D:/Go_Labs/channel_lab/main.go:15 +0x27c</span><br><span class="line">exit status 2</span><br></pre></td></tr></table></figure></p>
+<div class="alert warning"><p>這是因為，第三個接收訊息的程式碼 <code>fmt.Println(&lt;-c)</code> ，一直在等待第三個訊息出現，可是程式碼只有寫入兩次訊息，所以造成 deadlock。</p>
+</div>
+<h4 id="Channel-已關閉"><a href="#Channel-已關閉" class="headerlink" title="Channel 已關閉"></a>Channel 已關閉</h4><p>這次我在讀取 channel 之前，先把 channel 關閉，如下方程式碼。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Close channel</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">10</span>)</span><br><span class="line">	c &lt;- <span class="number">1</span></span><br><span class="line">	c &lt;- <span class="number">2</span></span><br><span class="line">	<span class="built_in">close</span>(c)</span><br><span class="line">	fmt.Println(&lt;-c)</span><br><span class="line">	fmt.Println(&lt;-c)</span><br><span class="line">	fmt.Println(&lt;-c)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure><br><em>範例程式: <a href="https://play.golang.org/p/z4kRgs1oHq9" target="_blank" rel="noopener">https://play.golang.org/p/z4kRgs1oHq9</a></em><br>上方的程式碼會出現下方的輸出，第三次讀取 channel 的值是 <span class="highlight-text danger">0</span><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">0</span><br></pre></td></tr></table></figure></p>
+<div class="alert info"><p>這是因為，當 channel 關閉之後，如果讀取次數超過寫入次數，channel 會回傳該型別的預設值，而 int 的預設值就是 0 。</p>
+</div>
+<h2 id="限制-channel-讀取與寫入"><a href="#限制-channel-讀取與寫入" class="headerlink" title="限制 channel 讀取與寫入"></a>限制 channel 讀取與寫入</h2><p>Channel 可以在 function 傳入的參數指定此 function 只能對 channel 寫入或讀取。</p>
+<p>如下方程式碼的兩個 functions ，<code>writeOnly</code> 與 <code>readOnly</code>，在 function 傳入參數的地方有指定此 function 只能夠有讀取權限或是寫入權限。<br><figure class="codeblock codeblock--tabbed"><figcaption><span>Read Write only</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">1</span>)</span><br><span class="line">	writeOnly(c)</span><br><span class="line">	readOnly(c)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">writeOnly</span><span class="params">(out <span class="keyword">chan</span>&lt;- <span class="keyword">int</span>)</span></span> {</span><br><span class="line">	out &lt;- <span class="number">10</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">readOnly</span><span class="params">(in &lt;-<span class="keyword">chan</span> <span class="keyword">int</span>)</span></span> {</span><br><span class="line">	fmt.Println(<span class="string">"Read:"</span>, &lt;-in)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure><br>如果在只有讀取權限的 function 裡面寫入 channel 的話，則 GO 編譯會出現錯誤，反之亦然。  錯誤訊息如下方範例:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">invalid operation: range in (receive from send-only type chan&lt;- int)</span><br><span class="line"></span><br><span class="line">invalid operation: out &lt;- i (send to receive-only type &lt;-chan int)</span><br></pre></td></tr></table></figure>
+<div class="alert danger no-icon"><p>最後要注意的是，<code>close</code> 只能用在有寫入權限的 channel，如果用在只有讀取權限的 channel ，則會造成編譯錯誤 <span class="highlight-text danger">invalid operation: close(out) (cannot close receive-only channel)</span></p>
+</div>
+<h3 id="資料來源"><a href="#資料來源" class="headerlink" title="資料來源"></a>資料來源</h3><p>[<a href="https://subscription.packtpub.com/book/programming/9781838559335/9/ch09lvl1sec122/channels" title="Mastering Go - Second Edition" target="_blank" rel="noopener">Mastering Go - Second Edition</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Channel/">Channel</a> <a class="tag tag--primary tag--small t-link" href="/tags/Go/">Go</a> <a class="tag tag--primary tag--small t-link" href="/tags/Goroutine/">Goroutine</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/02/Golang/Channel-練習題，列出質數/" data-tooltip="[Go] Channel 練習題，列出質數" aria-label="PREVIOUS: [Go] Channel 練習題，列出質數">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/Golang/Go-產生不同平台的執行檔/" data-tooltip="[Go] Go 產生不同平台的執行檔" aria-label="NEXT: [Go] Go 產生不同平台的執行檔">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/02/Golang/Channel-練習題，列出質數/" data-tooltip="[Go] Channel 練習題，列出質數" aria-label="PREVIOUS: [Go] Channel 練習題，列出質數">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/Golang/Go-產生不同平台的執行檔/" data-tooltip="[Go] Go 產生不同平台的執行檔" aria-label="NEXT: [Go] Go 產生不同平台的執行檔">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                97 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2020/01/Golang/Goroutines-使用-Channel-交換資料/';
+                 
+                    this.page.identifier = '2020/01/Golang/Goroutines-使用-Channel-交換資料/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>
