@@ -1,0 +1,888 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Go] 為什麼 Pointer Receiver 不能使用 Value Type 賦值給 Interface Value - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Go">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"當實作某一個介面的方法的時候，會視是否要 shared state 來決定要用 Pointer Receiver 還是 Value Receiver。  而使用 Pointer Receiver  的時候，會發現不能使用 Value Type 傳給 Interface Value，會出現下面這樣的錯誤。 \nCannot use ‘u’ (type user) as type notifier Type does not implement ‘notifier’ as ‘notify’ method has a Pointer Receiver\n\n但是使用 Value Receiver 卻兩種都可以傳，這是為什麼呢?\n\n例如下圖所示，使用 Value Receiver 可以使用 Pointer Type 與 Value Type。Value Receiver使用 Pointer Receiver 只能使用 Pointer Type 而已。 使用 Value Type 就會出現編譯錯誤。Pointer Receiver\n詞彙說明因為學習 Go 的中文資源不多，此篇的內容也都是參考原文，很多詞彙不知道怎麼翻成中文，所以我先說明比較無法理解的英文詞彙。\n\n\n\n詞彙\n說明\n\n\n\n\nUser-Defined Type\n像是 type user struct{} 或是 type myint int ，這些都算是 User-Defined Type 。\n\n\nMethod Sets\n定義在 User-Defined Type 上的多個方法，如: func (u user) pretty() string {...}\n\n\nPointer Receiver\n使用 Pointer 當作 Method 的 Receiver 如:func (u *user) pretty() string {...}\n\n\nValue Receiver\n使用 Value 當作 Method 的 Receiver 如:func (u user) pretty() string {...}\n\n\nValue Type\n使用 Value 的宣告方式，如: u := user{}\n\n\nPointer Type\n使用 Pointer 的宣告方式，如: u := &amp;user{}\n\n\nInterface Value\n宣告成介面的變數，例如範例中 notifier 是介面，而 n 就是 Interface Value var n notifier\n\n\n\n介面(Interface) 運作機制首先我們要先了解介面的運作機制。 介面是用來定義行為的一種 type，而你可以定義一個 User-Defined Type  實作介面定義好的行為(method)。 當你 assign User-Defined Type 給 Interface Value，Interface Value 會有兩個區塊用來紀錄 Stored Value 和 User-Defined Type info。 而 assign Value Type to Interface Value 跟 assign Pointer Type to Interface Value 紀錄的東西不太一樣。\nInterface Value 會有兩區塊用來儲存資料，第一個區塊用來儲存叫做 iTable 的位址，而 iTable 儲存 User-Defined Type 的資訊和跟此介面有關聯的 Method Sets。 第二個區塊也是一個位址指向 Stored Value。 如下圖 assign Value Type 給 Interface Value 的資料示意圖。Ref: Go in Action\n下圖是 assign Pointer Type 給 Interface Value 的資料示意圖。 跟上一張圖的差別是 iTable 是儲存指標的 type info。Ref: Go in Action\n當 Interface Value 執行方法時，就是用儲存於 Intreface Value 那兩區塊的資訊來執行方法。\n\nMethod Sets從上述的說明，知道 Interface Value 執行的方法的機制後，接下來就是要了解為什麼 Method Sets 在使用 Pointer Receiver 實作介面後，在執行方法的內部運作機制。\n接下來請看下列程式碼，我使用 Pointer Receiver 定義介面的方法，用 Value Type assign 給介面後，產生最開頭說到的編譯錯誤的情境。 (線上範例 https://play.golang.org/p/ojGulwuKZqo)\nfail to compilego1234567891011121314151617181920212223package mainimport \"fmt\"type notifier interface {\tnotify()}type user struct {\tname  string\temail string}func (u *user) notify() {\tfmt.Printf(\"Sending user email to %s&lt;%s&gt;\\n\",\t\tu.name,\t\tu.email)}func main() {\tu := user{}\tvar n notifier = u}\n我們接著看 Go 語言的規格書，裡面有提到一個規格。Method SetsA type may have a method set associated with it. The method set of an interface type is its interface.  The method set of any other type T consists of all methods declared with receiver type T. The method set of the corresponding Pointer Type T is the set of all methods declared with receiver T or T (that is, it also contains the method set of T). Further rules apply to structs containing embedded fields, as described in the section on struct types. Any other type has an empty method set. In a method set, each method must have a unique non-blank method name.\nThe method set of a type determines the interfaces that the type implements and the methods that can be called using a receiver of that type.\ngolang.orgThe Go Programming Language Specification - Method Sets\n上面畫起來的重點，就如下列的 table 的說明。 如果你是用 Pointer Receiver 實作介面，則只有 Pointer 實作該介面。 如果是用 Value Receiver 實作介面，則 Value Type 與 Pointer Type 都有實作該介面。\n\n\n\nMethods Receivers\nValues\n\n\n\n\n(t T)\nT and *T\n\n\n(t *T)\n*T\n\n\n\n為什麼會有這種規格限制呢?根據我參考 Go in Action - 5.4.3 Method Sets 的說明，書上說:「並不是每一次都可以從 Value 取得 位址」。 例如下面程式碼， 會出現 cannot take the address of duration(40) 的編譯錯誤。 (線上範例 https://play.golang.org/p/aas5NLV4dTg )\ncannot get addressgo123456789101112131415package mainimport \"fmt\"type duration intfunc (d *duration) pretty() string {\treturn fmt.Sprintf(\"Duration: %d\", d)}func main() {\t// cannot call pointer method on duration(40)\t// cannot take the address of duration(40)\tduration(40).pretty()}\n小結雖然在使用上就知道結論是 Pointer Receiver 只能傳 Pointer Type 給介面，使用 Value Receiver 兩種都可以。  但是為了搞清楚為什麼會有這種規格，我也參考了很多書籍才得出這樣的原因，但是還是沒找到什麼 無法取的位址 的原因，算是這篇的遺憾。 如果有人知道為什麼，歡迎在下面留言告知我。 或者是有推薦的英文翻譯成中文的詞彙也可以留言告訴我!!!\n參考來源[Go in Action][The Go Programming Language Specification][Mastering Go - Second Edition][The Way to Go: A Thorough Introduction to the Go Programming Language][Why can't I get the address of a type conversion in Go?]\n","dateCreated":"2020-08-01T15:09:32+08:00","dateModified":"2020-08-02T01:21:38+08:00","datePublished":"2020-08-01T15:09:32+08:00","description":"當實作某一個介面的方法的時候，會視是否要 shared state 來決定要用 Pointer Receiver 還是 Value Receiver。  而使用 Pointer Receiver  的時候，會發現不能使用 Value Type 傳給 Interface Value，會出現下面這樣的錯誤。 \nCannot use ‘u’ (type user) as type notifier Type does not implement ‘notifier’ as ‘notify’ method has a Pointer Receiver\n\n但是使用 Value Receiver 卻兩種都可以傳，這是為什麼呢?","headline":"[Go] 為什麼 Pointer Receiver 不能使用 Value Type 賦值給 Interface Value","image":["gopher-std.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/","keywords":"Go","thumbnailUrl":"gopher-std.png"}</script>
+    <meta name="description" content="當實作某一個介面的方法的時候，會視是否要 shared state 來決定要用 Pointer Receiver 還是 Value Receiver。  而使用 Pointer Receiver  的時候，會發現不能使用 Value Type 傳給 Interface Value，會出現下面這樣的錯誤。  Cannot use ‘u’ (type user) as type notifier Ty">
+<meta name="keywords" content="Go">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Go] 為什麼 Pointer Receiver 不能使用 Value Type 賦值給 Interface Value">
+<meta property="og:url" content="https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="當實作某一個介面的方法的時候，會視是否要 shared state 來決定要用 Pointer Receiver 還是 Value Receiver。  而使用 Pointer Receiver  的時候，會發現不能使用 Value Type 傳給 Interface Value，會出現下面這樣的錯誤。  Cannot use ‘u’ (type user) as type notifier Ty">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/value-receiver.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/pointer-receiver.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/interface-value-type.jpg">
+<meta property="og:image" content="https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/interface-pointer.jpg">
+<meta property="og:updated_time" content="2020-08-01T17:21:38.490Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Go] 為什麼 Pointer Receiver 不能使用 Value Type 賦值給 Interface Value">
+<meta name="twitter:description" content="當實作某一個介面的方法的時候，會視是否要 shared state 來決定要用 Pointer Receiver 還是 Value Receiver。  而使用 Pointer Receiver  的時候，會發現不能使用 Value Type 傳給 Interface Value，會出現下面這樣的錯誤。  Cannot use ‘u’ (type user) as type notifier Ty">
+<meta name="twitter:image" content="https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/value-receiver.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+        <meta property="og:image" content="https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/gopher-std.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/gopher-std.png" />
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Go] 為什麼 Pointer Receiver 不能使用 Value Type 賦值給 Interface Value
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-08-01T15:09:32+08:00">
+	
+		    Aug 01, 2020
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Go/">Go</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>當實作某一個介面的方法的時候，會視是否要 <strong>shared state</strong> 來決定要用 <span class="highlight-text primary">Pointer Receiver</span> 還是 <span class="highlight-text success">Value Receiver</span>。  而使用 <span class="highlight-text primary">Pointer Receiver </span> 的時候，會發現不能使用 <span class="highlight-text blue">Value Type</span> 傳給 <span class="highlight-text purple">Interface Value</span>，會出現下面這樣的錯誤。 </p>
+<div class="alert no-icon danger"><p>Cannot use ‘u’ (type user) as type notifier Type does not implement ‘notifier’ as ‘notify’ method has a Pointer Receiver</p>
+</div>
+<p>但是使用 <span class="highlight-text success">Value Receiver</span> 卻兩種都可以傳，這是為什麼呢?</p>
+<a id="more"></a>
+<p>例如下圖所示，使用 <span class="highlight-text success">Value Receiver</span> 可以使用 <span class="highlight-text" style="background-color:#03dffc;">Pointer Type</span> 與 <span class="highlight-text blue">Value Type</span>。<br><div class="figure center" style="width:;"><a class="fancybox" href="value-receiver.jpg" title="Value Receiver" data-caption="Value Receiver" data-fancybox="default"><img class="fig-img" src="value-receiver.jpg" alt="Value Receiver"></a><span class="caption">Value Receiver</span></div><br>使用 <span class="highlight-text primary">Pointer Receiver</span> 只能使用 <span class="highlight-text" style="background-color:#03dffc;">Pointer Type</span> 而已。 使用 <span class="highlight-text blue">Value Type</span> 就會出現編譯錯誤。<br><div class="figure center" style="width:;"><a class="fancybox" href="pointer-receiver.jpg" title="Pointer Receiver" data-caption="Pointer Receiver" data-fancybox="default"><img class="fig-img" src="pointer-receiver.jpg" alt="Pointer Receiver"></a><span class="caption">Pointer Receiver</span></div></p>
+<h2 id="詞彙說明"><a href="#詞彙說明" class="headerlink" title="詞彙說明"></a>詞彙說明</h2><p>因為學習 Go 的中文資源不多，此篇的內容也都是參考原文，很多詞彙不知道怎麼翻成中文，所以我先說明比較無法理解的英文詞彙。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">詞彙</th>
+<th style="text-align:left">說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">User-Defined Type</td>
+<td style="text-align:left">像是 <code>type user struct{}</code> 或是 <code>type myint int</code> ，這些都算是 User-Defined Type 。</td>
+</tr>
+<tr>
+<td style="text-align:left">Method Sets</td>
+<td style="text-align:left">定義在 User-Defined Type 上的多個方法，如: <code>func (u user) pretty() string {...}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class="highlight-text primary">Pointer Receiver</span></td>
+<td style="text-align:left">使用 Pointer 當作 Method 的 Receiver 如:<code>func (u *user) pretty() string {...}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class="highlight-text success">Value Receiver</span></td>
+<td style="text-align:left">使用 Value 當作 Method 的 Receiver 如:<code>func (u user) pretty() string {...}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class="highlight-text blue">Value Type</span></td>
+<td style="text-align:left">使用 Value 的宣告方式，如: <code>u := user{}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class="highlight-text" style="background-color:#03dffc;">Pointer Type</span></td>
+<td style="text-align:left">使用 Pointer 的宣告方式，如: <code>u := &amp;user{}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class="highlight-text purple">Interface Value</span></td>
+<td style="text-align:left">宣告成介面的變數，例如範例中 notifier 是介面，而 <strong>n</strong> 就是 <span class="highlight-text purple">Interface Value</span> <code>var n notifier</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="介面-Interface-運作機制"><a href="#介面-Interface-運作機制" class="headerlink" title="介面(Interface) 運作機制"></a>介面(Interface) 運作機制</h2><p>首先我們要先了解介面的運作機制。 介面是用來定義行為的一種 type，而你可以定義一個 User-Defined Type  實作介面定義好的行為(method)。 當你 assign User-Defined Type 給 <span class="highlight-text purple">Interface Value</span>，<span class="highlight-text purple">Interface Value</span> 會有兩個區塊用來紀錄 Stored Value 和 User-Defined Type info。 而 assign <span class="highlight-text blue">Value Type</span> to <span class="highlight-text purple">Interface Value</span> 跟 assign <span class="highlight-text" style="background-color:#03dffc;">Pointer Type</span> to <span class="highlight-text purple">Interface Value</span> 紀錄的東西不太一樣。</p>
+<span class="highlight-text purple">Interface Value</span> 會有兩區塊用來儲存資料，第一個區塊用來儲存叫做 <code>iTable</code> 的位址，而 <code>iTable</code> 儲存 User-Defined Type 的資訊和跟此介面有關聯的 Method Sets。 第二個區塊也是一個位址指向 Stored Value。 如下圖 assign <span class="highlight-text blue">Value Type</span> 給 <span class="highlight-text purple">Interface Value</span> 的資料示意圖。<br><div class="figure center" style="width:;"><a class="fancybox" href="interface-value-type.jpg" title="Ref: Go in Action" data-caption="Ref: Go in Action" data-fancybox="default"><img class="fig-img" src="interface-value-type.jpg" alt="Ref: Go in Action"></a><span class="caption">Ref: Go in Action</span></div>
+<p>下圖是 assign <span class="highlight-text" style="background-color:#03dffc;">Pointer Type</span> 給 <span class="highlight-text purple">Interface Value</span> 的資料示意圖。 跟上一張圖的差別是 <code>iTable</code> 是儲存指標的 type info。<br><div class="figure center" style="width:;"><a class="fancybox" href="interface-pointer.jpg" title="Ref: Go in Action" data-caption="Ref: Go in Action" data-fancybox="default"><img class="fig-img" src="interface-pointer.jpg" alt="Ref: Go in Action"></a><span class="caption">Ref: Go in Action</span></div></p>
+<div class="alert info"><p>當 <span class="highlight-text purple">Interface Value</span> 執行方法時，就是用儲存於 <span class="highlight-text purple">Intreface Value</span> 那兩區塊的資訊來執行方法。</p>
+</div>
+<h2 id="Method-Sets"><a href="#Method-Sets" class="headerlink" title="Method Sets"></a>Method Sets</h2><p>從上述的說明，知道 <span class="highlight-text purple">Interface Value</span> 執行的方法的機制後，接下來就是要了解為什麼 Method Sets 在使用 <span class="highlight-text primary">Pointer Receiver</span> 實作介面後，在執行方法的內部運作機制。</p>
+<p>接下來請看下列程式碼，我使用 <span class="highlight-text primary">Pointer Receiver</span> 定義介面的方法，用 <span class="highlight-text blue">Value Type</span> assign 給介面後，產生最開頭說到的編譯錯誤的情境。 <em>(線上範例 <a href="https://play.golang.org/p/ojGulwuKZqo" target="_blank" rel="noopener">https://play.golang.org/p/ojGulwuKZqo</a>)</em></p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>fail to compile</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> notifier <span class="keyword">interface</span> {</span><br><span class="line">	notify()</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> user <span class="keyword">struct</span> {</span><br><span class="line">	name  <span class="keyword">string</span></span><br><span class="line">	email <span class="keyword">string</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(u *user)</span> <span class="title">notify</span><span class="params">()</span></span> {</span><br><span class="line">	fmt.Printf(<span class="string">"Sending user email to %s&lt;%s&gt;\n"</span>,</span><br><span class="line">		u.name,</span><br><span class="line">		u.email)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	u := user{}</span><br><span class="line">	<span class="keyword">var</span> n notifier = u</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<p>我們接著看 Go 語言的規格書，裡面有提到一個規格。<br><blockquote><p><strong>Method Sets</strong><br>A type may have a method set associated with it. The method set of an interface type is its interface.  <span class="highlight-text warning">The method set of any other type T consists of all methods declared with receiver type T.</span> <span class="highlight-text warning">The method set of the corresponding Pointer Type <em>T is the set of all methods declared with receiver </em>T or T (that is, it also contains the method set of T).</span> Further rules apply to structs containing embedded fields, as described in the section on struct types. Any other type has an empty method set. In a method set, each method must have a unique non-blank method name.</p>
+<p>The method set of a type determines the interfaces that the type implements and the methods that can be called using a receiver of that type.</p>
+<footer><strong>golang.org</strong><cite><a href="https://golang.org/ref/spec#Method_sets" target="_blank" rel="noopener">The Go Programming Language Specification - Method Sets</a></cite></footer></blockquote></p>
+<p>上面畫起來的重點，就如下列的 table 的說明。 如果你是用 <span class="highlight-text primary">Pointer Receiver</span> 實作介面，則只有 Pointer 實作該介面。 如果是用 <span class="highlight-text success">Value Receiver</span> 實作介面，則 <span class="highlight-text blue">Value Type</span> 與 <span class="highlight-text" style="background-color:#03dffc;">Pointer Type</span> 都有實作該介面。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Methods Receivers</th>
+<th style="text-align:center">Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">(t T)</td>
+<td style="text-align:center">T and *T</td>
+</tr>
+<tr>
+<td style="text-align:center">(t *T)</td>
+<td style="text-align:center">*T</td>
+</tr>
+</tbody>
+</table>
+<h2 id="為什麼會有這種規格限制呢"><a href="#為什麼會有這種規格限制呢" class="headerlink" title="為什麼會有這種規格限制呢?"></a>為什麼會有這種規格限制呢?</h2><p>根據我參考 <a href="https://sample.com" title="Go in Action" target="_blank" rel="noopener">Go in Action - 5.4.3 Method Sets</a> 的說明，書上說:「並不是每一次都可以從 Value 取得 位址」。 例如下面程式碼， 會出現 <span class="highlight-text danger">cannot take the address of duration(40)</span> 的編譯錯誤。 <em>(線上範例 <a href="https://play.golang.org/p/aas5NLV4dTg" target="_blank" rel="noopener">https://play.golang.org/p/aas5NLV4dTg</a> )</em></p>
+<figure class="codeblock codeblock--tabbed"><figcaption><span>cannot get address</span><ul class="tabs"><li class="tab active">go</li></ul></figcaption><div class="tabs-content"><figure class="highlight go" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> duration <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d *duration)</span> <span class="title">pretty</span><span class="params">()</span> <span class="title">string</span></span> {</span><br><span class="line">	<span class="keyword">return</span> fmt.Sprintf(<span class="string">"Duration: %d"</span>, d)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> {</span><br><span class="line">	<span class="comment">// cannot call pointer method on duration(40)</span></span><br><span class="line">	<span class="comment">// cannot take the address of duration(40)</span></span><br><span class="line">	duration(<span class="number">40</span>).pretty()</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure></div></figure>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>雖然在使用上就知道結論是 <span class="highlight-text primary">Pointer Receiver</span> 只能傳 <span class="highlight-text" style="background-color:#03dffc;">Pointer Type</span> 給介面，使用 <span class="highlight-text success">Value Receiver</span> 兩種都可以。  但是為了搞清楚為什麼會有這種規格，我也參考了很多書籍才得出這樣的原因，但是還是沒找到什麼 <strong>無法取的位址</strong> 的原因，算是這篇的遺憾。 如果有人知道為什麼，歡迎在下面留言告知我。 或者是有推薦的英文翻譯成中文的詞彙也可以留言告訴我!!!</p>
+<h3 id="參考來源"><a href="#參考來源" class="headerlink" title="參考來源"></a>參考來源</h3><p>[<a href="https://www.manning.com/books/go-in-action" title="Go in Action" target="_blank" rel="noopener">Go in Action</a>]<br>[<a href="https://golang.org/ref/spec" title="The Go Programming Language Specification" target="_blank" rel="noopener">The Go Programming Language Specification</a>]<br>[<a href="https://www.packtpub.com/programming/mastering-go-second-edition" title="Mastering Go - Second Edition" target="_blank" rel="noopener">Mastering Go - Second Edition</a>]<br>[<a href="https://books.google.com.tw/books/about/The_Way_to_Go.html?id=Sxss1kQxfP0C&redir_esc=y" title="The Way to Go: A Thorough Introduction to the Go Programming Language" target="_blank" rel="noopener">The Way to Go: A Thorough Introduction to the Go Programming Language</a>]<br>[<a href="https://stackoverflow.com/questions/49270700/in-golang-why-an-interface-variable-can-get-address-of-a-struct-variable-but-can" title="Why can't I get the address of a type conversion in Go?" target="_blank" rel="noopener">Why can't I get the address of a type conversion in Go?</a>]</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Go/">Go</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/07/Golang/gorilla-sessions/" data-tooltip="[Go] Gorilla Sessions" aria-label="NEXT: [Go] Gorilla Sessions">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/07/Golang/gorilla-sessions/" data-tooltip="[Go] Gorilla Sessions" aria-label="NEXT: [Go] Gorilla Sessions">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                98 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/';
+                 
+                    this.page.identifier = '2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

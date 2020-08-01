@@ -225,6 +225,59 @@
             <div class="postShorten-header">
                 <h1 class="postShorten-title">
                     
+                        <a class="link-unstyled" href="/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/">
+                            [Go] 為什麼 Pointer Receiver 不能使用 Value Type 賦值給 Interface Value
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2020-08-01T15:09:32+08:00">
+	
+		    Aug 01, 2020
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Go/">Go</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-excerpt">
+                    <p>當實作某一個介面的方法的時候，會視是否要 <strong>shared state</strong> 來決定要用 <span class="highlight-text primary">Pointer Receiver</span> 還是 <span class="highlight-text success">Value Receiver</span>。  而使用 <span class="highlight-text primary">Pointer Receiver </span> 的時候，會發現不能使用 <span class="highlight-text blue">Value Type</span> 傳給 <span class="highlight-text purple">Interface Value</span>，會出現下面這樣的錯誤。 </p>
+<div class="alert no-icon danger"><p>Cannot use ‘u’ (type user) as type notifier Type does not implement ‘notifier’ as ‘notify’ method has a Pointer Receiver</p>
+</div>
+<p>但是使用 <span class="highlight-text success">Value Receiver</span> 卻兩種都可以傳，這是為什麼呢?</p>
+                    
+                        <a href="/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/" class="postShorten-excerpt_link link">
+                            Continue reading
+                        </a>
+                        
+                    
+                </div>
+            
+        </div>
+        
+            <a href="/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/">
+                <div class="postShorten-thumbnailimg">
+                    <img alt src="https://mileslin.github.io/2020/08/Golang/為什麼-Pointer-Receiver-不能使用-Value-Type-賦值給-Interface-Value/gopher-std.png">
+                </div>
+            </a>
+            
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-right">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
                         <a class="link-unstyled" href="/2020/07/Golang/gorilla-sessions/">
                             [Go] Gorilla Sessions
                         </a>
@@ -611,49 +664,6 @@
         
     </article>
     
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/2020/03/Golang/在-gRPC-建立-TLS-加密通道/">
-                            [Go] 在 gRPC 建立 TLS 加密通道
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2020-03-29T13:41:33+08:00">
-	
-		    Mar 29, 2020
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Go/">Go</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <p>今天會接續 <a href="https://mileslin.github.io/2020/03/Golang/%E7%94%A8-GO-%E5%BB%BA%E7%AB%8B-gRPC-%E7%9A%84-Server-%E8%88%87-Client/" title="[Go] 用 Go 建立 gRPC 的 Server 與 Client">[Go] 用 Go 建立 gRPC 的 Server 與 Client</a> 的範例，將 Server/Client 之間加入 TLS 加密通道。</p>
-                    
-                        <a href="/2020/03/Golang/在-gRPC-建立-TLS-加密通道/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
     <div class="pagination-bar">
     <ul class="pagination">
         
@@ -665,7 +675,7 @@
             </a>
           </li>
         
-        <li class="pagination-number">page 1 of 2</li>
+        <li class="pagination-number">page 1 of 3</li>
     </ul>
 </div>
 
@@ -965,7 +975,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                97 posts found
+                98 posts found
             </p>
         </div>
     </div>

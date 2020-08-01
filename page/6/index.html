@@ -224,6 +224,51 @@
             <div class="postShorten-header">
                 <h1 class="postShorten-title">
                     
+                        <a class="link-unstyled" href="/2019/03/Protractor-element-click-注意事項/">
+                            [自動化測試] Protractor element.click() 注意事項
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2019-03-25T17:44:12+08:00">
+	
+		    Mar 25, 2019
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/自動化測試/">自動化測試</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-excerpt">
+                    <p>前幾天 Protractor 的課程終於上完了，有學員就馬上在自己的網站上練習 E2E 的自動化測試。  寫了下方的程式碼<br><figure class="codeblock codeblock--tabbed"><figcaption><span>failed test</span><ul class="tabs"><li class="tab active">ts</li></ul></figcaption><div class="tabs-content"><figure class="highlight ts" style="display: block;"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">it(<span class="string">'should click the link'</span>, <span class="keyword">async</span> () =&gt; {</span><br><span class="line">  <span class="keyword">await</span> browser.waitForAngularEnabled(<span class="literal">false</span>);</span><br><span class="line">  <span class="keyword">await</span> browser.get(<span class="string">'https://xxx.sample.com/#/'</span>);</span><br><span class="line">  <span class="keyword">const</span> link = element(by.className(<span class="string">'anticon-down'</span>));</span><br><span class="line">  <span class="keyword">const</span> linkIsEnabled = EC.elementToBeClickable(link);</span><br><span class="line">  <span class="comment">// 點擊連結之前，先確認連結能被點擊!!!</span></span><br><span class="line">  <span class="keyword">await</span> browser.wait(linkIsEnabled, <span class="number">10000</span>);</span><br><span class="line">  <span class="keyword">await</span> link.click();</span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure></div></figure></p>
+<p>這程式碼看起來合情合理，結果在 <code>link.click()</code> 出現錯誤。  錯誤訊息大概是呈現這樣子。<br><span class="highlight-text danger"> 
+Failed: unknown error: Element < i class="anticon-down">< / i > is not clickable at point (165, 720). Other element would receive the click: < div class="Loader__foreground" style="display: table; width: 100%; height: 100%; text-align: center; z-index: 20; color: white;">...< /div></span></p>
+                    
+                        <a href="/2019/03/Protractor-element-click-注意事項/" class="postShorten-excerpt_link link">
+                            Continue reading
+                        </a>
+                        
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-right">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
                         <a class="link-unstyled" href="/2017/08/Template-Driven-動態加入驗證屬性注意事項/">
                             [Angular] Template-Driven 動態加入驗證屬性注意事項
                         </a>
@@ -656,56 +701,6 @@
         
     </article>
     
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/2017/07/Command-Line-筆記-遠端複製與壓縮/">
-                            [cmd] Command Line 筆記-遠端複製與壓縮
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2017-07-11T17:34:08+08:00">
-	
-		    Jul 11, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/cmd/">cmd</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <p>最近為了將的壓縮、解壓縮、遠端連線硬碟、複製貼上等等的繁瑣的事情寫成 bat 檔案，花了很多時間。  所以就來記錄一下，用 command line 自動化的功能。</p>
-<ul>
-<li>刪除整個資料夾、刪除單一檔案</li>
-<li>使用 msbuild 建立佈署檔案</li>
-<li>複製遠端硬碟的檔案、複製貼上整個資夾並自動取代現有檔案</li>
-<li>使用 PowerShell 壓縮與解壓縮檔案</li>
-<li>檢查檔案是否存在，並且執行不同指令</li>
-</ul>
-                    
-                        <a href="/2017/07/Command-Line-筆記-遠端複製與壓縮/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
     <div class="pagination-bar">
     <ul class="pagination">
         
@@ -1023,7 +1018,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                97 posts found
+                98 posts found
             </p>
         </div>
     </div>
