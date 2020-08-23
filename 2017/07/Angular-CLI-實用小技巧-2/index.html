@@ -17,7 +17,7 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"\n建立元件與檔案 (service,class,interface ….)\n建立檔案時指令的預設值設定\n\n\n建立 Component 小技巧ng g c &lt; options &gt;\n\n\n\n\nOptions\nAlias\nDescription\n\n\n\n\n--flat\n\n不要建立 Component 資料夾\n\n\n--inline-template\n-it\n不會建立 .html，將 html template 寫在 .ts file\n\n\n--inline-style\n-is\n不會建立 .css，將 style 寫在 .ts file\n\n\n--spec false\n\n不會建立 .spec\n\n\n--prefix my\n\nselector 加上 my prefix. ex: my-pet instead of app-pet\n\n\n--dry-run\n-d\n顯示那些檔案會新增跟那些檔案會變更\n\n\n\n建立 Service 小技巧此功能也能用在建立 Component 上新增 service 並自動加入指定 module providersng g s my-service -m app.module\n\n建立 Classes, Interfaces, Enums 小技巧在 models 底下建立 classng g cl models/customer\n\n在 models 底下建立 interfaceng g i models/person\n\n在 models 底下建立 enumng g e models/gender\n\n建立預設值(超好用)此設定會寫在 .angular-cli.json 底下 defautls 區塊\n建立 component 時候，自動不產生 .specng set defaults.component.spec false\n\n","dateCreated":"2017-07-04T23:26:07+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-07-04T23:26:07+08:00","description":"\n建立元件與檔案 (service,class,interface ….)\n建立檔案時指令的預設值設定\n","headline":"[Angular] Angular CLI 實用小技巧 2","image":["defaults.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/","keywords":"Angular CLI, Angular","thumbnailUrl":"defaults.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"\n建立元件與檔案 (service,class,interface ….)\n建立檔案時指令的預設值設定\n\n\n建立 Component 小技巧ng g c &lt; options &gt;\n\n\n\n\nOptions\nAlias\nDescription\n\n\n\n\n--flat\n\n不要建立 Component 資料夾\n\n\n--inline-template\n-it\n不會建立 .html，將 html template 寫在 .ts file\n\n\n--inline-style\n-is\n不會建立 .css，將 style 寫在 .ts file\n\n\n--spec false\n\n不會建立 .spec\n\n\n--prefix my\n\nselector 加上 my prefix. ex: my-pet instead of app-pet\n\n\n--dry-run\n-d\n顯示那些檔案會新增跟那些檔案會變更\n\n\n\n建立 Service 小技巧此功能也能用在建立 Component 上新增 service 並自動加入指定 module providersng g s my-service -m app.module\n\n建立 Classes, Interfaces, Enums 小技巧在 models 底下建立 classng g cl models/customer\n\n在 models 底下建立 interfaceng g i models/person\n\n在 models 底下建立 enumng g e models/gender\n\n建立預設值(超好用)此設定會寫在 .angular-cli.json 底下 defautls 區塊\n建立 component 時候，自動不產生 .specng set defaults.component.spec false\n\n","dateCreated":"2017-07-04T23:26:07+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-07-04T23:26:07+08:00","description":"\n建立元件與檔案 (service,class,interface ….)\n建立檔案時指令的預設值設定\n","headline":"[Angular] Angular CLI 實用小技巧 2","image":["defaults.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/","keywords":"Angular, Angular CLI","thumbnailUrl":"defaults.jpg"}</script>
     <meta name="description" content="建立元件與檔案 (service,class,interface ….) 建立檔案時指令的預設值設定">
 <meta name="keywords" content="Angular CLI,Angular">
 <meta property="og:type" content="blog">
@@ -323,6 +323,18 @@
 
         </div>
     </div>
+    <div class="main-content-wrap">
+        <p style="text-align:center">
+            如果我的文章有幫助到你，歡迎點個廣告支持我。
+        </p>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <!-- 文末廣告 -->
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5916182021497843" data-ad-slot="5209204933" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+    
     <div id="post-footer" class="post-footer main-content-wrap">
         
             <div class="post-footer-tags">
