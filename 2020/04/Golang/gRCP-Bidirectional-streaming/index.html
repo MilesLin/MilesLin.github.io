@@ -12,12 +12,12 @@
         <meta name="keywords" content="Go,gRCP,Protocol Buffers">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"寫完 gRCP Server streaming 和 gRCP Client streaming 後，終於來到最後一個 Bidirectional streaming ，這個是雙向的 streaming， Client/Server 可以 收到\n 與 送出\n  多個訊息。\n\n只要知道怎麼使用 Server streaming 和 Client streaming，要實作 Bidirectional streaming 其實是大同小異。 我們就接續 gRCP Client streaming 的範例，只是改成使用者可以上傳多個圖片，且上傳完一張後，伺服器會馬上回報接收到檔案。\n下面是這次範例的 message type 。\nprotoproto123456789101112131415syntax = \"proto3\";package pb;message AddPhotoRequest {  bytes data = 1;}message AddPhotoResponse {  bool isOk = 1;}service Employee {  rpc AddPhoto (stream AddPhotoRequest) returns (stream AddPhotoResponse);}\nServer CodeServer code 算單純，開一個 for 迴圈接收 Client 傳過來的訊息，收到訊息後在馬上回應給 Client。 最後只要判斷 io.EOF 來中斷迴圈就好。servergo1234567891011121314151617181920212223package serviceimport (\t\"fmt\"\t\"io\"\t\"trygrpc/pb\")type EmployeeService struct {}func (e EmployeeService) AddPhoto(r pb.Employee_AddPhotoServer) error {    for {        res, err := r.Recv()        if err == io.EOF {          return nil        }        if err != nil {          return err        }        fmt.Printf(\"Get bytes with len: %d\\n\", len(res.Data))        r.Send(&amp;pb.AddPhotoResponse{IsOk: true })    }}\nClient CodeClient Code 相對多一點，主要做了下列事情\n\n開一個 goroutine  來接收伺服器回傳的訊息\n使用 channel 確保有接收全部的伺服器回應後，才結束程式\n讀取三個圖片，將圖片資料傳送給伺服器\n\nclientgo1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859package mainimport (\t\"context\"\t\"fmt\"\t\"google.golang.org/grpc\"\t\"google.golang.org/grpc/credentials\"\t\"io\"\t\"io/ioutil\"\t\"log\"\t\"trygrpc/pb\")const (\taddress = \"localhost:50051\")func main() {\t// Create tls based credential.\tcreds, _ := credentials.NewClientTLSFromFile(\"../cert.pem\", \"\")\t// Set up a connection to the server.\tconn, _ := grpc.Dial(address, grpc.WithTransportCredentials(creds), grpc.WithBlock())\tdefer conn.Close()\tc := pb.NewEmployeeClient(conn)\tstream, _ := c.AddPhoto(context.Background())\tfilesPath := []string{\"goteam1.png\",\"goteam2.png\",\"goteam3.png\"}\tdoneCh := make(chan struct{})\t// 接收回應\tgo func(){\t\tfor {\t\t\tres, err := stream.Recv()\t\t\tif err == io.EOF {\t\t\t\tdoneCh &lt;- struct{}{}\t\t\t\tbreak\t\t\t}\t\t\tif err != nil {\t\t\t\tlog.Fatal(err)\t\t\t}\t\t\tfmt.Println(res)\t\t}\t}()\tfor _, p := range filesPath {\t\tfbytes, _ := ioutil.ReadFile(p)\t\tstream.Send(&amp;pb.AddPhotoRequest{Data: fbytes})\t}\tstream.CloseSend()\t&lt;-doneCh\tfmt.Println(\"完成傳送\")}\n執行結果從執行結果可以看到，Server/Client 都同時收到訊息與發送訊息。\n執行結果\n延伸閱讀[gRPC Basics - Go]\n","dateCreated":"2020-04-03T16:30:37+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-04-03T16:30:37+08:00","description":"寫完 gRCP Server streaming 和 gRCP Client streaming 後，終於來到最後一個 Bidirectional streaming ，這個是雙向的 streaming， Client/Server 可以 收到\n 與 送出\n  多個訊息。","headline":"[Go] gRCP Bidirectional streaming","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/04/Golang/gRCP-Bidirectional-streaming/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/04/Golang/gRCP-Bidirectional-streaming/","keywords":"Go, Protocol Buffers, gRCP"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"寫完 gRCP Server streaming 和 gRCP Client streaming 後，終於來到最後一個 Bidirectional streaming ，這個是雙向的 streaming， Client/Server 可以 收到\n 與 送出\n  多個訊息。\n\n只要知道怎麼使用 Server streaming 和 Client streaming，要實作 Bidirectional streaming 其實是大同小異。 我們就接續 gRCP Client streaming 的範例，只是改成使用者可以上傳多個圖片，且上傳完一張後，伺服器會馬上回報接收到檔案。\n下面是這次範例的 message type 。\nprotoproto123456789101112131415syntax = \"proto3\";package pb;message AddPhotoRequest {  bytes data = 1;}message AddPhotoResponse {  bool isOk = 1;}service Employee {  rpc AddPhoto (stream AddPhotoRequest) returns (stream AddPhotoResponse);}\nServer CodeServer code 算單純，開一個 for 迴圈接收 Client 傳過來的訊息，收到訊息後在馬上回應給 Client。 最後只要判斷 io.EOF 來中斷迴圈就好。servergo1234567891011121314151617181920212223package serviceimport (\t\"fmt\"\t\"io\"\t\"trygrpc/pb\")type EmployeeService struct {}func (e EmployeeService) AddPhoto(r pb.Employee_AddPhotoServer) error {    for {        res, err := r.Recv()        if err == io.EOF {          return nil        }        if err != nil {          return err        }        fmt.Printf(\"Get bytes with len: %d\\n\", len(res.Data))        r.Send(&amp;pb.AddPhotoResponse{IsOk: true })    }}\nClient CodeClient Code 相對多一點，主要做了下列事情\n\n開一個 goroutine  來接收伺服器回傳的訊息\n使用 channel 確保有接收全部的伺服器回應後，才結束程式\n讀取三個圖片，將圖片資料傳送給伺服器\n\nclientgo1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859package mainimport (\t\"context\"\t\"fmt\"\t\"google.golang.org/grpc\"\t\"google.golang.org/grpc/credentials\"\t\"io\"\t\"io/ioutil\"\t\"log\"\t\"trygrpc/pb\")const (\taddress = \"localhost:50051\")func main() {\t// Create tls based credential.\tcreds, _ := credentials.NewClientTLSFromFile(\"../cert.pem\", \"\")\t// Set up a connection to the server.\tconn, _ := grpc.Dial(address, grpc.WithTransportCredentials(creds), grpc.WithBlock())\tdefer conn.Close()\tc := pb.NewEmployeeClient(conn)\tstream, _ := c.AddPhoto(context.Background())\tfilesPath := []string{\"goteam1.png\",\"goteam2.png\",\"goteam3.png\"}\tdoneCh := make(chan struct{})\t// 接收回應\tgo func(){\t\tfor {\t\t\tres, err := stream.Recv()\t\t\tif err == io.EOF {\t\t\t\tdoneCh &lt;- struct{}{}\t\t\t\tbreak\t\t\t}\t\t\tif err != nil {\t\t\t\tlog.Fatal(err)\t\t\t}\t\t\tfmt.Println(res)\t\t}\t}()\tfor _, p := range filesPath {\t\tfbytes, _ := ioutil.ReadFile(p)\t\tstream.Send(&amp;pb.AddPhotoRequest{Data: fbytes})\t}\tstream.CloseSend()\t&lt;-doneCh\tfmt.Println(\"完成傳送\")}\n執行結果從執行結果可以看到，Server/Client 都同時收到訊息與發送訊息。\n執行結果\n延伸閱讀[gRPC Basics - Go]\n","dateCreated":"2020-04-03T16:30:37+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-04-03T16:30:37+08:00","description":"寫完 gRCP Server streaming 和 gRCP Client streaming 後，終於來到最後一個 Bidirectional streaming ，這個是雙向的 streaming， Client/Server 可以 收到\n 與 送出\n  多個訊息。","headline":"[Go] gRCP Bidirectional streaming","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/04/Golang/gRCP-Bidirectional-streaming/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/04/Golang/gRCP-Bidirectional-streaming/","keywords":"Go, Protocol Buffers, gRCP"}</script>
     <meta name="description" content="寫完 gRCP Server streaming 和 gRCP Client streaming 後，終於來到最後一個 Bidirectional streaming ，這個是雙向的 streaming， Client/Server 可以 收到  與 送出   多個訊息。">
 <meta name="keywords" content="Go,gRCP,Protocol Buffers">
 <meta property="og:type" content="blog">
@@ -97,19 +97,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -118,7 +123,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -127,7 +132,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -136,7 +141,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -145,7 +150,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -154,7 +159,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -167,7 +172,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -176,7 +181,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -185,7 +190,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -194,7 +199,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -207,7 +212,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -793,7 +798,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -801,7 +806,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

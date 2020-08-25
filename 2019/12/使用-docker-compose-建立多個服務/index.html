@@ -10,12 +10,12 @@
     <meta name="author" content="Miles">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"公司一直有一個維護的案子，該維護案的開發環境都一直放在雲端上，例如 SQL Server、後端 API 等等…。 但是該維護案又不會常常使用到開發環境，但是沒有開發環境偶爾要維護又很麻煩，所以為了節省成本，就決定把該開發環境容器化，並且把放在雲端的服務關掉。\n該維護案是前後端分離，前端是 Angular 後端是 ASP.NET Core API 與 SQL Server，所以要容器化的是 後端 的部分，只要將後端容器化後，前端開發就不用煩惱後端環境怎麼建立。\n所以今天要介紹如何用 docker-compose 建立 ASP.NET Core API 與 SQL Server 服務，並且該 API 會連 SQL Server 當作資料來源。  讓前端的開發工程師在開發的時候，不用為了後端的環境而煩惱。\n\n環境說明這次的 demo 我建立了一個 ASP.NET Core 的專案，且該專案用 EF Core 對資料庫做操作，以及建立了一個含有 northwnd 資料庫的 SQL Server 映像檔。\nASP.NET Core 專案說明我有將專案放到 Github 上供參考 ASP.NET Core API 專案 。\n該專案就是一個非常簡單的 API ，只有一個 Controller ，一個 API ，該 API 就是讀取資料庫，撈出一筆資料後丟出來。 如下方程式碼\nValueControllercs12345678910111213141516171819[Route(\"api/[controller]\")][ApiController]public class ValuesController : ControllerBase{    private readonly NORTHWNDContext _db;    public ValuesController(NORTHWNDContext db)    {        this._db = db;    }    // GET api/values    [HttpGet]    public ActionResult&lt;Customers&gt; Get()    {        var customer = _db.Customers.First();        return customer;    }}\n而該專案的資料夾，請參考下圖，會專注在 docker-compose.yml 上。 其中 Dockerfile 是用來建置後端 API ，可以參考這篇 [Docker] 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例backend project \n範例資料庫說明我有將範例的資料庫推上我的 docker hub - docker/mileslin/northwnd ，直接 docker run -e &quot;ACCEPT_EULA=Y&quot; -p 1433:1433 -d mileslin/northwnd 就可以把 northwnd 資料庫執行起來。 (但是我們今天不是要單獨執行，所以可以先不用執行此指令。)\n資料庫登入資訊\n\nport: 1433\n帳號: sa\n密碼: 2wsx#EDC\n\n若要了解如何從無到有建立 SQL Server 映像檔，可以參考 [Docker] SQL Server Container 快速入門 。 \n看懂 docker-compose.yml環境說明結束了，現在就是來使用 docker-compose 建立服務啦。 如果還不知道什麼是 docker-compose? 可以先看一下官方說明。Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration. To learn more about all the features of Compose, see the list of features.\ndockerOverview of Docker Compose\n簡單來說 docker-compose 就是用來定義一次執行多個容器的工具。\n所以我們現在要做的就是，要寫一個 docker-compose.yml 檔案，該檔案會定義我要建立的 docker 服務，並且使用 docker-compose 來啟動服務。 那接下來我就來帶大家看這份 docker-compose.yml 檔案吧。\n12345678910111213141516171819202122232425262728293031323334353637383940# 使用 Compose file format V3.2 版本version: '3.2'# 定義 services 區塊，以這裡的例子，我定義了 `mydb` 與 `myapi` 這兩個 services。services:  # 定義一個名為 mydb 的 service  mydb:    # 此 service 會使用此 image 執行。(這是我已經上傳好，含有 northwnd 資料庫的 SQL Server)    image: mileslin/northwnd    # 對外 mapping 1433 port。 如果沒有想要從外部連資料庫，則此設定可以不用。    ports:      - \"1433:1433\"    # 將此 service 加入一個自訂義的網路，名為 demonetwork。    networks:      - demonetwork    # 設定此 service 的環境變數，要使用此 SQL Server image ，要設定此環境變數，代表同意 End-User Licensing Agreement.    environment:      ACCEPT_EULA: \"Y\"  # 定義一個名為 myapi 的服務  myapi:    # 此 service 要用建置的方式產生 image ，並且設定 Dockerfile 的路徑位置    build:      context: ./      dockerfile: Dockerfile    # 對外 mapping 8000 port。所以當網站起來的時候，可以用 http://localhost:8000/api/values 取得資料。    ports:      - \"8000:80\"    # 設定此 service 的環境變數，覆寫資料庫的連線字串。 可以注意的是，我的 SQL Server 的位址是 mydb 這個服務的名稱。    environment:      ConnectionStrings__northwnd_db: \"Server=mydb;Database=NORTHWND;User ID=sa;Password=2wsx#EDC;Trusted_Connection=True;Integrated Security=False;\"    # 將此 service 加入一個自訂義的網路，名為 demonetwork。    networks:      - demonetwork    # 當 mydb service 起來後，再執行此 service 的設定    depends_on:      - mydb# 建立一個名為 demonetwork 的自訂義網路，且採用預設的 bridge 類別的網路networks:  demonetwork:    driver: bridge\ndepends_on 設定說明雖然上面有設定 myapi depends_on mydb ，但是請注意，就算 mydb 的 service 先啟動，不代表資料庫服務已經起來，還是需要等一段時間，資料庫的實體才會起來，在這段時間可能會造成 myapi 無法連線的問題。  如果要處理這個問題，需要使用 wait-for-it。\n\nDocker 預設的 DNS這裡要額外補充說明的是，為什麼 SQL Server 的位址是 mydb 這個服務的名稱? \n只要是 docker services 在同一個自訂義網路的情況下，docker 的 DNS 會從 service 的名稱解析到該 service 的位址。  所以以上方的範例，我將 mydb 與 myapi 都加入一個自訂義網路，名為 demonetwork ，所以我的 myapi 服務在設定資料庫連線字串的時候，可以使用 mydb 當作資料庫的位址，docker 的 DNS 就會幫我導到該資料庫去。 參考: Embedded DNS server in user-defined networks\n請注意，如果 service 不是建立在自訂義的網路，而是預設的 bridge 網路，則 docker 的 DNS 服務需要額外做設定。參考:  Configure container DNS\n\n使用 docker-compose 指令啟動服務與移除服務現在萬事都準備好了，只剩下把服務啟動， 執行 docker-compose -f docker-compose.yml up，就會看到下圖的情況，docker-compose 會把在 yml 裡面定義好的服務都啟動。因為 docker-compose.yml 是 docker 預設會找到檔案，所以 -f docker-compose.yml 不一定要設定，也可以使用此指令 docker-compose up 效果是一樣的。\n\ndocker-compose up\n服務起來後，我們來看一下 http://localhost:8000/api/values 是不是真的能夠連到資料result\n上圖可以知道，我們已經成功連到資料，且該資料是從資料庫來的!!\n那接下來，要移除服務也很簡單，只要輸入 docker-compose down 就可以把所以服務移除。docker-compose down\n如果啟動服務要背景執行的話，可以加入 -d 參數，如: docker-compose -f docker-compose.yml up -d 這樣 service 就會在背景執行了\n\n其他 docker-compose 指令docker-compose 也可以對單一 service 做操作，例如，我要停止 myapi service，我就可以使用 docker-compose stop myapi，重新啟動 myapi service，就可以使用 docker-compose start myapi。\n請參考下圖，我使用 docker-compose ps 來觀察停止服務與啟動服務的狀態restart service\n重新建置 myapi 的方式如果 myapi 的程式碼有調整，想要更新的話，是沒辦法直接 docker-compose down + docker-compose up 就更新的，因為有 cache 的問題，所以如果重新建置的話，要用其他方式，我這邊介紹兩種做法。\n方法一把 myapi 的 image 刪除，再重新 docker-compose up請參考下方指令\n\ndocker-compose images 找到要刪除的 image id\ndocker-compose stop myapi, docker-compose rm myapi 停止與刪除 myapi service\ndocker rmi 46ccc 刪除 myapi 的 image ，\ndocker-compose up 重新啟動服務rebuild servicebash12345docker-compose imagesdocker-compose stop myapidocker-compose rm myapidocker rmi 46cccdocker-compose up\n\n\n執行成功後，會看到下圖的樣子rebuild-1\n方法二重新建置該 service ，這方法是參考 How to restart a single container with docker-compose 的說明。\n只要執行下面 4 行指令就可以直接重 build 了。\nrebuild servicebash1234docker-compose stop myapidocker-compose build myapidocker-compose create myapidocker-compose start myapi\n小結如果讀者要直接執行的話，可以到我的專案範例 docker-compose-demo 下載下來後，直接 docker-compose up 就可以把服務執行起來了。 剩下的只要看懂 yml 在寫什麼，就可以很輕易運用到自己的專案上了。\n延伸閱讀[Overview of Docker Compose][Get started with Docker Compose][Overview of docker-compose CLI]\n","dateCreated":"2019-12-14T21:37:33+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-12-14T21:37:33+08:00","description":"公司一直有一個維護的案子，該維護案的開發環境都一直放在雲端上，例如 SQL Server、後端 API 等等…。 但是該維護案又不會常常使用到開發環境，但是沒有開發環境偶爾要維護又很麻煩，所以為了節省成本，就決定把該開發環境容器化，並且把放在雲端的服務關掉。\n該維護案是前後端分離，前端是 Angular 後端是 ASP.NET Core API 與 SQL Server，所以要容器化的是 後端 的部分，只要將後端容器化後，前端開發就不用煩惱後端環境怎麼建立。\n所以今天要介紹如何用 docker-compose 建立 ASP.NET Core API 與 SQL Server 服務，並且該 API 會連 SQL Server 當作資料來源。  讓前端的開發工程師在開發的時候，不用為了後端的環境而煩惱。","headline":"[Docker] 使用 docker-compose 建立多個服務","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/","keywords":"Docker, ASP.NET Core, SQL Server, EF Core"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"公司一直有一個維護的案子，該維護案的開發環境都一直放在雲端上，例如 SQL Server、後端 API 等等…。 但是該維護案又不會常常使用到開發環境，但是沒有開發環境偶爾要維護又很麻煩，所以為了節省成本，就決定把該開發環境容器化，並且把放在雲端的服務關掉。\n該維護案是前後端分離，前端是 Angular 後端是 ASP.NET Core API 與 SQL Server，所以要容器化的是 後端 的部分，只要將後端容器化後，前端開發就不用煩惱後端環境怎麼建立。\n所以今天要介紹如何用 docker-compose 建立 ASP.NET Core API 與 SQL Server 服務，並且該 API 會連 SQL Server 當作資料來源。  讓前端的開發工程師在開發的時候，不用為了後端的環境而煩惱。\n\n環境說明這次的 demo 我建立了一個 ASP.NET Core 的專案，且該專案用 EF Core 對資料庫做操作，以及建立了一個含有 northwnd 資料庫的 SQL Server 映像檔。\nASP.NET Core 專案說明我有將專案放到 Github 上供參考 ASP.NET Core API 專案 。\n該專案就是一個非常簡單的 API ，只有一個 Controller ，一個 API ，該 API 就是讀取資料庫，撈出一筆資料後丟出來。 如下方程式碼\nValueControllercs12345678910111213141516171819[Route(\"api/[controller]\")][ApiController]public class ValuesController : ControllerBase{    private readonly NORTHWNDContext _db;    public ValuesController(NORTHWNDContext db)    {        this._db = db;    }    // GET api/values    [HttpGet]    public ActionResult&lt;Customers&gt; Get()    {        var customer = _db.Customers.First();        return customer;    }}\n而該專案的資料夾，請參考下圖，會專注在 docker-compose.yml 上。 其中 Dockerfile 是用來建置後端 API ，可以參考這篇 [Docker] 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例backend project \n範例資料庫說明我有將範例的資料庫推上我的 docker hub - docker/mileslin/northwnd ，直接 docker run -e &quot;ACCEPT_EULA=Y&quot; -p 1433:1433 -d mileslin/northwnd 就可以把 northwnd 資料庫執行起來。 (但是我們今天不是要單獨執行，所以可以先不用執行此指令。)\n資料庫登入資訊\n\nport: 1433\n帳號: sa\n密碼: 2wsx#EDC\n\n若要了解如何從無到有建立 SQL Server 映像檔，可以參考 [Docker] SQL Server Container 快速入門 。 \n看懂 docker-compose.yml環境說明結束了，現在就是來使用 docker-compose 建立服務啦。 如果還不知道什麼是 docker-compose? 可以先看一下官方說明。Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration. To learn more about all the features of Compose, see the list of features.\ndockerOverview of Docker Compose\n簡單來說 docker-compose 就是用來定義一次執行多個容器的工具。\n所以我們現在要做的就是，要寫一個 docker-compose.yml 檔案，該檔案會定義我要建立的 docker 服務，並且使用 docker-compose 來啟動服務。 那接下來我就來帶大家看這份 docker-compose.yml 檔案吧。\n12345678910111213141516171819202122232425262728293031323334353637383940# 使用 Compose file format V3.2 版本version: '3.2'# 定義 services 區塊，以這裡的例子，我定義了 `mydb` 與 `myapi` 這兩個 services。services:  # 定義一個名為 mydb 的 service  mydb:    # 此 service 會使用此 image 執行。(這是我已經上傳好，含有 northwnd 資料庫的 SQL Server)    image: mileslin/northwnd    # 對外 mapping 1433 port。 如果沒有想要從外部連資料庫，則此設定可以不用。    ports:      - \"1433:1433\"    # 將此 service 加入一個自訂義的網路，名為 demonetwork。    networks:      - demonetwork    # 設定此 service 的環境變數，要使用此 SQL Server image ，要設定此環境變數，代表同意 End-User Licensing Agreement.    environment:      ACCEPT_EULA: \"Y\"  # 定義一個名為 myapi 的服務  myapi:    # 此 service 要用建置的方式產生 image ，並且設定 Dockerfile 的路徑位置    build:      context: ./      dockerfile: Dockerfile    # 對外 mapping 8000 port。所以當網站起來的時候，可以用 http://localhost:8000/api/values 取得資料。    ports:      - \"8000:80\"    # 設定此 service 的環境變數，覆寫資料庫的連線字串。 可以注意的是，我的 SQL Server 的位址是 mydb 這個服務的名稱。    environment:      ConnectionStrings__northwnd_db: \"Server=mydb;Database=NORTHWND;User ID=sa;Password=2wsx#EDC;Trusted_Connection=True;Integrated Security=False;\"    # 將此 service 加入一個自訂義的網路，名為 demonetwork。    networks:      - demonetwork    # 當 mydb service 起來後，再執行此 service 的設定    depends_on:      - mydb# 建立一個名為 demonetwork 的自訂義網路，且採用預設的 bridge 類別的網路networks:  demonetwork:    driver: bridge\ndepends_on 設定說明雖然上面有設定 myapi depends_on mydb ，但是請注意，就算 mydb 的 service 先啟動，不代表資料庫服務已經起來，還是需要等一段時間，資料庫的實體才會起來，在這段時間可能會造成 myapi 無法連線的問題。  如果要處理這個問題，需要使用 wait-for-it。\n\nDocker 預設的 DNS這裡要額外補充說明的是，為什麼 SQL Server 的位址是 mydb 這個服務的名稱? \n只要是 docker services 在同一個自訂義網路的情況下，docker 的 DNS 會從 service 的名稱解析到該 service 的位址。  所以以上方的範例，我將 mydb 與 myapi 都加入一個自訂義網路，名為 demonetwork ，所以我的 myapi 服務在設定資料庫連線字串的時候，可以使用 mydb 當作資料庫的位址，docker 的 DNS 就會幫我導到該資料庫去。 參考: Embedded DNS server in user-defined networks\n請注意，如果 service 不是建立在自訂義的網路，而是預設的 bridge 網路，則 docker 的 DNS 服務需要額外做設定。參考:  Configure container DNS\n\n使用 docker-compose 指令啟動服務與移除服務現在萬事都準備好了，只剩下把服務啟動， 執行 docker-compose -f docker-compose.yml up，就會看到下圖的情況，docker-compose 會把在 yml 裡面定義好的服務都啟動。因為 docker-compose.yml 是 docker 預設會找到檔案，所以 -f docker-compose.yml 不一定要設定，也可以使用此指令 docker-compose up 效果是一樣的。\n\ndocker-compose up\n服務起來後，我們來看一下 http://localhost:8000/api/values 是不是真的能夠連到資料result\n上圖可以知道，我們已經成功連到資料，且該資料是從資料庫來的!!\n那接下來，要移除服務也很簡單，只要輸入 docker-compose down 就可以把所以服務移除。docker-compose down\n如果啟動服務要背景執行的話，可以加入 -d 參數，如: docker-compose -f docker-compose.yml up -d 這樣 service 就會在背景執行了\n\n其他 docker-compose 指令docker-compose 也可以對單一 service 做操作，例如，我要停止 myapi service，我就可以使用 docker-compose stop myapi，重新啟動 myapi service，就可以使用 docker-compose start myapi。\n請參考下圖，我使用 docker-compose ps 來觀察停止服務與啟動服務的狀態restart service\n重新建置 myapi 的方式如果 myapi 的程式碼有調整，想要更新的話，是沒辦法直接 docker-compose down + docker-compose up 就更新的，因為有 cache 的問題，所以如果重新建置的話，要用其他方式，我這邊介紹兩種做法。\n方法一把 myapi 的 image 刪除，再重新 docker-compose up請參考下方指令\n\ndocker-compose images 找到要刪除的 image id\ndocker-compose stop myapi, docker-compose rm myapi 停止與刪除 myapi service\ndocker rmi 46ccc 刪除 myapi 的 image ，\ndocker-compose up 重新啟動服務rebuild servicebash12345docker-compose imagesdocker-compose stop myapidocker-compose rm myapidocker rmi 46cccdocker-compose up\n\n\n執行成功後，會看到下圖的樣子rebuild-1\n方法二重新建置該 service ，這方法是參考 How to restart a single container with docker-compose 的說明。\n只要執行下面 4 行指令就可以直接重 build 了。\nrebuild servicebash1234docker-compose stop myapidocker-compose build myapidocker-compose create myapidocker-compose start myapi\n小結如果讀者要直接執行的話，可以到我的專案範例 docker-compose-demo 下載下來後，直接 docker-compose up 就可以把服務執行起來了。 剩下的只要看懂 yml 在寫什麼，就可以很輕易運用到自己的專案上了。\n延伸閱讀[Overview of Docker Compose][Get started with Docker Compose][Overview of docker-compose CLI]\n","dateCreated":"2019-12-14T21:37:33+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-12-14T21:37:33+08:00","description":"公司一直有一個維護的案子，該維護案的開發環境都一直放在雲端上，例如 SQL Server、後端 API 等等…。 但是該維護案又不會常常使用到開發環境，但是沒有開發環境偶爾要維護又很麻煩，所以為了節省成本，就決定把該開發環境容器化，並且把放在雲端的服務關掉。\n該維護案是前後端分離，前端是 Angular 後端是 ASP.NET Core API 與 SQL Server，所以要容器化的是 後端 的部分，只要將後端容器化後，前端開發就不用煩惱後端環境怎麼建立。\n所以今天要介紹如何用 docker-compose 建立 ASP.NET Core API 與 SQL Server 服務，並且該 API 會連 SQL Server 當作資料來源。  讓前端的開發工程師在開發的時候，不用為了後端的環境而煩惱。","headline":"[Docker] 使用 docker-compose 建立多個服務","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/12/使用-docker-compose-建立多個服務/","keywords":"Docker, ASP.NET Core, SQL Server, EF Core"}</script>
     <meta name="description" content="公司一直有一個維護的案子，該維護案的開發環境都一直放在雲端上，例如 SQL Server、後端 API 等等…。 但是該維護案又不會常常使用到開發環境，但是沒有開發環境偶爾要維護又很麻煩，所以為了節省成本，就決定把該開發環境容器化，並且把放在雲端的服務關掉。 該維護案是前後端分離，前端是 Angular 後端是 ASP.NET Core API 與 SQL Server，所以要容器化的是 後端 的">
 <meta name="keywords" content="Docker,ASP.NET Core,SQL Server,EF Core">
 <meta property="og:type" content="blog">
@@ -100,19 +100,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -121,7 +126,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -130,7 +135,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -139,7 +144,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -148,7 +153,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -157,7 +162,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -170,7 +175,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -179,7 +184,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -188,7 +193,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -197,7 +202,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -210,7 +215,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -831,7 +836,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -839,7 +844,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

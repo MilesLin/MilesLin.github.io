@@ -12,12 +12,12 @@
         <meta name="keywords" content="Protractor">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"之前負責一個案子，是做客戶的官方網站，且該網站有要求 RWD，而在專案後期的時候，常常一個 CSS 沒調整好，導致其他頁面跑版，於是乎我就順手寫了跑全部頁面的 E2E 跑版測試，且可以輕易擴充要測試的解析度。 今天就來說明如何建立一個這樣的 E2E 測試專案。\n\n專案使用的套件說明除了使用 Protractor 以外，還有使用兩個補助套件\n\nblue-harvest: 此套件用於圖片比較的測試。\nprotractor-screenshot-utils: 使用 browser.takeScreenshot() 只會截到畫面有顯示的部分，並不會截未顯示的部分，所以要使用 protractor-screenshot-utils 這個套件幫助我們整頁截圖。\n\n專案範例說明我這邊會以 Protractor 官方網站的Protractor Setup menu 來當作測試案例。menu\n而完成這個專案最主要有三個步驟\n\n建立基底 protractor.conf.js\n建立測試案例 \n新增其他解析度的 protractor.conf.js\n\n這篇文章的範例專案放在 RWD-Test-Sample-by-Protractor，讀者可以邊參考專案邊看文章。\n\n建立基底 protractor.conf.jsprotractor.conf.jsjs12345678910111213141516171819202122232425262728293031323334353637const { SpecReporter } = require('jasmine-spec-reporter');process.env['UPDATE_GOLDENS'] = \"true\";exports.config = {  params: {     width: 1440,    height: 568,    imagePath: 'goldens/chrome',    device: 'desktop_1440'  },  allScriptsTimeout: 999000,  specs: [    './src/**/*.e2e-spec.ts'  ],  SELENIUM_PROMISE_MANAGER: false,  capabilities: {    'browserName': 'chrome',    shardTestFiles: true,    maxInstances: 2,  },  directConnect: true,  baseUrl: 'https://www.protractortest.org/#/',  framework: 'jasmine',  jasmineNodeOpts: {    showColors: true,    defaultTimeoutInterval: 999000,    print: function() {}  },  async onPrepare() {    require('ts-node').register({      project: require('path').join(__dirname, './tsconfig.json')    });    jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));    await browser.manage().window().setSize(browser.params.width, browser.params.height);  }};\n上敘述的 protractor.conf.js 有五個重點:\n第一個重點是 UPDATE_GOLDENS 的環境變數，用來設定是否更新 golden 圖， 1  或 true 是更新 golden 圖，反之是比對 golden 圖。\n1process.env['UPDATE_GOLDENS'] = \"true\";\n第二個重點是用來設定解析度跟儲存 golden 圖路徑的參數123456params: &#123;     width: 1440,    height: 568,    imagePath: 'goldens/chrome',    device: 'desktop_1440'  &#125;\n第三個重點是，SELENIUM_PROMISE_MANAGER 一定要設定為 false ，否則無法使用 blue-harvest 。第四個重點在 capabilities 可以設定 shardTestFiles 和 maxInstances ，這可以讓 Protractor 平行跑測試，效率上會比較好。123456SELENIUM_PROMISE_MANAGER: false,  capabilities: &#123;    'browserName': 'chrome',    shardTestFiles: true,    maxInstances: 2,  &#125;,\n第五個重點是，在 onPrepare 的時候，讀取重點二設定的解析度的參數，整條畫面的大小。1await browser.manage().window().setSize(browser.params.width, browser.params.height);\n建立測試案例我建立了一個 Protractor-Setup.e2e-spec.ts 的測試案例，用來巡覽 Protractor Setup 底下的所有 menu。\nProtractor-Setup.e2e-spec.tsts12345678910111213141516171819202122232425262728293031323334import { browser } from 'protractor';import { go, compareScreenshot } from 'blue-harvest'import { ProtractorScreenShotUtils } from 'protractor-screenshot-utils'describe('Protractor Setup Pages', function() {  const urls = [    'protractor-setup',    'server-setup',     'browser-setup',    'frameworks'  ]  it('should valid Protractor Setup', async function() {        // ProtractorScreenShotUtils 的使用方式    const screenShotUtils = new ProtractorScreenShotUtils({      browserInstance : browser    });        for (let index = 0; index &lt; urls.length; index++) {      const url = urls[index];      await go(browser.baseUrl + url);      const fileName = url;      const golden  = './src/' + browser.params.imagePath + `/${browser.params.device}/${fileName}.png`;      const diffDir = './src/' + browser.params.imagePath + `/${browser.params.device}/`;      const actual = await screenShotUtils.takeScreenshot();      const result = await compareScreenshot(actual, golden, diffDir);      expect(result).toBeTruthy();      }      });});\n這段程式碼三個重點:\n第一個重點，我建立一個 array ，用來儲存要瀏覽的頁面路徑，所以以後只要有新增頁面，我在這邊新增選項就好了。123456const urls = [    'protractor-setup',    'server-setup',     'browser-setup',    'frameworks'  ]\n第二個重點，使用 protractor-screenshot-utils 做整頁的截圖。12345const screenShotUtils = new ProtractorScreenShotUtils(&#123;      browserInstance : browser    &#125;);const actual = await screenShotUtils.takeScreenshot();\n第三個重點，用 for 迴圈巡覽全部頁面，並且讀取剛剛在 protractor.conf.js 設定的 golden 路徑。12345678910for (let index = 0; index &lt; urls.length; index++) &#123;  const url = urls[index];  await go(browser.baseUrl + url);  const fileName = url;  const golden  = './src/' + browser.params.imagePath + `/$&#123;browser.params.device&#125;/$&#123;fileName&#125;.png`;  const diffDir = './src/' + browser.params.imagePath + `/$&#123;browser.params.device&#125;/`;  const actual = await screenShotUtils.takeScreenshot();  const result = await compareScreenshot(actual, golden, diffDir);  expect(result).toBeTruthy();  &#125;\n執行 E2E 測試上敘步驟完成後，我們可以將測試執行起來 npm run protractor，執行後就會看到 golden 圖儲存到設定的路徑上。desktop 1440 goldens\n這樣未來只要把 UPDATE_GOLDENS 的環境變數清空或者設定成 false ，就可以跟 golden 做比對了12//in protractor.conf.jsprocess.env['UPDATE_GOLDENS'] = \"false\";\n新增其他解析度的 protractor.conf.js因為畫面的大小是寫在 browser.params ， 所以只要新增 protractor.conf.js 覆寫掉 browser.params 就可以快速產生不同解析度的測試，而且程式碼都不需要調整。 我這邊以新增一個 pad 解析度為例 protractor.conf.pad_768.jsprotractor.conf.pad_768.jsjs12345678910let config = require('./protractor.conf.js').config;config.params = {     width: 768,    height: 1024,    imagePath: 'goldens/chrome',    device: 'pad_768'};\u000bexports.config = config;\n然後在 package.json 新增 protractor.conf.pad_768.js 的 E2E 測試指令1234\"scripts\": &#123;  \"protractor\": \"protractor\",  \"chrome:768\": \"protractor protractor.conf.pad_768.js\",&#125;,\n執行 npm run chrome:768 後就會看到 golden 圖儲存到設定的路徑上。\npad 768 goldens\n小結透過這樣的方式，就可以寫少少的程式碼，快速把網站所有的頁面跑過一次跑版測試，並且保有擴充性，可以隨意新增要測試的解析度，甚至是不同的瀏覽器，只要新增 protractor.conf.js 並覆寫設定就可以了。\n另外，如果需要有更新 golden 圖的時候，只要使用 configuring-test-suites 或者是 fdescribe 來部分更新 golden 圖就可以了。\n","dateCreated":"2019-12-06T20:51:09+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-12-06T20:51:09+08:00","description":"之前負責一個案子，是做客戶的官方網站，且該網站有要求 RWD，而在專案後期的時候，常常一個 CSS 沒調整好，導致其他頁面跑版，於是乎我就順手寫了跑全部頁面的 E2E 跑版測試，且可以輕易擴充要測試的解析度。 今天就來說明如何建立一個這樣的 E2E 測試專案。","headline":"[自動化測試] 如何用 Protractor 寫 RWD 的畫面比對測試","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/12/如何用-Protractor-寫-RWD-的畫面比對測試/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/12/如何用-Protractor-寫-RWD-的畫面比對測試/","keywords":"Protractor, RWD"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"之前負責一個案子，是做客戶的官方網站，且該網站有要求 RWD，而在專案後期的時候，常常一個 CSS 沒調整好，導致其他頁面跑版，於是乎我就順手寫了跑全部頁面的 E2E 跑版測試，且可以輕易擴充要測試的解析度。 今天就來說明如何建立一個這樣的 E2E 測試專案。\n\n專案使用的套件說明除了使用 Protractor 以外，還有使用兩個補助套件\n\nblue-harvest: 此套件用於圖片比較的測試。\nprotractor-screenshot-utils: 使用 browser.takeScreenshot() 只會截到畫面有顯示的部分，並不會截未顯示的部分，所以要使用 protractor-screenshot-utils 這個套件幫助我們整頁截圖。\n\n專案範例說明我這邊會以 Protractor 官方網站的Protractor Setup menu 來當作測試案例。menu\n而完成這個專案最主要有三個步驟\n\n建立基底 protractor.conf.js\n建立測試案例 \n新增其他解析度的 protractor.conf.js\n\n這篇文章的範例專案放在 RWD-Test-Sample-by-Protractor，讀者可以邊參考專案邊看文章。\n\n建立基底 protractor.conf.jsprotractor.conf.jsjs12345678910111213141516171819202122232425262728293031323334353637const { SpecReporter } = require('jasmine-spec-reporter');process.env['UPDATE_GOLDENS'] = \"true\";exports.config = {  params: {     width: 1440,    height: 568,    imagePath: 'goldens/chrome',    device: 'desktop_1440'  },  allScriptsTimeout: 999000,  specs: [    './src/**/*.e2e-spec.ts'  ],  SELENIUM_PROMISE_MANAGER: false,  capabilities: {    'browserName': 'chrome',    shardTestFiles: true,    maxInstances: 2,  },  directConnect: true,  baseUrl: 'https://www.protractortest.org/#/',  framework: 'jasmine',  jasmineNodeOpts: {    showColors: true,    defaultTimeoutInterval: 999000,    print: function() {}  },  async onPrepare() {    require('ts-node').register({      project: require('path').join(__dirname, './tsconfig.json')    });    jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));    await browser.manage().window().setSize(browser.params.width, browser.params.height);  }};\n上敘述的 protractor.conf.js 有五個重點:\n第一個重點是 UPDATE_GOLDENS 的環境變數，用來設定是否更新 golden 圖， 1  或 true 是更新 golden 圖，反之是比對 golden 圖。\n1process.env['UPDATE_GOLDENS'] = \"true\";\n第二個重點是用來設定解析度跟儲存 golden 圖路徑的參數123456params: &#123;     width: 1440,    height: 568,    imagePath: 'goldens/chrome',    device: 'desktop_1440'  &#125;\n第三個重點是，SELENIUM_PROMISE_MANAGER 一定要設定為 false ，否則無法使用 blue-harvest 。第四個重點在 capabilities 可以設定 shardTestFiles 和 maxInstances ，這可以讓 Protractor 平行跑測試，效率上會比較好。123456SELENIUM_PROMISE_MANAGER: false,  capabilities: &#123;    'browserName': 'chrome',    shardTestFiles: true,    maxInstances: 2,  &#125;,\n第五個重點是，在 onPrepare 的時候，讀取重點二設定的解析度的參數，整條畫面的大小。1await browser.manage().window().setSize(browser.params.width, browser.params.height);\n建立測試案例我建立了一個 Protractor-Setup.e2e-spec.ts 的測試案例，用來巡覽 Protractor Setup 底下的所有 menu。\nProtractor-Setup.e2e-spec.tsts12345678910111213141516171819202122232425262728293031323334import { browser } from 'protractor';import { go, compareScreenshot } from 'blue-harvest'import { ProtractorScreenShotUtils } from 'protractor-screenshot-utils'describe('Protractor Setup Pages', function() {  const urls = [    'protractor-setup',    'server-setup',     'browser-setup',    'frameworks'  ]  it('should valid Protractor Setup', async function() {        // ProtractorScreenShotUtils 的使用方式    const screenShotUtils = new ProtractorScreenShotUtils({      browserInstance : browser    });        for (let index = 0; index &lt; urls.length; index++) {      const url = urls[index];      await go(browser.baseUrl + url);      const fileName = url;      const golden  = './src/' + browser.params.imagePath + `/${browser.params.device}/${fileName}.png`;      const diffDir = './src/' + browser.params.imagePath + `/${browser.params.device}/`;      const actual = await screenShotUtils.takeScreenshot();      const result = await compareScreenshot(actual, golden, diffDir);      expect(result).toBeTruthy();      }      });});\n這段程式碼三個重點:\n第一個重點，我建立一個 array ，用來儲存要瀏覽的頁面路徑，所以以後只要有新增頁面，我在這邊新增選項就好了。123456const urls = [    'protractor-setup',    'server-setup',     'browser-setup',    'frameworks'  ]\n第二個重點，使用 protractor-screenshot-utils 做整頁的截圖。12345const screenShotUtils = new ProtractorScreenShotUtils(&#123;      browserInstance : browser    &#125;);const actual = await screenShotUtils.takeScreenshot();\n第三個重點，用 for 迴圈巡覽全部頁面，並且讀取剛剛在 protractor.conf.js 設定的 golden 路徑。12345678910for (let index = 0; index &lt; urls.length; index++) &#123;  const url = urls[index];  await go(browser.baseUrl + url);  const fileName = url;  const golden  = './src/' + browser.params.imagePath + `/$&#123;browser.params.device&#125;/$&#123;fileName&#125;.png`;  const diffDir = './src/' + browser.params.imagePath + `/$&#123;browser.params.device&#125;/`;  const actual = await screenShotUtils.takeScreenshot();  const result = await compareScreenshot(actual, golden, diffDir);  expect(result).toBeTruthy();  &#125;\n執行 E2E 測試上敘步驟完成後，我們可以將測試執行起來 npm run protractor，執行後就會看到 golden 圖儲存到設定的路徑上。desktop 1440 goldens\n這樣未來只要把 UPDATE_GOLDENS 的環境變數清空或者設定成 false ，就可以跟 golden 做比對了12//in protractor.conf.jsprocess.env['UPDATE_GOLDENS'] = \"false\";\n新增其他解析度的 protractor.conf.js因為畫面的大小是寫在 browser.params ， 所以只要新增 protractor.conf.js 覆寫掉 browser.params 就可以快速產生不同解析度的測試，而且程式碼都不需要調整。 我這邊以新增一個 pad 解析度為例 protractor.conf.pad_768.jsprotractor.conf.pad_768.jsjs12345678910let config = require('./protractor.conf.js').config;config.params = {     width: 768,    height: 1024,    imagePath: 'goldens/chrome',    device: 'pad_768'};\u000bexports.config = config;\n然後在 package.json 新增 protractor.conf.pad_768.js 的 E2E 測試指令1234\"scripts\": &#123;  \"protractor\": \"protractor\",  \"chrome:768\": \"protractor protractor.conf.pad_768.js\",&#125;,\n執行 npm run chrome:768 後就會看到 golden 圖儲存到設定的路徑上。\npad 768 goldens\n小結透過這樣的方式，就可以寫少少的程式碼，快速把網站所有的頁面跑過一次跑版測試，並且保有擴充性，可以隨意新增要測試的解析度，甚至是不同的瀏覽器，只要新增 protractor.conf.js 並覆寫設定就可以了。\n另外，如果需要有更新 golden 圖的時候，只要使用 configuring-test-suites 或者是 fdescribe 來部分更新 golden 圖就可以了。\n","dateCreated":"2019-12-06T20:51:09+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-12-06T20:51:09+08:00","description":"之前負責一個案子，是做客戶的官方網站，且該網站有要求 RWD，而在專案後期的時候，常常一個 CSS 沒調整好，導致其他頁面跑版，於是乎我就順手寫了跑全部頁面的 E2E 跑版測試，且可以輕易擴充要測試的解析度。 今天就來說明如何建立一個這樣的 E2E 測試專案。","headline":"[自動化測試] 如何用 Protractor 寫 RWD 的畫面比對測試","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/12/如何用-Protractor-寫-RWD-的畫面比對測試/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/12/如何用-Protractor-寫-RWD-的畫面比對測試/","keywords":"Protractor, RWD"}</script>
     <meta name="description" content="之前負責一個案子，是做客戶的官方網站，且該網站有要求 RWD，而在專案後期的時候，常常一個 CSS 沒調整好，導致其他頁面跑版，於是乎我就順手寫了跑全部頁面的 E2E 跑版測試，且可以輕易擴充要測試的解析度。 今天就來說明如何建立一個這樣的 E2E 測試專案。">
 <meta name="keywords" content="Protractor">
 <meta property="og:type" content="blog">
@@ -99,19 +99,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -120,7 +125,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -129,7 +134,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -138,7 +143,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -147,7 +152,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -156,7 +161,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -169,7 +174,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -178,7 +183,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -187,7 +192,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -196,7 +201,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -209,7 +214,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -814,7 +819,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -822,7 +827,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

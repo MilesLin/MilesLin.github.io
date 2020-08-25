@@ -12,12 +12,12 @@
         <meta name="keywords" content="Go,gRCP,Protocol Buffers">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Server streaming 是當 client 發送一個 request ， 伺服器在一個 RPC 的回應裡，回應零個或多個訊息。 最經典的例子就是 client 做查詢，伺服器回應多個結果回來。\n\n這篇只會說明怎麼實作 Server 與 Client 程式碼，如果要了解怎麼建立 gRPC 服務，可以參考 用 Go 建立 gRPC 的 Server 與 Client\n讓我們用下列的訊息當作範例，我們定義了一個 RPC 方法，會接收 SearchRequest 的訊息，並且回傳 stream SearchResponse 給 Client 端。\nprotoproto1234567891011syntax = \"proto3\";service Database { rpc Search(SearchRequest) returns (stream SearchResponse);}message SearchRequest { string term = 1;}message SearchResponse { string matched_term = 1; string content = 2;}\n有定義檔之後，使用 protoc 產生程式碼，使用方法可參考 用 Go 建立 gRPC 的 Server 與 Client。 以我這篇的範例是執行 $ protoc -I pb/ pb/*.proto --go_out=plugins=grpc:pb 產生程式碼。\nServer Code接下來就是來實作 Server Code 啦。 我建立一個 DatabaseService 實作 Search 的方法，裡面我預設就回傳四筆資料。 \n其中比較特別的是這行 time.Sleep(1 * time.Second) ，我在每一次送資料的時候暫停一秒，用來驗證說每一次送資料給 Client 的時候會直接送到，而不會等到全部執行完才傳給 Client，這等等會在 Client Code 那邊看到效果。\n那怎樣才算 Server 回傳結束呢? 以 Golang 的範例來說，只要回傳 error 就好了。 如果你是回傳 nil 則 Client 的 error 物件會收到 io.EOF，代表資料已經傳輸完畢。\nservergo123456789101112131415161718192021222324252627282930313233package serviceimport (\t\"log\"\t\"time\"\t\"trygrpc/pb\")type DatabaseService struct {}func (d DatabaseService) Search(r *pb.SearchRequest, s pb.Database_SearchServer) error {  // 預設回傳 4 個 Responses\tresponses := []string{\t\t\"Highest ranked content\",\t\t\"Some ranked content\",\t\t\"Some ranked content\",\t\t\"Lowest ranked content\",\t}\tfor _, resp := range responses {\t\tresult := &amp;pb.SearchResponse{MatchedTerm: r.Term, Content: resp}\t\tif err := s.Send(result); err != nil {\t\t\tlog.Printf(\"Error sending message to the client:%v\", err)\t\t\treturn err\t\t}\t\t// 測試 stream 的效果\t\ttime.Sleep(1 * time.Second)\t}\treturn nil}\n如果要回傳其他 error 的話建議使用 grpc package google.golang.org/grpc/codes, google.golang.org/grpc/status 裡面預設的 error code 。 \n使用方法 err := status.Error(codes.NotFound, &quot;id was not found&quot;)。\n\nClient CodeClinet code 接收資料的方式就是建立一個無窮迴圈，呼叫 Recv() 這個方法接收資料，當這個方法回傳的 error 是 io.EOF 的時候呢，代表資料傳輸結束，就可以中斷迴圈了。\nclientgo123456789101112131415161718192021222324252627282930313233343536373839404142434445package mainimport (\t\"context\"\t\"fmt\"\t\"google.golang.org/grpc\"\t\"google.golang.org/grpc/credentials\"\t\"io\"\t\"log\"\t\"time\"\t\"trygrpc/pb\")const (\taddress = \"localhost:50051\")func main() {\t// Create tls based credential.\tcreds, _ := credentials.NewClientTLSFromFile(\"../cert.pem\", \"\")\t// Set up a connection to the server.\tconn, _ := grpc.Dial(address, grpc.WithTransportCredentials(creds), grpc.WithBlock())\tdefer conn.Close()\tc := pb.NewDatabaseClient(conn)\tresult, _ := c.Search(context.Background(),\t\t&amp;pb.SearchRequest{\t\t\tTerm: \"test term\",\t\t})\tfor {\t\tres, err := result.Recv()\t\tif err == io.EOF {\t\t\tbreak\t\t} else if err != nil {\t\t\tlog.Fatal(err)\t\t}\t\tfmt.Printf(\"Received time: %v:%v, data: %v \\n\", time.Now().Minute(), time.Now().Second() ,res)\t}}\n這邊可以看到 Client 也是每隔一秒收到一個訊息。 根據這個驗證，可以得知我送一個 request 給 Server 後，Server 回傳多個 Responses 給我\n\n這邊補充一個 Client error 處理的方式，如果 Server 是使用 grpc package 裡面預設的 error code ，在 client 就可以使用下方的方式比對 error。\ns := status.Convert(err)if s.Code() == codes.Aborted {  fmt.Println(“比對成功”)}\n\n延伸閱讀[gRPC Basics - Go][Go by Example: Time Formatting / Parsing][Advanced gRPC Error Usage]\n","dateCreated":"2020-04-01T22:49:41+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-04-01T22:49:41+08:00","description":"Server streaming 是當 client 發送一個 request ， 伺服器在一個 RPC 的回應裡，回應零個或多個訊息。 最經典的例子就是 client 做查詢，伺服器回應多個結果回來。","headline":"[Go] gRCP Server streaming","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/04/Golang/gRCP-Server-streaming/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/04/Golang/gRCP-Server-streaming/","keywords":"Go, Protocol Buffers, gRCP"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Server streaming 是當 client 發送一個 request ， 伺服器在一個 RPC 的回應裡，回應零個或多個訊息。 最經典的例子就是 client 做查詢，伺服器回應多個結果回來。\n\n這篇只會說明怎麼實作 Server 與 Client 程式碼，如果要了解怎麼建立 gRPC 服務，可以參考 用 Go 建立 gRPC 的 Server 與 Client\n讓我們用下列的訊息當作範例，我們定義了一個 RPC 方法，會接收 SearchRequest 的訊息，並且回傳 stream SearchResponse 給 Client 端。\nprotoproto1234567891011syntax = \"proto3\";service Database { rpc Search(SearchRequest) returns (stream SearchResponse);}message SearchRequest { string term = 1;}message SearchResponse { string matched_term = 1; string content = 2;}\n有定義檔之後，使用 protoc 產生程式碼，使用方法可參考 用 Go 建立 gRPC 的 Server 與 Client。 以我這篇的範例是執行 $ protoc -I pb/ pb/*.proto --go_out=plugins=grpc:pb 產生程式碼。\nServer Code接下來就是來實作 Server Code 啦。 我建立一個 DatabaseService 實作 Search 的方法，裡面我預設就回傳四筆資料。 \n其中比較特別的是這行 time.Sleep(1 * time.Second) ，我在每一次送資料的時候暫停一秒，用來驗證說每一次送資料給 Client 的時候會直接送到，而不會等到全部執行完才傳給 Client，這等等會在 Client Code 那邊看到效果。\n那怎樣才算 Server 回傳結束呢? 以 Golang 的範例來說，只要回傳 error 就好了。 如果你是回傳 nil 則 Client 的 error 物件會收到 io.EOF，代表資料已經傳輸完畢。\nservergo123456789101112131415161718192021222324252627282930313233package serviceimport (\t\"log\"\t\"time\"\t\"trygrpc/pb\")type DatabaseService struct {}func (d DatabaseService) Search(r *pb.SearchRequest, s pb.Database_SearchServer) error {  // 預設回傳 4 個 Responses\tresponses := []string{\t\t\"Highest ranked content\",\t\t\"Some ranked content\",\t\t\"Some ranked content\",\t\t\"Lowest ranked content\",\t}\tfor _, resp := range responses {\t\tresult := &amp;pb.SearchResponse{MatchedTerm: r.Term, Content: resp}\t\tif err := s.Send(result); err != nil {\t\t\tlog.Printf(\"Error sending message to the client:%v\", err)\t\t\treturn err\t\t}\t\t// 測試 stream 的效果\t\ttime.Sleep(1 * time.Second)\t}\treturn nil}\n如果要回傳其他 error 的話建議使用 grpc package google.golang.org/grpc/codes, google.golang.org/grpc/status 裡面預設的 error code 。 \n使用方法 err := status.Error(codes.NotFound, &quot;id was not found&quot;)。\n\nClient CodeClinet code 接收資料的方式就是建立一個無窮迴圈，呼叫 Recv() 這個方法接收資料，當這個方法回傳的 error 是 io.EOF 的時候呢，代表資料傳輸結束，就可以中斷迴圈了。\nclientgo123456789101112131415161718192021222324252627282930313233343536373839404142434445package mainimport (\t\"context\"\t\"fmt\"\t\"google.golang.org/grpc\"\t\"google.golang.org/grpc/credentials\"\t\"io\"\t\"log\"\t\"time\"\t\"trygrpc/pb\")const (\taddress = \"localhost:50051\")func main() {\t// Create tls based credential.\tcreds, _ := credentials.NewClientTLSFromFile(\"../cert.pem\", \"\")\t// Set up a connection to the server.\tconn, _ := grpc.Dial(address, grpc.WithTransportCredentials(creds), grpc.WithBlock())\tdefer conn.Close()\tc := pb.NewDatabaseClient(conn)\tresult, _ := c.Search(context.Background(),\t\t&amp;pb.SearchRequest{\t\t\tTerm: \"test term\",\t\t})\tfor {\t\tres, err := result.Recv()\t\tif err == io.EOF {\t\t\tbreak\t\t} else if err != nil {\t\t\tlog.Fatal(err)\t\t}\t\tfmt.Printf(\"Received time: %v:%v, data: %v \\n\", time.Now().Minute(), time.Now().Second() ,res)\t}}\n這邊可以看到 Client 也是每隔一秒收到一個訊息。 根據這個驗證，可以得知我送一個 request 給 Server 後，Server 回傳多個 Responses 給我\n\n這邊補充一個 Client error 處理的方式，如果 Server 是使用 grpc package 裡面預設的 error code ，在 client 就可以使用下方的方式比對 error。\ns := status.Convert(err)if s.Code() == codes.Aborted {  fmt.Println(“比對成功”)}\n\n延伸閱讀[gRPC Basics - Go][Go by Example: Time Formatting / Parsing][Advanced gRPC Error Usage]\n","dateCreated":"2020-04-01T22:49:41+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-04-01T22:49:41+08:00","description":"Server streaming 是當 client 發送一個 request ， 伺服器在一個 RPC 的回應裡，回應零個或多個訊息。 最經典的例子就是 client 做查詢，伺服器回應多個結果回來。","headline":"[Go] gRCP Server streaming","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/04/Golang/gRCP-Server-streaming/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/04/Golang/gRCP-Server-streaming/","keywords":"Go, Protocol Buffers, gRCP"}</script>
     <meta name="description" content="Server streaming 是當 client 發送一個 request ， 伺服器在一個 RPC 的回應裡，回應零個或多個訊息。 最經典的例子就是 client 做查詢，伺服器回應多個結果回來。">
 <meta name="keywords" content="Go,gRCP,Protocol Buffers">
 <meta property="og:type" content="blog">
@@ -97,19 +97,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -118,7 +123,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -127,7 +132,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -136,7 +141,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -145,7 +150,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -154,7 +159,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -167,7 +172,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -176,7 +181,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -185,7 +190,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -194,7 +199,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -207,7 +212,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -796,7 +801,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -804,7 +809,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

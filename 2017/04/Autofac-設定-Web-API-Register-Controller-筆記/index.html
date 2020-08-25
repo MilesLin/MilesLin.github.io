@@ -12,12 +12,12 @@
         <meta name="keywords" content="C#,.NET,Autofac">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)\n\n使用容器註冊物件為了方便整理，我會先新增 AutofacConfig.cs 放在 App_Start 資料夾裡面， AutofacConfig.cs 則負責註冊。\n\n安裝 Autofac.WebAPi2\n先註冊所有 Web API Controller 到 ContainerBuilder\n註冊所有 Controller 要相依的物件，這邊以 IConfiguration 為例子，表示 Controller 建構式注入 IConfiguration 時會取得 Configuration 物件\n開啟 Global.asax.cs 加入 AutofacConfig.Bootstrapper()AutofacConfigcs12345678910111213141516171819202122232425262728public class AutofacConfig{    public static void Bootstrapper()    {        var builder = new ContainerBuilder();        // Get your HttpConfiguration.        var config = GlobalConfiguration.Configuration;        // Register your Web API controllers.        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());        // OPTIONAL: Register the Autofac filter provider.        builder.RegisterWebApiFilterProvider(config);        builder.RegisterType&lt;Configuration&gt;()           .As&lt;IConfiguration&gt;()           .InstancePerLifetimeScope();        builder.RegisterType&lt;Configuration&gt;()           .As&lt;IConfiguration&gt;()           .InstancePerLifetimeScope();        var container = builder.Build();        config.DependencyResolver = new AutofacWebApiDependencyResolver(container);    }}\n\n\n打開 Global.asax.cs 加入 AutofacConfig.Bootstrapper();Global.asax.cscs123456789101112131415public class WebApiApplication : System.Web.HttpApplication{    protected void Application_Start()    {        AreaRegistration.RegisterAllAreas();        GlobalConfiguration.Configure(WebApiConfig.Register);        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);        RouteConfig.RegisterRoutes(RouteTable.Routes);        BundleConfig.RegisterBundles(BundleTable.Bundles);                // 加入這行        AutofacConfig.Bootstrapper();    }}\n接下來 Controller 就可以建構式注入 IConfiguration 取得 Configuration 物件Controllercs12345678public class ValuesController : ApiController{    IConfiguration _configuration;    public ValuesController(IConfiguration configuration)    {        _configuration = configuration;    }}\n建立 Autofac.Module當註冊物件一多的時候，我們可以建立 Aufofac.Module 把註冊這件事情分散在各個 Module 處理。\n例如我建立一個 EFModule ，註冊 Entities。EFModulecs123456789public class EFModule : Autofac.Module{    protected override void Load(ContainerBuilder builder)    {        builder.RegisterType&lt;WebPaymentEntities&gt;()           .As&lt;WebPaymentEntities&gt;()           .InstancePerLifetimeScope();    }}\n我的 ContainerBuilder 只要註冊 Module 就好Register Modulecs123456789101112131415161718192021222324public static void Bootstrapper()    {        var builder = new ContainerBuilder();        // Get your HttpConfiguration.        var config = GlobalConfiguration.Configuration;        // Register your Web API controllers.        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());        // OPTIONAL: Register the Autofac filter provider.        builder.RegisterWebApiFilterProvider(config);        builder.RegisterType&lt;Configuration&gt;()           .As&lt;IConfiguration&gt;()           .InstancePerLifetimeScope();                // 註冊 Module        builder.RegisterModule(new EFModule());        var container = builder.Build();        config.DependencyResolver = new AutofacWebApiDependencyResolver(container);    }\n一次註冊多個物件在寫 MVC 或 Web API 的時候可以常見到 Repository Pattern 而 Repository Pattern 有一定的命名規格，例如: 介面 IxxxRepository 會對應到一個類別 xxxRepository。Repositorycs12345678910public class ProductRepository : IProductRepository{    private WebPaymentEntities context;    public ImportContainerRepository(WebPaymentEntities context)    {        this.context = context;    }}\n我們就可以用這命名的 Pattern 建立一個 Autofac Module 註冊所有的 Repository\nRespository Modulecs12345678910public class RepositoryModule : Autofac.Module{    protected override void Load(ContainerBuilder builder)    {        builder.RegisterAssemblyTypes(typeof(WebApiApplication).Assembly)               .Where(t =&gt; t.Name.EndsWith(\"Repository\"))               .AsImplementedInterfaces()              .InstancePerLifetimeScope();    }}\n小結通常 Autofac 設定一次就很少再設定了，所以沒有研究很深，就先筆記到這邊，等之後需要其他應用的時候，再來詳細閱讀官方文件。\n參考Autofac 官方文件","dateCreated":"2017-04-28T20:52:13+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-04-28T20:52:13+08:00","description":"Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)","headline":"[Autofac] 設定 Web API Register Controller 筆記","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/","keywords":".NET, C#, Autofac"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)\n\n使用容器註冊物件為了方便整理，我會先新增 AutofacConfig.cs 放在 App_Start 資料夾裡面， AutofacConfig.cs 則負責註冊。\n\n安裝 Autofac.WebAPi2\n先註冊所有 Web API Controller 到 ContainerBuilder\n註冊所有 Controller 要相依的物件，這邊以 IConfiguration 為例子，表示 Controller 建構式注入 IConfiguration 時會取得 Configuration 物件\n開啟 Global.asax.cs 加入 AutofacConfig.Bootstrapper()AutofacConfigcs12345678910111213141516171819202122232425262728public class AutofacConfig{    public static void Bootstrapper()    {        var builder = new ContainerBuilder();        // Get your HttpConfiguration.        var config = GlobalConfiguration.Configuration;        // Register your Web API controllers.        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());        // OPTIONAL: Register the Autofac filter provider.        builder.RegisterWebApiFilterProvider(config);        builder.RegisterType&lt;Configuration&gt;()           .As&lt;IConfiguration&gt;()           .InstancePerLifetimeScope();        builder.RegisterType&lt;Configuration&gt;()           .As&lt;IConfiguration&gt;()           .InstancePerLifetimeScope();        var container = builder.Build();        config.DependencyResolver = new AutofacWebApiDependencyResolver(container);    }}\n\n\n打開 Global.asax.cs 加入 AutofacConfig.Bootstrapper();Global.asax.cscs123456789101112131415public class WebApiApplication : System.Web.HttpApplication{    protected void Application_Start()    {        AreaRegistration.RegisterAllAreas();        GlobalConfiguration.Configure(WebApiConfig.Register);        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);        RouteConfig.RegisterRoutes(RouteTable.Routes);        BundleConfig.RegisterBundles(BundleTable.Bundles);                // 加入這行        AutofacConfig.Bootstrapper();    }}\n接下來 Controller 就可以建構式注入 IConfiguration 取得 Configuration 物件Controllercs12345678public class ValuesController : ApiController{    IConfiguration _configuration;    public ValuesController(IConfiguration configuration)    {        _configuration = configuration;    }}\n建立 Autofac.Module當註冊物件一多的時候，我們可以建立 Aufofac.Module 把註冊這件事情分散在各個 Module 處理。\n例如我建立一個 EFModule ，註冊 Entities。EFModulecs123456789public class EFModule : Autofac.Module{    protected override void Load(ContainerBuilder builder)    {        builder.RegisterType&lt;WebPaymentEntities&gt;()           .As&lt;WebPaymentEntities&gt;()           .InstancePerLifetimeScope();    }}\n我的 ContainerBuilder 只要註冊 Module 就好Register Modulecs123456789101112131415161718192021222324public static void Bootstrapper()    {        var builder = new ContainerBuilder();        // Get your HttpConfiguration.        var config = GlobalConfiguration.Configuration;        // Register your Web API controllers.        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());        // OPTIONAL: Register the Autofac filter provider.        builder.RegisterWebApiFilterProvider(config);        builder.RegisterType&lt;Configuration&gt;()           .As&lt;IConfiguration&gt;()           .InstancePerLifetimeScope();                // 註冊 Module        builder.RegisterModule(new EFModule());        var container = builder.Build();        config.DependencyResolver = new AutofacWebApiDependencyResolver(container);    }\n一次註冊多個物件在寫 MVC 或 Web API 的時候可以常見到 Repository Pattern 而 Repository Pattern 有一定的命名規格，例如: 介面 IxxxRepository 會對應到一個類別 xxxRepository。Repositorycs12345678910public class ProductRepository : IProductRepository{    private WebPaymentEntities context;    public ImportContainerRepository(WebPaymentEntities context)    {        this.context = context;    }}\n我們就可以用這命名的 Pattern 建立一個 Autofac Module 註冊所有的 Repository\nRespository Modulecs12345678910public class RepositoryModule : Autofac.Module{    protected override void Load(ContainerBuilder builder)    {        builder.RegisterAssemblyTypes(typeof(WebApiApplication).Assembly)               .Where(t =&gt; t.Name.EndsWith(\"Repository\"))               .AsImplementedInterfaces()              .InstancePerLifetimeScope();    }}\n小結通常 Autofac 設定一次就很少再設定了，所以沒有研究很深，就先筆記到這邊，等之後需要其他應用的時候，再來詳細閱讀官方文件。\n參考Autofac 官方文件","dateCreated":"2017-04-28T20:52:13+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-04-28T20:52:13+08:00","description":"Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)","headline":"[Autofac] 設定 Web API Register Controller 筆記","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/04/Autofac-設定-Web-API-Register-Controller-筆記/","keywords":".NET, C#, Autofac"}</script>
     <meta name="description" content="Autofac 是一種幫忙管理物件注入的容器，能夠幫助我們在 Controller 建構式注入物件，這樣才有辦法與實體隔離，幫助我們寫單元測試。  今天就來說明怎麼設定 Autofac 使 Controller 建構式注入物件。  今天會以 Web API 為例子。(要注意:MVC的註冊方式有點不同)">
 <meta name="keywords" content="C#,.NET,Autofac">
 <meta property="og:type" content="blog">
@@ -95,19 +95,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -116,7 +121,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -125,7 +130,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -134,7 +139,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -143,7 +148,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -152,7 +157,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -165,7 +170,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -174,7 +179,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -183,7 +188,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -192,7 +197,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -205,7 +210,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -792,7 +797,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -800,7 +805,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

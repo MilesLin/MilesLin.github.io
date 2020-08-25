@@ -12,12 +12,12 @@
         <meta name="keywords" content="Go,gRPC">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"此篇不會說明有關 gRPC 與 protocol buffers 的詳細概念，如果要瞭解可以到 grpc.io 閱讀相關文件。 今天會筆記，怎麼從無到用 Go 建立好 gRPC 的 Server 與 Client，當作是學習 gRPC 的起點。\n\n安裝開始之前先把環境建立好，在 Compiling your protocol buffers 文件裡面有詳細說明如何安裝。 \n1. 首先要先到 protobuf-github release 下載 protobuf compiler 執行檔案。\n現在最新的版本是 Protocol Buffers v3.11.4 ，而我電腦是 win64，所以我就選擇 protoc-3.11.4-win64.zip 下載。\nProtocol Buffers v3.11.4\nwin64\n2. 將 protobuf compiler 執行檔加入環境變數\n將下載的檔案解壓縮後，有 bin 資料夾，將裡面的 protoc.exe 加入環境變數。protoc\n如果你的電腦有安裝 Go 的話，可以把檔案放在 ${GOROOT}/bin 底下，以我電腦為例，我就把 protoc.exe 放到 C:\\Go\\bin 底下，因為 ${GOROOT}/bin 已經加入環境變數了。  完成後打開命令提示字元輸入 $ protoc --version 就可以看到版本號了。version\n3. 安裝 Go protocol buffers plugin\n這是用來產生 Go Code 的工具，請執行下列指令安裝，install go protocol buffers pluginbash12$ go get google.golang.org/protobuf/cmd/protoc-gen-go$ go install google.golang.org/protobuf/cmd/protoc-gen-go\n安裝好後，就會看到 %{GOPATH}/bin 底下會有 protoc-gen-go.exe 執行檔案。protoc-gen-go\n根據 Go Quick Start 的說明，我以為就這樣安裝結束了。 但發現要使用時，出現了此錯誤\n\n根據 protocolbuffers/protobuf-go release note 的說明，這是因為 v1.20 以後 protoc-gen-go 不再支援產生 gRPC service definitions，未來要改用 protoc-gen-go-grpc。 \n但是我更改使用 protoc-gen-go-grpc 卻又產生 'protoc-gen-go-grpc' is not recognized as an internal or external command 的錯誤訊息。\n根據 google.golang.org/grpc: move protoc-gen-go-grpc into grpc module 的說明，這是因為 google.golang.org/protobuf 還沒有把 protoc-gen-go-grpc 的工具從 github.com/golang/protobuf 移植過來，所以要修正這個的問題，我們改從 github.com/golang/protobuf 取得 protoc-gen-go.exe，安裝方式請執行下面兩行程式。\ninstall go protocol buffers pluginbash12$ go get -u github.com/golang/protobuf/protoc-gen-go$ go install github.com/golang/protobuf/protoc-gen-go\n上敘是我在寫此篇文章當下遇到的問題，我相信過不久 Goolge 會把文件跟這個錯誤修正好。\n\n4. 最後要安裝 Golang 的 grpc package ，這是要用來寫 grpc code 的 package\ngrpc packagebash1$ go get -u google.golang.org/grpc\n這樣我們就把環就都弄好啦。接下來進入簡單的概念說明與開始寫 code 了。\n概念解說我從 Mastering Go - Second Edition 這本書擷取一段 gRPC 的說明。Strictly speaking, gRPC is a protocol built on HTTP/2 that allows you to create serviceseasily. gRPC can use protocol buffers to specify an interface definition language, as well asto specify the format of the interchanged messages. gRPC clients and servers can be writtenin any programming language without the need to have clients written in the sameprogramming language as their servers.\nMihalis Tsoukalos ,Mastering Go - Second EditionMastering Go - Second Edition\n上敘的翻譯為，「gRPC 是建立在 HTTP/2 上的通訊協定，gRPC 可以使用 protocol buffers 定義訊息的格式，gRPC 可以使用任何語言實作。」\n而我從此課程 Enhancing Application Communication with gRPC 擷取一張圖片，說明 Client 與 Server 使用 protocol buffers 的格式來傳送資料。\ngRPC Concepts - Basic Components\n根據上圖的架構就是我們這篇文章要做的事情\n\n使用 protocol buffers 定義 message type 產生程式碼框架。\n實作 Server Code，執行 gRPC Server 。\n實作 Client Code。\n\n定義 Message Type我們用 Define Message Type 範例來看 Message Type 的長相define message typeproto1234567syntax = \"proto3\";message SearchRequest {  string query = 1;  int32 page_number = 2;  int32 result_per_page = 3;}\n這邊要特別說的是為什麼每一個欄位後面會有一個數字呢?  根據 Assigning Field Numbers 的說明\nAssigning Field NumbersAs you can see, each field in the message definition has a unique number. These field numbers are used to identify your fields in the message binary format, and should not be changed once your message type is in use. Note that field numbers in the range 1 through 15 take one byte to encode, including the field number and the field’s type (you can find out more about this in Protocol Buffer Encoding). Field numbers in the range 16 through 2047 take two bytes. So you should reserve the numbers 1 through 15 for very frequently occurring message elements. Remember to leave some room for frequently occurring elements that might be added in the future.\ndevelopers.google.comAssigning Field Numbers\n這是說，當資料傳送的時候是用 message binary format ，該數字是用來 定位 該欄位。 而數字1-15 是只用了 1 byte encode， 16-2047 用了 2 btyes encode ，所以建議常用的欄位可以放在前 15 個欄位，可以多少減少一些資料的傳送量。\n為了今天的 Demo 能夠簡單，我將使用 Message Definition 提供的範例，當作是我們這篇的範例。define messageproto123456789101112131415161718syntax = \"proto3\";option go_package = \"pb\";// The greeting service definition.service Greeter {  // Sends a greeting  rpc SayHello (HelloRequest) returns (HelloReply) {}}// The request message containing the user's name.message HelloRequest {  string name = 1;}// The response message containing the greetingsmessage HelloReply {  string message = 1;}上敘 Message Definition 非常簡單，就定義兩個 Message Type 一個是 HelloRequest 一個是 HelloReply ，然後還有定義一個 RPC 的服務 rpc SayHello (HelloRequest) returns (HelloReply) {}，而等等的實作程式碼，就是要實作 SayHello 這個方法。\n定義好 Message 之後，我們就使用指令 $ protoc -I=$SRC_DIR --go_out=$DST_DIR $SRC_DIR/message.proto 產生程式碼，如下範例，\ngen codebash1$ protoc -I pb/ pb/messages.proto --go_out=plugins=grpc:pb\n也可以使用另一種寫法 $ protoc --go_out=plugins=grpc:$DST_DIR $SRC_DIR，例如  $ protoc --go_out=plugins=grpc:. pb/*.proto，參考:gRPC Support。\n執行完後，就會看到有一份 messages.pb.go 的程式碼被產生，這就是我們定義好的訊息介面，等等會要用到這份程式碼來實作 Server Code 與 Client Code。gen-code\n實作 Server Code我們打開 messages.pb.go ，裡面有一個 interface 如下，這是我們要實作 Server Code 的方法。GreeterServer intefacego12345// GreeterServer is the server API for Greeter service.type GreeterServer interface {\t// Sends a greeting\tSayHello(context.Context, *HelloRequest) (*HelloReply, error)}\n所以這邊我們定義一個 MessageService ，實作 GreeterServer interface 的內容。  我的實作內容只是讀取 HellowRequest 的資訊，加一些訊息後回傳給 Client。MessageServicego123456type MessageService struct{}func (m MessageService) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {\treturn &amp;pb.HelloReply{Message: \"Server say hello to \" + in.GetName()}, nil}\n建立 Server接下來請參考下方的程式碼，我們要把 MessageService 註冊到 gRPC 的 Server ，並且將 gRPC Server 執行起來。gRPC Servergo1234567891011121314151617181920212223242526package mainimport (\t\"google.golang.org/grpc\"\t\"log\"\t\"net\"\t\"trygrpc/pb\"\t\"trygrpc/service\")const (\tport = \":50051\")func main() {\t// Create gRPC Server\tlis, err := net.Listen(\"tcp\", port)\tif err != nil {\t\tlog.Fatalf(\"failed to listen: %v\", err)\t}\ts := grpc.NewServer()\tlog.Println(\"gRPC server is running.\")\tpb.RegisterGreeterServer(s, &amp;service.MessageService{})\tif err := s.Serve(lis); err != nil {\t\tlog.Fatalf(\"failed to serve: %v\", err)\t}}\n這樣我們 Server Code 就定義好了!!!\n實作 Client Code一樣我們打開 messages.pb.go ，尋找下面那段程式碼，就會發現 Client 的程式碼我們不用自己實作，他已經幫我們產生好了!!!  我們只需要直接用。\nMessage Clientgo123456789101112131415161718192021type GreeterClient interface {\t// Sends a greeting\tSayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)}type greeterClient struct {\tcc grpc.ClientConnInterface}func NewGreeterClient(cc grpc.ClientConnInterface) GreeterClient {\treturn &amp;greeterClient{cc}}func (c *greeterClient) SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error) {\tout := new(HelloReply)\terr := c.cc.Invoke(ctx, \"/Greeter/SayHello\", in, out, opts...)\tif err != nil {\t\treturn nil, err\t}\treturn out, nil}\n而使用方式如下Clientgo12345678910111213141516171819202122232425262728293031323334package mainimport (\t\"context\"\t\"google.golang.org/grpc\"\t\"log\"\t\"time\"\t\"trygrpc/pb\")const (\taddress     = \"localhost:50051\")func main() {\t// Set up a connection to the server.\tconn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())\tif err != nil {\t\tlog.Fatalf(\"did not connect: %v\", err)\t}\tdefer conn.Close()\tc := pb.NewGreeterClient(conn)\t// Contact the server and print out its response.\tname := \"Miles\"\tctx, cancel := context.WithTimeout(context.Background(), time.Second)\tdefer cancel()\tr, err := c.SayHello(ctx, &amp;pb.HelloRequest{Name: name})\tif err != nil {\t\tlog.Fatalf(\"could not greet: %v\", err)\t}\tlog.Printf(\"Greeting: %s\", r.GetMessage())}\n這樣 Client Code 也完成了!!!\n執行程式碼接下來就先把 Server 先跑起來，然後再執行 Client。  確定跑起來後，我們就完成最簡單的 gRPC 的範例的!!call-grpc\n最後我有把我的範例程式上傳到 Gihub 上，可以參考 MilesLin/gRPC-helloworld\n官方提供的程式碼範例今天範例是來自官方，可以從這邊找到 grpc-Build the example。 簡單的說我們只要安裝好 go get -u google.golang.org/grpc 的 package，就可以在 $GOPATH/src/google.golang.org/grpc/examples/helloworld 資料夾底下找到各種 grpc 的範例。 而這些範例也有放在 github 上 grpc-go/examples/features/。\n延伸閱讀[grpc.io][What are protocol buffers][Protocol Buffers][Enhancing Application Communication with gRPC][Go Quick Start][gRPC Concepts][grpc-go/examples]\n","dateCreated":"2020-03-28T15:30:22+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-03-28T15:30:22+08:00","description":"此篇不會說明有關 gRPC 與 protocol buffers 的詳細概念，如果要瞭解可以到 grpc.io 閱讀相關文件。 今天會筆記，怎麼從無到用 Go 建立好 gRPC 的 Server 與 Client，當作是學習 gRPC 的起點。","headline":"[Go] 用 Go 建立 gRPC 的 Server 與 Client","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/","keywords":"Go, gRPC"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"此篇不會說明有關 gRPC 與 protocol buffers 的詳細概念，如果要瞭解可以到 grpc.io 閱讀相關文件。 今天會筆記，怎麼從無到用 Go 建立好 gRPC 的 Server 與 Client，當作是學習 gRPC 的起點。\n\n安裝開始之前先把環境建立好，在 Compiling your protocol buffers 文件裡面有詳細說明如何安裝。 \n1. 首先要先到 protobuf-github release 下載 protobuf compiler 執行檔案。\n現在最新的版本是 Protocol Buffers v3.11.4 ，而我電腦是 win64，所以我就選擇 protoc-3.11.4-win64.zip 下載。\nProtocol Buffers v3.11.4\nwin64\n2. 將 protobuf compiler 執行檔加入環境變數\n將下載的檔案解壓縮後，有 bin 資料夾，將裡面的 protoc.exe 加入環境變數。protoc\n如果你的電腦有安裝 Go 的話，可以把檔案放在 ${GOROOT}/bin 底下，以我電腦為例，我就把 protoc.exe 放到 C:\\Go\\bin 底下，因為 ${GOROOT}/bin 已經加入環境變數了。  完成後打開命令提示字元輸入 $ protoc --version 就可以看到版本號了。version\n3. 安裝 Go protocol buffers plugin\n這是用來產生 Go Code 的工具，請執行下列指令安裝，install go protocol buffers pluginbash12$ go get google.golang.org/protobuf/cmd/protoc-gen-go$ go install google.golang.org/protobuf/cmd/protoc-gen-go\n安裝好後，就會看到 %{GOPATH}/bin 底下會有 protoc-gen-go.exe 執行檔案。protoc-gen-go\n根據 Go Quick Start 的說明，我以為就這樣安裝結束了。 但發現要使用時，出現了此錯誤\n\n根據 protocolbuffers/protobuf-go release note 的說明，這是因為 v1.20 以後 protoc-gen-go 不再支援產生 gRPC service definitions，未來要改用 protoc-gen-go-grpc。 \n但是我更改使用 protoc-gen-go-grpc 卻又產生 'protoc-gen-go-grpc' is not recognized as an internal or external command 的錯誤訊息。\n根據 google.golang.org/grpc: move protoc-gen-go-grpc into grpc module 的說明，這是因為 google.golang.org/protobuf 還沒有把 protoc-gen-go-grpc 的工具從 github.com/golang/protobuf 移植過來，所以要修正這個的問題，我們改從 github.com/golang/protobuf 取得 protoc-gen-go.exe，安裝方式請執行下面兩行程式。\ninstall go protocol buffers pluginbash12$ go get -u github.com/golang/protobuf/protoc-gen-go$ go install github.com/golang/protobuf/protoc-gen-go\n上敘是我在寫此篇文章當下遇到的問題，我相信過不久 Goolge 會把文件跟這個錯誤修正好。\n\n4. 最後要安裝 Golang 的 grpc package ，這是要用來寫 grpc code 的 package\ngrpc packagebash1$ go get -u google.golang.org/grpc\n這樣我們就把環就都弄好啦。接下來進入簡單的概念說明與開始寫 code 了。\n概念解說我從 Mastering Go - Second Edition 這本書擷取一段 gRPC 的說明。Strictly speaking, gRPC is a protocol built on HTTP/2 that allows you to create serviceseasily. gRPC can use protocol buffers to specify an interface definition language, as well asto specify the format of the interchanged messages. gRPC clients and servers can be writtenin any programming language without the need to have clients written in the sameprogramming language as their servers.\nMihalis Tsoukalos ,Mastering Go - Second EditionMastering Go - Second Edition\n上敘的翻譯為，「gRPC 是建立在 HTTP/2 上的通訊協定，gRPC 可以使用 protocol buffers 定義訊息的格式，gRPC 可以使用任何語言實作。」\n而我從此課程 Enhancing Application Communication with gRPC 擷取一張圖片，說明 Client 與 Server 使用 protocol buffers 的格式來傳送資料。\ngRPC Concepts - Basic Components\n根據上圖的架構就是我們這篇文章要做的事情\n\n使用 protocol buffers 定義 message type 產生程式碼框架。\n實作 Server Code，執行 gRPC Server 。\n實作 Client Code。\n\n定義 Message Type我們用 Define Message Type 範例來看 Message Type 的長相define message typeproto1234567syntax = \"proto3\";message SearchRequest {  string query = 1;  int32 page_number = 2;  int32 result_per_page = 3;}\n這邊要特別說的是為什麼每一個欄位後面會有一個數字呢?  根據 Assigning Field Numbers 的說明\nAssigning Field NumbersAs you can see, each field in the message definition has a unique number. These field numbers are used to identify your fields in the message binary format, and should not be changed once your message type is in use. Note that field numbers in the range 1 through 15 take one byte to encode, including the field number and the field’s type (you can find out more about this in Protocol Buffer Encoding). Field numbers in the range 16 through 2047 take two bytes. So you should reserve the numbers 1 through 15 for very frequently occurring message elements. Remember to leave some room for frequently occurring elements that might be added in the future.\ndevelopers.google.comAssigning Field Numbers\n這是說，當資料傳送的時候是用 message binary format ，該數字是用來 定位 該欄位。 而數字1-15 是只用了 1 byte encode， 16-2047 用了 2 btyes encode ，所以建議常用的欄位可以放在前 15 個欄位，可以多少減少一些資料的傳送量。\n為了今天的 Demo 能夠簡單，我將使用 Message Definition 提供的範例，當作是我們這篇的範例。define messageproto123456789101112131415161718syntax = \"proto3\";option go_package = \"pb\";// The greeting service definition.service Greeter {  // Sends a greeting  rpc SayHello (HelloRequest) returns (HelloReply) {}}// The request message containing the user's name.message HelloRequest {  string name = 1;}// The response message containing the greetingsmessage HelloReply {  string message = 1;}上敘 Message Definition 非常簡單，就定義兩個 Message Type 一個是 HelloRequest 一個是 HelloReply ，然後還有定義一個 RPC 的服務 rpc SayHello (HelloRequest) returns (HelloReply) {}，而等等的實作程式碼，就是要實作 SayHello 這個方法。\n定義好 Message 之後，我們就使用指令 $ protoc -I=$SRC_DIR --go_out=$DST_DIR $SRC_DIR/message.proto 產生程式碼，如下範例，\ngen codebash1$ protoc -I pb/ pb/messages.proto --go_out=plugins=grpc:pb\n也可以使用另一種寫法 $ protoc --go_out=plugins=grpc:$DST_DIR $SRC_DIR，例如  $ protoc --go_out=plugins=grpc:. pb/*.proto，參考:gRPC Support。\n執行完後，就會看到有一份 messages.pb.go 的程式碼被產生，這就是我們定義好的訊息介面，等等會要用到這份程式碼來實作 Server Code 與 Client Code。gen-code\n實作 Server Code我們打開 messages.pb.go ，裡面有一個 interface 如下，這是我們要實作 Server Code 的方法。GreeterServer intefacego12345// GreeterServer is the server API for Greeter service.type GreeterServer interface {\t// Sends a greeting\tSayHello(context.Context, *HelloRequest) (*HelloReply, error)}\n所以這邊我們定義一個 MessageService ，實作 GreeterServer interface 的內容。  我的實作內容只是讀取 HellowRequest 的資訊，加一些訊息後回傳給 Client。MessageServicego123456type MessageService struct{}func (m MessageService) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {\treturn &amp;pb.HelloReply{Message: \"Server say hello to \" + in.GetName()}, nil}\n建立 Server接下來請參考下方的程式碼，我們要把 MessageService 註冊到 gRPC 的 Server ，並且將 gRPC Server 執行起來。gRPC Servergo1234567891011121314151617181920212223242526package mainimport (\t\"google.golang.org/grpc\"\t\"log\"\t\"net\"\t\"trygrpc/pb\"\t\"trygrpc/service\")const (\tport = \":50051\")func main() {\t// Create gRPC Server\tlis, err := net.Listen(\"tcp\", port)\tif err != nil {\t\tlog.Fatalf(\"failed to listen: %v\", err)\t}\ts := grpc.NewServer()\tlog.Println(\"gRPC server is running.\")\tpb.RegisterGreeterServer(s, &amp;service.MessageService{})\tif err := s.Serve(lis); err != nil {\t\tlog.Fatalf(\"failed to serve: %v\", err)\t}}\n這樣我們 Server Code 就定義好了!!!\n實作 Client Code一樣我們打開 messages.pb.go ，尋找下面那段程式碼，就會發現 Client 的程式碼我們不用自己實作，他已經幫我們產生好了!!!  我們只需要直接用。\nMessage Clientgo123456789101112131415161718192021type GreeterClient interface {\t// Sends a greeting\tSayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)}type greeterClient struct {\tcc grpc.ClientConnInterface}func NewGreeterClient(cc grpc.ClientConnInterface) GreeterClient {\treturn &amp;greeterClient{cc}}func (c *greeterClient) SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error) {\tout := new(HelloReply)\terr := c.cc.Invoke(ctx, \"/Greeter/SayHello\", in, out, opts...)\tif err != nil {\t\treturn nil, err\t}\treturn out, nil}\n而使用方式如下Clientgo12345678910111213141516171819202122232425262728293031323334package mainimport (\t\"context\"\t\"google.golang.org/grpc\"\t\"log\"\t\"time\"\t\"trygrpc/pb\")const (\taddress     = \"localhost:50051\")func main() {\t// Set up a connection to the server.\tconn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())\tif err != nil {\t\tlog.Fatalf(\"did not connect: %v\", err)\t}\tdefer conn.Close()\tc := pb.NewGreeterClient(conn)\t// Contact the server and print out its response.\tname := \"Miles\"\tctx, cancel := context.WithTimeout(context.Background(), time.Second)\tdefer cancel()\tr, err := c.SayHello(ctx, &amp;pb.HelloRequest{Name: name})\tif err != nil {\t\tlog.Fatalf(\"could not greet: %v\", err)\t}\tlog.Printf(\"Greeting: %s\", r.GetMessage())}\n這樣 Client Code 也完成了!!!\n執行程式碼接下來就先把 Server 先跑起來，然後再執行 Client。  確定跑起來後，我們就完成最簡單的 gRPC 的範例的!!call-grpc\n最後我有把我的範例程式上傳到 Gihub 上，可以參考 MilesLin/gRPC-helloworld\n官方提供的程式碼範例今天範例是來自官方，可以從這邊找到 grpc-Build the example。 簡單的說我們只要安裝好 go get -u google.golang.org/grpc 的 package，就可以在 $GOPATH/src/google.golang.org/grpc/examples/helloworld 資料夾底下找到各種 grpc 的範例。 而這些範例也有放在 github 上 grpc-go/examples/features/。\n延伸閱讀[grpc.io][What are protocol buffers][Protocol Buffers][Enhancing Application Communication with gRPC][Go Quick Start][gRPC Concepts][grpc-go/examples]\n","dateCreated":"2020-03-28T15:30:22+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-03-28T15:30:22+08:00","description":"此篇不會說明有關 gRPC 與 protocol buffers 的詳細概念，如果要瞭解可以到 grpc.io 閱讀相關文件。 今天會筆記，怎麼從無到用 Go 建立好 gRPC 的 Server 與 Client，當作是學習 gRPC 的起點。","headline":"[Go] 用 Go 建立 gRPC 的 Server 與 Client","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/03/Golang/用-GO-建立-gRPC-的-Server-與-Client/","keywords":"Go, gRPC"}</script>
     <meta name="description" content="此篇不會說明有關 gRPC 與 protocol buffers 的詳細概念，如果要瞭解可以到 grpc.io 閱讀相關文件。 今天會筆記，怎麼從無到用 Go 建立好 gRPC 的 Server 與 Client，當作是學習 gRPC 的起點。">
 <meta name="keywords" content="Go,gRPC">
 <meta property="og:type" content="blog">
@@ -105,19 +105,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -126,7 +131,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -135,7 +140,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -144,7 +149,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -153,7 +158,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -162,7 +167,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -175,7 +180,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -184,7 +189,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -193,7 +198,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -202,7 +207,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -215,7 +220,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -840,7 +845,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -848,7 +853,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

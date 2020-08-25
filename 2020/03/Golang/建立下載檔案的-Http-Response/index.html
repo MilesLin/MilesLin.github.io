@@ -12,12 +12,12 @@
         <meta name="keywords" content="Go">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"從 .NET 轉來 GO 後，很多 API 的用法都要重新學習，今天就來熟悉如何使用 GO 來建立下載檔案的 Response。\n\n設定 Header以檔案下載的來說，我們有 3 個重要的 header 要設定。Content-Type這是用來告訴瀏覽器，回傳的檔案是什麼。  例如，是 jpeg 圖片的話，要設為 Content-Type: image/jpeg。 而 Go 有 http.DetectContentType 可以用來判斷回傳的檔案是哪一種 Content-Type 。這不一定要設定，使用 http.ServeContent 或 http.ServeFile 的話，會自動幫你設定好。\n\nContent-Disposition我們要用這個 Header 來告訴瀏覽器，我回傳的是一個檔案，例如 Content-Disposition: attachment; filename=&quot;filename.pdf。以 Chrome 來說，當 Content-Disposition: attachment 設定之後，瀏覽器才會執行下載，否則他會在新的 tab 開啟檔案。\n\nContent-Length這個 Header 是告訴瀏覽器檔案的大小，例如 content-length: 54138這不一定要設定，使用 http.ServeContent 或 http.ServeFile 的話，會自動幫你設定好。\n\n讀取檔案讀取檔案的話我們要用的是 ioutil.ReadFile，讀取完檔案後，此 API 會回傳 byte[]。\n傳送 Response我們要使用到的是 http.ServeContent 這個 API，這會將我們設定好的 Header 以及 byte[] 的資料寫入 Response 並回應給瀏覽器。 http.ServeContent 適合用在當你只能拿到 byte[] 的資料時候使用，如果你能夠明確指定檔案路徑的話，可以使用 http.ServeFile。\n請參考下方的範例程式碼，當使用者存取 http://localhost:8000/download 的時候，就會下載 test.pdf 的檔案了。\nhttp.ServeContentgo1234567891011121314151617181920212223242526272829303132333435363738package mainimport (\t\"bytes\"\t\"fmt\"\t\"io/ioutil\"\t\"net/http\"\t\"strconv\"\t\"time\")func main() {\thttp.HandleFunc(\"/download\", downloadFile)\tfmt.Println(\"Server run on port 8000\")\thttp.ListenAndServe(\":8000\", nil)}func downloadFile(w http.ResponseWriter, r *http.Request) {\tfile := \"test.pdf\"  // 讀取檔案\tdownloadBytes, err := ioutil.ReadFile(file)\tif err != nil {\t\tfmt.Println(err)\t}\t// 取得檔案的 MIME type\tmime := http.DetectContentType(downloadBytes)\tfileSize := len(string(downloadBytes))\tw.Header().Set(\"Content-Type\", mime)\tw.Header().Set(\"Content-Disposition\", \"attachment; filename=\"+file)\tw.Header().Set(\"Content-Length\", strconv.Itoa(fileSize))\thttp.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))}\n另一種回應檔案的方式Go 還有提供另一個 http.ServeFile API，只要傳入檔案路徑，就會幫我們回傳檔案了，這個 API 比 http.ServeContent 簡單許多。\nhttp.ServeFilego123456789101112131415161718192021package mainimport (\t\"fmt\"\t\"net/http\")func main() {\thttp.HandleFunc(\"/download\", downloadFile)\tfmt.Println(\"Server run on port 8000\")\thttp.ListenAndServe(\":8000\", nil)}func downloadFile(w http.ResponseWriter, r *http.Request) {\tfile := \"test.pdf\"\t// 設定此 Header 告訴瀏覽器下載檔案。 如果沒設定則會在新的 tab 開啟檔案。\t// w.Header().Set(\"Content-Disposition\", \"attachment; filename=\"+file)\thttp.ServeFile(w, r, file)}\n延伸閱讀[HTTP File Upload and Download with Go][Golang : Force download file example][Downloading large files in Go]\n","dateCreated":"2020-03-22T17:22:16+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-03-22T17:22:16+08:00","description":"從 .NET 轉來 GO 後，很多 API 的用法都要重新學習，今天就來熟悉如何使用 GO 來建立下載檔案的 Response。","headline":"[Go] 建立下載檔案的 Http Response","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/","keywords":"Go"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"從 .NET 轉來 GO 後，很多 API 的用法都要重新學習，今天就來熟悉如何使用 GO 來建立下載檔案的 Response。\n\n設定 Header以檔案下載的來說，我們有 3 個重要的 header 要設定。Content-Type這是用來告訴瀏覽器，回傳的檔案是什麼。  例如，是 jpeg 圖片的話，要設為 Content-Type: image/jpeg。 而 Go 有 http.DetectContentType 可以用來判斷回傳的檔案是哪一種 Content-Type 。這不一定要設定，使用 http.ServeContent 或 http.ServeFile 的話，會自動幫你設定好。\n\nContent-Disposition我們要用這個 Header 來告訴瀏覽器，我回傳的是一個檔案，例如 Content-Disposition: attachment; filename=&quot;filename.pdf。以 Chrome 來說，當 Content-Disposition: attachment 設定之後，瀏覽器才會執行下載，否則他會在新的 tab 開啟檔案。\n\nContent-Length這個 Header 是告訴瀏覽器檔案的大小，例如 content-length: 54138這不一定要設定，使用 http.ServeContent 或 http.ServeFile 的話，會自動幫你設定好。\n\n讀取檔案讀取檔案的話我們要用的是 ioutil.ReadFile，讀取完檔案後，此 API 會回傳 byte[]。\n傳送 Response我們要使用到的是 http.ServeContent 這個 API，這會將我們設定好的 Header 以及 byte[] 的資料寫入 Response 並回應給瀏覽器。 http.ServeContent 適合用在當你只能拿到 byte[] 的資料時候使用，如果你能夠明確指定檔案路徑的話，可以使用 http.ServeFile。\n請參考下方的範例程式碼，當使用者存取 http://localhost:8000/download 的時候，就會下載 test.pdf 的檔案了。\nhttp.ServeContentgo1234567891011121314151617181920212223242526272829303132333435363738package mainimport (\t\"bytes\"\t\"fmt\"\t\"io/ioutil\"\t\"net/http\"\t\"strconv\"\t\"time\")func main() {\thttp.HandleFunc(\"/download\", downloadFile)\tfmt.Println(\"Server run on port 8000\")\thttp.ListenAndServe(\":8000\", nil)}func downloadFile(w http.ResponseWriter, r *http.Request) {\tfile := \"test.pdf\"  // 讀取檔案\tdownloadBytes, err := ioutil.ReadFile(file)\tif err != nil {\t\tfmt.Println(err)\t}\t// 取得檔案的 MIME type\tmime := http.DetectContentType(downloadBytes)\tfileSize := len(string(downloadBytes))\tw.Header().Set(\"Content-Type\", mime)\tw.Header().Set(\"Content-Disposition\", \"attachment; filename=\"+file)\tw.Header().Set(\"Content-Length\", strconv.Itoa(fileSize))\thttp.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))}\n另一種回應檔案的方式Go 還有提供另一個 http.ServeFile API，只要傳入檔案路徑，就會幫我們回傳檔案了，這個 API 比 http.ServeContent 簡單許多。\nhttp.ServeFilego123456789101112131415161718192021package mainimport (\t\"fmt\"\t\"net/http\")func main() {\thttp.HandleFunc(\"/download\", downloadFile)\tfmt.Println(\"Server run on port 8000\")\thttp.ListenAndServe(\":8000\", nil)}func downloadFile(w http.ResponseWriter, r *http.Request) {\tfile := \"test.pdf\"\t// 設定此 Header 告訴瀏覽器下載檔案。 如果沒設定則會在新的 tab 開啟檔案。\t// w.Header().Set(\"Content-Disposition\", \"attachment; filename=\"+file)\thttp.ServeFile(w, r, file)}\n延伸閱讀[HTTP File Upload and Download with Go][Golang : Force download file example][Downloading large files in Go]\n","dateCreated":"2020-03-22T17:22:16+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-03-22T17:22:16+08:00","description":"從 .NET 轉來 GO 後，很多 API 的用法都要重新學習，今天就來熟悉如何使用 GO 來建立下載檔案的 Response。","headline":"[Go] 建立下載檔案的 Http Response","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/03/Golang/建立下載檔案的-Http-Response/","keywords":"Go"}</script>
     <meta name="description" content="從 .NET 轉來 GO 後，很多 API 的用法都要重新學習，今天就來熟悉如何使用 GO 來建立下載檔案的 Response。">
 <meta name="keywords" content="Go">
 <meta property="og:type" content="blog">
@@ -95,19 +95,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -116,7 +121,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -125,7 +130,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -134,7 +139,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -143,7 +148,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -152,7 +157,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -165,7 +170,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -174,7 +179,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -183,7 +188,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -192,7 +197,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -205,7 +210,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -788,7 +793,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -796,7 +801,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

@@ -12,12 +12,12 @@
         <meta name="keywords" content="ASP.NET Core,EF Core">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天會介紹怎麼在 ASP.NET Core MVC 專案使用 EF Core。  會以現有資料庫當範例。\n\n首先，我已經先建立好了一個 Sample Database ，且只有 Person 一個資料表。 如下圖。sample-database有資料庫後，我們就要使用反向工程，把資料庫轉成 DbContext。 而 Entity Framework Core tools reference - .NET CLI 有提供 Scaffold 的工具可以讓我們使用。\nScaffold 資料庫有兩種方式可以 Scaffold 資料庫\n\n使用 dotnet cli\ndotnet ef dbcontext scaffoldbash1dotnet ef dbcontext scaffold \"Server=10.0.75.1;Database=Sample;User ID=sa;Password=xxxxxx;Trusted_Connection=True;Integrated Security=False;\" Microsoft.EntityFrameworkCore.SqlServer -o Models\n\n使用 Visual Studio - Package Manager Console\nPackage Manager Consolebash1Scaffold-DbContext \"Server=10.0.75.1;Database=Sample;User ID=sa;Password=xxxxxx;Trusted_Connection=True;Integrated Security=False;\" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models\n\n\nScaffold 成功後，會看到 SampleDbContext.cs 被建立起來。 如下圖。SampleDbContext\n調整連線字串的位置你會看到 scaffold 後 SampleDbContext 裡面有連線字串 ，一般來說連線字串是跟 Source Code 分開的。  所以現在就是要將連線字串從 Source Code 拿掉，改由寫在 appsettings.json 裡面。\n\n移除 SampleDbContext.cs 裡面的 optionsBuilder.UseSqlServer 程式碼，如下方範例，把連線字串那行拿掉，或是整個 OnConfiguring 方法移除也行\n移除程式碼cs123456789protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)        {            if (!optionsBuilder.IsConfigured)            {#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.                // 移除                // optionsBuilder.UseSqlServer(\"Server=10.0.75.1;Database=Sample;User ID=sa;Password=xxx;Trusted_Connection=True;Integrated Security=False;\");            }        }\n\n於 appsettings.json 加入連線字串，如下方範例。\nappsettings.jsonjson1234567891011{  \"Logging\": {    \"LogLevel\": {      \"Default\": \"Warning\"    }  },  \"AllowedHosts\": \"*\",  \"ConnectionStrings\": {    \"Sample\": \"Server=10.0.75.1;Database=Sample;User ID=sa;Password=xxxx;Trusted_Connection=True;Integrated Security=False;\"  }}\n\n於 Startup.cs 註冊 SampleDbContext 服務這個設定是要讓 SampleDbContext 可以被建構式注入。\nStartup.cscs123456public void ConfigureServices(IServiceCollection services){    ...    services.AddDbContext&lt;SampleContext&gt;(options =&gt;        options.UseSqlServer(Configuration.GetConnectionString(\"Sample\")));}\n\n\n接下來就可以正常使用 EF Core 開發了。\n錯誤排除其實今天寫這篇文章，是因為我在 Scaffold 資料庫的時候遇到下圖的錯誤 Trouble Connecting to sql server Login failed. The login is from an untrusted domain and cannot be used with Windows authentication。 這是因為當連線的 SQL Server 是不同 domain controller 的情況，且連線字串含有(預設) Integrated Security = True 時，SQL Server 會使用 windows credentials 來登入，這會讓你使用帳號密碼登入無效。fail-scaffold\n所以記得在連線字串加入 Integrated Security = false; 解決這個問題\n\n延伸閱讀[Getting Started with EF Core on ASP.NET Core with an Existing Database][Entity Framework Core tools reference - .NET CLI][EF Core - Connection Strings]\n","dateCreated":"2019-04-16T21:22:01+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-04-16T21:22:01+08:00","description":"今天會介紹怎麼在 ASP.NET Core MVC 專案使用 EF Core。  會以現有資料庫當範例。","headline":"[EF Core] 在 ASP.NET Core MVC 使用 EF Core","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/04/在-ASP-NET-Core-MVC-使用-EF-Core/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/04/在-ASP-NET-Core-MVC-使用-EF-Core/","keywords":"ASP.NET Core, EF Core"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天會介紹怎麼在 ASP.NET Core MVC 專案使用 EF Core。  會以現有資料庫當範例。\n\n首先，我已經先建立好了一個 Sample Database ，且只有 Person 一個資料表。 如下圖。sample-database有資料庫後，我們就要使用反向工程，把資料庫轉成 DbContext。 而 Entity Framework Core tools reference - .NET CLI 有提供 Scaffold 的工具可以讓我們使用。\nScaffold 資料庫有兩種方式可以 Scaffold 資料庫\n\n使用 dotnet cli\ndotnet ef dbcontext scaffoldbash1dotnet ef dbcontext scaffold \"Server=10.0.75.1;Database=Sample;User ID=sa;Password=xxxxxx;Trusted_Connection=True;Integrated Security=False;\" Microsoft.EntityFrameworkCore.SqlServer -o Models\n\n使用 Visual Studio - Package Manager Console\nPackage Manager Consolebash1Scaffold-DbContext \"Server=10.0.75.1;Database=Sample;User ID=sa;Password=xxxxxx;Trusted_Connection=True;Integrated Security=False;\" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models\n\n\nScaffold 成功後，會看到 SampleDbContext.cs 被建立起來。 如下圖。SampleDbContext\n調整連線字串的位置你會看到 scaffold 後 SampleDbContext 裡面有連線字串 ，一般來說連線字串是跟 Source Code 分開的。  所以現在就是要將連線字串從 Source Code 拿掉，改由寫在 appsettings.json 裡面。\n\n移除 SampleDbContext.cs 裡面的 optionsBuilder.UseSqlServer 程式碼，如下方範例，把連線字串那行拿掉，或是整個 OnConfiguring 方法移除也行\n移除程式碼cs123456789protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)        {            if (!optionsBuilder.IsConfigured)            {#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.                // 移除                // optionsBuilder.UseSqlServer(\"Server=10.0.75.1;Database=Sample;User ID=sa;Password=xxx;Trusted_Connection=True;Integrated Security=False;\");            }        }\n\n於 appsettings.json 加入連線字串，如下方範例。\nappsettings.jsonjson1234567891011{  \"Logging\": {    \"LogLevel\": {      \"Default\": \"Warning\"    }  },  \"AllowedHosts\": \"*\",  \"ConnectionStrings\": {    \"Sample\": \"Server=10.0.75.1;Database=Sample;User ID=sa;Password=xxxx;Trusted_Connection=True;Integrated Security=False;\"  }}\n\n於 Startup.cs 註冊 SampleDbContext 服務這個設定是要讓 SampleDbContext 可以被建構式注入。\nStartup.cscs123456public void ConfigureServices(IServiceCollection services){    ...    services.AddDbContext&lt;SampleContext&gt;(options =&gt;        options.UseSqlServer(Configuration.GetConnectionString(\"Sample\")));}\n\n\n接下來就可以正常使用 EF Core 開發了。\n錯誤排除其實今天寫這篇文章，是因為我在 Scaffold 資料庫的時候遇到下圖的錯誤 Trouble Connecting to sql server Login failed. The login is from an untrusted domain and cannot be used with Windows authentication。 這是因為當連線的 SQL Server 是不同 domain controller 的情況，且連線字串含有(預設) Integrated Security = True 時，SQL Server 會使用 windows credentials 來登入，這會讓你使用帳號密碼登入無效。fail-scaffold\n所以記得在連線字串加入 Integrated Security = false; 解決這個問題\n\n延伸閱讀[Getting Started with EF Core on ASP.NET Core with an Existing Database][Entity Framework Core tools reference - .NET CLI][EF Core - Connection Strings]\n","dateCreated":"2019-04-16T21:22:01+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-04-16T21:22:01+08:00","description":"今天會介紹怎麼在 ASP.NET Core MVC 專案使用 EF Core。  會以現有資料庫當範例。","headline":"[EF Core] 在 ASP.NET Core MVC 使用 EF Core","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/04/在-ASP-NET-Core-MVC-使用-EF-Core/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/04/在-ASP-NET-Core-MVC-使用-EF-Core/","keywords":"ASP.NET Core, EF Core"}</script>
     <meta name="description" content="今天會介紹怎麼在 ASP.NET Core MVC 專案使用 EF Core。  會以現有資料庫當範例。">
 <meta name="keywords" content="ASP.NET Core,EF Core">
 <meta property="og:type" content="blog">
@@ -99,19 +99,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -120,7 +125,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -129,7 +134,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -138,7 +143,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -147,7 +152,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -156,7 +161,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -169,7 +174,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -178,7 +183,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -187,7 +192,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -196,7 +201,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -209,7 +214,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -807,7 +812,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -815,7 +820,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

@@ -12,12 +12,12 @@
         <meta name="keywords" content="SEO">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天會筆記 4-3 的內容，robots meta。\n\n設定網頁的 robots meta 與 robots.txtrobots meta 與 robots.txt 主要的目的是讓 搜索引擎應該如何處理網頁 ，例如是否要索引網頁。  這個設定雖然只是宣告性質，但是大多數的搜尋引擎會依照宣告的方式進行動作。\n設定 robots metarobots meta 宣告放置於 &lt;head&gt; &lt;/head&gt; 中間，如下範例robots metahtml123&lt;head&gt;  &lt;META NAME=\"屬性值#1\" CONTENT=\"屬性值#2\"&gt;&lt;/head&gt;\n屬性值#1 指定搜尋引擎\n\n\n屬性值#1\n說明\n\n\n\n\nrobots\n所有搜尋引擎的爬蟲程式\n\n\ngooglebot\nGoogle 的爬蟲程式\n\n\ngooglebot-mobile\nGoogle 行動的爬蟲程式\n\n\ngooglebot-news\nGoogle 新聞的爬蟲程式\n\n\ngooglebot-image\nGoogle 圖片的爬蟲程式\n\n\ngooglebot-video\nGoogle 視訊的爬蟲程式\n\n\nbingbot\nBing 的爬蟲程式\n\n\nslurp\nYahoo 的爬蟲程式\n\n\nbaiduspider\n百度的爬蟲程式\n\n\nrogerbot\nMoz.com 的爬蟲程式\n\n\nMJ12bot\nMajestic.com 的爬蟲程式\n\n\nAhrefsBot\nAhrefs.com  的爬蟲程式\n\n\nia-archiver\nAlexa.com  的爬蟲程式\n\n\n\n屬性值#2 指定處理的方式\n\n\n屬性值#2\n說明\n\n\n\n\nall\n沒有索引或服務的限制。注意：這個指令是預設值，如果明確列出這個指令並不會產生任何影響。\n\n\nnoindex\n不在搜尋結果中顯示這個網頁，也不要在搜尋結果中顯示「快取」連結。\n\n\nnofollow\n不追蹤這個網頁上的連結。\n\n\nnone\n相當於 noindex, nofollow。\n\n\nnoarchive\n不在搜尋結果中顯示「快取」連結。\n\n\nnosnippet\n不在搜尋結果中顯示這個網頁的文字片段或影片預覽畫面。系統仍會顯示靜態縮圖 (如果有的話)。\n\n\nnotranslate\n不在搜尋結果中提供這個網頁的翻譯。\n\n\nnoimageindex\n不為這個網頁上的圖片建立索引。\n\n\nunavailable_after: [RFC-850 date/time]\n在指定的日期/時間後不在搜尋結果中顯示這個網頁。指定日期/時間時需使用 RFC 850 格式。\n\n\n\n例如我要設定所有爬蟲不在搜尋結果中顯示這個網頁、不追蹤這個網頁上的連結，就會寫成下方範例的樣子robots metahtml123&lt;head&gt;  &lt;META NAME=\"robots\" CONTENT=\"noindex, nofollow\"&gt;&lt;/head&gt;\n設定 robots.txtrobots.txt 使用上更加彈性，不用像 robots meta 每頁都要設定，而是統一在 txt 設定好。 該檔案要放在網站的根目錄底下，例如 http://網址/robots.txt 這個位置。\nrobots.txt 有五種宣告方式\n\n\n宣告類型\n說明\n\n\n\n\nUser-agent\n指定搜尋引擎爬蟲類型\n\n\nCrawl-delay\n限定爬蟲抓取每頁的秒數限制\n\n\nDisallow\n不希望被扒取的網址路徑\n\n\nAllow\n允許被扒取的網址路徑\n\n\nSitemap\n告知搜尋引擎網站的 Sitemap 網址\n\n\n\n舉些例子，例如要拒絕全部的搜尋引擎爬取\n拒絕全部的搜尋引擎txt12User-agent: *Disallow: /\n拒絕百度搜尋引擎爬蟲，但是允許其他搜尋引擎爬蟲拒絕百度搜尋引擎爬蟲txt1234User-agent: BaiduspiderDisallow: /User-agent: *Disallow:\n拒絕特定目錄被爬取，以下方的例子，則是說不要爬取 login 的頁面拒絕特定目錄被爬取txt12User-agent: *Disallow: /login\n這邊提供更實際的案例可以參考， Apple robots.txt 範例 。\n開發人員必懂的 SEO 第三集\n參考[SEO 超入門][Robots.txt 規範][Robots Meta Directives][Moz robots.txt]\n","dateCreated":"2019-03-29T23:15:03+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-03-29T23:15:03+08:00","description":"今天會筆記 4-3 的內容，robots meta。","headline":"[SEO] 開發人員必懂的 SEO 第二集 - robots meta","image":["SEO_Cover.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/03/開發人員必懂的SEO第二集/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/03/開發人員必懂的SEO第二集/","keywords":"SEO","thumbnailUrl":"SEO_Cover.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天會筆記 4-3 的內容，robots meta。\n\n設定網頁的 robots meta 與 robots.txtrobots meta 與 robots.txt 主要的目的是讓 搜索引擎應該如何處理網頁 ，例如是否要索引網頁。  這個設定雖然只是宣告性質，但是大多數的搜尋引擎會依照宣告的方式進行動作。\n設定 robots metarobots meta 宣告放置於 &lt;head&gt; &lt;/head&gt; 中間，如下範例robots metahtml123&lt;head&gt;  &lt;META NAME=\"屬性值#1\" CONTENT=\"屬性值#2\"&gt;&lt;/head&gt;\n屬性值#1 指定搜尋引擎\n\n\n屬性值#1\n說明\n\n\n\n\nrobots\n所有搜尋引擎的爬蟲程式\n\n\ngooglebot\nGoogle 的爬蟲程式\n\n\ngooglebot-mobile\nGoogle 行動的爬蟲程式\n\n\ngooglebot-news\nGoogle 新聞的爬蟲程式\n\n\ngooglebot-image\nGoogle 圖片的爬蟲程式\n\n\ngooglebot-video\nGoogle 視訊的爬蟲程式\n\n\nbingbot\nBing 的爬蟲程式\n\n\nslurp\nYahoo 的爬蟲程式\n\n\nbaiduspider\n百度的爬蟲程式\n\n\nrogerbot\nMoz.com 的爬蟲程式\n\n\nMJ12bot\nMajestic.com 的爬蟲程式\n\n\nAhrefsBot\nAhrefs.com  的爬蟲程式\n\n\nia-archiver\nAlexa.com  的爬蟲程式\n\n\n\n屬性值#2 指定處理的方式\n\n\n屬性值#2\n說明\n\n\n\n\nall\n沒有索引或服務的限制。注意：這個指令是預設值，如果明確列出這個指令並不會產生任何影響。\n\n\nnoindex\n不在搜尋結果中顯示這個網頁，也不要在搜尋結果中顯示「快取」連結。\n\n\nnofollow\n不追蹤這個網頁上的連結。\n\n\nnone\n相當於 noindex, nofollow。\n\n\nnoarchive\n不在搜尋結果中顯示「快取」連結。\n\n\nnosnippet\n不在搜尋結果中顯示這個網頁的文字片段或影片預覽畫面。系統仍會顯示靜態縮圖 (如果有的話)。\n\n\nnotranslate\n不在搜尋結果中提供這個網頁的翻譯。\n\n\nnoimageindex\n不為這個網頁上的圖片建立索引。\n\n\nunavailable_after: [RFC-850 date/time]\n在指定的日期/時間後不在搜尋結果中顯示這個網頁。指定日期/時間時需使用 RFC 850 格式。\n\n\n\n例如我要設定所有爬蟲不在搜尋結果中顯示這個網頁、不追蹤這個網頁上的連結，就會寫成下方範例的樣子robots metahtml123&lt;head&gt;  &lt;META NAME=\"robots\" CONTENT=\"noindex, nofollow\"&gt;&lt;/head&gt;\n設定 robots.txtrobots.txt 使用上更加彈性，不用像 robots meta 每頁都要設定，而是統一在 txt 設定好。 該檔案要放在網站的根目錄底下，例如 http://網址/robots.txt 這個位置。\nrobots.txt 有五種宣告方式\n\n\n宣告類型\n說明\n\n\n\n\nUser-agent\n指定搜尋引擎爬蟲類型\n\n\nCrawl-delay\n限定爬蟲抓取每頁的秒數限制\n\n\nDisallow\n不希望被扒取的網址路徑\n\n\nAllow\n允許被扒取的網址路徑\n\n\nSitemap\n告知搜尋引擎網站的 Sitemap 網址\n\n\n\n舉些例子，例如要拒絕全部的搜尋引擎爬取\n拒絕全部的搜尋引擎txt12User-agent: *Disallow: /\n拒絕百度搜尋引擎爬蟲，但是允許其他搜尋引擎爬蟲拒絕百度搜尋引擎爬蟲txt1234User-agent: BaiduspiderDisallow: /User-agent: *Disallow:\n拒絕特定目錄被爬取，以下方的例子，則是說不要爬取 login 的頁面拒絕特定目錄被爬取txt12User-agent: *Disallow: /login\n這邊提供更實際的案例可以參考， Apple robots.txt 範例 。\n開發人員必懂的 SEO 第三集\n參考[SEO 超入門][Robots.txt 規範][Robots Meta Directives][Moz robots.txt]\n","dateCreated":"2019-03-29T23:15:03+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-03-29T23:15:03+08:00","description":"今天會筆記 4-3 的內容，robots meta。","headline":"[SEO] 開發人員必懂的 SEO 第二集 - robots meta","image":["SEO_Cover.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/03/開發人員必懂的SEO第二集/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/03/開發人員必懂的SEO第二集/","keywords":"SEO","thumbnailUrl":"SEO_Cover.jpg"}</script>
     <meta name="description" content="今天會筆記 4-3 的內容，robots meta。">
 <meta name="keywords" content="SEO">
 <meta property="og:type" content="blog">
@@ -98,19 +98,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -119,7 +124,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -128,7 +133,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -137,7 +142,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -146,7 +151,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -155,7 +160,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -168,7 +173,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -177,7 +182,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -186,7 +191,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -195,7 +200,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -208,7 +213,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -927,7 +932,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -935,7 +940,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

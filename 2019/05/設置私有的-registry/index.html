@@ -12,12 +12,12 @@
         <meta name="keywords" content="Docker">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"雖然我們通常只要從 Docker hub pull 和 push 就可以管理映像檔。 但是面對客戶的環境要求，還是有很大的機會在基礎架構中使用私有的 registry 來管理我們的映像檔。\n\n自架 registry 聽起來好像很難，但是只要會 Docker 就可以很輕鬆的搞定，因為 Docker 官方已經有一個現成的 registry 的映像檔 。\n使用說明輸入以下指令 docker run -d -p 5000:5000 --restart always --name myregistry registry:2 ，輸入完後會 registry 就會執行起來，如下圖。run-registry指令說明\n\n-d 背景執行\n-p 對應 port 5000\n--restart always 容器重啟政策的設定，請參考 Restart policies (--restart)\n--name 命名容器為 myregistry\nregistry:2 映像檔名稱+版本\n\n接下來要將要 push 的映像檔加上 localhost:5000 的 tag，這樣在 push 的時候 Docker 指令就知道要 push 到哪一個 registry。 我這邊以 alpine 映像檔為範例，輸入以下指令 docker tag alpine localhost:5000/myalpine 下 tag。 \n接著 push 該映像檔 docker push localhost:5000/myalpine，如下圖。push\n接著輸入 API 的查詢指令 curl -X GET http://localhost:5000/v2/_catalog，可以檢查有沒有成功 push 上去，如下圖。search_repository\n之後要抓取私有 registry 映像檔的時候只要加上 localhost:5000 就可以抓取了，如下方指令 docker pull localhost:5000/myalpine。\n小結因為自架的 registry 也是容器，所以要注意當容器被移除後，裡面的映象檔也會跟著消失，這點要特別注意。\n延伸閱讀[Docker Official Images - registry][Docker Registry][How to search images from private 1.0 registry in docker?]\n","dateCreated":"2019-05-16T22:55:58+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-05-16T22:55:58+08:00","description":"雖然我們通常只要從 Docker hub pull 和 push 就可以管理映像檔。 但是面對客戶的環境要求，還是有很大的機會在基礎架構中使用私有的 registry 來管理我們的映像檔。","headline":"[Docker] 設置私有的 registry","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/05/設置私有的-registry/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/05/設置私有的-registry/","keywords":"Docker"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"雖然我們通常只要從 Docker hub pull 和 push 就可以管理映像檔。 但是面對客戶的環境要求，還是有很大的機會在基礎架構中使用私有的 registry 來管理我們的映像檔。\n\n自架 registry 聽起來好像很難，但是只要會 Docker 就可以很輕鬆的搞定，因為 Docker 官方已經有一個現成的 registry 的映像檔 。\n使用說明輸入以下指令 docker run -d -p 5000:5000 --restart always --name myregistry registry:2 ，輸入完後會 registry 就會執行起來，如下圖。run-registry指令說明\n\n-d 背景執行\n-p 對應 port 5000\n--restart always 容器重啟政策的設定，請參考 Restart policies (--restart)\n--name 命名容器為 myregistry\nregistry:2 映像檔名稱+版本\n\n接下來要將要 push 的映像檔加上 localhost:5000 的 tag，這樣在 push 的時候 Docker 指令就知道要 push 到哪一個 registry。 我這邊以 alpine 映像檔為範例，輸入以下指令 docker tag alpine localhost:5000/myalpine 下 tag。 \n接著 push 該映像檔 docker push localhost:5000/myalpine，如下圖。push\n接著輸入 API 的查詢指令 curl -X GET http://localhost:5000/v2/_catalog，可以檢查有沒有成功 push 上去，如下圖。search_repository\n之後要抓取私有 registry 映像檔的時候只要加上 localhost:5000 就可以抓取了，如下方指令 docker pull localhost:5000/myalpine。\n小結因為自架的 registry 也是容器，所以要注意當容器被移除後，裡面的映象檔也會跟著消失，這點要特別注意。\n延伸閱讀[Docker Official Images - registry][Docker Registry][How to search images from private 1.0 registry in docker?]\n","dateCreated":"2019-05-16T22:55:58+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-05-16T22:55:58+08:00","description":"雖然我們通常只要從 Docker hub pull 和 push 就可以管理映像檔。 但是面對客戶的環境要求，還是有很大的機會在基礎架構中使用私有的 registry 來管理我們的映像檔。","headline":"[Docker] 設置私有的 registry","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/05/設置私有的-registry/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/05/設置私有的-registry/","keywords":"Docker"}</script>
     <meta name="description" content="雖然我們通常只要從 Docker hub pull 和 push 就可以管理映像檔。 但是面對客戶的環境要求，還是有很大的機會在基礎架構中使用私有的 registry 來管理我們的映像檔。">
 <meta name="keywords" content="Docker">
 <meta property="og:type" content="blog">
@@ -99,19 +99,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -120,7 +125,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -129,7 +134,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -138,7 +143,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -147,7 +152,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -156,7 +161,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -169,7 +174,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -178,7 +183,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -187,7 +192,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -196,7 +201,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -209,7 +214,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -794,7 +799,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -802,7 +807,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

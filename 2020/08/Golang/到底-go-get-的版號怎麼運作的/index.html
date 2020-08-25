@@ -1,0 +1,892 @@
+
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Miles&#39;s Journey">
+    <title>[Go] 到底 go get 的版號怎麼運作的? - Miles&#39;s Journey</title>
+    <meta name="author" content="Miles">
+    
+        <meta name="keywords" content="Go">
+    
+    
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"在 Go Module 模式底下使用 go get 取得套件的時候常常會有各種版號出現，例如 v1.0.2、v2.0.3 +incompatible、甚至是一段 hash v0.0.0-20200226145339-3e397ee01bc6。  還有取得 v2 版本的時候，有時候是 go get github.com/my/foo@v2.2.0 有時候是 go get github.com/my/foo/v2@v2.2.0。 為了搞懂這些差別，我參考了一些官方文章還有做了一些實驗，今天就來解說這些差別到底是什麼情況。\n\n在閱讀此文章之前，建議要先了解\n\n什麼是 Go Module。 Ref: Using Go Modules\n如何更改主版號(如: v1.0.0 升級成 v2.0.0)。 Ref: Go Modules: v2 and Beyond\nv1.2.3 版號的意義。 Ref: Semantic Versioning 2.0.0\n\nSemantic import version在文章開始前需簡短說明一下什麼是 Semantic Import Versioning。\n根據 Semantic Versioning 版本建議規則，當主版號變更的時候，代表有破壞性更新。 以 Go 來說，如果這時候更新的版本還是用同樣的路徑，會造成使用的人一更新套件(package)就會壞掉。  所以會建議使用新的路徑讓兩個版本並行，並且在採用漸進式升級的方式升級成新的版本。 例如 v1.x.x 的路徑會是 import github.com/my/foo ，主版號升級到 v2 後，路徑會是 import github.com/my/foo/v2。 而這種不同版本相容的 import 方式稱為 Semantic Import Versioning。\n當 Go Module 啟用後，會強制按照 Semantic Import Versioning 的規則，履行下列義務\n\n版本號需要使用 Semantic Versioning 的方式。 例如 v1.2.3, v2.7.1。\n當版本號大於等於 v2+ 的時候，在 go.mod 的 module path 要加上 /vN，例如 module github.com/my/foo/v2。 此時的要使用 foo/mypkg 套件的時候， import 會變成 import github.com/my/foo/v2/mypkg。\n如果主版號是 v0 或 v1 則 module path 與 import path 不需要加上 /v0 或 /v1\n\n有了上敘的知識後，就開始我們今天的故事吧!!\n都跟取得套件的 Repository 有關係這些 go get 版本的路徑要怎麼指定，差別都是來自於你要 go get 那個目標的 Repository。 我目前歸納出來有四個因素會影響 go get 的版號\n\nCommit\n標籤(tag)。go get 會參考 tag 當作版號，例如 v.1.2.3\n是否啟用 Go Module\n什麼時候啟用 Go Module\n\n接下來我會分三個情境來解說這些差別\n\n如果目標 Repository 沒有啟用的 Go Module\n如果目標 Repository 沒有啟用的 Go Module，但是有 v2+ 以上版本會發生什麼事情?\n如果在 v2+ 版本以上啟用 Go Module 的時候會發生什麼事情?\n\n如果目標 Repository 沒有啟用的 Go Module如果你的目標 Repository 沒有啟用的 Go Module 的話，他會根據 該 Repository 的 tag 版本，下載最後一版 (Version Selection)。 例如該 Repository 有 v3.1.2, v2.1.1, v1.2.5, v1.1.0 這 4 個 tag ，執行 go get github.com/my/foo@latest 的話，他會下載 v3.1.2 那個 tag 的版本。\n假設該 Repository 連 tag 都沒有的話，則採用 Pseudo-versions 的方式，會去抓取 master 分支的最後一個 commit，然後你就會看到該版本號的資訊會類似 v0.0.0-20200824153131-fdc22cc4ae4b 這種格式，他是由 v0.0.0-{commit 時間}-{commit hash} 所組成的。\n如果目標 Repository 沒有啟用的 Go Module，但是有 v2 以上版本會發生什麼事情?在看一些 Go Module 文章的時候，例如 Using Go Modules，裡面有提到，啟用 Go Module 後，如果是 v2 以上版本的時候，需要加上 /vN 路徑，例如 go get github.com/my/foo/v2，這是當作跟 v1 是不同路徑的方式來抓 v2 的版本。 那如果目標 Repository 沒有啟用 Go Module，都採用 tag 的方式標示版本，會發生什麼事情呢?\n這種情況底下，的做法就不是使用 /v2 ，而是使用 @ 的方式指定版本就可以了，例如 go get github.com/my/foo@v2.0.0，因為沒有啟用 Go Module 的模式，所以所有版本都是在同一個路徑 github.com/my/foo 底下 。\n當下載 v2 以上版本的時候會看到 go.mod 紀錄的套件會有 +incompatible 這個字樣，例如 require github.com/my/foo v3.0.1+incompatible，為什麼會有 +incompatible 呢?\n為什麼有 +incompatible?我們要從 Go 的 FAQ - How should I manage package versions using go get?  說起，這是 Go 的建議多年的套件管控機制，裡面有一段話說\nPackages intended for public use should try to maintain backward compatibility as they evolve. The Go 1 compatibility guidelines are a good reference here: don’t remove exported names, encourage tagged composite literals, and so on. If different functionality is required, add a new name instead of changing an old one. If a complete break is required, create a new package with a new import path\ngo-module-wikiSemantic Import Versioning\n上面畫線的重點是，如果新的版本有包含破壞性更新，則建立一個新的 package import path ，例如 github.com/my/foo/v2。 這是因為當使用同一個 package import path 時要能夠確保相容性，不能讓使用者更新套件後，程式就壞掉。 而這建議也是從 Semantic Import Versioning 來的。 \nGo Module 也有根據這個原則設計，啟用 Go Module 後有 三個原則 需要遵守\n\nimport path 不一樣會當成不同的套件\n例如 github.com/my/foo vs github.com/my/foo/v2 是不一樣的套件\n\n\nimport path 如果沒有包含 /v2+ 的路徑的話，會當作 v1 或 v0 版本\nimport path 是從 go.mod 裡面的 module path 定義的，如 module github.com/my/foo/v2\n\n簡短來說， +incompatible 是指說「當使用的套件沒有啟用 Go Module 以及其版本號大於 v1，也就是 v2+ 的時候，我們 import 的路徑會是 import github.com/my/foo，這時候根據上敘的原則2， Go Module 會將其看待成 v1 或 v0 版本，這就造成與原則2產生衝突。。」\n這情況下， Go Module 會 認為該套件並沒有使用 Semantic Import Versioning 的方式來管控套件 ，就會認為他跟 v1 版本是不相容的，所以加上 +incompatible 當作警告，但不影響使用。\n如果在 v2+ 版本以上啟用 Go Module 的時候會發生什麼事情?現在假設有一個情況，有一個遠端的 Repository get github.com/my/foo 一直沒有啟用 Go Module，而且已經存在了好幾版的 tag，例如 v1.2.1、v1.3.5、v1.3.7、v2.1.9、v2.4.7、v3.0.1。  在這情況下 go get github.com/my/foo@latest 自然會取得 v3.0.1+incompatible 的版本。\n這時候 Repository github.com/my/foo 的作者又有新版 v4.0.0 想要釋出，他可以有兩個選擇\n\n繼續不啟用 Go Module ，新增 tag v4.0.0 版本。 在這情況下，當然 go get github.com/my/foo@latest 就會取得 v4.0.0+incompatible 的版本\n\n決定啟用 Go Module 改用符合 Semantic Import Versioning 的規則管理套件，然後在這情況下釋出 v4.0.0 版本。\n\n\n在第二個選擇的情況下，go get github.com/my/foo@latest 你還是會取得 v3.0.1+incompatible，因為根據 Semantic Import Versioning 的原則，主要版本變更會要求 不同路徑，要用 go get github.com/my/foo/v4 才可以取得 v4.0.0 的版本，而之後所有的 v4 版本都會釋出在 github.com/my/foo/v4 這個路徑底下。\n如果這時候新增一個 v3.2.3 的版本會發生麼事情?在沒有建立 go get github.com/my/foo/v3 的路徑，直接新增 v3.2.0 tag 的情況下，是沒辦法 go get github.com/my/foo@v3.2.0 版本。會出現這種錯誤訊息\ninvalid version: module contains a go.mod file, so major version must be compatible: should be v0 or v1, not v3\n這是因為，當啟用 Go Module 後的那個 commit 就是一個切割點 。 在那個 commit 之前的版本 v1.2.1、v1.3.5、v1.3.7、v2.1.9、v2.4.7、v3.0.1 都還是放在 github.com/my/foo 這個路徑底下，所以你還是可以 go get github.com/my/foo@v3.0.1。 但是在這 commit 之後，所有規則請按照 Semantic Import Versioning 來走。 想要新增一個 v3 的版本? 請放在 github.com/my/foo/v3 底下。\n當作者有按照規則走的時候，你就可以 go get github.com/my/foo/v3 取得 v3.2.0 版本了。\n在這規則底下，就是每一個主版本都放在他該存在的路徑，v2.x.x 放在 github.com/my/foo/v2 路徑， v3.x.x 放在 github.com/my/foo/v3 路徑，v1.x.x 就放在 github.com/my/foo 路徑。\n小結這些就是 go get 各種不同版號的運作機制啦。 這也是為什麼很多人，啟用 Go Module 後會直接跳一個主版本，否則可能會發生 v3 的舊版本的在 github.com/my/foo 路徑，啟用 Go Module 後的 v3 新版本會在 github.com/my/foo/v3 路徑。 到不如就把 v3 以前都放在 github.com/my/foo 未來所有版本都開始分路徑 github.com/my/foo/v4+。\n延伸閱讀[Go Modules wiki][The Go Blog - Using Go Modules][FAQs — Semantic Import Versioning]\n","dateCreated":"2020-08-25T23:10:44+08:00","dateModified":"2020-08-26T00:47:49+08:00","datePublished":"2020-08-25T23:10:44+08:00","description":"在 Go Module 模式底下使用 go get 取得套件的時候常常會有各種版號出現，例如 v1.0.2、v2.0.3 +incompatible、甚至是一段 hash v0.0.0-20200226145339-3e397ee01bc6。  還有取得 v2 版本的時候，有時候是 go get github.com/my/foo@v2.2.0 有時候是 go get github.com/my/foo/v2@v2.2.0。 為了搞懂這些差別，我參考了一些官方文章還有做了一些實驗，今天就來解說這些差別到底是什麼情況。","headline":"[Go] 到底 go get 的版號怎麼運作的?","image":["gopher-std.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/","keywords":"Go, Go Module","thumbnailUrl":"gopher-std.png"}</script>
+    <meta name="description" content="在 Go Module 模式底下使用 go get 取得套件的時候常常會有各種版號出現，例如 v1.0.2、v2.0.3 +incompatible、甚至是一段 hash v0.0.0-20200226145339-3e397ee01bc6。  還有取得 v2 版本的時候，有時候是 go get github.com/my/foo@v2.2.0 有時候是 go get github.com/my/">
+<meta name="keywords" content="Go">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="[Go] 到底 go get 的版號怎麼運作的?">
+<meta property="og:url" content="https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/index.html">
+<meta property="og:site_name" content="Miles&#39;s Journey">
+<meta property="og:description" content="在 Go Module 模式底下使用 go get 取得套件的時候常常會有各種版號出現，例如 v1.0.2、v2.0.3 +incompatible、甚至是一段 hash v0.0.0-20200226145339-3e397ee01bc6。  還有取得 v2 版本的時候，有時候是 go get github.com/my/foo@v2.2.0 有時候是 go get github.com/my/">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/failed_get_v3.2.0.jpg">
+<meta property="og:updated_time" content="2020-08-25T16:47:49.535Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[Go] 到底 go get 的版號怎麼運作的?">
+<meta name="twitter:description" content="在 Go Module 模式底下使用 go get 取得套件的時候常常會有各種版號出現，例如 v1.0.2、v2.0.3 +incompatible、甚至是一段 hash v0.0.0-20200226145339-3e397ee01bc6。  還有取得 v2 版本的時候，有時候是 go get github.com/my/foo@v2.2.0 有時候是 go get github.com/my/">
+<meta name="twitter:image" content="https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/failed_get_v3.2.0.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=640"/>
+    
+    
+        <meta property="og:image" content="https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/gopher-std.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/gopher-std.png" />
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-c4ozcsklz4kht2pebhp44xorvyverh23toayhn7i6ubrpyedak24hv1v0hyd.min.css">
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-90394318-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-90394318-1');
+    </script>
+
+
+    
+    <script data-ad-client="ca-pub-5916182021497843" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">Miles&#39;s Journey</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=90" alt="Author&#39;s picture">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
+                
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</h5>
+                
+            </div>
+        
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                    
+                        <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Pluralsight</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                    
+                        <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Medium</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            [Go] 到底 go get 的版號怎麼運作的?
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-08-25T23:10:44+08:00">
+	
+		    Aug 25, 2020
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Go/">Go</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>在 Go Module 模式底下使用 <code>go get</code> 取得套件的時候常常會有各種版號出現，例如 <em>v1.0.2</em>、<em>v2.0.3 +incompatible</em>、甚至是一段 hash <em>v0.0.0-20200226145339-3e397ee01bc6</em>。  還有取得 <span class="highlight-text primary">v2</span> 版本的時候，有時候是 <code>go get github.com/my/foo@v2.2.0</code> 有時候是 <code>go get github.com/my/foo/v2@v2.2.0</code>。 為了搞懂這些差別，我參考了一些官方文章還有做了一些實驗，今天就來解說這些差別到底是什麼情況。</p>
+<a id="more"></a>
+<p><strong>在閱讀此文章之前，建議要先了解</strong></p>
+<ul>
+<li>什麼是 Go Module。 Ref: <a href="https://blog.golang.org/using-go-modules" target="_blank" rel="noopener">Using Go Modules</a></li>
+<li>如何更改主版號(如: <em>v1.0.0</em> 升級成 <em>v2.0.0</em>)。 Ref: <a href="https://blog.golang.org/v2-go-modules" target="_blank" rel="noopener">Go Modules: v2 and Beyond</a></li>
+<li><em>v1.2.3</em> 版號的意義。 Ref: <a href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning 2.0.0</a></li>
+</ul>
+<h2 id="Semantic-import-version"><a href="#Semantic-import-version" class="headerlink" title="Semantic import version"></a>Semantic import version</h2><p>在文章開始前需簡短說明一下什麼是 <a href="https://github.com/golang/go/wiki/Modules#semantic-import-versioning" target="_blank" rel="noopener">Semantic Import Versioning</a>。</p>
+<p>根據 <a href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning</a> 版本建議規則，當主版號變更的時候，代表有破壞性更新。 以 Go 來說，如果這時候更新的版本還是用同樣的路徑，會造成使用的人一更新套件<em>(package)</em>就會壞掉。  所以會建議使用新的路徑讓兩個版本並行，並且在採用<span class="highlight-text primary">漸進式升級</span>的方式升級成新的版本。 例如 <em>v1.x.x</em> 的路徑會是 <code>import github.com/my/foo</code> ，主版號升級到 <em>v2</em> 後，路徑會是 <code>import github.com/my/foo/v2</code>。 而這種不同版本相容的 import 方式稱為 <a href="https://github.com/golang/go/wiki/Modules#semantic-import-versioning" target="_blank" rel="noopener">Semantic Import Versioning</a>。</p>
+<p>當 Go Module 啟用後，會<strong>強制</strong>按照 <a href="https://github.com/golang/go/wiki/Modules#semantic-import-versioning" target="_blank" rel="noopener">Semantic Import Versioning</a> 的規則，履行下列義務</p>
+<ol>
+<li>版本號需要使用 <a href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning</a> 的方式。 例如 <em>v1.2.3</em>, <em>v2.7.1</em>。</li>
+<li>當版本號大於等於 <em>v2+</em> 的時候，在 <code>go.mod</code> 的 <strong>module path</strong> 要加上 <em>/vN</em>，例如 <code>module github.com/my/foo/v2</code>。 此時的要使用 <code>foo/mypkg</code> 套件的時候， import 會變成 <code>import github.com/my/foo/v2/mypkg</code>。</li>
+<li>如果主版號是 <em>v0</em> 或 <em>v1</em> 則 <strong>module path</strong> 與 <strong>import path</strong> 不需要加上 <em>/v0</em> 或 <em>/v1</em></li>
+</ol>
+<p><strong>有了上敘的知識後，就開始我們今天的故事吧!!</strong></p>
+<h2 id="都跟取得套件的-Repository-有關係"><a href="#都跟取得套件的-Repository-有關係" class="headerlink" title="都跟取得套件的 Repository 有關係"></a>都跟取得套件的 Repository 有關係</h2><p>這些 <code>go get</code> 版本的路徑要怎麼指定，差別都是來自於你要 <code>go get</code> 那個目標的 Repository。 我目前歸納出來有四個因素會影響 <code>go get</code> 的版號</p>
+<ol>
+<li>Commit</li>
+<li>標籤(tag)。<em><code>go get</code> 會參考 tag 當作版號，例如 v.1.2.3</em></li>
+<li>是否啟用 Go Module</li>
+<li>什麼時候啟用 Go Module</li>
+</ol>
+<p>接下來我會分三個情境來解說這些差別</p>
+<ol>
+<li><a href="#如果目標-Repository-沒有啟用的-Go-Module">如果目標 Repository 沒有啟用的 Go Module</a></li>
+<li><a href="#如果目標-Repository-沒有啟用的-Go-Module，但是有-v2-以上版本會發生什麼事情">如果目標 Repository 沒有啟用的 Go Module，但是有 <em>v2+</em> 以上版本會發生什麼事情?</a></li>
+<li><a href="#如果在-v2-版本以上啟用-Go-Module-的時候會發生什麼事情">如果在 <em>v2+</em> 版本以上啟用 Go Module 的時候會發生什麼事情?</a></li>
+</ol>
+<h2 id="如果目標-Repository-沒有啟用的-Go-Module"><a href="#如果目標-Repository-沒有啟用的-Go-Module" class="headerlink" title="如果目標 Repository 沒有啟用的 Go Module"></a>如果目標 Repository 沒有啟用的 Go Module</h2><p>如果你的目標 Repository 沒有啟用的 Go Module 的話，他會根據 該 Repository 的 tag 版本，下載最後一版 <em>(<a href="https://github.com/golang/go/wiki/Modules#version-selection" target="_blank" rel="noopener">Version Selection</a>)</em>。 例如該 Repository 有 <em>v3.1.2</em>, <em>v2.1.1</em>, <em>v1.2.5</em>, <em>v1.1.0</em> 這 4 個 tag ，執行 <code>go get github.com/my/foo@latest</code> 的話，他會下載 <em>v3.1.2</em> 那個 tag 的版本。</p>
+<p>假設該 Repository 連 tag 都沒有的話，則採用 <a href="https://golang.org/cmd/go/#hdr-Pseudo_versions" target="_blank" rel="noopener">Pseudo-versions</a> 的方式，會去抓取 master 分支的最後一個 commit，然後你就會看到該版本號的資訊會類似 <em>v0.0.0-20200824153131-fdc22cc4ae4b</em> 這種格式，他是由 <em>v0.0.0-{commit 時間}-{commit hash}</em> 所組成的。</p>
+<h2 id="如果目標-Repository-沒有啟用的-Go-Module，但是有-v2-以上版本會發生什麼事情"><a href="#如果目標-Repository-沒有啟用的-Go-Module，但是有-v2-以上版本會發生什麼事情" class="headerlink" title="如果目標 Repository 沒有啟用的 Go Module，但是有 v2 以上版本會發生什麼事情?"></a>如果目標 Repository 沒有啟用的 Go Module，但是有 <em>v2</em> 以上版本會發生什麼事情?</h2><p>在看一些 Go Module 文章的時候，例如 <a href="https://blog.golang.org/using-go-modules" target="_blank" rel="noopener">Using Go Modules</a>，裡面有提到，啟用 Go Module 後，如果是 <em>v2</em> 以上版本的時候，需要加上 <em><code>/vN</code></em> 路徑，例如 <code>go get github.com/my/foo/v2</code>，這是當作跟 <em>v1</em> 是不同路徑的方式來抓 <em>v2</em> 的版本。 那如果目標 Repository 沒有啟用 Go Module，都採用 tag 的方式標示版本，會發生什麼事情呢?</p>
+<p>這種情況底下，的做法就不是使用 <em><code>/v2</code></em> ，而是使用 <code>@</code> 的方式指定版本就可以了，例如 <code>go get github.com/my/foo@v2.0.0</code>，因為沒有啟用 Go Module 的模式，所以所有版本都是在同一個路徑 <code>github.com/my/foo</code> 底下 。</p>
+<p>當下載 <em>v2</em> 以上版本的時候會看到 go.mod 紀錄的套件會有 <code>+incompatible</code> 這個字樣，例如 <code>require github.com/my/foo v3.0.1+incompatible</code>，為什麼會有 <code>+incompatible</code> 呢?</p>
+<h4 id="為什麼有-incompatible"><a href="#為什麼有-incompatible" class="headerlink" title="為什麼有 +incompatible?"></a>為什麼有 +incompatible?</h4><p>我們要從 Go 的 <a href="https://golang.org/doc/faq#get_version" target="_blank" rel="noopener">FAQ - How should I manage package versions using go get? </a> 說起，這是 Go 的建議多年的套件管控機制，裡面有一段話說</p>
+<blockquote><p>Packages intended for public use should try to maintain backward compatibility as they evolve. The Go 1 compatibility guidelines are a good reference here: don’t remove exported names, encourage tagged composite literals, and so on. If different functionality is required, add a new name instead of changing an old one. <span class="highlight-text success">If a complete break is required, create a new package with a new import path</span></p>
+<footer><strong>go-module-wiki</strong><cite><a href="https://github.com/golang/go/wiki/Modules#semantic-import-versioning" target="_blank" rel="noopener">Semantic Import Versioning</a></cite></footer></blockquote>
+<p>上面畫線的重點是，<strong>如果新的版本有包含破壞性更新，則建立一個新的 package import path </strong>，例如 <code>github.com/my/foo/v2</code>。 這是因為當使用同一個 package import path 時要能夠確保相容性，不能讓使用者更新套件後，程式就壞掉。 而這建議也是從 <a href="https://github.com/golang/go/wiki/Modules#semantic-import-versioning" target="_blank" rel="noopener">Semantic Import Versioning</a> 來的。 </p>
+<p>Go Module 也有根據這個原則設計，啟用 Go Module 後有 <a href="https://github.com/golang/go/wiki/Modules#can-a-module-consume-a-v2-package-that-has-not-opted-into-modules-what-does-incompatible-mean" target="_blank" rel="noopener">三個原則</a> 需要遵守</p>
+<ol>
+<li>import path 不一樣會當成不同的套件<ul>
+<li>例如 <code>github.com/my/foo</code> vs <code>github.com/my/foo/v2</code> 是不一樣的套件</li>
+</ul>
+</li>
+<li>import path 如果沒有包含 <em><code>/v2+</code></em> 的路徑的話，會當作 <em>v1</em> 或 <em>v0</em> 版本</li>
+<li>import path 是從 go.mod 裡面的 <strong>module path</strong> 定義的，如 <code>module github.com/my/foo/v2</code></li>
+</ol>
+<p>簡短來說， <span class="highlight-text primary">+incompatible</span> 是指說「當使用的套件沒有啟用 Go Module 以及其版本號大於 <em>v1</em>，也就是 <em>v2+</em> 的時候，我們 import 的路徑會是 <code>import github.com/my/foo</code>，這時候根據上敘的<strong>原則2</strong>， Go Module 會將其看待成 <em>v1</em> 或 <em>v0</em> 版本，這就造成與<strong>原則2</strong>產生衝突。。」</p>
+<p>這情況下， Go Module 會 <span class="highlight-text success">認為該套件並沒有使用 Semantic Import Versioning 的方式來管控套件</span> ，就會認為他跟 <em>v1</em> 版本是不相容的，所以加上 <span class="highlight-text primary">+incompatible</span> 當作警告，但不影響使用。</p>
+<h2 id="如果在-v2-版本以上啟用-Go-Module-的時候會發生什麼事情"><a href="#如果在-v2-版本以上啟用-Go-Module-的時候會發生什麼事情" class="headerlink" title="如果在 v2+ 版本以上啟用 Go Module 的時候會發生什麼事情?"></a>如果在 v2+ 版本以上啟用 Go Module 的時候會發生什麼事情?</h2><p>現在假設有一個情況，有一個遠端的 Repository <code>get github.com/my/foo</code> 一直沒有啟用 Go Module，而且已經存在了好幾版的 tag，例如 <em>v1.2.1</em>、<em>v1.3.5</em>、<em>v1.3.7</em>、<em>v2.1.9</em>、<em>v2.4.7</em>、<em>v3.0.1</em>。  在這情況下 <code>go get github.com/my/foo@latest</code> 自然會取得 <em>v3.0.1+incompatible</em> 的版本。</p>
+<p>這時候 Repository <code>github.com/my/foo</code> 的作者又有新版 <em>v4.0.0</em> 想要釋出，他可以有兩個選擇</p>
+<ol>
+<li><p>繼續不啟用 Go Module ，新增 tag <em>v4.0.0</em> 版本。 在這情況下，當然 <code>go get github.com/my/foo@latest</code> 就會取得 <em>v4.0.0+incompatible</em> 的版本</p>
+</li>
+<li><p>決定啟用 Go Module 改用符合 <a href="https://github.com/golang/go/wiki/Modules#semantic-import-versioning" target="_blank" rel="noopener">Semantic Import Versioning</a> 的規則管理套件，然後在這情況下釋出 <code>v4.0.0</code> 版本。</p>
+</li>
+</ol>
+<p>在第二個選擇的情況下，<code>go get github.com/my/foo@latest</code> 你還是會取得 <em>v3.0.1+incompatible</em>，因為根據 <a href="https://github.com/golang/go/wiki/Modules#semantic-import-versioning" target="_blank" rel="noopener">Semantic Import Versioning</a> 的原則，主要版本變更會要求 <span class="highlight-text primary">不同路徑</span>，要用 <code>go get github.com/my/foo/v4</code> 才可以取得 <em>v4.0.0</em> 的版本，而之後所有的 <em>v4</em> 版本都會釋出在 <code>github.com/my/foo/v4</code> 這個路徑底下。</p>
+<h4 id="如果這時候新增一個-v3-2-3-的版本會發生麼事情"><a href="#如果這時候新增一個-v3-2-3-的版本會發生麼事情" class="headerlink" title="如果這時候新增一個 v3.2.3 的版本會發生麼事情?"></a>如果這時候新增一個 <em>v3.2.3</em> 的版本會發生麼事情?</h4><p>在沒有建立 <code>go get github.com/my/foo/v3</code> 的路徑，直接新增 <em>v3.2.0</em> tag 的情況下，是沒辦法 <code>go get github.com/my/foo@v3.2.0</code> 版本。會出現這種錯誤訊息</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="failed_get_v3.2.0.jpg" title="invalid version: module contains a go.mod file, so major version must be compatible: should be v0 or v1, not v3" data-caption="invalid version: module contains a go.mod file, so major version must be compatible: should be v0 or v1, not v3" data-fancybox="default"><img class="fig-img" src="failed_get_v3.2.0.jpg" alt="invalid version: module contains a go.mod file, so major version must be compatible: should be v0 or v1, not v3"></a><span class="caption">invalid version: module contains a go.mod file, so major version must be compatible: should be v0 or v1, not v3</span></div>
+<p><span class="highlight-text success">這是因為，當啟用 Go Module 後的那個 commit 就是一個切割點</span> 。 在那個 commit 之前的版本 <em>v1.2.1</em>、<em>v1.3.5</em>、<em>v1.3.7</em>、<em>v2.1.9</em>、<em>v2.4.7</em>、<em>v3.0.1</em> 都還是放在 <code>github.com/my/foo</code> 這個路徑底下，所以你還是可以 <code>go get github.com/my/foo@v3.0.1</code>。 但是在這 commit 之後，<span class="highlight-text success">所有規則請按照 Semantic Import Versioning 來走</span>。 想要新增一個 <em>v3</em> 的版本? 請放在 <code>github.com/my/foo/v3</code> 底下。</p>
+<p>當作者有按照規則走的時候，你就可以 <code>go get github.com/my/foo/v3</code> 取得 <em>v3.2.0</em> 版本了。</p>
+<p>在這規則底下，就是每一個主版本都放在他該存在的路徑，<em>v2.x.x</em> 放在 <code>github.com/my/foo/v2</code> 路徑， <em>v3.x.x</em> 放在 <code>github.com/my/foo/v3</code> 路徑，<em>v1.x.x</em> 就放在 <code>github.com/my/foo</code> 路徑。</p>
+<h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>這些就是 <code>go get</code> 各種不同版號的運作機制啦。 這也是為什麼很多人，啟用 Go Module 後會直接跳一個主版本，否則可能會發生 <em>v3</em> 的舊版本的在 <code>github.com/my/foo</code> 路徑，啟用 Go Module 後的 <em>v3</em> 新版本會在 <code>github.com/my/foo/v3</code> 路徑。 到不如就把 <em>v3</em> 以前都放在 <code>github.com/my/foo</code> 未來所有版本都開始分路徑 <code>github.com/my/foo/v4+</code>。</p>
+<h3 id="延伸閱讀"><a href="#延伸閱讀" class="headerlink" title="延伸閱讀"></a>延伸閱讀</h3><p>[<a href="https://github.com/golang/go/wiki/Modules" title="Go Modules wiki" target="_blank" rel="noopener">Go Modules wiki</a>]<br>[<a href="https://blog.golang.org/using-go-modules" title="The Go Blog - Using Go Modules" target="_blank" rel="noopener">The Go Blog - Using Go Modules</a>]<br>[<a href="https://github.com/golang/go/wiki/Modules#faqs--semantic-import-versioning" title="FAQs — Semantic Import Versioning" target="_blank" rel="noopener">FAQs — Semantic Import Versioning</a>]</p>
+
+            
+
+        </div>
+    </div>
+    
+    
+    <div class="main-content-wrap" style="margin-top: 30px;">
+        <div style="width: 100%;height: 2px;border-top: solid #ACC0D8 1px;"></div>
+        <p>
+            如果文章有幫助到你，歡迎點個廣告支持我。
+        </p>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <!-- 文末廣告 -->
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5916182021497843" data-ad-slot="5209204933" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+    
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/Go/">Go</a> <a class="tag tag--primary tag--small t-link" href="/tags/Go-Module/">Go Module</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/08/Golang/Live-Reload-For-Go/" data-tooltip="[Go] Live Reload For Go" aria-label="NEXT: [Go] Live Reload For Go">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Miles. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2020/08/Golang/Live-Reload-For-Go/" data-tooltip="[Go] Live Reload For Go" aria-label="NEXT: [Go] Live Reload For Go">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/" title="Share on Google+">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Miles</h4>
+        
+            <div id="about-card-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Web Developer</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Taiwan
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search" class="form-control input--large search-input" placeholder="Search ">
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2016/12/動態指定泛型型別/">
+                            <h3 class="media-heading">[C#] 動態指定泛型型別</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Dec 30, 2016
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天為了程式能寫好看一點，一直在糾結怎麼指定動態泛型，</p>
+<p>但是想想實用性好像不太大，可是把這技術忘掉太可惜XD</p>
+<p>還是記錄下來，以防忘記<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/1_Comprised-of-Angular2.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Anatomy-of-an-Angular-2-Application/">
+                            <h3 class="media-heading">[Angular] Anatomy of an Angular Application</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 28, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h2><p><strong>Angular2 Application</strong> 的都是由Component組合而成的，而Services則就是提供功能，可以在Component之間使用。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/01/Angular2-Modules/">
+                            <h3 class="media-heading">[Angular] Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Jan 30, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>javascrip一直存在著Namespaces的問題，意思是指很容易將variables或者functions定義在global namespace。  另一方面javascript並沒有提供管理javascript code的方式。</p>
+<!-- classes : info success warning danger no-icon -->
+<div class="alert info"><p>Modules 幫我們解決了這個問題</p>
+</div></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/flow.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Bootstrapping-App-Component/">
+                            <h3 class="media-heading">[Angular] Bootstrapping App Component</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 2, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明的是Angular是如何Bootstrapping Component的。  我們會從 pluralsight的課程 <a href="https://app.pluralsight.com/library/courses/angular-2-getting-started-update/table-of-contents" title="Angular 2: Getting Started" target="_blank" rel="noopener">Angular 2: Getting Started</a> 提供的 <a href="https://github.com/DeborahK/Angular2-GettingStarted/tree/master/APM%20-%20Start" title="Angular 2: Getting Started" target="_blank" rel="noopener">Github範例</a> 做說明。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Binding-syntax/">
+                            <h3 class="media-heading">[Angular] Binding syntax</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 4, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>要從class將資料繫結到template上面，Angular有四種方式。</p>
+<ul>
+<li>內嵌繫結 ( Interpolation )</li>
+<li>屬性繫結 ( Property Binding )</li>
+<li>事件繫結 ( Event Binding )</li>
+<li>雙向繫結 ( Two-way Binding )</li>
+</ul></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/Routing-Basics/1_Two_Component.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Routing-Basics/">
+                            <h3 class="media-heading">[Angular] Routing Basics</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 8, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要介紹Angular Routing提供了View之間切換的功能，以及如何使用跟怎麼設定。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Navigation-and-Routing-Additional-Techniques/">
+                            <h3 class="media-heading">[Angular] Navigation and Routing Additional Techniques</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 9, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><a href="https://mileslin.github.io/2017/02/Routing-Basics/" title="Routing-Basics">上一篇Routing Basics</a> 介紹基本用法後，今天要來多加說明如何帶參數，以及如何使用程式碼navigate到其他route。<br><br></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Protecting-Routes-with-Guards/">
+                            <h3 class="media-heading">[Angular] Protecting Routes with Guards</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 11, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>預設的情況下，任何user都是可以瀏覽到route有對應到的網址，這並不是一個好的情況。 通常會有需要一些權限的控管。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <img class="media-image" src="https://mileslin.github.io/2017/02/NgModule-Decorator/2_ImportTruth.jpg" width="90" height="90">
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/NgModule-Decorator/">
+                            <h3 class="media-heading">[Angular] NgModule Decorator</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 13, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>再深入講NgModule之前，要先說明App.Module的Decorator使用的一些原則。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a class="link-unstyled" href="https://mileslin.github.io/2017/02/Dive-into-Angular-Modules/">
+                            <h3 class="media-heading">[Angular] Dive into Angular Modules</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Feb 14, 2017
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天要說明如何整合多個Angular Module，讓程式碼職責跟清晰，更好維護。<br></p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
+                100 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mileslin.github.io/2020/08/Golang/到底-go-get-的版號怎麼運作的/';
+                 
+                    this.page.identifier = '2020/08/Golang/到底-go-get-的版號怎麼運作的/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'https-mileslin-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+    <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script>
+        var algoliaClient = algoliasearch('L9G904WBYQ', '771bd925856042416e867f07ce03375a');
+        var algoliaIndex = algoliaClient.initIndex('tranquilpeak');
+    </script>
+
+
+    </body>
+</html>

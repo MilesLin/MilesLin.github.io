@@ -12,12 +12,12 @@
         <meta name="keywords" content="Docker,ftp,sftp">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"這次案子有需要使用 .net core 存取 FTP 的功能，且又要求 FTP 要分三種登入方式 \n\n使用帳號密碼登入 FTP Server \n使用帳號密碼登入 SFTP Server \n使用 SSH 金鑰登入 SFTP Server\n\n為了 開發環境 需要，最快方法就是使用容器產生這三種 FTP 的環境。 今天就要來說明，怎麼使用 Docker 產生這三種 FTP 環境。\n\n使用工具說明此篇會說明使用 pure-ftpd 建立 FTP 環境，atmoz/sftp 建立 SFTP 環境。 使用 FileZilla FTP 工具測試連線，以及使用 OpenSSH 工具產生 SSH 金鑰。\n建立 FTP Server根據 pure-ftpd 的說明，只要執行下面的指令，你的 FTP Server 就跑起來囉。\nbashbash1$ docker run -d --name ftpd_server -p 23:21 -p 30010-30019:30010-30019 -e \"FTP_PASSIVE_PORTS=30010:30019\" -e FTP_USER_HOME=/home/miles -e FTP_USER_NAME=miles -e FTP_USER_PASS=123456 -e \"PUBLICHOST=localhost\" stilliard/pure-ftpd\n參數說明\n\n\n\n參數\n說明\n\n\n\n\n-p 23:21\n使用 host 23 port 連線到容器的 21 port。 而 21 port 是 FTP 預設的連接 port 。\n\n\n-e &quot;FTP_PASSIVE_PORTS=30010:30019&quot;\nstilliard/pure-ftpd 預設使用 30000-30009 port 做資料傳輸，如果要使用預設以外的 port 做資料傳輸，則一定要設定 FTP_PASSIVE_PORTS 環境變數，此案例我改使用 30010-30019 port 做資料傳輸。\n\n\n-p 30010-30019:30010-30019\n這邊要特別注意的是，host 的 port 一定要跟容器設定的資料傳輸的 port 一樣，否則是無法正常運作。 以我的例子，因為資料傳輸的 port 是 30010-30019 ，所以這裡也是使用 host port 30010-30019 作對應。\n\n\n-e FTP_USER_NAME=miles\n使用者的帳號。\n\n\n-e FTP_USER_PASS=123456\n使用者的密碼。\n\n\n-e FTP_USER_HOME=/home/miles\n登入使用者存取的資料夾，home 的子目錄一定要是使用者帳號的名稱，否則會有權限無法存取的問題。 以我的例子，使用者帳號是 miles ，所以我要設定資料夾路徑是 /home/miles。\n\n\n-e &quot;PUBLICHOST=localhost&quot;\n我是本地開發使用，沒有要提供其他電腦存取，則可以設定為 PUBLICHOST=localhost。 如果此 FTP Server 要給其他電腦使用的話，一定要設定為 host 的對外 IP，以我電腦 IP 192.168.2.103 為例，所以就要設定 PUBLICHOST=192.168.2.103。\n\n\n\n作者有提供 docker-compose 範例: https://github.com/stilliard/docker-pure-ftpd/blob/master/docker-compose.yml\n啟用 FTP Server 後，成功連線圖\n建立 SFTP Server，使用帳號密碼登入根據 atmoz/sftp 的說明，只要執行下面的指令，你的 SFTP Server 就跑起來囉，SSH 金鑰預設都會自動產生。\nbashbash1$ docker run -p 2223:22 -d atmoz/sftp miles:123456:::upload\n參數說明\n\n\n\n參數\n說明\n\n\n\n\n-p 2223:22\n使用 host 2223 port 連線到容器的 22 port。 而 22 port 是 SFTP 預設的連接 port\n\n\nmiles:123456:::upload\n這是設定帳號、權限、資料夾的指令格式，格式是 帳號:密碼:uid:gid:子資料夾 。 子資料夾會建立在 /home 資料夾底下，這一定要設定，因為建立的使用者沒辦法在 /home 資料夾底下寫檔案，預設情況下，只能在此子資料夾寫檔案。\n\n\n\n啟用 SFTP Server 後，成功連線圖\n建立 SFTP Server，使用 SSH 金鑰登入使用 SSH 金鑰登入會稍微麻煩一點，我把步驟拆解如下\n\n產生一組 public/private SSH 金鑰\n寫一個 Dockerfile 將 public key 複製到 atmoz/sftp 的指定資料夾底下，並使用 docker build 產生新的 Image\n執行步驟 2 建立的 Image 與 使用 FileZilla 加 SSH 金鑰連線\n\n1. 建立 public/private SSH 金鑰atmoz/sftp 裡面有提到建立 SSH 金鑰，可以使用 OpenSSH 的 ssh-keygen 指令。 而我這邊使用 RSA 加密演算法 產生金鑰。\nbashbash1$ ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key\n指令執行完就會產生一對 public/private key 了rsa_key\n這邊要注意的是 Enter passphrase (empty for no passphrase):，這是在建立金鑰的時候會問你要不要輸入 private key 的密碼，如果有設定的話，在使用 private key 登入的時候會請你輸入 private key 的密碼，如果保留空白的話，則不會要求輸入密碼。\n\n2. 將 public key 放到容器裡面atmoz/sftp 裡面有提到說，要把 public key 放在 /home/{username}/.ssh/keys/ 底下，而我的 username 是 miles ，所以會放在 /home/miles/.ssh/keys/ 底下，為了完成這件事情，我會建立一個 Dockerfile 做兩件事情\n\n先把 /home/miles/.ssh/keys/ 資料夾建立出來 \n將剛剛產生的 public key ssh_host_rsa_key.pub 複製到 /home/miles/.ssh/keys/\n\nDockerfileDockerfile123FROM atmoz/sftpRUN mkdir -p /home/miles/.ssh/keysCOPY ./ssh_host_rsa_key.pub /home/miles/.ssh/keys/\n寫好 Dockerfile 後，只要執行 $ docker build . -t mysftp 就可以把 Image 建立好，如下圖\nbuild_image\n3. Run Image 與使用金鑰連線執行下方指令，將容器執行起來bashbash1docker run -p 2223:22 -d mysftp miles::::upload\n可以注意我使用 miles::::upload 當作參數，這代表我使用者 miles 沒有設密碼，這是為了強迫使用者 miles 使用 private key 登入。\n\n再到 FileZilla 的 setting 加入剛剛產生的 private keyfz_setting\nadd_key\n設定完後，就可以成功使用 SSH 金鑰登入了。ssh-login\n使用 Docker-Compose最後附上寫好的 Docker-Compose ，只要將專案 clone 下來，執行 $ docker-compose up ，此篇說明的三種 FTP Server 就都會執行起來了。\n延伸閱讀[解說 FTP Protocol 的運作原理]\n","dateCreated":"2020-02-26T22:53:02+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-02-26T22:53:02+08:00","description":"這次案子有需要使用 .net core 存取 FTP 的功能，且又要求 FTP 要分三種登入方式 \n\n使用帳號密碼登入 FTP Server \n使用帳號密碼登入 SFTP Server \n使用 SSH 金鑰登入 SFTP Server\n\n為了 開發環境 需要，最快方法就是使用容器產生這三種 FTP 的環境。 今天就要來說明，怎麼使用 Docker 產生這三種 FTP 環境。","headline":"[Docker] 使用 Docker 建置 FTP(SFTP) 環境","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/02/使用-Docker-建置-FTP-SFTP-環境/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/02/使用-Docker-建置-FTP-SFTP-環境/","keywords":"Docker, ftp, sftp"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"這次案子有需要使用 .net core 存取 FTP 的功能，且又要求 FTP 要分三種登入方式 \n\n使用帳號密碼登入 FTP Server \n使用帳號密碼登入 SFTP Server \n使用 SSH 金鑰登入 SFTP Server\n\n為了 開發環境 需要，最快方法就是使用容器產生這三種 FTP 的環境。 今天就要來說明，怎麼使用 Docker 產生這三種 FTP 環境。\n\n使用工具說明此篇會說明使用 pure-ftpd 建立 FTP 環境，atmoz/sftp 建立 SFTP 環境。 使用 FileZilla FTP 工具測試連線，以及使用 OpenSSH 工具產生 SSH 金鑰。\n建立 FTP Server根據 pure-ftpd 的說明，只要執行下面的指令，你的 FTP Server 就跑起來囉。\nbashbash1$ docker run -d --name ftpd_server -p 23:21 -p 30010-30019:30010-30019 -e \"FTP_PASSIVE_PORTS=30010:30019\" -e FTP_USER_HOME=/home/miles -e FTP_USER_NAME=miles -e FTP_USER_PASS=123456 -e \"PUBLICHOST=localhost\" stilliard/pure-ftpd\n參數說明\n\n\n\n參數\n說明\n\n\n\n\n-p 23:21\n使用 host 23 port 連線到容器的 21 port。 而 21 port 是 FTP 預設的連接 port 。\n\n\n-e &quot;FTP_PASSIVE_PORTS=30010:30019&quot;\nstilliard/pure-ftpd 預設使用 30000-30009 port 做資料傳輸，如果要使用預設以外的 port 做資料傳輸，則一定要設定 FTP_PASSIVE_PORTS 環境變數，此案例我改使用 30010-30019 port 做資料傳輸。\n\n\n-p 30010-30019:30010-30019\n這邊要特別注意的是，host 的 port 一定要跟容器設定的資料傳輸的 port 一樣，否則是無法正常運作。 以我的例子，因為資料傳輸的 port 是 30010-30019 ，所以這裡也是使用 host port 30010-30019 作對應。\n\n\n-e FTP_USER_NAME=miles\n使用者的帳號。\n\n\n-e FTP_USER_PASS=123456\n使用者的密碼。\n\n\n-e FTP_USER_HOME=/home/miles\n登入使用者存取的資料夾，home 的子目錄一定要是使用者帳號的名稱，否則會有權限無法存取的問題。 以我的例子，使用者帳號是 miles ，所以我要設定資料夾路徑是 /home/miles。\n\n\n-e &quot;PUBLICHOST=localhost&quot;\n我是本地開發使用，沒有要提供其他電腦存取，則可以設定為 PUBLICHOST=localhost。 如果此 FTP Server 要給其他電腦使用的話，一定要設定為 host 的對外 IP，以我電腦 IP 192.168.2.103 為例，所以就要設定 PUBLICHOST=192.168.2.103。\n\n\n\n作者有提供 docker-compose 範例: https://github.com/stilliard/docker-pure-ftpd/blob/master/docker-compose.yml\n啟用 FTP Server 後，成功連線圖\n建立 SFTP Server，使用帳號密碼登入根據 atmoz/sftp 的說明，只要執行下面的指令，你的 SFTP Server 就跑起來囉，SSH 金鑰預設都會自動產生。\nbashbash1$ docker run -p 2223:22 -d atmoz/sftp miles:123456:::upload\n參數說明\n\n\n\n參數\n說明\n\n\n\n\n-p 2223:22\n使用 host 2223 port 連線到容器的 22 port。 而 22 port 是 SFTP 預設的連接 port\n\n\nmiles:123456:::upload\n這是設定帳號、權限、資料夾的指令格式，格式是 帳號:密碼:uid:gid:子資料夾 。 子資料夾會建立在 /home 資料夾底下，這一定要設定，因為建立的使用者沒辦法在 /home 資料夾底下寫檔案，預設情況下，只能在此子資料夾寫檔案。\n\n\n\n啟用 SFTP Server 後，成功連線圖\n建立 SFTP Server，使用 SSH 金鑰登入使用 SSH 金鑰登入會稍微麻煩一點，我把步驟拆解如下\n\n產生一組 public/private SSH 金鑰\n寫一個 Dockerfile 將 public key 複製到 atmoz/sftp 的指定資料夾底下，並使用 docker build 產生新的 Image\n執行步驟 2 建立的 Image 與 使用 FileZilla 加 SSH 金鑰連線\n\n1. 建立 public/private SSH 金鑰atmoz/sftp 裡面有提到建立 SSH 金鑰，可以使用 OpenSSH 的 ssh-keygen 指令。 而我這邊使用 RSA 加密演算法 產生金鑰。\nbashbash1$ ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key\n指令執行完就會產生一對 public/private key 了rsa_key\n這邊要注意的是 Enter passphrase (empty for no passphrase):，這是在建立金鑰的時候會問你要不要輸入 private key 的密碼，如果有設定的話，在使用 private key 登入的時候會請你輸入 private key 的密碼，如果保留空白的話，則不會要求輸入密碼。\n\n2. 將 public key 放到容器裡面atmoz/sftp 裡面有提到說，要把 public key 放在 /home/{username}/.ssh/keys/ 底下，而我的 username 是 miles ，所以會放在 /home/miles/.ssh/keys/ 底下，為了完成這件事情，我會建立一個 Dockerfile 做兩件事情\n\n先把 /home/miles/.ssh/keys/ 資料夾建立出來 \n將剛剛產生的 public key ssh_host_rsa_key.pub 複製到 /home/miles/.ssh/keys/\n\nDockerfileDockerfile123FROM atmoz/sftpRUN mkdir -p /home/miles/.ssh/keysCOPY ./ssh_host_rsa_key.pub /home/miles/.ssh/keys/\n寫好 Dockerfile 後，只要執行 $ docker build . -t mysftp 就可以把 Image 建立好，如下圖\nbuild_image\n3. Run Image 與使用金鑰連線執行下方指令，將容器執行起來bashbash1docker run -p 2223:22 -d mysftp miles::::upload\n可以注意我使用 miles::::upload 當作參數，這代表我使用者 miles 沒有設密碼，這是為了強迫使用者 miles 使用 private key 登入。\n\n再到 FileZilla 的 setting 加入剛剛產生的 private keyfz_setting\nadd_key\n設定完後，就可以成功使用 SSH 金鑰登入了。ssh-login\n使用 Docker-Compose最後附上寫好的 Docker-Compose ，只要將專案 clone 下來，執行 $ docker-compose up ，此篇說明的三種 FTP Server 就都會執行起來了。\n延伸閱讀[解說 FTP Protocol 的運作原理]\n","dateCreated":"2020-02-26T22:53:02+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-02-26T22:53:02+08:00","description":"這次案子有需要使用 .net core 存取 FTP 的功能，且又要求 FTP 要分三種登入方式 \n\n使用帳號密碼登入 FTP Server \n使用帳號密碼登入 SFTP Server \n使用 SSH 金鑰登入 SFTP Server\n\n為了 開發環境 需要，最快方法就是使用容器產生這三種 FTP 的環境。 今天就要來說明，怎麼使用 Docker 產生這三種 FTP 環境。","headline":"[Docker] 使用 Docker 建置 FTP(SFTP) 環境","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/02/使用-Docker-建置-FTP-SFTP-環境/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/02/使用-Docker-建置-FTP-SFTP-環境/","keywords":"Docker, ftp, sftp"}</script>
     <meta name="description" content="這次案子有需要使用 .net core 存取 FTP 的功能，且又要求 FTP 要分三種登入方式   使用帳號密碼登入 FTP Server  使用帳號密碼登入 SFTP Server  使用 SSH 金鑰登入 SFTP Server  為了 開發環境 需要，最快方法就是使用容器產生這三種 FTP 的環境。 今天就要來說明，怎麼使用 Docker 產生這三種 FTP 環境。">
 <meta name="keywords" content="Docker,ftp,sftp">
 <meta property="og:type" content="blog">
@@ -103,19 +103,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -124,7 +129,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -133,7 +138,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -142,7 +147,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -151,7 +156,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -160,7 +165,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -173,7 +178,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -182,7 +187,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -191,7 +196,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -200,7 +205,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -213,7 +218,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -882,7 +887,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -890,7 +895,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

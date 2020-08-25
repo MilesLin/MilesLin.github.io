@@ -12,12 +12,12 @@
         <meta name="keywords" content="Angular">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。\n此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’\n\n\nExpression Changed After It Has Been Checked Error\n案例說明在解答這個問題之前，先敘述一下將要展示的簡單案例。\n\n畫面有 Age 與 Married 兩個下拉選單\nAge 必填，可選擇 Child 與 Adult\nMarried ，可選擇 Married 與 Not Yet \n當 Age 選擇 Adult 時， Married 一定要選擇，並顯示 Required 文字 \n  \n\n\n\n\n了解案例後，讀者可以到 Angular-Expression Changed After It Has Been Checked Error Demo 按照步驟操作，即可出現錯誤訊息。  (記得看一下程式碼喔~)\nDevelopment Mode如果讀者有操作上敘案例的話，按下 F12 開啟開發者模式的時候，會看到這段訊息。Development_Mode_Message\n什麼是 Development Mode? Development Mode 會有什麼機制? 這是本篇的 Key Point 啊!!!\n引用 Angular #6005 的說明In short, after every round of change detection, dev mode immediately performs a second round to verify that no bindings have changed since the end of the first, as this would indicate that changes are being caused by change detection itself\ndrew-mooreEXCEPTION: Expression has changed after it was checked. #6005\n意思是說，在 Development Mode 的情況下，變更偵測觸發後，會立即執行第二次變更偵測，確保 status 的值沒有被變更。  如果 status 的值被變更了，則會出現該錯誤訊息，而這情形稱之為  change detection loops 。\n不建議執行 enableProdMode() 解決這個問題剛剛那篇 issue 的說明，有提到一個解決方式，就是 enableProdMode() 啟用 Production Mode，恩….沒錯，啟用 Production Mode ，這個問題就不會再出現了。  但是這樣只是把問題隱藏而已，因為 Development Mode 會有這機制，是有原因的 !!!\n如 stackoverflow 有人說明，第二次變更偵測的時候，變更偵測自行變更 status ，或者是在執行一個方法時，每次執行都回傳不同的值，這樣會造成 status 非常不穩定。If the model has changed between the regular and the additional change detection turn, this indicates that either\n\nchange detection itself has caused a change\na method or getter returns a different value every time it is calledwhich are both bad, because it is not clear how to proceed because the model might never stabilize.\n\nGünter ZöchbauerExpressionChangedAfterItHasBeenCheckedError Explained\n再來是根據 Angular University 的建議， 最好在開發時期啟用 Development Mode，那將會避免問題發生。We really have to go out of our way to trigger a change detection loop, but just in case its better to always use development mode during the development phase, as that will avoid the problem.\nAngular UniversityAre change detection issues frequent?\nLifecycle Hooks好了!! 接下來就是要找出問題的發生點，在這之前會建議讀者稍微了解一下生命週期的概念。 =&gt; Lifecycle Hooks，\n根據 Angular University - How to trigger a change detection loop in Angular? 的說明，這錯誤訊息是發生在 Angular Lifecycle Hooks - ngAfterViewChecked 這個階段。\n接下來請到線上範例 Angular-Expression Changed After It Has Been Checked Error Demo With Lifecycle Hooks 看一下生命週期 ngAfterContentChecked 與 ngAfterViewChecked 執行的情形。  (記得看一下程式碼喔~)\n可以看到 married invalid:true 在 ngAfterViewChecked 的階段，值改變了!!!Lifecycle_Hooks_Error_Message\n至於為什麼會這樣，請讀者看著這張圖，讓我按照順序說明畫面說明\n\n在 Age 還沒選擇時，2.[required]=&quot;age.value === &#39;2&#39;&quot;，不會成立，所以 married.invalid === false\nAge 選擇 Adult 時， view render 會先 render 到 1.&lt;em *ngIf=&quot;married.invalid&quot;&gt;Required&lt;/em&gt; 的位置，此時married.invalid 還是 === false\n接下來 view render 到 married 下拉選單，發現 2.[required]=&quot;age.value === &#39;2&#39;&quot;成立了，則 married.invalid === true， married.invalid 在這時候 status 改變了 !!! 。(這也是為什麼最一開始的程式範例，要執行步驟四，Required的訊息才會出現的原因)\n在 ngAfterViewChecked(view render 結束) 階段修改 status ，蹦 !! 錯誤訊息發生\n\n雙重驗證上述流程!!  根據上述流程，所以只要將 Required 訊息移到 married 下拉選單後面，讓 married 下拉選單先 render ，之後再 render Required 訊息，就不會有 view render 結束後又改變 status 的情形發生?A: 沒錯!!!\n讀者可以試試看，把 Required 訊息換位置(如下圖)。  讀者可以發現 change detection loops 的情形不再發生 !!\n更改 Required 訊息位置\n\n在 Age 還沒選擇時，2.[required]=&quot;age.value === &#39;2&#39;&quot;，不會成立，所以 married.invalid === false\nAge 選擇 Adult 時， view render 會先 render 到 married 下拉選單，發現 [required]=&quot;age.value === &#39;2&#39;&quot;成立了，則 married.invalid === true。\n接下來 view render 到 &lt;em *ngIf=&quot;married.invalid&quot;&gt;Required&lt;/em&gt;，因為 married.invalid 在流程 2 的時候已經是 true ，所以則顯示 Required 訊息。\n結束。  完全沒有在 ngAfterViewChecked(view render 結束) 階段修改 status\n\n最終解法 !!雖然上面有提到，只要移動 Required 訊息，問題就解決了，可是 版型就是這樣定的，錯誤訊息就是要擺那裏阿。  那如果錯誤訊息真的要放那邊怎麼辦?  而 Angular 生命週期的機制就是那樣，我們能做的是改變寫法。 \n請參考下圖，Age 下拉選單增加 chagne 事件，取代 [required]=&quot;age.value === &#39;2&#39;&quot; 寫法使用 change 事件\n\n使用 @ViewChild(&#39;form&#39;) form: NgForm; 取得 NgForm 物件\n在 markMarriedAsRequiredOrOptional 方法，設定 married 為 required用 NgForm 取得 FormControl 設定 married 為 Required\n\n\n最後當然還是有提供線上範例啦，讀者可以自行點連結去看看喔。 =&gt; Solution\n題外話好吧，其實這也是很重要的一個觀念，但是我不知道擺在文章的哪一段XD。  在這篇 how-does-angular-2-change-detection-really-work 的留言，有人認為說是 change detection loops 是 bug ，而 Angular University 則回應這是 feature 不是 bug ，其理由就讀者自行閱讀了。\n題外話XD\n小結想不到一個簡單的小功能造成的一個錯誤訊息，牽扯到的觀念那麼多，剛好也趁這時候認識了 Angular 生命週期與變更偵測的機制。  另外，讀者可以參考下方延伸閱讀的文章，其中有提到 onpush-change-detection ，使用這個方式，也可以解決 change detection loops 的問題，但是原因為何，目前還沒研究出來XD。\n參考[angular-university-how-does-angular-2-change-detection-really-work],[lifecycle-hooks],[stackoverflow-expressionchangedafterithasbeencheckederror-explained],[angular/issues/6005],[thoughtram-angular-2-change-detection-explained]  \n延伸閱讀[onpush-change-detection-how-it-works],[training-book-change-detection],[change-detection-strategy],[AbstractControl]\n","dateCreated":"2017-08-13T22:19:00+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-08-13T22:19:00+08:00","description":"在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。\n此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’\n","headline":"[Angular] Template-Driven 動態加入驗證屬性注意事項","image":["hooks-in-sequence.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/","keywords":"Angular","thumbnailUrl":"hooks-in-sequence.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。\n此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’\n\n\nExpression Changed After It Has Been Checked Error\n案例說明在解答這個問題之前，先敘述一下將要展示的簡單案例。\n\n畫面有 Age 與 Married 兩個下拉選單\nAge 必填，可選擇 Child 與 Adult\nMarried ，可選擇 Married 與 Not Yet \n當 Age 選擇 Adult 時， Married 一定要選擇，並顯示 Required 文字 \n  \n\n\n\n\n了解案例後，讀者可以到 Angular-Expression Changed After It Has Been Checked Error Demo 按照步驟操作，即可出現錯誤訊息。  (記得看一下程式碼喔~)\nDevelopment Mode如果讀者有操作上敘案例的話，按下 F12 開啟開發者模式的時候，會看到這段訊息。Development_Mode_Message\n什麼是 Development Mode? Development Mode 會有什麼機制? 這是本篇的 Key Point 啊!!!\n引用 Angular #6005 的說明In short, after every round of change detection, dev mode immediately performs a second round to verify that no bindings have changed since the end of the first, as this would indicate that changes are being caused by change detection itself\ndrew-mooreEXCEPTION: Expression has changed after it was checked. #6005\n意思是說，在 Development Mode 的情況下，變更偵測觸發後，會立即執行第二次變更偵測，確保 status 的值沒有被變更。  如果 status 的值被變更了，則會出現該錯誤訊息，而這情形稱之為  change detection loops 。\n不建議執行 enableProdMode() 解決這個問題剛剛那篇 issue 的說明，有提到一個解決方式，就是 enableProdMode() 啟用 Production Mode，恩….沒錯，啟用 Production Mode ，這個問題就不會再出現了。  但是這樣只是把問題隱藏而已，因為 Development Mode 會有這機制，是有原因的 !!!\n如 stackoverflow 有人說明，第二次變更偵測的時候，變更偵測自行變更 status ，或者是在執行一個方法時，每次執行都回傳不同的值，這樣會造成 status 非常不穩定。If the model has changed between the regular and the additional change detection turn, this indicates that either\n\nchange detection itself has caused a change\na method or getter returns a different value every time it is calledwhich are both bad, because it is not clear how to proceed because the model might never stabilize.\n\nGünter ZöchbauerExpressionChangedAfterItHasBeenCheckedError Explained\n再來是根據 Angular University 的建議， 最好在開發時期啟用 Development Mode，那將會避免問題發生。We really have to go out of our way to trigger a change detection loop, but just in case its better to always use development mode during the development phase, as that will avoid the problem.\nAngular UniversityAre change detection issues frequent?\nLifecycle Hooks好了!! 接下來就是要找出問題的發生點，在這之前會建議讀者稍微了解一下生命週期的概念。 =&gt; Lifecycle Hooks，\n根據 Angular University - How to trigger a change detection loop in Angular? 的說明，這錯誤訊息是發生在 Angular Lifecycle Hooks - ngAfterViewChecked 這個階段。\n接下來請到線上範例 Angular-Expression Changed After It Has Been Checked Error Demo With Lifecycle Hooks 看一下生命週期 ngAfterContentChecked 與 ngAfterViewChecked 執行的情形。  (記得看一下程式碼喔~)\n可以看到 married invalid:true 在 ngAfterViewChecked 的階段，值改變了!!!Lifecycle_Hooks_Error_Message\n至於為什麼會這樣，請讀者看著這張圖，讓我按照順序說明畫面說明\n\n在 Age 還沒選擇時，2.[required]=&quot;age.value === &#39;2&#39;&quot;，不會成立，所以 married.invalid === false\nAge 選擇 Adult 時， view render 會先 render 到 1.&lt;em *ngIf=&quot;married.invalid&quot;&gt;Required&lt;/em&gt; 的位置，此時married.invalid 還是 === false\n接下來 view render 到 married 下拉選單，發現 2.[required]=&quot;age.value === &#39;2&#39;&quot;成立了，則 married.invalid === true， married.invalid 在這時候 status 改變了 !!! 。(這也是為什麼最一開始的程式範例，要執行步驟四，Required的訊息才會出現的原因)\n在 ngAfterViewChecked(view render 結束) 階段修改 status ，蹦 !! 錯誤訊息發生\n\n雙重驗證上述流程!!  根據上述流程，所以只要將 Required 訊息移到 married 下拉選單後面，讓 married 下拉選單先 render ，之後再 render Required 訊息，就不會有 view render 結束後又改變 status 的情形發生?A: 沒錯!!!\n讀者可以試試看，把 Required 訊息換位置(如下圖)。  讀者可以發現 change detection loops 的情形不再發生 !!\n更改 Required 訊息位置\n\n在 Age 還沒選擇時，2.[required]=&quot;age.value === &#39;2&#39;&quot;，不會成立，所以 married.invalid === false\nAge 選擇 Adult 時， view render 會先 render 到 married 下拉選單，發現 [required]=&quot;age.value === &#39;2&#39;&quot;成立了，則 married.invalid === true。\n接下來 view render 到 &lt;em *ngIf=&quot;married.invalid&quot;&gt;Required&lt;/em&gt;，因為 married.invalid 在流程 2 的時候已經是 true ，所以則顯示 Required 訊息。\n結束。  完全沒有在 ngAfterViewChecked(view render 結束) 階段修改 status\n\n最終解法 !!雖然上面有提到，只要移動 Required 訊息，問題就解決了，可是 版型就是這樣定的，錯誤訊息就是要擺那裏阿。  那如果錯誤訊息真的要放那邊怎麼辦?  而 Angular 生命週期的機制就是那樣，我們能做的是改變寫法。 \n請參考下圖，Age 下拉選單增加 chagne 事件，取代 [required]=&quot;age.value === &#39;2&#39;&quot; 寫法使用 change 事件\n\n使用 @ViewChild(&#39;form&#39;) form: NgForm; 取得 NgForm 物件\n在 markMarriedAsRequiredOrOptional 方法，設定 married 為 required用 NgForm 取得 FormControl 設定 married 為 Required\n\n\n最後當然還是有提供線上範例啦，讀者可以自行點連結去看看喔。 =&gt; Solution\n題外話好吧，其實這也是很重要的一個觀念，但是我不知道擺在文章的哪一段XD。  在這篇 how-does-angular-2-change-detection-really-work 的留言，有人認為說是 change detection loops 是 bug ，而 Angular University 則回應這是 feature 不是 bug ，其理由就讀者自行閱讀了。\n題外話XD\n小結想不到一個簡單的小功能造成的一個錯誤訊息，牽扯到的觀念那麼多，剛好也趁這時候認識了 Angular 生命週期與變更偵測的機制。  另外，讀者可以參考下方延伸閱讀的文章，其中有提到 onpush-change-detection ，使用這個方式，也可以解決 change detection loops 的問題，但是原因為何，目前還沒研究出來XD。\n參考[angular-university-how-does-angular-2-change-detection-really-work],[lifecycle-hooks],[stackoverflow-expressionchangedafterithasbeencheckederror-explained],[angular/issues/6005],[thoughtram-angular-2-change-detection-explained]  \n延伸閱讀[onpush-change-detection-how-it-works],[training-book-change-detection],[change-detection-strategy],[AbstractControl]\n","dateCreated":"2017-08-13T22:19:00+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-08-13T22:19:00+08:00","description":"在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。\n此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?ERROR Error: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: ‘false’. Current value: ‘true’\n","headline":"[Angular] Template-Driven 動態加入驗證屬性注意事項","image":["hooks-in-sequence.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/08/Template-Driven-動態加入驗證屬性注意事項/","keywords":"Angular","thumbnailUrl":"hooks-in-sequence.png"}</script>
     <meta name="description" content="在開發表單的功能時，常常會有調整 A 欄位的值， B 欄位就要驗證為必填的功能。  以 Template-Driven 的方式實作這功能，我相信閉著眼睛都能實作，例如用 Binding [required] 的方式就能完成。 此時，以為能開心收工了，但…您是否發生過以下的錯誤訊息呢?ERROR Error: ExpressionChangedAfterItHasBeenCheckedError:">
 <meta name="keywords" content="Angular">
 <meta property="og:type" content="blog">
@@ -108,19 +108,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -129,7 +134,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -138,7 +143,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -147,7 +152,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -156,7 +161,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -165,7 +170,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -178,7 +183,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -187,7 +192,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -196,7 +201,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -205,7 +210,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -218,7 +223,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -850,7 +855,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -858,7 +863,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

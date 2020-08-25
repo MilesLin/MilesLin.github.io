@@ -12,12 +12,12 @@
         <meta name="keywords" content="Authentication">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"自行 AuthorizeFilter\n\n生命週期說明根據 mvc 的生命週期，其中有兩個驗證的點 Authentication Filter  與 Authorization Filter 來驗證使用者是否驗證成功，這兩個分別代表:\n\nAuthentication Filter : 驗證你是誰 \nAuthorization Filter : 驗證你能做什麼事情來源 : goo.gl/uXbsgV\n\n\n實作 Authorization Filter這兩個實作方法差不多，而今天會實作 Authorization Filter 當作範例。\n\n首先新增一個 MyAuthorizationFilter\n繼承 FilterAttribute 與 實作 IAuthorizationFilter (要注意命名空間是 System.Web.Mvc ，不要選錯了)\n驗證通過不要做任何事 vs 驗證失敗 assign => filterContext.Result = new HttpUnauthorizedResult();\nMyAuthorizationFiltercs12345678910public class MyAuthorizationFilter : System.Web.Mvc.FilterAttribute, System.Web.Mvc.IAuthorizationFilter{    public void OnAuthorization(AuthorizationContext filterContext)    {        if (!filterContext.HttpContext.User.Identity.IsAuthenticated)        {            filterContext.Result = new HttpUnauthorizedResult();        }                }}\n\n\n至於 assign HttpUnauthorizedResult() 的意思是說，驗證沒通過，會將導向登入頁面。  這邊以表單驗證為例，登入頁面網址是設定在 web.config 。\nconfig\n參考[Using ASP.NET MVC 5 IAuthenticationFilter for Authentication Challenges] [pluralsight 範例] [附上 web api2 驗證說明]\n","dateCreated":"2017-07-24T23:16:40+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-07-24T23:16:40+08:00","description":"自行 AuthorizeFilter","headline":"[Authentication] 自訂 AuthorizeFilter","image":["FilterExecutionProcess.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/07/自訂-AuthorizeFilter/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/07/自訂-AuthorizeFilter/","keywords":"Authentication","thumbnailUrl":"FilterExecutionProcess.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"自行 AuthorizeFilter\n\n生命週期說明根據 mvc 的生命週期，其中有兩個驗證的點 Authentication Filter  與 Authorization Filter 來驗證使用者是否驗證成功，這兩個分別代表:\n\nAuthentication Filter : 驗證你是誰 \nAuthorization Filter : 驗證你能做什麼事情來源 : goo.gl/uXbsgV\n\n\n實作 Authorization Filter這兩個實作方法差不多，而今天會實作 Authorization Filter 當作範例。\n\n首先新增一個 MyAuthorizationFilter\n繼承 FilterAttribute 與 實作 IAuthorizationFilter (要注意命名空間是 System.Web.Mvc ，不要選錯了)\n驗證通過不要做任何事 vs 驗證失敗 assign => filterContext.Result = new HttpUnauthorizedResult();\nMyAuthorizationFiltercs12345678910public class MyAuthorizationFilter : System.Web.Mvc.FilterAttribute, System.Web.Mvc.IAuthorizationFilter{    public void OnAuthorization(AuthorizationContext filterContext)    {        if (!filterContext.HttpContext.User.Identity.IsAuthenticated)        {            filterContext.Result = new HttpUnauthorizedResult();        }                }}\n\n\n至於 assign HttpUnauthorizedResult() 的意思是說，驗證沒通過，會將導向登入頁面。  這邊以表單驗證為例，登入頁面網址是設定在 web.config 。\nconfig\n參考[Using ASP.NET MVC 5 IAuthenticationFilter for Authentication Challenges] [pluralsight 範例] [附上 web api2 驗證說明]\n","dateCreated":"2017-07-24T23:16:40+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-07-24T23:16:40+08:00","description":"自行 AuthorizeFilter","headline":"[Authentication] 自訂 AuthorizeFilter","image":["FilterExecutionProcess.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/07/自訂-AuthorizeFilter/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/07/自訂-AuthorizeFilter/","keywords":"Authentication","thumbnailUrl":"FilterExecutionProcess.jpg"}</script>
     <meta name="description" content="自行 AuthorizeFilter">
 <meta name="keywords" content="Authentication">
 <meta property="og:type" content="blog">
@@ -101,19 +101,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -122,7 +127,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -131,7 +136,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -140,7 +145,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -149,7 +154,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -158,7 +163,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -171,7 +176,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -180,7 +185,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -189,7 +194,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -198,7 +203,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -211,7 +216,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -798,7 +803,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -806,7 +811,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

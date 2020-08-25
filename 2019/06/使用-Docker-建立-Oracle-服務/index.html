@@ -10,12 +10,12 @@
     <meta name="author" content="Miles">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"自己對 Oracle 非常不熟悉，所以每次要把 Oracle 環境建置起來的時候總要花很多時間。 但是自從 Oracle 有提供 Docker 的映像檔後，什麼都變容易了呢。 所以今天就來記錄一下怎麼使用 Docker 將 Oracle 環境架起來吧。\n\n當你找到 Docker Hub - Oracle Database Enterprise Edition 提供的映像檔時候，竟然有一個 Proceed to Checkout 的按鈕，跟一般的直接 pull 的訊息不一樣。 那是因為 Oracle 將映像檔放在 Docker Store 裡。(Docker Store 是 Docker 提供給廠商能夠進行商業行為的 Repository)Proceed to Checkout\n畢竟 Oracle 對 License 非常的重視，所以才這樣子吧。 不過竟然要使用，還是按照 Oracle 的規則來走吧，點下 Proceed to Checkout 後，會需要填一些資料，填完之後，點選 Get Content ，如下圖。Agreement\n接下來到 Docker Profile 的 My Content 就可以找到 Oracle 的內容。Added_to_my_content\n點選 Setup ，就可以看到 Oracle 映像檔案的使用方式。click_setup\n點選 Setup 後就可以看到 Oracle 映像檔案的使用方式了。\n啟用 Oracle 容器因為這是 Docker Store 的容器，所以並不是公開的，所以 pull 之前要先執行 docker login 指令登入 Docker hub 後，再執行 Oracle 的容器。\n接下來呢，請執行下方 Oracle 執行容器的指令bashbash1docker run -d -it --name oracle -P store/oracle/database-enterprise:12.2.0.1\n\n參數 -P 是說把所有有公開的連接埠發佈到隨機的連接埠(P一定要大寫)。 根據 Oracle 的文件會把連接埠 1521 與 5500 釋出The database server exposes port 1521 for Oracle client connections over SQLNet protocol and port 5500 for Oracle XML DB. SQLPlus or any JDBC client can be used to connect to the database server from outside the container.\ndocker-oracle\n\n\n當 Oracle 容器執行起來後，就要來看一下哪些隨機的連接埠被使用了，我們要使用這連接埠連到 Oracle ，請輸入 docker port oracle 指令取得連接埠對應資訊。 我的範例是 1521/tcp -&gt; 32769, 5500/tcp -&gt; 32768。docker_oracle_port\n有了連接埠後，就可以連到 Oracle 服務了，而根據 Oracle 的文件預設的帳號密碼是 sys/Oradoc_db1 ，預設 SID 是 ORCLCDB。 根據預設的帳號密碼，我這邊使用 SQL Developer 連線到資料庫。 這邊在建立連線的時候記得 Role 要選擇 SYSDBA，否則無法連線。add_connection in SQL Developer\n如上圖說明，當我資料輸入完之後，測試連線，狀態成功!!!\n新增使用者我在測試的時候，sys 的在建立 table 時候會失敗，所以我採用新增使用者的方式來處理這個問題。 用以下的方式建立完角色後，在使用工具登入時候，記得角色要選擇 default 才可以登入。\ncreate an usersql1234ALTER SESSION SET \"_ORACLE_SCRIPT\"=TRUE;CREATE USER miles IDENTIFIED BY 123456;GRANT CONNECT, RESOURCE, DBA TO miles;ALTER SESSION SET \"_ORACLE_SCRIPT\"=FALSE;\n我這邊密碼範例使用 123456 ，我在測試的時候，如果密碼有特殊字元如 #$ 之類的都會出錯，所以建議可以使用 英文字+數字 就好。\n\nEF 連線字串範例把伺服器架起來後，更換連線字串也花了我一點時間，在這邊筆記一下。connection stringconfig1&lt;add name=\"myEntities\" connectionString=\"DATA SOURCE=localhost:32769/ORCLCDB.localdomain;PASSWORD=xxxx;PERSIST SECURITY INFO=false;USER ID=yyyy\" providerName=\"Oracle.ManagedDataAccess.Client\" /&gt;\n延伸閱讀[Docker Store Program and Policies][Docker Hub - Oracle Database Enterprise Edition][SQL Developer Data Pump Import - Video 2 of 3]\n","dateCreated":"2019-06-01T13:33:09+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-06-01T13:33:09+08:00","description":"自己對 Oracle 非常不熟悉，所以每次要把 Oracle 環境建置起來的時候總要花很多時間。 但是自從 Oracle 有提供 Docker 的映像檔後，什麼都變容易了呢。 所以今天就來記錄一下怎麼使用 Docker 將 Oracle 環境架起來吧。","headline":"[Docker] 使用 Docker 建立 Oracle 服務","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/06/使用-Docker-建立-Oracle-服務/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/06/使用-Docker-建立-Oracle-服務/","keywords":"Docker, Oracle"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"自己對 Oracle 非常不熟悉，所以每次要把 Oracle 環境建置起來的時候總要花很多時間。 但是自從 Oracle 有提供 Docker 的映像檔後，什麼都變容易了呢。 所以今天就來記錄一下怎麼使用 Docker 將 Oracle 環境架起來吧。\n\n當你找到 Docker Hub - Oracle Database Enterprise Edition 提供的映像檔時候，竟然有一個 Proceed to Checkout 的按鈕，跟一般的直接 pull 的訊息不一樣。 那是因為 Oracle 將映像檔放在 Docker Store 裡。(Docker Store 是 Docker 提供給廠商能夠進行商業行為的 Repository)Proceed to Checkout\n畢竟 Oracle 對 License 非常的重視，所以才這樣子吧。 不過竟然要使用，還是按照 Oracle 的規則來走吧，點下 Proceed to Checkout 後，會需要填一些資料，填完之後，點選 Get Content ，如下圖。Agreement\n接下來到 Docker Profile 的 My Content 就可以找到 Oracle 的內容。Added_to_my_content\n點選 Setup ，就可以看到 Oracle 映像檔案的使用方式。click_setup\n點選 Setup 後就可以看到 Oracle 映像檔案的使用方式了。\n啟用 Oracle 容器因為這是 Docker Store 的容器，所以並不是公開的，所以 pull 之前要先執行 docker login 指令登入 Docker hub 後，再執行 Oracle 的容器。\n接下來呢，請執行下方 Oracle 執行容器的指令bashbash1docker run -d -it --name oracle -P store/oracle/database-enterprise:12.2.0.1\n\n參數 -P 是說把所有有公開的連接埠發佈到隨機的連接埠(P一定要大寫)。 根據 Oracle 的文件會把連接埠 1521 與 5500 釋出The database server exposes port 1521 for Oracle client connections over SQLNet protocol and port 5500 for Oracle XML DB. SQLPlus or any JDBC client can be used to connect to the database server from outside the container.\ndocker-oracle\n\n\n當 Oracle 容器執行起來後，就要來看一下哪些隨機的連接埠被使用了，我們要使用這連接埠連到 Oracle ，請輸入 docker port oracle 指令取得連接埠對應資訊。 我的範例是 1521/tcp -&gt; 32769, 5500/tcp -&gt; 32768。docker_oracle_port\n有了連接埠後，就可以連到 Oracle 服務了，而根據 Oracle 的文件預設的帳號密碼是 sys/Oradoc_db1 ，預設 SID 是 ORCLCDB。 根據預設的帳號密碼，我這邊使用 SQL Developer 連線到資料庫。 這邊在建立連線的時候記得 Role 要選擇 SYSDBA，否則無法連線。add_connection in SQL Developer\n如上圖說明，當我資料輸入完之後，測試連線，狀態成功!!!\n新增使用者我在測試的時候，sys 的在建立 table 時候會失敗，所以我採用新增使用者的方式來處理這個問題。 用以下的方式建立完角色後，在使用工具登入時候，記得角色要選擇 default 才可以登入。\ncreate an usersql1234ALTER SESSION SET \"_ORACLE_SCRIPT\"=TRUE;CREATE USER miles IDENTIFIED BY 123456;GRANT CONNECT, RESOURCE, DBA TO miles;ALTER SESSION SET \"_ORACLE_SCRIPT\"=FALSE;\n我這邊密碼範例使用 123456 ，我在測試的時候，如果密碼有特殊字元如 #$ 之類的都會出錯，所以建議可以使用 英文字+數字 就好。\n\nEF 連線字串範例把伺服器架起來後，更換連線字串也花了我一點時間，在這邊筆記一下。connection stringconfig1&lt;add name=\"myEntities\" connectionString=\"DATA SOURCE=localhost:32769/ORCLCDB.localdomain;PASSWORD=xxxx;PERSIST SECURITY INFO=false;USER ID=yyyy\" providerName=\"Oracle.ManagedDataAccess.Client\" /&gt;\n延伸閱讀[Docker Store Program and Policies][Docker Hub - Oracle Database Enterprise Edition][SQL Developer Data Pump Import - Video 2 of 3]\n","dateCreated":"2019-06-01T13:33:09+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-06-01T13:33:09+08:00","description":"自己對 Oracle 非常不熟悉，所以每次要把 Oracle 環境建置起來的時候總要花很多時間。 但是自從 Oracle 有提供 Docker 的映像檔後，什麼都變容易了呢。 所以今天就來記錄一下怎麼使用 Docker 將 Oracle 環境架起來吧。","headline":"[Docker] 使用 Docker 建立 Oracle 服務","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/06/使用-Docker-建立-Oracle-服務/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/06/使用-Docker-建立-Oracle-服務/","keywords":"Docker, Oracle"}</script>
     <meta name="description" content="自己對 Oracle 非常不熟悉，所以每次要把 Oracle 環境建置起來的時候總要花很多時間。 但是自從 Oracle 有提供 Docker 的映像檔後，什麼都變容易了呢。 所以今天就來記錄一下怎麼使用 Docker 將 Oracle 環境架起來吧。">
 <meta name="keywords" content="Docker,Oracle">
 <meta property="og:type" content="blog">
@@ -100,19 +100,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -121,7 +126,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -130,7 +135,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -139,7 +144,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -148,7 +153,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -157,7 +162,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -170,7 +175,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -179,7 +184,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -188,7 +193,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -197,7 +202,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -210,7 +215,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -801,7 +806,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -809,7 +814,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

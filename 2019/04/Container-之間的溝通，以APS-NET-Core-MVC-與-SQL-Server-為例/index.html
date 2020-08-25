@@ -12,12 +12,12 @@
         <meta name="keywords" content="ASP.NET Core,EF Core">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"在 Dokcer 的世界裡，他們有自己的虛擬網路 Software-Defined Networks (SDN)。 而 Container 在執行的時候預設會加入 bridge 的虛擬網路。 這個虛擬網路就能夠讓我們 Container 之間互相溝通。\n\n下圖為 Dokcer 預設建立好的虛擬網路。network-ls\n今天的範例是基於的 ASP.NET Core MVC 專案，透過 EF Core 與資料庫連接的方式來展示。展示的重點主要會是，當把 MVC 專案放到 Container 裡面去後，如何修改 EF Core 的連線字串，讓連線字串指向同樣是 SQL Server 的 虛擬網路 IP。\n在後面步驟開始前，我已經先執行下方指令，把 SQL Server 執行起來了。 (如果讀者要執行，請記得修改密碼，要符合 預設密碼強度)sql serverbash1docker run -e \"ACCEPT_EULA=Y\" -e \"SA_PASSWORD=xxxxx\" -p 1433:1433 --name sql1 -d mcr.microsoft.com/mssql/server\n如何查詢 SQL Server 的虛擬IP?因為如上述所說，當 Container 執行後，會自動加入 bridge 的虛擬網路，所以請執行下方指令，就可以看到加入這個虛擬網路的 Container IP。\ninspect bridgebash1docker network inspect bridge\n執行後，會看到 SQL Server 的 IP，我這邊的 IP 是 172.17.0.2，如下圖。sql-server-ip\n有 SQL Server IP 後，我們就可以來想辦法更改 ASP.NET Core MVC Container 裡面的連線字串啦。\n修改連接字串的方法要改變連線字串有兩種方法，一種是使用多個 appsettings.Production.json，一個是把連線字串設定成環境變數。\n使用多個 appsettings.json我們先在 ASP.NET Core MVC 專案新增一個 appsettings.Production.json，且把連線字串設定好指向 172.17.0.2 這個 IP。appsettings-production\n接下來只要在啟動 Container 的時候設定環境變數 ASPNETCORE_ENVIRONMENT=Production，他就會去讀 appsettings.Production.json 的，這樣就成功切換 appsettings 啦。 而執行指令如下範例。\nappsettings productionbash1docker run -e \"ASPNETCORE_ENVIRONMENT=Production\" -d -p 8000:80 myapp --name=prod\n-e &quot;ASPNETCORE_ENVIRONMENT=Production&quot; 建議放 run 後面，我在練習的時放在指令的最後面，都會無效。\n\n連線字串設定成環境變數另一種方法是設定環境變數，要注意環境變數的優先權會比 appsettings 高，所以如果 appsettings 跟環境變數都有同樣的變數的話，會以環境變數為為主。那要怎麼設定下方範例這種路徑的環境變數呢?connection stringjson123\"ConnectionStrings\": {  \"Sample\": \"xxxx\"}\n只要在設定環境變數的時候使用兩個底線 __ 就可以代表下一個階層，所以我只要設定這樣的環境變數 ConnectionStrings__Sample=Server=10.0.75.1;Database=Sample;User ID=sa;Password=xx;Trusted_Connection=True;Integrated Security=False; 就可以將連線字串整個換掉。 完整指令如下範例。run with envbash1docker run -e \"ConnectionStrings__Sample=Server=172.17.0.2;Database=Sample;User ID=sa;Password=xxxx;Trusted_Connection=True;Integrated Security=False;\" -d -p 8000:80 myapp --name=prod\n搞定收工!!\n延伸閱讀[Use multiple environments in ASP.NET Core]\n","dateCreated":"2019-04-18T23:19:52+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-04-18T23:19:52+08:00","description":"在 Dokcer 的世界裡，他們有自己的虛擬網路 Software-Defined Networks (SDN)。 而 Container 在執行的時候預設會加入 bridge 的虛擬網路。 這個虛擬網路就能夠讓我們 Container 之間互相溝通。","headline":"[Docker] Container 之間的溝通，以 APS.NET Core MVC 與 SQL Server 為例","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/04/Container-之間的溝通，以APS-NET-Core-MVC-與-SQL-Server-為例/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/04/Container-之間的溝通，以APS-NET-Core-MVC-與-SQL-Server-為例/","keywords":"Docker, ASP.NET Core"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"在 Dokcer 的世界裡，他們有自己的虛擬網路 Software-Defined Networks (SDN)。 而 Container 在執行的時候預設會加入 bridge 的虛擬網路。 這個虛擬網路就能夠讓我們 Container 之間互相溝通。\n\n下圖為 Dokcer 預設建立好的虛擬網路。network-ls\n今天的範例是基於的 ASP.NET Core MVC 專案，透過 EF Core 與資料庫連接的方式來展示。展示的重點主要會是，當把 MVC 專案放到 Container 裡面去後，如何修改 EF Core 的連線字串，讓連線字串指向同樣是 SQL Server 的 虛擬網路 IP。\n在後面步驟開始前，我已經先執行下方指令，把 SQL Server 執行起來了。 (如果讀者要執行，請記得修改密碼，要符合 預設密碼強度)sql serverbash1docker run -e \"ACCEPT_EULA=Y\" -e \"SA_PASSWORD=xxxxx\" -p 1433:1433 --name sql1 -d mcr.microsoft.com/mssql/server\n如何查詢 SQL Server 的虛擬IP?因為如上述所說，當 Container 執行後，會自動加入 bridge 的虛擬網路，所以請執行下方指令，就可以看到加入這個虛擬網路的 Container IP。\ninspect bridgebash1docker network inspect bridge\n執行後，會看到 SQL Server 的 IP，我這邊的 IP 是 172.17.0.2，如下圖。sql-server-ip\n有 SQL Server IP 後，我們就可以來想辦法更改 ASP.NET Core MVC Container 裡面的連線字串啦。\n修改連接字串的方法要改變連線字串有兩種方法，一種是使用多個 appsettings.Production.json，一個是把連線字串設定成環境變數。\n使用多個 appsettings.json我們先在 ASP.NET Core MVC 專案新增一個 appsettings.Production.json，且把連線字串設定好指向 172.17.0.2 這個 IP。appsettings-production\n接下來只要在啟動 Container 的時候設定環境變數 ASPNETCORE_ENVIRONMENT=Production，他就會去讀 appsettings.Production.json 的，這樣就成功切換 appsettings 啦。 而執行指令如下範例。\nappsettings productionbash1docker run -e \"ASPNETCORE_ENVIRONMENT=Production\" -d -p 8000:80 myapp --name=prod\n-e &quot;ASPNETCORE_ENVIRONMENT=Production&quot; 建議放 run 後面，我在練習的時放在指令的最後面，都會無效。\n\n連線字串設定成環境變數另一種方法是設定環境變數，要注意環境變數的優先權會比 appsettings 高，所以如果 appsettings 跟環境變數都有同樣的變數的話，會以環境變數為為主。那要怎麼設定下方範例這種路徑的環境變數呢?connection stringjson123\"ConnectionStrings\": {  \"Sample\": \"xxxx\"}\n只要在設定環境變數的時候使用兩個底線 __ 就可以代表下一個階層，所以我只要設定這樣的環境變數 ConnectionStrings__Sample=Server=10.0.75.1;Database=Sample;User ID=sa;Password=xx;Trusted_Connection=True;Integrated Security=False; 就可以將連線字串整個換掉。 完整指令如下範例。run with envbash1docker run -e \"ConnectionStrings__Sample=Server=172.17.0.2;Database=Sample;User ID=sa;Password=xxxx;Trusted_Connection=True;Integrated Security=False;\" -d -p 8000:80 myapp --name=prod\n搞定收工!!\n延伸閱讀[Use multiple environments in ASP.NET Core]\n","dateCreated":"2019-04-18T23:19:52+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-04-18T23:19:52+08:00","description":"在 Dokcer 的世界裡，他們有自己的虛擬網路 Software-Defined Networks (SDN)。 而 Container 在執行的時候預設會加入 bridge 的虛擬網路。 這個虛擬網路就能夠讓我們 Container 之間互相溝通。","headline":"[Docker] Container 之間的溝通，以 APS.NET Core MVC 與 SQL Server 為例","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/04/Container-之間的溝通，以APS-NET-Core-MVC-與-SQL-Server-為例/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/04/Container-之間的溝通，以APS-NET-Core-MVC-與-SQL-Server-為例/","keywords":"Docker, ASP.NET Core"}</script>
     <meta name="description" content="在 Dokcer 的世界裡，他們有自己的虛擬網路 Software-Defined Networks (SDN)。 而 Container 在執行的時候預設會加入 bridge 的虛擬網路。 這個虛擬網路就能夠讓我們 Container 之間互相溝通。">
 <meta name="keywords" content="ASP.NET Core,EF Core">
 <meta property="og:type" content="blog">
@@ -99,19 +99,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -120,7 +125,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -129,7 +134,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -138,7 +143,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -147,7 +152,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -156,7 +161,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -169,7 +174,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -178,7 +183,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -187,7 +192,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -196,7 +201,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -209,7 +214,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -796,7 +801,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -804,7 +809,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

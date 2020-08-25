@@ -12,12 +12,12 @@
         <meta name="keywords" content="Docker">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天會介紹怎麼一步一步的將 ASP.NET Core 網站容器化，主要的步驟為\n\n產生一個 ASP.NET Core MVC 預設專案\n建立 Dockerfile\n從 Dockerfile 建立包含網站的 Image\n建立和執行 Container\n\n\n建立 ASP.NET Core MVC 預設專案這個步驟我們先要產生一個預設的 MVC 專案，並且要產生好佈署檔案，佈署檔案等等會用來複製到 Container。\n先執行下方指令，產生好專案後，確定能執行起來create mvcbash123dotnet new mvc -n CoolWebcd CoolWebdetnet run成功的話，會看類似這樣網站預設 ASP.NET Core MVC 網站\n因為 docker 沒有設定憑證問題，所以 publish 之前，請到 Startup.cs 把 這行 app.UseHttpsRedirection(); 移除。\n\n接下來使用 Ctrl + C 停止執行網站，然後使用 dotnet publish 建立佈署檔案。\npublishbash1dotnet publish -o dist\n接下來你看到一個資料夾 dist，裡面就是我們需要的佈署檔案。佈署檔案\n只要有這些佈署檔案，我們就可以把網站執行起來，你可以嘗試執行 dotnet CoolWeb.dll，就會看到網站執行起來了。\n建立 Dockerfile建立 Dockerfile 的目的是用來執行一連串的動作，從 Pull Image 、把佈署檔案放進 Container 、到建立一個我們自己網站的 Image。\n我們在 dist 資料夾裡面，建立一個 Dockerfile 檔案 (請注意， Dockerfile 沒有副檔名)dockerfile\n並在 Dockerfile 貼上以下指令。dockerfilebash123FROM mcr.microsoft.com/dotnet/core/aspnet:2.1COPY . .ENTRYPOINT [\"dotnet\", \"CoolWeb.dll\"]這三行指令個代表是\n\nPull ASP.NET Core Runtime 的 Image ，且我指定版本是 2.1 版本。\n複製當下資料夾的檔案(這邊是指 dist 資料夾)，貼到 Container\nContainer 建立後會執行 dotent CoolWeb.dll 這段指令，讓網頁跑起來\n這段指令指行完後，會有一個 Process 在 Container 裡面執行，如果沒有這個 Process 表示 Container 已經沒有在執行任何東西。\n\n\n\n從 Dockerfile 建立 Image接下來就要讀取 Dockerfile，建立有我們網站的 Image， 請執行以下指令\nbuild imagebash1docker build . -t myapp -f Dockerfile\n\n參數 . 是指當下目錄\n-t myapp 將產生的 Image 取名為 myapp\n-f Dockerfile 讀取 Dockerfile 這個檔案(預設可省略)\n\n執行成功後，就會看到 myapp 的 Image 被建立了myapp image\n建立和執行 Container終於到了最後一個步驟了，接下來我們就要建立 Container 啦。 請執行以下指令create containerbash1docker create -p 8000:80 --name exampleApp myapp\n\n-p 8000:80 建立 Container 80 port 與 host system 8000 port 的 proxy。\n所以當我輸入 http://localhost:8000/ 的時候，會連到 Container 的 http://localhost:80/\n\n\n--name exampleApp 指定 Container 的別名\nmyapp 從 myapp 這個 Image 建立 Container\n\n建立完後，執行 docker ps -a 就會看到建立好的 Containercontainer\n接下來就是要執行 Container 了，請執行以下指令。 此指令會讓 Container 執行起來，且是在背景執行。start containerbash1docker start exampleApp\n接下來就是打開 chrome 輸入網址 http://localhost:8000/ ，就會看到已經連線到容器化後的 ASP.NET Core MVC 網站了!!!\n將 create 與 start 用一個指令代替另外 dokcer 有提供一個 run 指令，能夠將 create 和 start 兩個指令一起執行。  請看下方指令\nrun containerbash1docker run -d --rm -p 8000:80 myapp\n\n-d 讓 Container 背景執行，如果沒有這個參數，則命令提示字元會停在那邊沒辦法做其他事情\n--rm 當 Container 停止的時候，會自動把 Container 刪除\n\n小結今天只有介紹怎麼把佈署檔案放到 Container 裡面去，其實將 ASP.NET Core 網站容器的方法有很多，例如也可以使用 .NET Core SDK 的 Image ，這個 Image 裡面有提供 dotnet SDK 的功能，所以我能夠在 Container 裡面執行 dotnet restore, dotnet publish 之類的指令，做更多的事情。\n延伸閱讀[Introduction to .NET and Docker][Docker hub - .NET Core SDK][Docker hub - ASP.NET Core Runtime]\n","dateCreated":"2019-04-11T21:30:52+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-04-11T21:30:52+08:00","description":"今天會介紹怎麼一步一步的將 ASP.NET Core 網站容器化，主要的步驟為\n\n產生一個 ASP.NET Core MVC 預設專案\n建立 Dockerfile\n從 Dockerfile 建立包含網站的 Image\n建立和執行 Container\n","headline":"[Docker] 如何容器化 ASP.NET Core 網站","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/","keywords":"Docker, ASP.NET Core"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天會介紹怎麼一步一步的將 ASP.NET Core 網站容器化，主要的步驟為\n\n產生一個 ASP.NET Core MVC 預設專案\n建立 Dockerfile\n從 Dockerfile 建立包含網站的 Image\n建立和執行 Container\n\n\n建立 ASP.NET Core MVC 預設專案這個步驟我們先要產生一個預設的 MVC 專案，並且要產生好佈署檔案，佈署檔案等等會用來複製到 Container。\n先執行下方指令，產生好專案後，確定能執行起來create mvcbash123dotnet new mvc -n CoolWebcd CoolWebdetnet run成功的話，會看類似這樣網站預設 ASP.NET Core MVC 網站\n因為 docker 沒有設定憑證問題，所以 publish 之前，請到 Startup.cs 把 這行 app.UseHttpsRedirection(); 移除。\n\n接下來使用 Ctrl + C 停止執行網站，然後使用 dotnet publish 建立佈署檔案。\npublishbash1dotnet publish -o dist\n接下來你看到一個資料夾 dist，裡面就是我們需要的佈署檔案。佈署檔案\n只要有這些佈署檔案，我們就可以把網站執行起來，你可以嘗試執行 dotnet CoolWeb.dll，就會看到網站執行起來了。\n建立 Dockerfile建立 Dockerfile 的目的是用來執行一連串的動作，從 Pull Image 、把佈署檔案放進 Container 、到建立一個我們自己網站的 Image。\n我們在 dist 資料夾裡面，建立一個 Dockerfile 檔案 (請注意， Dockerfile 沒有副檔名)dockerfile\n並在 Dockerfile 貼上以下指令。dockerfilebash123FROM mcr.microsoft.com/dotnet/core/aspnet:2.1COPY . .ENTRYPOINT [\"dotnet\", \"CoolWeb.dll\"]這三行指令個代表是\n\nPull ASP.NET Core Runtime 的 Image ，且我指定版本是 2.1 版本。\n複製當下資料夾的檔案(這邊是指 dist 資料夾)，貼到 Container\nContainer 建立後會執行 dotent CoolWeb.dll 這段指令，讓網頁跑起來\n這段指令指行完後，會有一個 Process 在 Container 裡面執行，如果沒有這個 Process 表示 Container 已經沒有在執行任何東西。\n\n\n\n從 Dockerfile 建立 Image接下來就要讀取 Dockerfile，建立有我們網站的 Image， 請執行以下指令\nbuild imagebash1docker build . -t myapp -f Dockerfile\n\n參數 . 是指當下目錄\n-t myapp 將產生的 Image 取名為 myapp\n-f Dockerfile 讀取 Dockerfile 這個檔案(預設可省略)\n\n執行成功後，就會看到 myapp 的 Image 被建立了myapp image\n建立和執行 Container終於到了最後一個步驟了，接下來我們就要建立 Container 啦。 請執行以下指令create containerbash1docker create -p 8000:80 --name exampleApp myapp\n\n-p 8000:80 建立 Container 80 port 與 host system 8000 port 的 proxy。\n所以當我輸入 http://localhost:8000/ 的時候，會連到 Container 的 http://localhost:80/\n\n\n--name exampleApp 指定 Container 的別名\nmyapp 從 myapp 這個 Image 建立 Container\n\n建立完後，執行 docker ps -a 就會看到建立好的 Containercontainer\n接下來就是要執行 Container 了，請執行以下指令。 此指令會讓 Container 執行起來，且是在背景執行。start containerbash1docker start exampleApp\n接下來就是打開 chrome 輸入網址 http://localhost:8000/ ，就會看到已經連線到容器化後的 ASP.NET Core MVC 網站了!!!\n將 create 與 start 用一個指令代替另外 dokcer 有提供一個 run 指令，能夠將 create 和 start 兩個指令一起執行。  請看下方指令\nrun containerbash1docker run -d --rm -p 8000:80 myapp\n\n-d 讓 Container 背景執行，如果沒有這個參數，則命令提示字元會停在那邊沒辦法做其他事情\n--rm 當 Container 停止的時候，會自動把 Container 刪除\n\n小結今天只有介紹怎麼把佈署檔案放到 Container 裡面去，其實將 ASP.NET Core 網站容器的方法有很多，例如也可以使用 .NET Core SDK 的 Image ，這個 Image 裡面有提供 dotnet SDK 的功能，所以我能夠在 Container 裡面執行 dotnet restore, dotnet publish 之類的指令，做更多的事情。\n延伸閱讀[Introduction to .NET and Docker][Docker hub - .NET Core SDK][Docker hub - ASP.NET Core Runtime]\n","dateCreated":"2019-04-11T21:30:52+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-04-11T21:30:52+08:00","description":"今天會介紹怎麼一步一步的將 ASP.NET Core 網站容器化，主要的步驟為\n\n產生一個 ASP.NET Core MVC 預設專案\n建立 Dockerfile\n從 Dockerfile 建立包含網站的 Image\n建立和執行 Container\n","headline":"[Docker] 如何容器化 ASP.NET Core 網站","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/04/如何容器化-ASP.NET-Core-網站/","keywords":"Docker, ASP.NET Core"}</script>
     <meta name="description" content="今天會介紹怎麼一步一步的將 ASP.NET Core 網站容器化，主要的步驟為  產生一個 ASP.NET Core MVC 預設專案 建立 Dockerfile 從 Dockerfile 建立包含網站的 Image 建立和執行 Container">
 <meta name="keywords" content="Docker">
 <meta property="og:type" content="blog">
@@ -101,19 +101,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -122,7 +127,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -131,7 +136,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -140,7 +145,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -149,7 +154,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -158,7 +163,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -171,7 +176,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -180,7 +185,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -189,7 +194,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -198,7 +203,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -211,7 +216,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -834,7 +839,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -842,7 +847,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

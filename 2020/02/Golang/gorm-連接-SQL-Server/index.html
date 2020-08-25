@@ -12,12 +12,12 @@
         <meta name="keywords" content="Go,gorm">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"我電腦 Go 的版本是 1.13.4，參考 gorm 文件 Connecting to database 連接到資料庫的時候一直出現 invalid port when using sqlserver://username:password@localhost:1433?database=dbname 的錯誤，這個錯誤看起來就是連線字串格式錯誤。 今天就來筆記，我如何處理這問題。\n\n接著，我又去參考了微軟 SQL Server 的文件 Create GO apps using SQL Server on Windows ，發現他連線字串跟 gorm 的文件不太一樣啊!!\n這是 gorm 文件的連線字串格式sqlserver://username:password@localhost:1433?database=dbname\n這是 SQL Server 官方文件的連線字串server=localhost;user id=user;password=pwd;port=1433;database=dbname;\n範例於是乎，我將連線字串改成 Create GO apps using SQL Server on Windows 的連線字串格式，其他都參照 gorm 的文件，就成功了!!  下方式為成功連線的程式碼範例。\ngorm connect to sql servergo1234567891011121314151617181920212223242526272829303132333435package mainimport (\t\"fmt\"\t\"github.com/jinzhu/gorm\"\t_ \"github.com/jinzhu/gorm/dialects/mssql\")var server = \"localhost\"var port = 1433var user = \"xxxx\"var password = \"aaayyybbbEE\"var database = \"dbname\"func main() {\tconnString := fmt.Sprintf(\"server=%s;user id=%s;password=%s;port=%d;database=%s;\",\t\tserver, user, password, port, database)\tdb, err := gorm.Open(\"mssql\", connString)\tif err != nil {\t\tfmt.Println(err)\t}\t// 防止 gorm 產生 SQL 時，自動在 table 加上 s\t// https://gorm.io/docs/conventions.html#Pluralized-Table-Name\tdb.SingularTable(true)\tvar id int\tvar name string\tdb.Debug().Table(\"Account\").Select(\"Id, Name\").Row().Scan(&amp;id, &amp;name)\tfmt.Println(id, name)}\n延伸閱讀[GORM - Conventions][GORM - Connecting to database][Create Go apps using SQL Server on Windows]\n","dateCreated":"2020-02-16T16:57:13+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-02-16T16:57:13+08:00","description":"我電腦 Go 的版本是 1.13.4，參考 gorm 文件 Connecting to database 連接到資料庫的時候一直出現 invalid port when using sqlserver://username:password@localhost:1433?database=dbname 的錯誤，這個錯誤看起來就是連線字串格式錯誤。 今天就來筆記，我如何處理這問題。","headline":"[Go] gorm 連接 SQL Server","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/02/Golang/gorm-連接-SQL-Server/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/02/Golang/gorm-連接-SQL-Server/","keywords":"Go, gorm, Sql Server"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"我電腦 Go 的版本是 1.13.4，參考 gorm 文件 Connecting to database 連接到資料庫的時候一直出現 invalid port when using sqlserver://username:password@localhost:1433?database=dbname 的錯誤，這個錯誤看起來就是連線字串格式錯誤。 今天就來筆記，我如何處理這問題。\n\n接著，我又去參考了微軟 SQL Server 的文件 Create GO apps using SQL Server on Windows ，發現他連線字串跟 gorm 的文件不太一樣啊!!\n這是 gorm 文件的連線字串格式sqlserver://username:password@localhost:1433?database=dbname\n這是 SQL Server 官方文件的連線字串server=localhost;user id=user;password=pwd;port=1433;database=dbname;\n範例於是乎，我將連線字串改成 Create GO apps using SQL Server on Windows 的連線字串格式，其他都參照 gorm 的文件，就成功了!!  下方式為成功連線的程式碼範例。\ngorm connect to sql servergo1234567891011121314151617181920212223242526272829303132333435package mainimport (\t\"fmt\"\t\"github.com/jinzhu/gorm\"\t_ \"github.com/jinzhu/gorm/dialects/mssql\")var server = \"localhost\"var port = 1433var user = \"xxxx\"var password = \"aaayyybbbEE\"var database = \"dbname\"func main() {\tconnString := fmt.Sprintf(\"server=%s;user id=%s;password=%s;port=%d;database=%s;\",\t\tserver, user, password, port, database)\tdb, err := gorm.Open(\"mssql\", connString)\tif err != nil {\t\tfmt.Println(err)\t}\t// 防止 gorm 產生 SQL 時，自動在 table 加上 s\t// https://gorm.io/docs/conventions.html#Pluralized-Table-Name\tdb.SingularTable(true)\tvar id int\tvar name string\tdb.Debug().Table(\"Account\").Select(\"Id, Name\").Row().Scan(&amp;id, &amp;name)\tfmt.Println(id, name)}\n延伸閱讀[GORM - Conventions][GORM - Connecting to database][Create Go apps using SQL Server on Windows]\n","dateCreated":"2020-02-16T16:57:13+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-02-16T16:57:13+08:00","description":"我電腦 Go 的版本是 1.13.4，參考 gorm 文件 Connecting to database 連接到資料庫的時候一直出現 invalid port when using sqlserver://username:password@localhost:1433?database=dbname 的錯誤，這個錯誤看起來就是連線字串格式錯誤。 今天就來筆記，我如何處理這問題。","headline":"[Go] gorm 連接 SQL Server","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/02/Golang/gorm-連接-SQL-Server/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/02/Golang/gorm-連接-SQL-Server/","keywords":"Go, gorm, Sql Server"}</script>
     <meta name="description" content="我電腦 Go 的版本是 1.13.4，參考 gorm 文件 Connecting to database 連接到資料庫的時候一直出現 invalid port when using sqlserver://username:password@localhost:1433?database=dbname 的錯誤，這個錯誤看起來就是連線字串格式錯誤。 今天就來筆記，我如何處理這問題。">
 <meta name="keywords" content="Go,gorm">
 <meta property="og:type" content="blog">
@@ -95,19 +95,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -116,7 +121,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -125,7 +130,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -134,7 +139,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -143,7 +148,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -152,7 +157,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -165,7 +170,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -174,7 +179,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -183,7 +188,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -192,7 +197,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -205,7 +210,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -781,7 +786,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -789,7 +794,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

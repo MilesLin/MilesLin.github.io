@@ -12,12 +12,12 @@
         <meta name="keywords" content="Go">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"在網站開發上，常常會用 快取(cache) 來提升回應時間，或者是減少對資料庫的操作等等…。 而 Go 的標準函式庫並沒有提供 cache 的實作，但是我們可以使用別人寫好的函示庫來實作 cache。\n在 GitHub 上有幾個不錯的 cache 實作，例如 freecache 和 go-cache，而今天這篇文章會以 go-cache 當作範例。\n\n注意:此篇並不是說明 HTTP 快取\n\ngo-cache 簡介go-cache 是 in-memory key-value pair 的 cache 機制，適合用在網站只跑在一台機器上的情況，他最大的優點是支援 執行續安全(thread-safe) 。 而且還可以將 cache 存成檔案，並且從檔案初始化 cache。\n範例使用的方式請參考下面的程式碼，有三個重點\n\n宣告一個 package scope 的 newCache 變數 var newCache *cache.Cache\n在 init() 初始化 newCache = cache.New(1*time.Minute, 20*time.Minute)\n第一個參數 1*time.Minute 是在指定，如果再 set cache 的時候沒有指定過期時間，會使用 1 分鐘當作預設過期時間。\n第二個參數 20*time.Minute 是說，每 20 分鐘會刪除過期 cache 的資料。\n\n\n取得 cache 的方式也很簡單 newCache.Get(&quot;foo&quot;)，只要參考 func getFromCache 的程式碼，一看就會懂了。cachinggo12345678910111213141516171819202122232425262728293031323334package mainimport (\t\"fmt\"\t\"github.com/patrickmn/go-cache\"\t\"log\"\t\"net/http\"\t\"time\")var newCache *cache.Cachefunc init() {\tnewCache = cache.New(1*time.Minute, 20*time.Minute)\tnewCache.Set(\"foo\", \"miles\", cache.DefaultExpiration)}func main() {\thttp.HandleFunc(\"/\", getFromCache)\terr := http.ListenAndServe(\"localhost:8080\", nil)\tif err != nil {\t\tlog.Fatal(\"error starting http server : \", err)\t\treturn\t}}func getFromCache(w http.ResponseWriter, r *http.Request) {\tfoo, found := newCache.Get(\"foo\")\tif !found {\t\tnewCache.Set(\"foo\", \"Bob\", cache.DefaultExpiration)\t\tfoo, _ = newCache.Get(\"foo\")\t}\tfmt.Fprintf(w, \"Hello \"+foo.(string))}\n\n\nSample Code\n延伸閱讀[go-cache][go-cache doc][freecache]\n","dateCreated":"2020-07-18T14:55:11+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-07-18T14:55:11+08:00","description":"在網站開發上，常常會用 快取(cache) 來提升回應時間，或者是減少對資料庫的操作等等…。 而 Go 的標準函式庫並沒有提供 cache 的實作，但是我們可以使用別人寫好的函示庫來實作 cache。\n在 GitHub 上有幾個不錯的 cache 實作，例如 freecache 和 go-cache，而今天這篇文章會以 go-cache 當作範例。","headline":"[Go] Implementing caching in Go","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/07/Golang/Implementing-caching-in-Go/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/07/Golang/Implementing-caching-in-Go/","keywords":"Go, go-web-tool"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"在網站開發上，常常會用 快取(cache) 來提升回應時間，或者是減少對資料庫的操作等等…。 而 Go 的標準函式庫並沒有提供 cache 的實作，但是我們可以使用別人寫好的函示庫來實作 cache。\n在 GitHub 上有幾個不錯的 cache 實作，例如 freecache 和 go-cache，而今天這篇文章會以 go-cache 當作範例。\n\n注意:此篇並不是說明 HTTP 快取\n\ngo-cache 簡介go-cache 是 in-memory key-value pair 的 cache 機制，適合用在網站只跑在一台機器上的情況，他最大的優點是支援 執行續安全(thread-safe) 。 而且還可以將 cache 存成檔案，並且從檔案初始化 cache。\n範例使用的方式請參考下面的程式碼，有三個重點\n\n宣告一個 package scope 的 newCache 變數 var newCache *cache.Cache\n在 init() 初始化 newCache = cache.New(1*time.Minute, 20*time.Minute)\n第一個參數 1*time.Minute 是在指定，如果再 set cache 的時候沒有指定過期時間，會使用 1 分鐘當作預設過期時間。\n第二個參數 20*time.Minute 是說，每 20 分鐘會刪除過期 cache 的資料。\n\n\n取得 cache 的方式也很簡單 newCache.Get(&quot;foo&quot;)，只要參考 func getFromCache 的程式碼，一看就會懂了。cachinggo12345678910111213141516171819202122232425262728293031323334package mainimport (\t\"fmt\"\t\"github.com/patrickmn/go-cache\"\t\"log\"\t\"net/http\"\t\"time\")var newCache *cache.Cachefunc init() {\tnewCache = cache.New(1*time.Minute, 20*time.Minute)\tnewCache.Set(\"foo\", \"miles\", cache.DefaultExpiration)}func main() {\thttp.HandleFunc(\"/\", getFromCache)\terr := http.ListenAndServe(\"localhost:8080\", nil)\tif err != nil {\t\tlog.Fatal(\"error starting http server : \", err)\t\treturn\t}}func getFromCache(w http.ResponseWriter, r *http.Request) {\tfoo, found := newCache.Get(\"foo\")\tif !found {\t\tnewCache.Set(\"foo\", \"Bob\", cache.DefaultExpiration)\t\tfoo, _ = newCache.Get(\"foo\")\t}\tfmt.Fprintf(w, \"Hello \"+foo.(string))}\n\n\nSample Code\n延伸閱讀[go-cache][go-cache doc][freecache]\n","dateCreated":"2020-07-18T14:55:11+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-07-18T14:55:11+08:00","description":"在網站開發上，常常會用 快取(cache) 來提升回應時間，或者是減少對資料庫的操作等等…。 而 Go 的標準函式庫並沒有提供 cache 的實作，但是我們可以使用別人寫好的函示庫來實作 cache。\n在 GitHub 上有幾個不錯的 cache 實作，例如 freecache 和 go-cache，而今天這篇文章會以 go-cache 當作範例。","headline":"[Go] Implementing caching in Go","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/07/Golang/Implementing-caching-in-Go/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/07/Golang/Implementing-caching-in-Go/","keywords":"Go, go-web-tool"}</script>
     <meta name="description" content="在網站開發上，常常會用 快取(cache) 來提升回應時間，或者是減少對資料庫的操作等等…。 而 Go 的標準函式庫並沒有提供 cache 的實作，但是我們可以使用別人寫好的函示庫來實作 cache。 在 GitHub 上有幾個不錯的 cache 實作，例如 freecache 和 go-cache，而今天這篇文章會以 go-cache 當作範例。">
 <meta name="keywords" content="Go">
 <meta property="og:type" content="blog">
@@ -95,19 +95,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -116,7 +121,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -125,7 +130,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -134,7 +139,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -143,7 +148,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -152,7 +157,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -165,7 +170,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -174,7 +179,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -183,7 +188,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -192,7 +197,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -205,7 +210,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -792,7 +797,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -800,7 +805,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

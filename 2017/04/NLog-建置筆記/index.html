@@ -12,12 +12,12 @@
         <meta name="keywords" content="C#,.NET,Nlog">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。\n\n使用 NuGet 安裝 NLog至少要安裝紅色圈起來的 package:\n\nNLog\nNLog.Config\nNLog.Extended\nNLog.Web\n\nNLogInstall\n新增 Table在使用 NLog 將 Log 新增到資料庫裡面之前，一定要先有 Table ，我參考官方給的範例，直接新增。官方文件SQLsql123456789101112131415161718192021CREATE TABLE [dbo].[NLog] (   [ID] [int] IDENTITY(1,1) NOT NULL,   [MachineName] [nvarchar](200) NULL,   [SiteName] [nvarchar](200) NOT NULL,   [Logged] [datetime] NOT NULL,   [Level] [varchar](5) NOT NULL,   [UserName] [nvarchar](200) NULL,   [Message] [nvarchar](max) NOT NULL,   [Logger] [nvarchar](300) NULL,   [Properties] [nvarchar](max) NULL,   [ServerName] [nvarchar](200) NULL,   [Port] [nvarchar](100) NULL,   [Url] [nvarchar](2000) NULL,   [Https] [bit] NULL,   [ServerAddress] [nvarchar](100) NULL,   [RemoteAddress] [nvarchar](100) NULL,   [Callsite] [nvarchar](300) NULL,   [Exception] [nvarchar](max) NULL, CONSTRAINT [PK_dbo.Log] PRIMARY KEY CLUSTERED ([ID] ASC)    WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY];\n設定 NLog.config這個步驟最重要，因為設定錯也不知道怎麼 debug XDXML Elements 說明\n\nextensions : 經由擴充功能，來取得一些特定欄位，例如: Web.config的值，或者是 IP 等等….\ntargets : 就是我們 NLog 要寫 Log 的目標，這邊我設定是資料庫\ntarget : 資料庫設定的說明，請參考:  資料庫 target 設定\nrule : 說明什麼層級的訊息要存入 database 這個 target，(共有 6 各層級)\nTrace\nDebug\nInfo\nWarn\nError\nFatal\n\n\n\nNLog.configxml123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566&lt;?xml version=\"1.0\" encoding=\"utf-8\" ?&gt;&lt;nlog xmlns=\"http://www.nlog-project.org/schemas/NLog.xsd\"      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"      xsi:schemaLocation=\"http://www.nlog-project.org/schemas/NLog.xsd NLog.xsd\"      autoReload=\"true\"      throwExceptions=\"false\"      internalLogLevel=\"Off\" internalLogFile=\"c:\\temp\\nlog-internal.log\"&gt;    &lt;extensions&gt;    &lt;!-- load NLog.Extended to enable ASP.NET-specific functionality --&gt;    &lt;add assembly=\"NLog.Extended\" /&gt;    &lt;add assembly=\"NLog.Web\" /&gt;  &lt;/extensions&gt;    &lt;targets&gt;    &lt;!-- write log message to database --&gt;    &lt;target name=\"database\" xsi:type=\"Database\"&gt;      &lt;dbProvider&gt;System.Data.SqlClient&lt;/dbProvider&gt;      &lt;!--帳密驗證--&gt;      &lt;!--&lt;connectionString&gt;server=192.168.0.1;database=TetNlog;user id = abc;password=xxxx&lt;/connectionString&gt;--&gt;      &lt;!--Windows驗證--&gt;      &lt;connectionString&gt;(localdb)\\ProjectsV12;database=TetNlog;integrated security=True&lt;/connectionString&gt;            &lt;commandText&gt;        insert into dbo.Log (        Application, Logged, Level, Message,        Username,        ServerName, Port, Url, Https,        ServerAddress, RemoteAddress,        Logger, CallSite, Exception        ) values (        @Application, @Logged, @Level, @Message,        @Username,        @ServerName, @Port, @Url, @Https,        @ServerAddress, @RemoteAddress,        @Logger, @Callsite, @Exception        );      &lt;/commandText&gt;      &lt;parameter name=\"@application\" layout=\"${appsetting:name=AppName:default=Unknown\\: set AppName in appSettings}\" /&gt;      &lt;parameter name=\"@logged\" layout=\"${date}\" /&gt;      &lt;parameter name=\"@level\" layout=\"${level}\" /&gt;      &lt;parameter name=\"@message\" layout=\"${message}\" /&gt;      &lt;parameter name=\"@username\" layout=\"${identity}\" /&gt;      &lt;parameter name=\"@serverName\" layout=\"${aspnet-request:serverVariable=SERVER_NAME}\" /&gt;      &lt;parameter name=\"@port\" layout=\"${aspnet-request:serverVariable=SERVER_PORT}\" /&gt;      &lt;parameter name=\"@url\" layout=\"${aspnet-request:serverVariable=HTTP_URL}\" /&gt;      &lt;parameter name=\"@https\" layout=\"${when:inner=1:when='${aspnet-request:serverVariable=HTTPS}' == 'on'}${when:inner=0:when='${aspnet-request:serverVariable=HTTPS}' != 'on'}\" /&gt;      &lt;parameter name=\"@serverAddress\" layout=\"${aspnet-request:serverVariable=LOCAL_ADDR}\" /&gt;      &lt;parameter name=\"@remoteAddress\" layout=\"${aspnet-request:serverVariable=REMOTE_ADDR}:${aspnet-request:serverVariable=REMOTE_PORT}\" /&gt;      &lt;parameter name=\"@logger\" layout=\"${logger}\" /&gt;      &lt;parameter name=\"@callSite\" layout=\"${callsite}\" /&gt;      &lt;parameter name=\"@exception\" layout=\"${exception:tostring}\" /&gt;    &lt;/target&gt;  &lt;/targets&gt;  &lt;rules&gt;    &lt;logger name=\"*\" minlevel=\"Trace\" writeTo=\"database\" /&gt;  &lt;/rules&gt;&lt;/nlog&gt;\n紀錄 Log 使用方式一般的使用方式 LogManager.GetCurrentClassLogger()，這個會取得當下 class 的類別存到資料庫\n\nLog 一般使用方式cs123456789101112131415161718public class MyClass{  private static Logger logger = LogManager.GetCurrentClassLogger();  public void MyMethod1()  {    logger.Trace(\"Sample trace message\");    logger.Debug(\"Sample debug message\");    logger.Info(\"Sample informational message\");    logger.Warn(\"Sample warning message\");    logger.Error(\"Sample error message\");    logger.Fatal(\"Sample fatal error message\");    // alternatively you can call the Log() method    // and pass log level as the parameter.    logger.Log(LogLevel.Info, \"Sample informational message\");  }}\n如果是在 BaseClass 的話，則只要呼叫這個方法，則可以取得當下的 class 。\n\nLog BaseClass 使用方式cs123456789public class BaseApiController  : ApiController{    public BaseApiController()    {        Logger = LogManager.GetLogger(GetType().FullName);    }    protected Logger Logger { get; private set; }}\n使用 autofac 注入的方式\n\n完成 ILog 介面跟 Logger 實體 classILogger 和 Loggercs123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778public interface ILog{    void Trace(string format, params object[] args);    void Debug(string format, params object[] args);    void Info(string format, params object[] args);    void Warn(string format, params object[] args);    void Error(string format, params object[] args);    void Error(Exception ex);    void Error(Exception ex, string format, params object[] args);    void Fatal(Exception ex, string format, params object[] args);}public class Logger : ILog{    private readonly Logger _log;    public NLogLogger(Type type)    {        _log = LogManager.GetLogger(type.FullName);    }    public void Trace(string format, params object[] args)    {        Log(LogLevel.Trace, format, args);    }    public void Debug(string format, params object[] args)    {        Log(LogLevel.Debug, format, args);    }    public void Info(string format, params object[] args)    {        Log(LogLevel.Info, format, args);    }    public void Warn(string format, params object[] args)    {        Log(LogLevel.Warn, format, args);    }    public void Error(string format, params object[] args)    {        Log(LogLevel.Error, format, args);    }    public void Error(Exception ex)    {        Log(LogLevel.Error, null, null, ex);    }    public void Error(Exception ex, string format, params object[] args)    {        Log(LogLevel.Error, format, args, ex);    }    public void Fatal(Exception ex, string format, params object[] args)    {        Log(LogLevel.Fatal, format, args, ex);    }    private void Log(LogLevel level, string format, object[] args)    {        _log.Log(typeof(NLogLogger), new LogEventInfo(level, _log.Name, null, format, args));    }    private void Log(LogLevel level, string format, object[] args, Exception ex)    {        _log.Log(typeof(NLogLogger), new LogEventInfo(level, _log.Name, null, format, args, ex));    }}\n新增有 Autofac.Module，註冊 ILog 與 logger ，然後加入 Autofac builder 裡面\nAutofac.Modulecs1234567891011121314151617181920212223242526272829303132333435363738394041424344public static void Bootstrapper()      {        // web api 的 autofac 設定方式          var builder = new ContainerBuilder();          // Get your HttpConfiguration.          var config = GlobalConfiguration.Configuration;          // Register your Web API controllers.          builder.RegisterApiControllers(Assembly.GetExecutingAssembly());          // OPTIONAL: Register the Autofac filter provider.          builder.RegisterWebApiFilterProvider(config);          builder.RegisterModule(new LoggingModule());          var container = builder.Build();          config.DependencyResolver = new AutofacWebApiDependencyResolver(container);      }      public class LoggingModule : Autofac.Module  {      protected override void Load(ContainerBuilder builder)      {          builder              .Register((c, p) =&gt; new NLogLogger(p.TypedAs&lt;Type&gt;()))              .AsImplementedInterfaces();      }      protected override void AttachToComponentRegistration(IComponentRegistry componentRegistry, IComponentRegistration registration)      {          registration.Preparing +=              (sender, args) =&gt;              {                  var forType = args.Component.Activator.LimitType;                  var logParameter = new ResolvedParameter(                      (p, c) =&gt; p.ParameterType == typeof(ILog),                      (p, c) =&gt; c.Resolve&lt;ILog&gt;(TypedParameter.From(forType)));                  args.Parameters = args.Parameters.Union(new[] { logParameter });              };      }  }\n這樣就可以在 Controller 注入，並且還可以取得當下 class 的資訊\n參考官方文件","dateCreated":"2017-04-26T21:54:29+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-04-26T21:54:29+08:00","description":"最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。","headline":"[NLog] NLog 建置筆記","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/04/NLog-建置筆記/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/04/NLog-建置筆記/","keywords":".NET, C#, Nlog"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。\n\n使用 NuGet 安裝 NLog至少要安裝紅色圈起來的 package:\n\nNLog\nNLog.Config\nNLog.Extended\nNLog.Web\n\nNLogInstall\n新增 Table在使用 NLog 將 Log 新增到資料庫裡面之前，一定要先有 Table ，我參考官方給的範例，直接新增。官方文件SQLsql123456789101112131415161718192021CREATE TABLE [dbo].[NLog] (   [ID] [int] IDENTITY(1,1) NOT NULL,   [MachineName] [nvarchar](200) NULL,   [SiteName] [nvarchar](200) NOT NULL,   [Logged] [datetime] NOT NULL,   [Level] [varchar](5) NOT NULL,   [UserName] [nvarchar](200) NULL,   [Message] [nvarchar](max) NOT NULL,   [Logger] [nvarchar](300) NULL,   [Properties] [nvarchar](max) NULL,   [ServerName] [nvarchar](200) NULL,   [Port] [nvarchar](100) NULL,   [Url] [nvarchar](2000) NULL,   [Https] [bit] NULL,   [ServerAddress] [nvarchar](100) NULL,   [RemoteAddress] [nvarchar](100) NULL,   [Callsite] [nvarchar](300) NULL,   [Exception] [nvarchar](max) NULL, CONSTRAINT [PK_dbo.Log] PRIMARY KEY CLUSTERED ([ID] ASC)    WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY];\n設定 NLog.config這個步驟最重要，因為設定錯也不知道怎麼 debug XDXML Elements 說明\n\nextensions : 經由擴充功能，來取得一些特定欄位，例如: Web.config的值，或者是 IP 等等….\ntargets : 就是我們 NLog 要寫 Log 的目標，這邊我設定是資料庫\ntarget : 資料庫設定的說明，請參考:  資料庫 target 設定\nrule : 說明什麼層級的訊息要存入 database 這個 target，(共有 6 各層級)\nTrace\nDebug\nInfo\nWarn\nError\nFatal\n\n\n\nNLog.configxml123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566&lt;?xml version=\"1.0\" encoding=\"utf-8\" ?&gt;&lt;nlog xmlns=\"http://www.nlog-project.org/schemas/NLog.xsd\"      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"      xsi:schemaLocation=\"http://www.nlog-project.org/schemas/NLog.xsd NLog.xsd\"      autoReload=\"true\"      throwExceptions=\"false\"      internalLogLevel=\"Off\" internalLogFile=\"c:\\temp\\nlog-internal.log\"&gt;    &lt;extensions&gt;    &lt;!-- load NLog.Extended to enable ASP.NET-specific functionality --&gt;    &lt;add assembly=\"NLog.Extended\" /&gt;    &lt;add assembly=\"NLog.Web\" /&gt;  &lt;/extensions&gt;    &lt;targets&gt;    &lt;!-- write log message to database --&gt;    &lt;target name=\"database\" xsi:type=\"Database\"&gt;      &lt;dbProvider&gt;System.Data.SqlClient&lt;/dbProvider&gt;      &lt;!--帳密驗證--&gt;      &lt;!--&lt;connectionString&gt;server=192.168.0.1;database=TetNlog;user id = abc;password=xxxx&lt;/connectionString&gt;--&gt;      &lt;!--Windows驗證--&gt;      &lt;connectionString&gt;(localdb)\\ProjectsV12;database=TetNlog;integrated security=True&lt;/connectionString&gt;            &lt;commandText&gt;        insert into dbo.Log (        Application, Logged, Level, Message,        Username,        ServerName, Port, Url, Https,        ServerAddress, RemoteAddress,        Logger, CallSite, Exception        ) values (        @Application, @Logged, @Level, @Message,        @Username,        @ServerName, @Port, @Url, @Https,        @ServerAddress, @RemoteAddress,        @Logger, @Callsite, @Exception        );      &lt;/commandText&gt;      &lt;parameter name=\"@application\" layout=\"${appsetting:name=AppName:default=Unknown\\: set AppName in appSettings}\" /&gt;      &lt;parameter name=\"@logged\" layout=\"${date}\" /&gt;      &lt;parameter name=\"@level\" layout=\"${level}\" /&gt;      &lt;parameter name=\"@message\" layout=\"${message}\" /&gt;      &lt;parameter name=\"@username\" layout=\"${identity}\" /&gt;      &lt;parameter name=\"@serverName\" layout=\"${aspnet-request:serverVariable=SERVER_NAME}\" /&gt;      &lt;parameter name=\"@port\" layout=\"${aspnet-request:serverVariable=SERVER_PORT}\" /&gt;      &lt;parameter name=\"@url\" layout=\"${aspnet-request:serverVariable=HTTP_URL}\" /&gt;      &lt;parameter name=\"@https\" layout=\"${when:inner=1:when='${aspnet-request:serverVariable=HTTPS}' == 'on'}${when:inner=0:when='${aspnet-request:serverVariable=HTTPS}' != 'on'}\" /&gt;      &lt;parameter name=\"@serverAddress\" layout=\"${aspnet-request:serverVariable=LOCAL_ADDR}\" /&gt;      &lt;parameter name=\"@remoteAddress\" layout=\"${aspnet-request:serverVariable=REMOTE_ADDR}:${aspnet-request:serverVariable=REMOTE_PORT}\" /&gt;      &lt;parameter name=\"@logger\" layout=\"${logger}\" /&gt;      &lt;parameter name=\"@callSite\" layout=\"${callsite}\" /&gt;      &lt;parameter name=\"@exception\" layout=\"${exception:tostring}\" /&gt;    &lt;/target&gt;  &lt;/targets&gt;  &lt;rules&gt;    &lt;logger name=\"*\" minlevel=\"Trace\" writeTo=\"database\" /&gt;  &lt;/rules&gt;&lt;/nlog&gt;\n紀錄 Log 使用方式一般的使用方式 LogManager.GetCurrentClassLogger()，這個會取得當下 class 的類別存到資料庫\n\nLog 一般使用方式cs123456789101112131415161718public class MyClass{  private static Logger logger = LogManager.GetCurrentClassLogger();  public void MyMethod1()  {    logger.Trace(\"Sample trace message\");    logger.Debug(\"Sample debug message\");    logger.Info(\"Sample informational message\");    logger.Warn(\"Sample warning message\");    logger.Error(\"Sample error message\");    logger.Fatal(\"Sample fatal error message\");    // alternatively you can call the Log() method    // and pass log level as the parameter.    logger.Log(LogLevel.Info, \"Sample informational message\");  }}\n如果是在 BaseClass 的話，則只要呼叫這個方法，則可以取得當下的 class 。\n\nLog BaseClass 使用方式cs123456789public class BaseApiController  : ApiController{    public BaseApiController()    {        Logger = LogManager.GetLogger(GetType().FullName);    }    protected Logger Logger { get; private set; }}\n使用 autofac 注入的方式\n\n完成 ILog 介面跟 Logger 實體 classILogger 和 Loggercs123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778public interface ILog{    void Trace(string format, params object[] args);    void Debug(string format, params object[] args);    void Info(string format, params object[] args);    void Warn(string format, params object[] args);    void Error(string format, params object[] args);    void Error(Exception ex);    void Error(Exception ex, string format, params object[] args);    void Fatal(Exception ex, string format, params object[] args);}public class Logger : ILog{    private readonly Logger _log;    public NLogLogger(Type type)    {        _log = LogManager.GetLogger(type.FullName);    }    public void Trace(string format, params object[] args)    {        Log(LogLevel.Trace, format, args);    }    public void Debug(string format, params object[] args)    {        Log(LogLevel.Debug, format, args);    }    public void Info(string format, params object[] args)    {        Log(LogLevel.Info, format, args);    }    public void Warn(string format, params object[] args)    {        Log(LogLevel.Warn, format, args);    }    public void Error(string format, params object[] args)    {        Log(LogLevel.Error, format, args);    }    public void Error(Exception ex)    {        Log(LogLevel.Error, null, null, ex);    }    public void Error(Exception ex, string format, params object[] args)    {        Log(LogLevel.Error, format, args, ex);    }    public void Fatal(Exception ex, string format, params object[] args)    {        Log(LogLevel.Fatal, format, args, ex);    }    private void Log(LogLevel level, string format, object[] args)    {        _log.Log(typeof(NLogLogger), new LogEventInfo(level, _log.Name, null, format, args));    }    private void Log(LogLevel level, string format, object[] args, Exception ex)    {        _log.Log(typeof(NLogLogger), new LogEventInfo(level, _log.Name, null, format, args, ex));    }}\n新增有 Autofac.Module，註冊 ILog 與 logger ，然後加入 Autofac builder 裡面\nAutofac.Modulecs1234567891011121314151617181920212223242526272829303132333435363738394041424344public static void Bootstrapper()      {        // web api 的 autofac 設定方式          var builder = new ContainerBuilder();          // Get your HttpConfiguration.          var config = GlobalConfiguration.Configuration;          // Register your Web API controllers.          builder.RegisterApiControllers(Assembly.GetExecutingAssembly());          // OPTIONAL: Register the Autofac filter provider.          builder.RegisterWebApiFilterProvider(config);          builder.RegisterModule(new LoggingModule());          var container = builder.Build();          config.DependencyResolver = new AutofacWebApiDependencyResolver(container);      }      public class LoggingModule : Autofac.Module  {      protected override void Load(ContainerBuilder builder)      {          builder              .Register((c, p) =&gt; new NLogLogger(p.TypedAs&lt;Type&gt;()))              .AsImplementedInterfaces();      }      protected override void AttachToComponentRegistration(IComponentRegistry componentRegistry, IComponentRegistration registration)      {          registration.Preparing +=              (sender, args) =&gt;              {                  var forType = args.Component.Activator.LimitType;                  var logParameter = new ResolvedParameter(                      (p, c) =&gt; p.ParameterType == typeof(ILog),                      (p, c) =&gt; c.Resolve&lt;ILog&gt;(TypedParameter.From(forType)));                  args.Parameters = args.Parameters.Union(new[] { logParameter });              };      }  }\n這樣就可以在 Controller 注入，並且還可以取得當下 class 的資訊\n參考官方文件","dateCreated":"2017-04-26T21:54:29+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-04-26T21:54:29+08:00","description":"最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。","headline":"[NLog] NLog 建置筆記","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/04/NLog-建置筆記/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/04/NLog-建置筆記/","keywords":".NET, C#, Nlog"}</script>
     <meta name="description" content="最近的專案有用到 NLog 來記錄 Log ，在環境建置上處理了一段時間，但是最後還是成功設定好，把 Log 存到資料庫，趁記憶新鮮，趕快紀錄。">
 <meta name="keywords" content="C#,.NET,Nlog">
 <meta property="og:type" content="blog">
@@ -97,19 +97,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -118,7 +123,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -127,7 +132,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -136,7 +141,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -145,7 +150,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -154,7 +159,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -167,7 +172,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -176,7 +181,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -185,7 +190,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -194,7 +199,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -207,7 +212,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -814,7 +819,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -822,7 +827,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

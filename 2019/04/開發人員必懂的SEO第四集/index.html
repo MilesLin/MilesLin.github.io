@@ -12,12 +12,12 @@
         <meta name="keywords" content="SEO">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天會筆記 4-10 的內容，搜尋引擎會如何處理動態網址產生的網頁。\n\n動態網址說明所謂的動態網址就是網頁上顯示的內容會根據網址裡面帶的參數不同，有不同的呈現。  例如: https://www.google.com.tw/search?q=SEO 其 q=SEO 是查詢條件，那根據查詢條件不同，網址會根據查詢條件不同而不一樣，這就是所謂的動態網址。\n那搜尋引擎在動態網址上做了什麼事情呢?  當動態網址中的參數不同而產生相同的內容，當這類動態網址大量出現時，搜尋引擎會開始放棄部分的索引，甚至將這類動態網址停止出現在搜尋結果中。  因為搜尋引擎不願意浪費索引資源在相同的內容，也不希望重複的內容會引起使用者的困擾。\n例如下方兩個網址的例子，一個有sortOrder 一個沒有，可是呈現的結果都是一樣的，這種網址的設計就要特別注意。\n\nhttps://ecshweb.pchome.com.tw/search/v3.3/?q=seo&amp;scope=all&amp;sortParm=prc&amp;sortOrder=dc\nhttps://ecshweb.pchome.com.tw/search/v3.3/?q=seo&amp;scope=all&amp;sortParm=prc\n\n正確的處理動態網址有兩種方式可以來處理不同的動態網址產生同樣內容的網頁，其中一種是使用 Google 網站管理員工具設定參數，不過這跟開發者比較沒有關係，就先不提。  先提第二種方式，使用 標準連結元素 。\n標準連結元素 (Canonical link element)標準連結元素 就是用來解決因網址引起的內容重覆問題，告訴由不同網址進入的搜尋引擎，哪個網址才是統一標準的進入點，如此一來搜尋引擎就只需要索引一份資料。  舉個例子，這三個網址 http://www.domain.com/index.html、http://www.domain.com、http://www.domain 都會導向同一個 index.html，這時候我們可以在 &lt;head&gt;&lt;/head&gt; 裡面放上 標準連結元素，告訴搜尋引擎，這三個網址都是同一個頁面，而這時候搜尋引擎只會建立一份索引，如下範例。\nCononical link elementhtml123&lt;head&gt;  &lt;link rel=\"canonical\" href=\"http://www.domain.com/index.html\" /&gt;&lt;/head&gt;\n所以說，根據動態網址的說明範例，我們可以在網頁裡面加上 標準連結元素 告訴搜尋引擎這兩個網址都是一樣的，如下範例\npc homeCononical link elementhtml123&lt;head&gt;&lt;link rel=\"canonical\" href=\"https://ecshweb.pchome.com.tw/search/v3.3/?q=seo&amp;scope=all&amp;sortParm=prc\" /&gt;&lt;/head&gt;\n延伸閱讀[整合重複的網址][標準連結元素使用範例 (Canonical link element)]\n","dateCreated":"2019-04-01T21:16:04+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-04-01T21:16:04+08:00","description":"今天會筆記 4-10 的內容，搜尋引擎會如何處理動態網址產生的網頁。","headline":"[SEO] 開發人員必懂的 SEO 第四集 - 動態網址","image":["SEO_Cover.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/04/開發人員必懂的SEO第四集/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/04/開發人員必懂的SEO第四集/","keywords":"SEO","thumbnailUrl":"SEO_Cover.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天會筆記 4-10 的內容，搜尋引擎會如何處理動態網址產生的網頁。\n\n動態網址說明所謂的動態網址就是網頁上顯示的內容會根據網址裡面帶的參數不同，有不同的呈現。  例如: https://www.google.com.tw/search?q=SEO 其 q=SEO 是查詢條件，那根據查詢條件不同，網址會根據查詢條件不同而不一樣，這就是所謂的動態網址。\n那搜尋引擎在動態網址上做了什麼事情呢?  當動態網址中的參數不同而產生相同的內容，當這類動態網址大量出現時，搜尋引擎會開始放棄部分的索引，甚至將這類動態網址停止出現在搜尋結果中。  因為搜尋引擎不願意浪費索引資源在相同的內容，也不希望重複的內容會引起使用者的困擾。\n例如下方兩個網址的例子，一個有sortOrder 一個沒有，可是呈現的結果都是一樣的，這種網址的設計就要特別注意。\n\nhttps://ecshweb.pchome.com.tw/search/v3.3/?q=seo&amp;scope=all&amp;sortParm=prc&amp;sortOrder=dc\nhttps://ecshweb.pchome.com.tw/search/v3.3/?q=seo&amp;scope=all&amp;sortParm=prc\n\n正確的處理動態網址有兩種方式可以來處理不同的動態網址產生同樣內容的網頁，其中一種是使用 Google 網站管理員工具設定參數，不過這跟開發者比較沒有關係，就先不提。  先提第二種方式，使用 標準連結元素 。\n標準連結元素 (Canonical link element)標準連結元素 就是用來解決因網址引起的內容重覆問題，告訴由不同網址進入的搜尋引擎，哪個網址才是統一標準的進入點，如此一來搜尋引擎就只需要索引一份資料。  舉個例子，這三個網址 http://www.domain.com/index.html、http://www.domain.com、http://www.domain 都會導向同一個 index.html，這時候我們可以在 &lt;head&gt;&lt;/head&gt; 裡面放上 標準連結元素，告訴搜尋引擎，這三個網址都是同一個頁面，而這時候搜尋引擎只會建立一份索引，如下範例。\nCononical link elementhtml123&lt;head&gt;  &lt;link rel=\"canonical\" href=\"http://www.domain.com/index.html\" /&gt;&lt;/head&gt;\n所以說，根據動態網址的說明範例，我們可以在網頁裡面加上 標準連結元素 告訴搜尋引擎這兩個網址都是一樣的，如下範例\npc homeCononical link elementhtml123&lt;head&gt;&lt;link rel=\"canonical\" href=\"https://ecshweb.pchome.com.tw/search/v3.3/?q=seo&amp;scope=all&amp;sortParm=prc\" /&gt;&lt;/head&gt;\n延伸閱讀[整合重複的網址][標準連結元素使用範例 (Canonical link element)]\n","dateCreated":"2019-04-01T21:16:04+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-04-01T21:16:04+08:00","description":"今天會筆記 4-10 的內容，搜尋引擎會如何處理動態網址產生的網頁。","headline":"[SEO] 開發人員必懂的 SEO 第四集 - 動態網址","image":["SEO_Cover.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/04/開發人員必懂的SEO第四集/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/04/開發人員必懂的SEO第四集/","keywords":"SEO","thumbnailUrl":"SEO_Cover.jpg"}</script>
     <meta name="description" content="今天會筆記 4-10 的內容，搜尋引擎會如何處理動態網址產生的網頁。">
 <meta name="keywords" content="SEO">
 <meta property="og:type" content="blog">
@@ -98,19 +98,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -119,7 +124,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -128,7 +133,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -137,7 +142,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -146,7 +151,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -155,7 +160,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -168,7 +173,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -177,7 +182,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -186,7 +191,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -195,7 +200,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -208,7 +213,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -791,7 +796,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -799,7 +804,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

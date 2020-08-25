@@ -12,12 +12,12 @@
         <meta name="keywords" content="Go">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天要來筆記一下學到的 Go Module 的指令，這篇文章只會紀錄一些我覺得會常用的指令，並不會說明什麼是 Module，如果要了解什麼是 Module 可以參考 Go 1.11 Modules。\n此文章會說明的指令有 $ go mod init &lt;module name&gt;, $ go list, $ go get, $ go mod verify, $ go mod tidy, $ go mod why &lt;package&gt;, $ go mod edit, $ go mod vendor。\n初始化 Module初始化 Module 的指令: $ go mod init &lt;module name&gt;init 範例bash1$ go mod init github.com/mileslin/myproject上述範例 module name github.com/mileslin/myproject 的意義\n\n在 build go 專案的時候，會根據 module name 的最後一路路徑 myproject 當作輸出檔名，會產生 myproject.exe 的檔案\n在 import 自己專案 package 的路徑的時候，github.com/mileslin/myproject 是根目錄，例如我新增一個 pg1 的 package ，則我在 import 的時候要輸入 import &quot;github.com/mileslin/myproject/pg1&quot;。\n\n在初始化完畢後，會產生一個 go.mod 檔案，這是用來紀錄相依套件的檔案。 go.mod 檔案的範例如下\nmodmod123module github.com/mileslin/myprojectgo 1.13\n取得套件跟原本的 go get 取得套件的方式一樣，如: $ go get -u github.com/gorilla/mux (-u 是說明，取得套件的時候不要從 cache 取得)。  取得套件後會產生一個  的檔案，這個檔案裡面有套件的 hash ，用來驗證你下載的套件沒有被經過串改。\n除了會新增一個 go.sum 檔案之外呢， go.mod 也會記錄你下載的套件，如下範例go.modmod12345module github.com/mileslin/myprojectgo 1.13require github.com/gorilla/mux v1.7.3 // indirect// indirect 的意思是說，此套件還沒被用到。 所以只要在程式碼中使用此到件，並且 build 專案後，// indirect 就會消失\n最後提一下，下載的套件會被放在 GOPATH/pkg/mod 底下。 (可以使用 go env 指令查看 GOPATH 路徑)\n列出套件與套件版本使用 $ go list 取得可以使用的套件列表，常用方式如下\n\n$ go list all 會列出所有套件，包含 GOROOT 套件\n$ go list -m all  只列出 module 列出的套件(包含自己的 package)\n$ go list -m -versions github.com/gorilla/mux 列出此套件的所有版本\n\n驗證套件的正確性使用 $ go mod verify 可以驗證套件在下載之後，有沒有在本機上被修改過。 而驗證方式是根據套件 source code 產生的 hash，來做比對，此 hash 是存在 go.sum 裡面。\n注意: $ go build . 的時候並不會驗證。  只有執行 $ go mod verify 指令才驗證套件是否被串改。\n\n補充: 如果不小心改了套件 source code ，只要把套件從 GOPATH/pkg/mod 底下刪除，重新 $ go get 該套件，就可以恢復正常。\n\n清除用不到的套件有些套件已經記錄在 go.mod 裡面，但是實際上此套件在專案裡面沒有用到，則可以使用 $ go mod tidy 指令，來清楚用不到的專案。  執行此指令後，就會 go.mod 裡面沒用到的套件拿掉。\n取得不同版本的套件$ go get 如果沒有特別指定版本的話，預設會抓穩定版第 1 版的套件。  如果要抓其他版本的話，可以先用 $ go list -m -versions github.com/gorilla/mux 指令來查詢有哪些版本可以用，然後在 $ go get 的時候指定版本，如 $ go get github.com/gorilla/mux@v1.6.1\nGo Module 套件的版本說明: Semantic Import Versioning\n檢查套件使用情形使用 $ go mod why github.com/gorilla/mux 他會就列出使套件在哪裡有被用到，這算是在檢查套件的時候，蠻實用的一個指令。\n用指令編輯 go.mod$ go mod edit 是一種可以使用指令的方式來修改 go.mod 檔案，使用情境通常是在整合 CI/CD 的時候使用。  其他一般情況，其實只要手動修改 go.mod 檔案就可以了，不需要用到 $ go mod edit 指令。\n$ go mod edit 一些簡單的用法如下\n\n$ go mod edit -print, $ go mod edit -json 印出 go.mod 檔案\n$ go mod edit -require github.com/gorilla/context@v1.1.1 requrie 其他套件\n\n參考: Edit go.mod from tools or scripts\n使用 vendor directoryVendor Directories 是在 Go Module 還沒有出來之前，一種管理套件的方式。 既然我們現在有 Go Module 的方式管理套件了，這方式還是不太建議。\n但是此方式還是有它的使用情境，例如 IT 部門在 Production 環境不許允連網路，這樣就沒辦法使用 $ go get 來下載套件，這時候我們可以使用 vendor directory 的方式，把套件的檔案都準備好，這樣就不用額外在 $ go get 檔案\n啟用 vendor directory 的指令 $ go mod vendor，執行完畢後，就會看到專案裡面多一個 vendor 的資料夾，該資料夾就是存放第三方套件的地方。\n啟用 vendor directory 後，建置專案的方式如果執行 $ go run . 或 $ go build . 的時候會發現，實際上程式也是會去抓 GOPATH/pkg/mod 的套件，而不是專案底下的 vendor 套件。\n\n如果要使用專案底下 vendor 的檔案來 build 專案的話，必須加入一些參數，使用方法如 $ go run -mod=vendor .,  $ go build -mod=vendor .。\n小結今天的筆記都是從 Exploring Go Modules by pluralsight 這個課程來的，如果有 pluralsight 的訂閱讀者，很推薦此課程。\n延伸閱讀[Go 1.11 Modules][Semantic Versioning][Exploring Go Modules - pluralsight][Go Command]  \n","dateCreated":"2020-01-03T21:57:53+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-01-03T21:57:53+08:00","description":"今天要來筆記一下學到的 Go Module 的指令，這篇文章只會紀錄一些我覺得會常用的指令，並不會說明什麼是 Module，如果要了解什麼是 Module 可以參考 Go 1.11 Modules。\n此文章會說明的指令有 $ go mod init &lt;module name&gt;, $ go list, $ go get, $ go mod verify, $ go mod tidy, $ go mod why &lt;package&gt;, $ go mod edit, $ go mod vendor。","headline":"[Go] Go Module 常用指令筆記","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/","keywords":"Go, Go Module"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"今天要來筆記一下學到的 Go Module 的指令，這篇文章只會紀錄一些我覺得會常用的指令，並不會說明什麼是 Module，如果要了解什麼是 Module 可以參考 Go 1.11 Modules。\n此文章會說明的指令有 $ go mod init &lt;module name&gt;, $ go list, $ go get, $ go mod verify, $ go mod tidy, $ go mod why &lt;package&gt;, $ go mod edit, $ go mod vendor。\n初始化 Module初始化 Module 的指令: $ go mod init &lt;module name&gt;init 範例bash1$ go mod init github.com/mileslin/myproject上述範例 module name github.com/mileslin/myproject 的意義\n\n在 build go 專案的時候，會根據 module name 的最後一路路徑 myproject 當作輸出檔名，會產生 myproject.exe 的檔案\n在 import 自己專案 package 的路徑的時候，github.com/mileslin/myproject 是根目錄，例如我新增一個 pg1 的 package ，則我在 import 的時候要輸入 import &quot;github.com/mileslin/myproject/pg1&quot;。\n\n在初始化完畢後，會產生一個 go.mod 檔案，這是用來紀錄相依套件的檔案。 go.mod 檔案的範例如下\nmodmod123module github.com/mileslin/myprojectgo 1.13\n取得套件跟原本的 go get 取得套件的方式一樣，如: $ go get -u github.com/gorilla/mux (-u 是說明，取得套件的時候不要從 cache 取得)。  取得套件後會產生一個  的檔案，這個檔案裡面有套件的 hash ，用來驗證你下載的套件沒有被經過串改。\n除了會新增一個 go.sum 檔案之外呢， go.mod 也會記錄你下載的套件，如下範例go.modmod12345module github.com/mileslin/myprojectgo 1.13require github.com/gorilla/mux v1.7.3 // indirect// indirect 的意思是說，此套件還沒被用到。 所以只要在程式碼中使用此到件，並且 build 專案後，// indirect 就會消失\n最後提一下，下載的套件會被放在 GOPATH/pkg/mod 底下。 (可以使用 go env 指令查看 GOPATH 路徑)\n列出套件與套件版本使用 $ go list 取得可以使用的套件列表，常用方式如下\n\n$ go list all 會列出所有套件，包含 GOROOT 套件\n$ go list -m all  只列出 module 列出的套件(包含自己的 package)\n$ go list -m -versions github.com/gorilla/mux 列出此套件的所有版本\n\n驗證套件的正確性使用 $ go mod verify 可以驗證套件在下載之後，有沒有在本機上被修改過。 而驗證方式是根據套件 source code 產生的 hash，來做比對，此 hash 是存在 go.sum 裡面。\n注意: $ go build . 的時候並不會驗證。  只有執行 $ go mod verify 指令才驗證套件是否被串改。\n\n補充: 如果不小心改了套件 source code ，只要把套件從 GOPATH/pkg/mod 底下刪除，重新 $ go get 該套件，就可以恢復正常。\n\n清除用不到的套件有些套件已經記錄在 go.mod 裡面，但是實際上此套件在專案裡面沒有用到，則可以使用 $ go mod tidy 指令，來清楚用不到的專案。  執行此指令後，就會 go.mod 裡面沒用到的套件拿掉。\n取得不同版本的套件$ go get 如果沒有特別指定版本的話，預設會抓穩定版第 1 版的套件。  如果要抓其他版本的話，可以先用 $ go list -m -versions github.com/gorilla/mux 指令來查詢有哪些版本可以用，然後在 $ go get 的時候指定版本，如 $ go get github.com/gorilla/mux@v1.6.1\nGo Module 套件的版本說明: Semantic Import Versioning\n檢查套件使用情形使用 $ go mod why github.com/gorilla/mux 他會就列出使套件在哪裡有被用到，這算是在檢查套件的時候，蠻實用的一個指令。\n用指令編輯 go.mod$ go mod edit 是一種可以使用指令的方式來修改 go.mod 檔案，使用情境通常是在整合 CI/CD 的時候使用。  其他一般情況，其實只要手動修改 go.mod 檔案就可以了，不需要用到 $ go mod edit 指令。\n$ go mod edit 一些簡單的用法如下\n\n$ go mod edit -print, $ go mod edit -json 印出 go.mod 檔案\n$ go mod edit -require github.com/gorilla/context@v1.1.1 requrie 其他套件\n\n參考: Edit go.mod from tools or scripts\n使用 vendor directoryVendor Directories 是在 Go Module 還沒有出來之前，一種管理套件的方式。 既然我們現在有 Go Module 的方式管理套件了，這方式還是不太建議。\n但是此方式還是有它的使用情境，例如 IT 部門在 Production 環境不許允連網路，這樣就沒辦法使用 $ go get 來下載套件，這時候我們可以使用 vendor directory 的方式，把套件的檔案都準備好，這樣就不用額外在 $ go get 檔案\n啟用 vendor directory 的指令 $ go mod vendor，執行完畢後，就會看到專案裡面多一個 vendor 的資料夾，該資料夾就是存放第三方套件的地方。\n啟用 vendor directory 後，建置專案的方式如果執行 $ go run . 或 $ go build . 的時候會發現，實際上程式也是會去抓 GOPATH/pkg/mod 的套件，而不是專案底下的 vendor 套件。\n\n如果要使用專案底下 vendor 的檔案來 build 專案的話，必須加入一些參數，使用方法如 $ go run -mod=vendor .,  $ go build -mod=vendor .。\n小結今天的筆記都是從 Exploring Go Modules by pluralsight 這個課程來的，如果有 pluralsight 的訂閱讀者，很推薦此課程。\n延伸閱讀[Go 1.11 Modules][Semantic Versioning][Exploring Go Modules - pluralsight][Go Command]  \n","dateCreated":"2020-01-03T21:57:53+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2020-01-03T21:57:53+08:00","description":"今天要來筆記一下學到的 Go Module 的指令，這篇文章只會紀錄一些我覺得會常用的指令，並不會說明什麼是 Module，如果要了解什麼是 Module 可以參考 Go 1.11 Modules。\n此文章會說明的指令有 $ go mod init &lt;module name&gt;, $ go list, $ go get, $ go mod verify, $ go mod tidy, $ go mod why &lt;package&gt;, $ go mod edit, $ go mod vendor。","headline":"[Go] Go Module 常用指令筆記","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2020/01/Golang/Go-Module-快速上手筆記/","keywords":"Go, Go Module"}</script>
     <meta name="description" content="今天要來筆記一下學到的 Go Module 的指令，這篇文章只會紀錄一些我覺得會常用的指令，並不會說明什麼是 Module，如果要了解什麼是 Module 可以參考 Go 1.11 Modules。 此文章會說明的指令有 $ go mod init &amp;lt;module name&amp;gt;, $ go list, $ go get, $ go mod verify, $ go mod tidy, $">
 <meta name="keywords" content="Go">
 <meta property="og:type" content="blog">
@@ -95,19 +95,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -116,7 +121,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -125,7 +130,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -134,7 +139,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -143,7 +148,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -152,7 +157,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -165,7 +170,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -174,7 +179,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -183,7 +188,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -192,7 +197,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -205,7 +210,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -815,7 +820,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -823,7 +828,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

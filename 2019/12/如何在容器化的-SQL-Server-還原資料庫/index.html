@@ -10,12 +10,12 @@
     <meta name="author" content="Miles">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"之前已經寫過 SQL Server Container 快速入門，這能快速把一個 SQL Server 建立起來，但是要還原資料庫的話，則還要先把備份檔案放到容器裡面。 而今天就是要來筆記一下，如何把檔案放到容器裡面。\n\n說明今天的案例會以 northwind 的資料庫 bak 檔案做為示範。  首先我已經將容器化的 SQL Server 執行起來，但是打開備份功能的時候，會發現路徑是容器裡面的路徑，如下圖。bak path\n所以我們現在要做的事情，把 bak 檔案放到容器 var/opt/mssql/data 路徑底下。\n複製檔案與還原資料庫先使用 docker ps 看容器的 ID 是哪一個Container Id接下來就可以使用 docker cp 指令將檔案複製到指定資料夾，以下方為例子我將 Northwind.bak 檔案複製到 容器 1840e5 的 /var/opt/mssql/data位置上\nbashbash1docker cp Northwind.bak 1840e5:/var/opt/mssql/data\ncopy bak\n複製完了以後，就可以看到我可以選擇該 bak 檔案，做還原的動作了。copied bak\n另外要將檔案從容器裡面複製出來也很簡單，只要對調複製的路徑就好，例如下方的指令代表，要把容器 /var/opt/mssql/data/Northwind.bak 的檔案複製出來到當下的路徑docker cp 1840e5:/var/opt/mssql/data/Northwind.bak ./\n\n延伸閱讀[Copying files from host to Docker container][docker cp]\n","dateCreated":"2019-12-13T14:43:50+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-12-13T14:43:50+08:00","description":"之前已經寫過 SQL Server Container 快速入門，這能快速把一個 SQL Server 建立起來，但是要還原資料庫的話，則還要先把備份檔案放到容器裡面。 而今天就是要來筆記一下，如何把檔案放到容器裡面。","headline":"[Docker] 如何在容器化的 SQL Server 還原資料庫","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/12/如何在容器化的-SQL-Server-還原資料庫/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/12/如何在容器化的-SQL-Server-還原資料庫/","keywords":"Docker, SQL Server"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"之前已經寫過 SQL Server Container 快速入門，這能快速把一個 SQL Server 建立起來，但是要還原資料庫的話，則還要先把備份檔案放到容器裡面。 而今天就是要來筆記一下，如何把檔案放到容器裡面。\n\n說明今天的案例會以 northwind 的資料庫 bak 檔案做為示範。  首先我已經將容器化的 SQL Server 執行起來，但是打開備份功能的時候，會發現路徑是容器裡面的路徑，如下圖。bak path\n所以我們現在要做的事情，把 bak 檔案放到容器 var/opt/mssql/data 路徑底下。\n複製檔案與還原資料庫先使用 docker ps 看容器的 ID 是哪一個Container Id接下來就可以使用 docker cp 指令將檔案複製到指定資料夾，以下方為例子我將 Northwind.bak 檔案複製到 容器 1840e5 的 /var/opt/mssql/data位置上\nbashbash1docker cp Northwind.bak 1840e5:/var/opt/mssql/data\ncopy bak\n複製完了以後，就可以看到我可以選擇該 bak 檔案，做還原的動作了。copied bak\n另外要將檔案從容器裡面複製出來也很簡單，只要對調複製的路徑就好，例如下方的指令代表，要把容器 /var/opt/mssql/data/Northwind.bak 的檔案複製出來到當下的路徑docker cp 1840e5:/var/opt/mssql/data/Northwind.bak ./\n\n延伸閱讀[Copying files from host to Docker container][docker cp]\n","dateCreated":"2019-12-13T14:43:50+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-12-13T14:43:50+08:00","description":"之前已經寫過 SQL Server Container 快速入門，這能快速把一個 SQL Server 建立起來，但是要還原資料庫的話，則還要先把備份檔案放到容器裡面。 而今天就是要來筆記一下，如何把檔案放到容器裡面。","headline":"[Docker] 如何在容器化的 SQL Server 還原資料庫","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/12/如何在容器化的-SQL-Server-還原資料庫/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/12/如何在容器化的-SQL-Server-還原資料庫/","keywords":"Docker, SQL Server"}</script>
     <meta name="description" content="之前已經寫過 SQL Server Container 快速入門，這能快速把一個 SQL Server 建立起來，但是要還原資料庫的話，則還要先把備份檔案放到容器裡面。 而今天就是要來筆記一下，如何把檔案放到容器裡面。">
 <meta name="keywords" content="Docker,SQL Server">
 <meta property="og:type" content="blog">
@@ -98,19 +98,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -119,7 +124,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -128,7 +133,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -137,7 +142,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -146,7 +151,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -155,7 +160,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -168,7 +173,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -177,7 +182,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -186,7 +191,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -195,7 +200,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -208,7 +213,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -787,7 +792,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -795,7 +800,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

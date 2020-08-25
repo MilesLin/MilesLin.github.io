@@ -12,12 +12,12 @@
         <meta name="keywords" content="Docker,ASP.NET Core,CI/CD">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"使用 Dockerfile 建置映像檔時，每一行指令都會新增一層 layer ，這都會使映像檔變大。 又或者是我們會在 Dockerfile 裡面執行建置的工作 (這在 CI/CD 很常見)，例如執行 dotnet publish 來產生網站的發佈檔，為了可以使用 dotnet publish 產生發佈檔，我們會使用有 dotnet cli SDK 工具的映像檔，例如 Image - .NET Core SDK ，這映像檔相對來說會比較大，但是將網站執行起來只需要 image - ASP.NET Core Runtime 的映像檔案就好，並不需要含有 SDK 工具的映像檔。\n而建置映像檔的時候，我們都希望映像檔越小越好，在 Docker 版本 17.05.0-ce 新增了多階段建置 (multi-stage build) 的支援，能夠幫助我們簡單的處理這個問題。\n\n前提概要這次的範例會使用 dotnet cli 建立一個的 asp.net core mvc 專案範例，並在且 .NET Core SDK 映像檔產生發佈檔案，再複製發佈檔案到 ASP.NET Core Runtime 映像檔，最後將網站執行起來。\n建立 asp.net core mvc 範例專案先執行 dotnet new mvc -n=docker.lab 建立一個 asp.net core mvc 專案，然後在專案的資料夾底下新增一個 Dockerfile ，完成後專案資料夾大概會如下圖。 (我的 dotnet cli 版本是 2.2.204。)initial_project\n撰寫 Dockerfile接下來請將底下的內容貼到 Dockerfile 。dockerfiledockerfile123456789FROM mcr.microsoft.com/dotnet/core-nightly/sdk:2.2 AS BuilderWORKDIR /appCOPY . .RUN dotnet publish -o=dist --configuration=ReleaseFROM mcr.microsoft.com/dotnet/core/aspnet:2.2COPY --from=Builder ./app/dist ./appWORKDIR /appENTRYPOINT [\"dotnet\", \"docker.lab.dll\"]\n第一段(the first stage)的 From 到 RUN dotnet publish，是使用含有 dotnet sdk 的映像檔，將專案的程式碼複製到容器底面，並且使用 dotnet publish 產生發佈檔案。這裡一定要加入 WORKDIR /app 否則 dotnet publish 的時候會失敗。 請參考 ISSUE: dotnet publish fails when building in container\n\n第二段(the second stage) 的 From 到 ENTRYPOINT，是使用 .net core runtime 的映像檔，並且複製上一個映像檔產生的發佈檔，最後將網站執行起來。其中 COPY --from=Builder ./app/dist ./app 我是使用 建立別名 的方式指定複製上一個映像檔的內容。 這裡再提供另一個方法，就是也可以使用 --from=0 取代 --from=Builder 來表示要複製上一個 stage 的內容。\n建置映像檔接著執行 docker build . -t dockerlab 建置映像檔案，執行成功的結果會如下圖。docker_build然後在執行 docker run --rm -p 81:80 dockerlab 理論上網站就會跑起來了。run_web\n檢查映像檔的歷史我們可以檢查映像檔的每一層 layer 紀錄，來確認是否沒有多餘的 layer。 執行 docker history dockerlab 查詢歷史紀錄，檢查的結果如下圖，可以證實，這個映像檔只有做了三件事情，1.複製檔案 2.指定 workdir 3.執行網站，並沒有多餘的執行過程在 layer 裡面。docker_history\n小結用多階段建置映像檔(multi-stage build) 的方式，就可以很輕易地建立出沒有多餘 layer 的映像檔 ，而且在 CI/CD 的情境底下也很好用的，是必學的建置方式!!\n延伸閱讀[Use multi-stage builds][Docker Hub - .NET Core SDK][Docker Hub - ASP.NET Core Runtime][dotnet cli - dotnet restore][dotnet cli - dotnet publish]\n","dateCreated":"2019-05-19T21:33:12+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-05-19T21:33:12+08:00","description":"使用 Dockerfile 建置映像檔時，每一行指令都會新增一層 layer ，這都會使映像檔變大。 又或者是我們會在 Dockerfile 裡面執行建置的工作 (這在 CI/CD 很常見)，例如執行 dotnet publish 來產生網站的發佈檔，為了可以使用 dotnet publish 產生發佈檔，我們會使用有 dotnet cli SDK 工具的映像檔，例如 Image - .NET Core SDK ，這映像檔相對來說會比較大，但是將網站執行起來只需要 image - ASP.NET Core Runtime 的映像檔案就好，並不需要含有 SDK 工具的映像檔。\n而建置映像檔的時候，我們都希望映像檔越小越好，在 Docker 版本 17.05.0-ce 新增了多階段建置 (multi-stage build) 的支援，能夠幫助我們簡單的處理這個問題。","headline":"[Docker] 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/05/Docker-多階段建置映像檔/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/05/Docker-多階段建置映像檔/","keywords":"Docker, ASP.NET Core, CI/CD"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"使用 Dockerfile 建置映像檔時，每一行指令都會新增一層 layer ，這都會使映像檔變大。 又或者是我們會在 Dockerfile 裡面執行建置的工作 (這在 CI/CD 很常見)，例如執行 dotnet publish 來產生網站的發佈檔，為了可以使用 dotnet publish 產生發佈檔，我們會使用有 dotnet cli SDK 工具的映像檔，例如 Image - .NET Core SDK ，這映像檔相對來說會比較大，但是將網站執行起來只需要 image - ASP.NET Core Runtime 的映像檔案就好，並不需要含有 SDK 工具的映像檔。\n而建置映像檔的時候，我們都希望映像檔越小越好，在 Docker 版本 17.05.0-ce 新增了多階段建置 (multi-stage build) 的支援，能夠幫助我們簡單的處理這個問題。\n\n前提概要這次的範例會使用 dotnet cli 建立一個的 asp.net core mvc 專案範例，並在且 .NET Core SDK 映像檔產生發佈檔案，再複製發佈檔案到 ASP.NET Core Runtime 映像檔，最後將網站執行起來。\n建立 asp.net core mvc 範例專案先執行 dotnet new mvc -n=docker.lab 建立一個 asp.net core mvc 專案，然後在專案的資料夾底下新增一個 Dockerfile ，完成後專案資料夾大概會如下圖。 (我的 dotnet cli 版本是 2.2.204。)initial_project\n撰寫 Dockerfile接下來請將底下的內容貼到 Dockerfile 。dockerfiledockerfile123456789FROM mcr.microsoft.com/dotnet/core-nightly/sdk:2.2 AS BuilderWORKDIR /appCOPY . .RUN dotnet publish -o=dist --configuration=ReleaseFROM mcr.microsoft.com/dotnet/core/aspnet:2.2COPY --from=Builder ./app/dist ./appWORKDIR /appENTRYPOINT [\"dotnet\", \"docker.lab.dll\"]\n第一段(the first stage)的 From 到 RUN dotnet publish，是使用含有 dotnet sdk 的映像檔，將專案的程式碼複製到容器底面，並且使用 dotnet publish 產生發佈檔案。這裡一定要加入 WORKDIR /app 否則 dotnet publish 的時候會失敗。 請參考 ISSUE: dotnet publish fails when building in container\n\n第二段(the second stage) 的 From 到 ENTRYPOINT，是使用 .net core runtime 的映像檔，並且複製上一個映像檔產生的發佈檔，最後將網站執行起來。其中 COPY --from=Builder ./app/dist ./app 我是使用 建立別名 的方式指定複製上一個映像檔的內容。 這裡再提供另一個方法，就是也可以使用 --from=0 取代 --from=Builder 來表示要複製上一個 stage 的內容。\n建置映像檔接著執行 docker build . -t dockerlab 建置映像檔案，執行成功的結果會如下圖。docker_build然後在執行 docker run --rm -p 81:80 dockerlab 理論上網站就會跑起來了。run_web\n檢查映像檔的歷史我們可以檢查映像檔的每一層 layer 紀錄，來確認是否沒有多餘的 layer。 執行 docker history dockerlab 查詢歷史紀錄，檢查的結果如下圖，可以證實，這個映像檔只有做了三件事情，1.複製檔案 2.指定 workdir 3.執行網站，並沒有多餘的執行過程在 layer 裡面。docker_history\n小結用多階段建置映像檔(multi-stage build) 的方式，就可以很輕易地建立出沒有多餘 layer 的映像檔 ，而且在 CI/CD 的情境底下也很好用的，是必學的建置方式!!\n延伸閱讀[Use multi-stage builds][Docker Hub - .NET Core SDK][Docker Hub - ASP.NET Core Runtime][dotnet cli - dotnet restore][dotnet cli - dotnet publish]\n","dateCreated":"2019-05-19T21:33:12+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-05-19T21:33:12+08:00","description":"使用 Dockerfile 建置映像檔時，每一行指令都會新增一層 layer ，這都會使映像檔變大。 又或者是我們會在 Dockerfile 裡面執行建置的工作 (這在 CI/CD 很常見)，例如執行 dotnet publish 來產生網站的發佈檔，為了可以使用 dotnet publish 產生發佈檔，我們會使用有 dotnet cli SDK 工具的映像檔，例如 Image - .NET Core SDK ，這映像檔相對來說會比較大，但是將網站執行起來只需要 image - ASP.NET Core Runtime 的映像檔案就好，並不需要含有 SDK 工具的映像檔。\n而建置映像檔的時候，我們都希望映像檔越小越好，在 Docker 版本 17.05.0-ce 新增了多階段建置 (multi-stage build) 的支援，能夠幫助我們簡單的處理這個問題。","headline":"[Docker] 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/05/Docker-多階段建置映像檔/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/05/Docker-多階段建置映像檔/","keywords":"Docker, ASP.NET Core, CI/CD"}</script>
     <meta name="description" content="使用 Dockerfile 建置映像檔時，每一行指令都會新增一層 layer ，這都會使映像檔變大。 又或者是我們會在 Dockerfile 裡面執行建置的工作 (這在 CI/CD 很常見)，例如執行 dotnet publish 來產生網站的發佈檔，為了可以使用 dotnet publish 產生發佈檔，我們會使用有 dotnet cli SDK 工具的映像檔，例如 Image - .NET C">
 <meta name="keywords" content="Docker,ASP.NET Core,CI&#x2F;CD">
 <meta property="og:type" content="blog">
@@ -100,19 +100,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -121,7 +126,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -130,7 +135,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -139,7 +144,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -148,7 +153,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -157,7 +162,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -170,7 +175,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -179,7 +184,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -188,7 +193,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -197,7 +202,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -210,7 +215,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -791,7 +796,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -799,7 +804,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->

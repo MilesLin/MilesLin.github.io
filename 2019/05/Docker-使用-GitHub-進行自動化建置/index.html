@@ -12,12 +12,12 @@
         <meta name="keywords" content="Docker">
     
     
-        <link rel="icon" href="https://mileslin.github.io/assets/images/favicon.png">
+        <link rel="icon" href="https://mileslin.github.io/assets/images/gopher-favicon.png">
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Docker Hub 與 GitHub 的 CI/CD 整合做的非常的好，所以在設定上也非常的直覺，今天就要來介紹怎麼在 Docker Hub 與 GitHub 之間完成 CI/CD 的工作。\n\n前提概要在文章開始之前一定要有 Docker Hub 帳號與 GitHub 帳號，並且準備好一個 GitHub Repository 裡面，且原始碼裡 一定要有 Dockerfile，這篇文章的 GitHub Repository 是以我的 GitHub - Docker.Lab 為範例，是一個 ASP.NET Core 專案，且原始碼裡面已經有一個可以建置的 Dockerfile。\n如果不知道怎麼在 CI/CD 建立可以建置的 Dockerfile，請先閱讀這篇文章 Docker 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例 。\n那麼，就讓我們開始吧。\n設定 GitHub 連結第一步驟我們要先讓 Docker Hub 與 GitHub 連結。\n\n請先到 https://cloud.docker.com 登入後，點選 Account Settings 。account_setting_menu\n\n\n\n到 Linked Accounts 頁籤， 點選 GitHub 的 Connect。\nLinked_Accounts \n\n授權 Docker Hub Builder\nAuthorize_Docker\n\n授權成功後，就會看到底下畫面。\nGitHub_Connected\n\n\n建立新的 Docker Hub Repository 並設定好 CI/CD\n接下來到 Repositories 頁面，建立新的 Docker Hub Repository \nCreate_Repository\n\n輸入 Repository 資訊，並且選擇剛剛連結的 GitHub 帳號，和選擇要整合的 GitHub Repository，然後點選 Create &amp; Build。\nCreate_and_Build\n\n接下來到 Repositories 頁面，會看到新的 Repository 建立好了 \ndockerlab_created \n\n點進去後就會到該 Repository 的頁面\ndockerlab_general\n\n來到 build 頁籤，就可以看到關於自動化建置的訊息 \ndocker_build_tab\n\n\n到這個步驟後，通常就設定好了。\nPush 新版本到 GitHub ，觸發 Docker Hub CI/CD為了實驗，我隨便做一個 push 一個 commit 到 GitHub - Docker.Lab 上，來確定是否有觸發 CI/CD。當我推上去後，在 build 頁籤裡就會看到一個新的 CI/CD 建置，如下圖。the_latest_build\n再點進去看，就會看到該建置的過程auto-build_success\n當建置成功後，就會把建置好的映像檔 Push 到 Docker Hub Repository 去了。\n進階設定簡單說明如果要做一些其他的進階設定，可以到 build 頁籤，點選 Configure_Automated_Builds\nConfigure_Automated_Builds\n這裡可以設定觸發規則，Dockerfile 位置，和 設定建置的環境變數， 相當實用。build_configuration\n小結Docker Hub 跟 GitHub 在 CI/CD 上整合真的做得很好，而且又很直覺，讓我在研究上不用花過多的時間，就完成了!!!\n延伸閱讀[Docker - Set up Automated builds][Docker - Configure Automated Builds from GitHub and BitBucket]\n","dateCreated":"2019-05-20T22:55:18+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-05-20T22:55:18+08:00","description":"Docker Hub 與 GitHub 的 CI/CD 整合做的非常的好，所以在設定上也非常的直覺，今天就要來介紹怎麼在 Docker Hub 與 GitHub 之間完成 CI/CD 的工作。","headline":"[Docker] 使用 GitHub 進行自動化建置","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/MilesLin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/","keywords":"Docker, GitHub, CI/CD"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"Docker Hub 與 GitHub 的 CI/CD 整合做的非常的好，所以在設定上也非常的直覺，今天就要來介紹怎麼在 Docker Hub 與 GitHub 之間完成 CI/CD 的工作。\n\n前提概要在文章開始之前一定要有 Docker Hub 帳號與 GitHub 帳號，並且準備好一個 GitHub Repository 裡面，且原始碼裡 一定要有 Dockerfile，這篇文章的 GitHub Repository 是以我的 GitHub - Docker.Lab 為範例，是一個 ASP.NET Core 專案，且原始碼裡面已經有一個可以建置的 Dockerfile。\n如果不知道怎麼在 CI/CD 建立可以建置的 Dockerfile，請先閱讀這篇文章 Docker 多階段建置映像檔 (multi-stage build)，以 ASP.NET Core 為例 。\n那麼，就讓我們開始吧。\n設定 GitHub 連結第一步驟我們要先讓 Docker Hub 與 GitHub 連結。\n\n請先到 https://cloud.docker.com 登入後，點選 Account Settings 。account_setting_menu\n\n\n\n到 Linked Accounts 頁籤， 點選 GitHub 的 Connect。\nLinked_Accounts \n\n授權 Docker Hub Builder\nAuthorize_Docker\n\n授權成功後，就會看到底下畫面。\nGitHub_Connected\n\n\n建立新的 Docker Hub Repository 並設定好 CI/CD\n接下來到 Repositories 頁面，建立新的 Docker Hub Repository \nCreate_Repository\n\n輸入 Repository 資訊，並且選擇剛剛連結的 GitHub 帳號，和選擇要整合的 GitHub Repository，然後點選 Create &amp; Build。\nCreate_and_Build\n\n接下來到 Repositories 頁面，會看到新的 Repository 建立好了 \ndockerlab_created \n\n點進去後就會到該 Repository 的頁面\ndockerlab_general\n\n來到 build 頁籤，就可以看到關於自動化建置的訊息 \ndocker_build_tab\n\n\n到這個步驟後，通常就設定好了。\nPush 新版本到 GitHub ，觸發 Docker Hub CI/CD為了實驗，我隨便做一個 push 一個 commit 到 GitHub - Docker.Lab 上，來確定是否有觸發 CI/CD。當我推上去後，在 build 頁籤裡就會看到一個新的 CI/CD 建置，如下圖。the_latest_build\n再點進去看，就會看到該建置的過程auto-build_success\n當建置成功後，就會把建置好的映像檔 Push 到 Docker Hub Repository 去了。\n進階設定簡單說明如果要做一些其他的進階設定，可以到 build 頁籤，點選 Configure_Automated_Builds\nConfigure_Automated_Builds\n這裡可以設定觸發規則，Dockerfile 位置，和 設定建置的環境變數， 相當實用。build_configuration\n小結Docker Hub 跟 GitHub 在 CI/CD 上整合真的做得很好，而且又很直覺，讓我在研究上不用花過多的時間，就完成了!!!\n延伸閱讀[Docker - Set up Automated builds][Docker - Configure Automated Builds from GitHub and BitBucket]\n","dateCreated":"2019-05-20T22:55:18+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2019-05-20T22:55:18+08:00","description":"Docker Hub 與 GitHub 的 CI/CD 整合做的非常的好，所以在設定上也非常的直覺，今天就要來介紹怎麼在 Docker Hub 與 GitHub 之間完成 CI/CD 的工作。","headline":"[Docker] 使用 GitHub 進行自動化建置","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2019/05/Docker-使用-GitHub-進行自動化建置/","keywords":"Docker, GitHub, CI/CD"}</script>
     <meta name="description" content="Docker Hub 與 GitHub 的 CI/CD 整合做的非常的好，所以在設定上也非常的直覺，今天就要來介紹怎麼在 Docker Hub 與 GitHub 之間完成 CI/CD 的工作。">
 <meta name="keywords" content="Docker">
 <meta property="og:type" content="blog">
@@ -109,19 +109,24 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name">Miles</h4>
+                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
+        <style>
+            .miles-define:hover {
+                color:rgb(85, 84, 84) !important;
+            }
+        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/ " title="Home">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -130,7 +135,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -139,7 +144,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -148,7 +153,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -157,7 +162,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -166,7 +171,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="#about" title="About">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -179,7 +184,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/MilesLin" target="_blank" rel="noopener" title="GitHub">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -188,7 +193,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -197,7 +202,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -206,7 +211,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -219,7 +224,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -834,7 +839,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                99 posts found
+                100 posts found
             </p>
         </div>
     </div>
@@ -842,7 +847,7 @@
 
         
         
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('/assets/images/gopher-cover.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-dbd16rvloemmuxdzniplmnxxvwoz24eya9wol0b7vvmlokgqsjivmb8dnscy.min.js"></script>
 <!--SCRIPTS END-->
