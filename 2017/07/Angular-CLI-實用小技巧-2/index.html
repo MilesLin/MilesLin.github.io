@@ -17,7 +17,7 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"\n建立元件與檔案 (service,class,interface ….)\n建立檔案時指令的預設值設定\n\n\n建立 Component 小技巧ng g c &lt; options &gt;\n\n\n\n\nOptions\nAlias\nDescription\n\n\n\n\n--flat\n\n不要建立 Component 資料夾\n\n\n--inline-template\n-it\n不會建立 .html，將 html template 寫在 .ts file\n\n\n--inline-style\n-is\n不會建立 .css，將 style 寫在 .ts file\n\n\n--spec false\n\n不會建立 .spec\n\n\n--prefix my\n\nselector 加上 my prefix. ex: my-pet instead of app-pet\n\n\n--dry-run\n-d\n顯示那些檔案會新增跟那些檔案會變更\n\n\n\n建立 Service 小技巧此功能也能用在建立 Component 上新增 service 並自動加入指定 module providersng g s my-service -m app.module\n\n建立 Classes, Interfaces, Enums 小技巧在 models 底下建立 classng g cl models/customer\n\n在 models 底下建立 interfaceng g i models/person\n\n在 models 底下建立 enumng g e models/gender\n\n建立預設值(超好用)此設定會寫在 .angular-cli.json 底下 defautls 區塊\n建立 component 時候，自動不產生 .specng set defaults.component.spec false\n\n","dateCreated":"2017-07-04T23:26:07+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-07-04T23:26:07+08:00","description":"\n建立元件與檔案 (service,class,interface ….)\n建立檔案時指令的預設值設定\n","headline":"[Angular] Angular CLI 實用小技巧 2","image":["defaults.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/","keywords":"Angular CLI, Angular","thumbnailUrl":"defaults.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"\n建立元件與檔案 (service,class,interface ….)\n建立檔案時指令的預設值設定\n\n\n建立 Component 小技巧ng g c &lt; options &gt;\n\n\n\n\nOptions\nAlias\nDescription\n\n\n\n\n--flat\n\n不要建立 Component 資料夾\n\n\n--inline-template\n-it\n不會建立 .html，將 html template 寫在 .ts file\n\n\n--inline-style\n-is\n不會建立 .css，將 style 寫在 .ts file\n\n\n--spec false\n\n不會建立 .spec\n\n\n--prefix my\n\nselector 加上 my prefix. ex: my-pet instead of app-pet\n\n\n--dry-run\n-d\n顯示那些檔案會新增跟那些檔案會變更\n\n\n\n建立 Service 小技巧此功能也能用在建立 Component 上新增 service 並自動加入指定 module providersng g s my-service -m app.module\n\n建立 Classes, Interfaces, Enums 小技巧在 models 底下建立 classng g cl models/customer\n\n在 models 底下建立 interfaceng g i models/person\n\n在 models 底下建立 enumng g e models/gender\n\n建立預設值(超好用)此設定會寫在 .angular-cli.json 底下 defautls 區塊\n建立 component 時候，自動不產生 .specng set defaults.component.spec false\n\n","dateCreated":"2017-07-04T23:26:07+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-07-04T23:26:07+08:00","description":"\n建立元件與檔案 (service,class,interface ….)\n建立檔案時指令的預設值設定\n","headline":"[Angular] Angular CLI 實用小技巧 2","image":["defaults.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/07/Angular-CLI-實用小技巧-2/","keywords":"Angular, Angular CLI","thumbnailUrl":"defaults.jpg"}</script>
     <meta name="description" content="建立元件與檔案 (service,class,interface ….) 建立檔案時指令的預設值設定">
 <meta name="keywords" content="Angular CLI,Angular">
 <meta property="og:type" content="blog">
@@ -100,24 +100,19 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
+                <h4 class="sidebar-profile-name">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
-        <style>
-            .miles-define:hover {
-                color:rgb(85, 84, 84) !important;
-            }
-        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
+                        <a class="sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -126,7 +121,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -135,7 +130,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -144,7 +139,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -153,7 +148,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -162,7 +157,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
+                        <a class="sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -175,7 +170,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
+                        <a class="sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -184,7 +179,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -193,7 +188,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -202,7 +197,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -215,7 +210,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>

@@ -17,7 +17,7 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 Angular CLI 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。\n\n建立專案首先我們要執行 cmd 指令 ng new my-app 建立 Angular 專案，Angular CLI 會幫我們建立這樣專案架構的專案Structure\nThe root folder負責放支援建置 app 的設定檔\n\n\n\n檔案\n說明\n\n\n\n\ne2e/\n負責放 End-to-End 測試程式碼的資料夾\n\n\nnode_modules/\nNode.js 建立的資料夾，負責放 third party modules 的資料夾，其 thrid party modules 清單則放在 package.json裡面\n\n\n.angular-cli.json\n放 Angular CLI 的設定檔 Angular CLI Config Schema\n\n\n.editorconfig\n幫助開發者使用不同的 IDEs 保持檔案格式一致性的設定檔 \n\n\n.gitignore\nGit 的設定檔，讓指定檔案不會 commit 到 Source control\n\n\nkarma.conf.js\nKarma test 的 unit tests 設定 Karma\n\n\npackage.json\nnpm 設定檔， third party 清單與版本資訊\n\n\nprotractor.conf.js\nAngular end-to-end test framework Protractor 設定檔\n\n\nREADME.md\nAngular CLI 基本指令文件\n\n\ntsconfig.json\nTypeScript 編譯器設定檔案\n\n\ntslint.json\n保持 code style 一致性的 TSLint 設定檔\n\n\n\nThe src folder寫程式碼的地方。  所有的 Angular components, templates, styles, images 等等…都放這邊。\nSrc\n\n\n\n檔案\n說明\n\n\n\n\napp/app.component.{ts,html,css,spec.ts}\n所有的 Componet、Service、Pipe、Unit test 等等..程式碼都是放在這個資料夾，而 app.component 則是 Angular CLI 預設建立的 root component\n\n\napp/app.module.ts\n預設的 root module ， 告訴 Angular 有哪些 Components 、Modules、 Services，讓 Angular 知道如何 assemble the application\n\n\nassets/*\n放圖片或者是建立 application 需要用的到材料\n\n\nenvironments/*\n設定 Angular 程式碼會用到的參數，很像 Web.config 的東西。  預設為 environment.ts ， 要產生不同的 environment 的話，參考命名規則為 environment.xxx.ts，在執行或者 build Angular application 的時候加入 xxx 的參數，則可以指定到該 environmnet ，例如 : ng build -xxx、 ng serve -xxx\n\n\nfavicon.ico\n網頁頁籤的 icon \n\n\nindex.html\n網頁進入點，當使用者拜訪網站的時候，是執行到這個頁面。  在大部分的情況，是不需用編輯的， Angular CLI 在 build application 的時候會自動加入 js 和 css\n\n\nmain.ts\n啟動 application root module(AppModule) 的編譯起始點\n\n\npolyfills.ts\n因為不同的瀏覽器會支援不同的 web standards， polyfills 就像補丁的概念，補足些沒有支援的部分。 Browser Support\n\n\nstyles.css\n放置 global styles 的 CSS\n\n\ntest.ts\nunit tests 的進入點，有些 unit tests 的設定也寫在這邊\n\n\ntsconfig.{app,spec}.json\nTypeScript 編譯設定檔 ，tsconfig.app.json for Angular app、 tsconfig.spec.json for unit tests\n\n\n\n參考CLI QUICKSTART","dateCreated":"2017-04-30T17:46:33+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-04-30T17:46:33+08:00","description":"從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 Angular CLI 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。","headline":"[Angular] 使用 Angular CLI 建立 Angular 專案架構說明","image":["Structure.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/","keywords":"Angular CLI, Angular","thumbnailUrl":"Structure.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg"},"articleBody":"從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 Angular CLI 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。\n\n建立專案首先我們要執行 cmd 指令 ng new my-app 建立 Angular 專案，Angular CLI 會幫我們建立這樣專案架構的專案Structure\nThe root folder負責放支援建置 app 的設定檔\n\n\n\n檔案\n說明\n\n\n\n\ne2e/\n負責放 End-to-End 測試程式碼的資料夾\n\n\nnode_modules/\nNode.js 建立的資料夾，負責放 third party modules 的資料夾，其 thrid party modules 清單則放在 package.json裡面\n\n\n.angular-cli.json\n放 Angular CLI 的設定檔 Angular CLI Config Schema\n\n\n.editorconfig\n幫助開發者使用不同的 IDEs 保持檔案格式一致性的設定檔 \n\n\n.gitignore\nGit 的設定檔，讓指定檔案不會 commit 到 Source control\n\n\nkarma.conf.js\nKarma test 的 unit tests 設定 Karma\n\n\npackage.json\nnpm 設定檔， third party 清單與版本資訊\n\n\nprotractor.conf.js\nAngular end-to-end test framework Protractor 設定檔\n\n\nREADME.md\nAngular CLI 基本指令文件\n\n\ntsconfig.json\nTypeScript 編譯器設定檔案\n\n\ntslint.json\n保持 code style 一致性的 TSLint 設定檔\n\n\n\nThe src folder寫程式碼的地方。  所有的 Angular components, templates, styles, images 等等…都放這邊。\nSrc\n\n\n\n檔案\n說明\n\n\n\n\napp/app.component.{ts,html,css,spec.ts}\n所有的 Componet、Service、Pipe、Unit test 等等..程式碼都是放在這個資料夾，而 app.component 則是 Angular CLI 預設建立的 root component\n\n\napp/app.module.ts\n預設的 root module ， 告訴 Angular 有哪些 Components 、Modules、 Services，讓 Angular 知道如何 assemble the application\n\n\nassets/*\n放圖片或者是建立 application 需要用的到材料\n\n\nenvironments/*\n設定 Angular 程式碼會用到的參數，很像 Web.config 的東西。  預設為 environment.ts ， 要產生不同的 environment 的話，參考命名規則為 environment.xxx.ts，在執行或者 build Angular application 的時候加入 xxx 的參數，則可以指定到該 environmnet ，例如 : ng build -xxx、 ng serve -xxx\n\n\nfavicon.ico\n網頁頁籤的 icon \n\n\nindex.html\n網頁進入點，當使用者拜訪網站的時候，是執行到這個頁面。  在大部分的情況，是不需用編輯的， Angular CLI 在 build application 的時候會自動加入 js 和 css\n\n\nmain.ts\n啟動 application root module(AppModule) 的編譯起始點\n\n\npolyfills.ts\n因為不同的瀏覽器會支援不同的 web standards， polyfills 就像補丁的概念，補足些沒有支援的部分。 Browser Support\n\n\nstyles.css\n放置 global styles 的 CSS\n\n\ntest.ts\nunit tests 的進入點，有些 unit tests 的設定也寫在這邊\n\n\ntsconfig.{app,spec}.json\nTypeScript 編譯設定檔 ，tsconfig.app.json for Angular app、 tsconfig.spec.json for unit tests\n\n\n\n參考CLI QUICKSTART","dateCreated":"2017-04-30T17:46:33+08:00","dateModified":"2020-07-23T22:37:19+08:00","datePublished":"2017-04-30T17:46:33+08:00","description":"從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 Angular CLI 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。","headline":"[Angular] 使用 Angular CLI 建立 Angular 專案架構說明","image":["Structure.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/"},"publisher":{"@type":"Organization","name":"Miles","sameAs":["https://github.com/mileslin","https://www.linkedin.com/in/miles-lin-328492138","https://app.pluralsight.com/profile/miles-lin","https://medium.com/@milesasp"],"image":"selfie.jpg","logo":{"@type":"ImageObject","url":"selfie.jpg"}},"url":"https://mileslin.github.io/2017/04/使用-Angular-CLI-建立-Angular-專案架構說明/","keywords":"Angular, Angular CLI","thumbnailUrl":"Structure.jpg"}</script>
     <meta name="description" content="從頭建立 Angular 專案是一件很麻煩的事情，所以通常都會用 Angular CLI 建立 Anuglar 專案，而今天則要說明 Angular CLI 建立 Angular 專案的檔案內容。">
 <meta name="keywords" content="Angular">
 <meta property="og:type" content="blog">
@@ -102,24 +102,19 @@
                 <a href="/#about">
                     <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/05bae9a97d25f82a00f54f2e2b8a3320?s=110" alt="Author&#39;s picture">
                 </a>
-                <h4 class="sidebar-profile-name" style="color:rgb(46, 46, 46)">Miles</h4>
+                <h4 class="sidebar-profile-name">Miles</h4>
                 
-                    <h5 class="sidebar-profile-bio" style="color:black"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
+                    <h5 class="sidebar-profile-bio"><p>I’m a person who is enthusiastic about Coding, and that’s my job by the way.</p>
 </h5>
                 
             </div>
         
-        <style>
-            .miles-define:hover {
-                color:rgb(85, 84, 84) !important;
-            }
-        </style>
         
             <ul class="sidebar-buttons">
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="/ " title="Home">
+                        <a class="sidebar-button-link " href="/ " title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -128,7 +123,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-categories" title="Categories">
+                        <a class="sidebar-button-link " href="/all-categories" title="Categories">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories</span>
@@ -137,7 +132,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-tags" title="Tags">
+                        <a class="sidebar-button-link " href="/all-tags" title="Tags">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags</span>
@@ -146,7 +141,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="/all-archives" title="Archives">
+                        <a class="sidebar-button-link " href="/all-archives" title="Archives">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives</span>
@@ -155,7 +150,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link open-algolia-search" href="#search" title="Search">
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="Search">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Search</span>
@@ -164,7 +159,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="#about" title="About">
+                        <a class="sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -177,7 +172,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
+                        <a class="sidebar-button-link " href="https://github.com/mileslin" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -186,7 +181,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/miles-lin-328492138" target="_blank" rel="noopener" title="LinkedIn">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn</span>
@@ -195,7 +190,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
+                        <a class="sidebar-button-link " href="https://app.pluralsight.com/profile/miles-lin" target="_blank" rel="noopener" title="Pluralsight">
                     
                         <i class="sidebar-button-icon far fa-play-circle" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Pluralsight</span>
@@ -204,7 +199,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
+                        <a class="sidebar-button-link " href="https://medium.com/@milesasp" target="_blank" rel="noopener" title="Medium">
                     
                         <i class="sidebar-button-icon fab fa-medium" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Medium</span>
@@ -217,7 +212,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a style="color:black" class="miles-define sidebar-button-link " href="/atom.xml" title="RSS">
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
