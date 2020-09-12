@@ -225,6 +225,58 @@
             <div class="postShorten-header">
                 <h1 class="postShorten-title">
                     
+                        <a class="link-unstyled" href="/2020/09/Golang/os-OpenFile-的第三個參數-perm-FileMode/">
+                            [Go] os.OpenFile 的第三個參數 perm FileMode
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2020-09-12T11:00:11+08:00">
+	
+		    Sep 12, 2020
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Go/">Go</a>
+
+
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-excerpt">
+                    <p>當用 Go 操作檔案的時候，很常會用到 <code>os.OpenFile</code> 讀寫檔案，而其中最後一參數 <code>perm FileMode</code> 所代表的含意對於 Windows 使用者來說肯定是黑人問號，例如下列範例，傳入 <code>os.FileMode(0660)</code> 代表什麼意思?</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">os.OpenFile(<span class="string">"file.txt"</span>, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(<span class="number">0660</span>))</span><br></pre></td></tr></table></figure>
+<p>如果你也有同樣的困惑，今天這篇文章就是來解答其背後的意義，就讓我們開始吧。</p>
+                    
+                        <a href="/2020/09/Golang/os-OpenFile-的第三個參數-perm-FileMode/" class="postShorten-excerpt_link link">
+                            Continue reading
+                        </a>
+                        
+                    
+                </div>
+            
+        </div>
+        
+            <a href="/2020/09/Golang/os-OpenFile-的第三個參數-perm-FileMode/">
+                <div class="postShorten-thumbnailimg">
+                    <img alt src="https://mileslin.github.io/2020/09/Golang/os-OpenFile-的第三個參數-perm-FileMode/gopher-std.png">
+                </div>
+            </a>
+            
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-right">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
                         <a class="link-unstyled" href="/2020/08/Golang/到底-go-get-的版號怎麼運作的/">
                             [Go] 到底 go get 的版號怎麼運作的?
                         </a>
@@ -635,51 +687,6 @@
         
     </article>
     
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/2020/04/Golang/gRCP-Bidirectional-streaming/">
-                            [Go] gRCP Bidirectional streaming
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2020-04-03T16:30:37+08:00">
-	
-		    Apr 03, 2020
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Go/">Go</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <p>寫完 <a href="https://mileslin.github.io/2020/04/Golang/gRCP-Server-streaming/">gRCP Server streaming</a> 和 <a href="https://mileslin.github.io/2020/04/Golang/gRCP-Client-streaming/">gRCP Client streaming</a> 後，終於來到最後一個 Bidirectional streaming ，這個是雙向的 streaming， Client/Server 可以 <span class="highlight-text primary">收到</span>
- 與 <span class="highlight-text primary">送出
- </span> 多個訊息。</p>
-                    
-                        <a href="/2020/04/Golang/gRCP-Bidirectional-streaming/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
     <div class="pagination-bar">
     <ul class="pagination">
         
@@ -691,7 +698,7 @@
             </a>
           </li>
         
-        <li class="pagination-number">page 1 of 10</li>
+        <li class="pagination-number">page 1 of 11</li>
     </ul>
 </div>
 
@@ -991,7 +998,7 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium" data-message-zero="no post found" data-message-one="1 post found" data-message-other="{n} posts found">
-                100 posts found
+                101 posts found
             </p>
         </div>
     </div>
